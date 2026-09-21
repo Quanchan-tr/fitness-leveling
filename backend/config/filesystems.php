@@ -3,30 +3,49 @@
 declare(strict_types=1);
 
 return [
-    'default' => env('FILESYSTEM_DISK', 's3'),
+    /*
+    |--------------------------------------------------------------------------
+    | Default Filesystem Disk
+    |--------------------------------------------------------------------------
+    | MVP uses local storage. No S3 / MinIO required.
+    */
+    'default' => env('FILESYSTEM_DISK', 'local'),
+
     'disks' => [
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app'),
-            'throw' => false,
+            'root'   => storage_path('app'),
+            'throw'  => false,
         ],
+
         'public' => [
-            'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => env('APP_URL') . '/storage',
+            'driver'     => 'local',
+            'root'       => storage_path('app/public'),
+            'url'        => env('APP_URL') . '/storage',
             'visibility' => 'public',
-            'throw' => false,
+            'throw'      => false,
         ],
-        's3' => [
-            'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
-            'bucket' => env('AWS_BUCKET', 'fittrack-user-assets'),
-            'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', true),
-            'throw' => false,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Private Disk
+        |--------------------------------------------------------------------------
+        | Used exclusively for pose-check video files. Files are never publicly
+        | accessible — Laravel checks ownership before serving. Path structure:
+        |
+        |   storage/app/private/pose-videos/{user_id}/{session_id}.{ext}
+        |
+        | This disk is also shared with the Python CV Worker via Docker named
+        | volume (private_storage) mounted at /var/www/html/storage/app/private.
+        */
+        'private' => [
+            'driver' => 'local',
+            'root'   => storage_path('app/private'),
+            'throw'  => true,
         ],
+    ],
+
+    'links' => [
+        public_path('storage') => storage_path('app/public'),
     ],
 ];

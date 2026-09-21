@@ -26,27 +26,35 @@ services:
       - "8000:8000"
     env_file:
       - ./backend/.env
+    volumes:
+      # Shared private storage: accessible by backend, queue-worker, and pose-worker
+      - private_storage:/var/www/html/storage/app/private
     depends_on:
       - postgres
-      - redis
-      - minio
 
   # --- LARAVEL QUEUE WORKER ---
+  # Runs php artisan queue:work with the database driver (PostgreSQL jobs table).
+  # No Redis required: queue state lives entirely in PostgreSQL.
   queue-worker:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: fittrack-queue-worker
     restart: unless-stopped
-    command: ["php", "artisan", "queue:work", "redis", "--queue=pose_processing,default", "--tries=2", "--timeout=180"]
+    command: ["php", "artisan", "queue:work", "database", "--queue=pose_processing,default", "--tries=2", "--timeout=180"]
     env_file:
       - ./backend/.env
+    volumes:
+      # Must share the same private storage volume to read uploaded videos
+      - private_storage:/var/www/html/storage/app/private
     depends_on:
       - backend
-      - redis
+      - postgres
       - pose-worker
 
   # --- PYTHON POSE WORKER (FASTAPI + MEDIAPIPE) ---
+  # Internal service only — not exposed to clients.
+  # Reads videos from the shared private_storage volume.
   pose-worker:
     build:
       context: ./pose-worker
@@ -59,8 +67,14 @@ services:
       - PORT=8001
       - POSE_VIDEO_MAX_SIZE_MB=100
       - POSE_VIDEO_MAX_DURATION_SEC=60
+      # Shared storage mount path (same volume as backend)
+      - PRIVATE_STORAGE_PATH=/app/private_storage
+    volumes:
+      # Pose worker reads videos directly from the shared volume
+      - private_storage:/app/private_storage
 
   # --- DATABASE (POSTGRESQL 16) ---
+  # Single source of truth: business data + database queue (jobs table).
   postgres:
     image: postgres:16-alpine
     container_name: fittrack-postgres
@@ -74,32 +88,8 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  # --- CACHE & QUEUE BROKER (REDIS 7.2) ---
-  redis:
-    image: redis:7.2-alpine
-    container_name: fittrack-redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redisdata:/data
-
-  # --- S3-COMPATIBLE OBJECT STORAGE (MINIO) ---
-  minio:
-    image: quay.io/minio/minio:latest
-    container_name: fittrack-minio
-    restart: unless-stopped
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - miniodata:/data
-
 volumes:
   pgdata:
-  redisdata:
-  miniodata:
+  # Named volume for pose video files — shared between backend, queue-worker, and pose-worker.
+  # No S3/MinIO required for MVP.
+  private_storage:
