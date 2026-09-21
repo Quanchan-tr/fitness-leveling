@@ -1,18 +1,18 @@
 # FitTrack AI — 3D Fitness Tracking & AI Pose Check Platform
 
-<div align="center"> 
+<div align="center">
 
-![FitTrack Banner](https://img.shields.io/badge/FitTrack%20AI-v2.0-FF6B35?style=for-the-badge&logo=flame&logoColor=white)
+![FitTrack Banner](https://img.shields.io/badge/FitTrack%20AI-v2.0_Course_MVP-FF6B35?style=for-the-badge&logo=flame&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js%2014-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel%2011-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
 ![Python](https://img.shields.io/badge/Python%203.11-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL%2016-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis%207-DC382D?style=for-the-badge&logo=redis&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker%20Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 **Nền tảng theo dõi luyện tập & dinh dưỡng cá nhân hóa tích hợp AI, chấm điểm kỹ thuật động tác (Pose Check) qua Computer Vision và Dashboard 3D Home-Gym tĩnh cách điệu.**
 
-[Tính năng](#-tính-năng-cốt-lõi) • [Kiến trúc](#-kiến-trúc-kỹ-thuật) • [Quy tắc 3D](#-quy-tắc-dashboard-3d) • [Cài đặt & Chạy](#-hướng-dẫn-cài-đặt--khởi-chạy) • [API Specification](#-api-endpoints)
+[Tính năng](#-tính-năng-cốt-lõi) • [Kiến trúc v2 MVP](#-kiến-trúc-kỹ-thuật-v2-course-mvp) • [Quy tắc 3D](#-quy-tắc-dashboard-3d) • [Cài đặt & Chạy](#-hướng-dẫn-cài-đặt--khởi-chạy) • [API Specification](#-api-endpoints)
 
 </div>
 
@@ -20,9 +20,12 @@
 
 ## 📖 Giới thiệu (Overview)
 
-**FitTrack AI** là giải pháp toàn diện kết hợp giữa công cụ ghi chép thể hình (Workout & Nutrition Logging), trợ lý AI lập kế hoạch cá nhân hóa, công nghệ thị giác máy tính chấm form tập trực tiếp trên trình duyệt, cùng không gian trải nghiệm **3D Home-Gym Dashboard** trực quan.
+**FitTrack AI** là giải pháp toàn diện kết hợp giữa công cụ ghi chép thể hình (Workout & Nutrition Logging), trợ lý AI lập kế hoạch cá nhân hóa, công nghệ thị giác máy tính chấm form tập trực tiếp trên trình duyệt (Edge MediaPipe) và phân tích chuyên sâu qua video bất đồng bộ (Python CV Worker), cùng không gian trải nghiệm **3D Home-Gym Dashboard** trực quan.
 
-Dự án được xây dựng dựa trên tài liệu **Đề xuất dự án v1.0** và **Tài liệu Thiết kế Kỹ thuật v2.0** (`tech_design_reword.md`), loại bỏ toàn bộ kiến trúc cũ để chuẩn hóa theo mô hình *Unified Laravel Monolith API + Decoupled Asynchronous Python CV Worker + Client-Side Edge Inference (Next.js/React)*.
+Dự án được xây dựng và chuẩn hóa theo tài liệu kiến trúc **FitTrack AI System Design v2.0 (Course Project MVP)**:
+- **Tối giản hạ tầng (Infrastructure Simplification)**: Loại bỏ các dependency phức tạp bên ngoài như Redis, MinIO/AWS S3, Nginx proxy, tập trung vào **PostgreSQL 16 làm Single Source of Truth** (lưu trữ nghiệp vụ, Database Queue `jobs`, Database Cache & Atomic Locks, Idempotency Records).
+- **Lưu trữ video an toàn**: Sử dụng **Laravel Private Local Storage** trên Docker Named Volume (`private_storage`) dùng chung giữa Backend, Queue Worker và Python Pose Worker, loại bỏ sự phụ thuộc vào S3 presigned URL.
+- **Ranh giới hệ thống rõ ràng**: Unified Laravel Monolith API + Decoupled Asynchronous Python CV Worker + Client-Side Edge Inference (Next.js 14 App Router + Three.js).
 
 ---
 
@@ -50,7 +53,11 @@ Dự án được xây dựng dựa trên tài liệu **Đề xuất dự án v1
 
 ### 5. 🤖 AI Coach Studio & Edge Pose Check (`/ai-coach`)
 - **AI Pose Check thời gian thực (Edge Computing)**: Trích xuất 33 mốc xương cơ thể qua MediaPipe WebAssembly/WebGL trực tiếp tại trình duyệt client, tính góc khớp và chấm điểm form tập (Squat, Push-up, Plank) với độ trễ < 50ms.
-- **Async Video Upload**: Tải lên video bài tập ($\le 100\text{ MB}$, $\le 60\text{s}$) lên S3 Private Bucket, đưa vào hàng đợi Redis để Python Worker phân tích chi tiết từng giây chuyển động.
+- **Async Video Pose Check (Phân tích video bất đồng bộ)**:
+  - Tải lên video bài tập ($\le 100\text{ MB}$, $\le 60\text{s}$) qua API `/api/v1/pose-check/upload`.
+  - Video được lưu trữ bảo mật tại **Laravel Private Local Storage** (`storage/app/private/pose-checks/`).
+  - Đẩy công việc vào **Laravel Database Queue** (`jobs` table trên PostgreSQL).
+  - **Python CV Worker** đọc video trực tiếp từ shared volume `/app/private_storage`, phân tích kinematic angles qua MediaPipe + OpenCV và trả kết quả tổng hợp (Reps, Form Score, Lỗi sai & Khuyến nghị) cập nhật vào PostgreSQL.
 - **AI Workout & Meal Planner**: Sinh lịch tập và thực đơn theo mục tiêu (`lose_weight`, `gain_muscle`, `maintain`) với cơ chế **Triple-Layer Fallback** (Local JSON Repair $\rightarrow$ Prompt Retry $\rightarrow$ Static Expert Templates) đảm bảo hệ thống không bao giờ trả về lỗi thô.
 
 ### 6. 🌐 Exercise Library & Community (`/community`)
@@ -59,7 +66,7 @@ Dự án được xây dựng dựa trên tài liệu **Đề xuất dự án v1
 
 ---
 
-## 🏗️ Kiến trúc kỹ thuật (Architecture)
+## 🏗️ Kiến trúc kỹ thuật (v2 Course MVP)
 
 ```
                        +-----------------------------------+
@@ -75,52 +82,57 @@ Dự án được xây dựng dựa trên tài liệu **Đề xuất dự án v1
 +-----------------------------------------------------------------------------------+
 |                            LARAVEL 11 API BACKEND                                 |
 |  - Laravel Sanctum Authentication                                                 |
-|  - Request Validation & Idempotency Key Lock (Redis Atomic Locks)                 |
+|  - Request Validation & Idempotency Key Lock (Database Lock & Idempotency Table)  |
 |  - AI Orchestrator (Triple-Layer Fallback & Sanitization)                         |
-|  - S3 Storage Manager (Pre-signed URL Generator)                                  |
+|  - Private Video Storage Service (Local Secure Storage)                           |
 +-----------+---------------------+-------------------+---------------------+-------+
             |                     |                   |                     |
-     (SQL Queries)         (Cache & Queues)     (Private Video)       (Structured Prompt)
+     (SQL Queries)         (Queue & Locks)     (Save Video File)      (Structured Prompt)
             v                     v                   v                     v
-  +------------------+   +-----------------+ +-----------------+  +-------------------+
-  |    PostgreSQL    |   |      Redis      | |  MinIO / AWS S3 |  |  External LLM API |
-  | (Primary RDBMS)  |   | (Queue + Cache) | | Object Storage  |  | (OpenAI / Claude) |
-  +------------------+   +--------+--------+ +--------+--------+  +-------------------+
-                                  |                   ^
-                           (Pops Job)                 | (Fetch Video)
-                                  v                   |
-                         +-----------------+          |
-                         |  Laravel Queue  |          |
-                         |     Worker      +----------+
-                         +--------+--------+
-                                  |
-                (Internal Private |
-                 REST Task :8001) v
-                         +-----------------+
-                         |   Python Pose   |
-                         |  Worker (CV)    |
-                         | MediaPipe/OpenCV|
-                         +-----------------+
+  +-------------------------------------+   +-----------------+   +-------------------+
+  |            POSTGRESQL 16            |   | Shared Volume   |   |  External LLM API |
+  |      (Single Source of Truth)       |   | private_storage |   | (OpenAI / Claude) |
+  |  - Business Models (UUID)           |   | (Pose Check Vid)|   +-------------------+
+  |  - Database Queue (`jobs`)          |   +--------+--------+
+  |  - Database Cache & Locks (`cache`) |            ^
+  |  - Idempotency (`idempotency_rec`)  |            | (Direct File Read via Mount)
+  +------------------+------------------+            |
+                     |                               |
+              (Pops Job from DB)                     |
+                     v                               |
+            +-----------------+                      |
+            |  Laravel Queue  |                      |
+            |     Worker      +----------------------+
+            +--------+--------+                      |
+                     |                               |
+   (Internal Private |                               |
+    REST Task :8001) v                               |
+            +-----------------+                      |
+            |   Python Pose   |                      |
+            |   Worker (CV)   +----------------------+
+            | MediaPipe/OpenCV|
+            +-----------------+
 ```
 
 ### Chi tiết Stack công nghệ:
 - **Frontend**: Next.js 14 (App Router), React 18, TypeScript, Tailwind CSS, Three.js, `@react-three/fiber`, `@react-three/drei`, Lucide React.
-- **Backend**: PHP 8.3, Laravel 11.x, Laravel Sanctum, Eloquent ORM, `predis/predis`, `opis/json-schema`.
-- **AI Pose Worker**: Python 3.11+, FastAPI, OpenCV headless, MediaPipe, NumPy, Pydantic v2, boto3.
-- **Cơ sở dữ liệu & Cache**: PostgreSQL 16 (UUID primary keys, JSONB, Soft deletes) + Redis 7.2 (Queues, Cache, Idempotency locks).
-- **Lưu trữ Object Storage**: MinIO (Local) / AWS S3 (Production) với Private Bucket & Pre-signed URLs tạm thời.
+- **Backend API**: PHP 8.3, Laravel 11.x, Laravel Sanctum, Eloquent ORM, Database Queue Driver, Database Cache & Atomic Locks, `guzzlehttp/guzzle`, `opis/json-schema`.
+- **AI Pose Worker**: Python 3.11+, FastAPI, OpenCV headless, MediaPipe, NumPy, Pydantic v2 (Xử lý trực tiếp file hệ thống, không dùng boto3/S3).
+- **Cơ sở dữ liệu**: PostgreSQL 16 (UUID primary keys, JSONB, Soft deletes, jobs queue, cache locks, idempotency table).
+- **Lưu trữ Video**: Docker Named Volume (`private_storage`) gắn kết tại `/var/www/html/storage/app/private` (Backend/Queue Worker) và `/app/private_storage` (Python Worker).
+- **Phạm vi MVP**: Hoàn toàn **không dùng** Redis, MinIO/S3, Nginx, Kafka, hay microservice phân mảnh — tối ưu hóa tài nguyên cho môi trường Course Project MVP.
 
 ---
 
 ## 📐 Quy tắc Dashboard 3D (3D Rules)
 
 Theo tài liệu đặc tả, giao diện 3D tuân thủ nghiêm ngặt các nguyên tắc:
-1. **Camera cố định**: Góc nhìn 3/4 isometric chuẩn, không dùng `OrbitControls` trên môi trường sản xuất.
+1. **Camera cố định**: Góc nhìn 3/4 isometric chuẩn (`[7.2, 6.2, 7.2]`), không dùng `OrbitControls` trên môi trường sản xuất.
 2. **Không biến thành Game**: Không di chuyển nhân vật bằng phím WASD, không cơ chế chiến đấu/nhập vai phức tạp.
 3. **Đúng 2 tương tác hợp lệ**:
    - **Wall Note**: Mở Body Metrics modal.
    - **Progress Photo Album**: Mở Photo Timeline modal.
-4. **Các vật thể khác strictly trang trí**: Giàn tạ (Weight Rack), Gương (Mirror), Cúp (Trophy) chỉ đóng vai trò thẩm mỹ, không kích hoạt route sai quy định.
+4. **Các vật thể khác strictly trang trí**: Giàn tạ (Weight Rack), Gương (Mirror), Thảm tập (Gym Mat), Kệ cây chỉ đóng vai trò thẩm mỹ, không kích hoạt route sai quy định.
 
 ---
 
@@ -141,16 +153,15 @@ Theo tài liệu đặc tả, giao diện 3D tuân thủ nghiêm ngặt các ngu
    docker compose up -d --build
    ```
 
-3. **Chạy Migration cơ sở dữ liệu**:
+3. **Chạy Migration & Seed cơ sở dữ liệu**:
    ```bash
-   docker compose exec backend php artisan migrate
+   docker compose exec backend php artisan migrate --seed
    ```
 
 4. **Truy cập các dịch vụ**:
    - 🌐 **Web App Frontend**: [http://localhost:3000](http://localhost:3000)
    - 🔌 **Laravel API Backend**: [http://localhost:8000/api/v1](http://localhost:8000/api/v1)
-   - 🧠 **Python Pose Worker Docs**: [http://localhost:8001/docs](http://localhost:8001/docs)
-   - 📦 **MinIO S3 Storage Console**: [http://localhost:9001](http://localhost:9001) (`minioadmin` / `minioadmin`)
+   - 🧠 **Python Pose Worker Swagger Docs**: [http://localhost:8001/docs](http://localhost:8001/docs)
 
 ---
 
@@ -200,23 +211,18 @@ Theo tài liệu đặc tả, giao diện 3D tuân thủ nghiêm ngặt các ngu
 | `POST` | `/api/v1/ai/exercise-plan` | User | **Có** | AI sinh lịch tập cá nhân hóa |
 | `POST` | `/api/v1/ai/meal-plan` | User | **Có** | AI sinh thực đơn dinh dưỡng |
 | `POST` | `/api/v1/pose-check/realtime/result` | User | Không | Gửi tóm tắt kết quả chấm form real-time |
-| `POST` | `/api/v1/pose-check/upload` | User | **Có** | Upload video bài tập lên S3 & Queue |
-| `GET` | `/api/v1/pose-check/sessions/{id}` | User | Không | Polling kết quả phân tích video và link Pre-signed |
+| `POST` | `/api/v1/pose-check/upload` | User | **Có** | Upload video bài tập lên Private Local Storage & đẩy Job vào Queue |
+| `GET` | `/api/v1/pose-check/sessions/{id}` | User | Không | Polling kết quả phân tích video bài tập (Session status, reps, score, feedback) |
 
 ---
 
 ## 📁 Cấu trúc thư mục dự án
 
 ```text
-Fitness-tracking-3d/
-├── .gitignore                     # Master gitignore cấu hình toàn diện
-├── docker-compose.yml             # Orchestration cho toàn bộ stack
+fitness-leveling/
+├── .gitignore                     # Gitignore chuẩn hóa cho full stack
+├── docker-compose.yml             # Orchestration: frontend, backend, queue-worker, pose-worker, postgres
 ├── README.md                      # Tài liệu hướng dẫn chính của dự án
-├── docs/                          # Tài liệu kỹ thuật và thiết kế
-│   ├── FitTrack-AI-De-xuat-du-an.docx
-│   ├── tech_design_reword.md      # Tài liệu chuẩn thiết kế v2.0
-│   ├── implementation-status.md   # Nhật ký và trạng thái triển khai
-│   └── setup-guide.md             # Hướng dẫn chi tiết môi trường
 ├── frontend/                      # Next.js 14 App Router + Three.js
 │   ├── Dockerfile
 │   ├── package.json
@@ -227,7 +233,7 @@ Fitness-tracking-3d/
 │       ├── components/
 │       │   ├── layout/            # Sidebar, TopBar
 │       │   └── home/              # FitnessRoom, TodayPanel, CharacterTag, Modals
-│       │       └── 3d/            # RoomStructure, Character, WallNote, ProgressPhotoAlbum, GymMat, WeightRack, BedArea, RoomLighting
+│       │       └── 3d/            # RoomStructure, Character, WallNote, ProgressPhotoAlbum, GymMat, WeightRack, BedArea
 │       └── lib/                   # fitnessData.ts, api.ts
 ├── backend/                       # Laravel 11.x Monolith API
 │   ├── Dockerfile
@@ -237,23 +243,28 @@ Fitness-tracking-3d/
 │   │   ├── Http/
 │   │   │   ├── Controllers/Api/V1/# Auth, Workout, Nutrition, Metrics, Exercise, AI, PoseCheck
 │   │   │   └── Middleware/        # IdempotencyMiddleware, EnsureUserIsAdmin
-│   │   ├── Jobs/                  # ProcessPoseCheckJob
+│   │   ├── Jobs/                  # ProcessPoseCheckJob (Database Queue)
 │   │   ├── Models/                # User, Exercise, WorkoutLog, NutritionLog, PoseCheckSession...
-│   │   └── Services/              # AiOrchestrationService, StaticPlanFallback, PoseWorkerClient...
-│   ├── database/migrations/       # 9 migration files với UUID, Foreign Keys, Indexes
-│   └── routes/api.php             # /api/v1 endpoints
+│   │   └── Services/
+│   │       ├── Ai/                # AiOrchestrationService, StaticPlanFallback...
+│   │       └── Pose/              # PrivateVideoStorageService, PoseWorkerClient
+│   ├── database/migrations/       # Migrations: users, exercises, logs, sessions, cache, jobs, idempotency_records...
+│   └── routes/api.php             # /api/v1 REST endpoints
 └── pose-worker/                   # Python 3.11+ FastAPI Computer Vision Worker
     ├── Dockerfile
-    ├── requirements.txt
+    ├── requirements.txt           # fastapi, uvicorn, mediapipe, opencv-headless, numpy, pydantic
     └── app/
         ├── cv/                    # angle_math.py (Kinematics)
         ├── rules/                 # squat_rule.py, pushup_rule.py, plank_rule.py
-        ├── schemas/               # Pydantic request & response schemas
-        └── main.py                # FastAPI endpoint POST /v1/process-video
+        ├── schemas/               # request.py (video_path), response.py
+        └── main.py                # POST /v1/process-video (đọc video từ shared volume)
 ```
 
 ---
 
 ## 🔒 Bản quyền & Bảo mật
 
-- Dự án được phát triển theo tiêu chuẩn an toàn bảo mật: Không lưu khóa API cứng trong mã nguồn, tự động khử trùng dữ liệu nhạy cảm (PII Sanitization) trước khi gửi tới LLM, và cách ly dữ liệu người dùng tuyệt đối qua UUID và Laravel Policies.
+- **Không hardcode thông tin nhạy cảm**: Toàn bộ secrets và API keys được nạp qua biến môi trường (`.env`).
+- **PII Sanitization**: Tự động khử trùng dữ liệu nhận dạng cá nhân trước khi gửi prompt tới External LLM.
+- **Bảo mật file video riêng tư**: Video bài tập được lưu trữ tại Private Local Storage, không public ra Internet, chỉ được truy cập nội bộ thông qua đường dẫn bảo mật giữa Backend và Worker container.
+- **Bảo vệ toàn vẹn dữ liệu**: Quản lý phiên làm việc bằng Laravel Sanctum Bearer Token, UUID và kiểm soát tránh trùng lặp thao tác bằng Database Idempotency Locks.
