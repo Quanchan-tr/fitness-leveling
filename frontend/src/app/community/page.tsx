@@ -4,218 +4,180 @@
 import React, { useState } from 'react';
 import { TopBar } from '@/components/layout/TopBar';
 import { initialFitnessData } from '@/lib/fitnessData';
-import { Users, Search, Star, ShieldCheck, Video, Dumbbell, Flag, Plus } from 'lucide-react';
-
-interface ExerciseItem {
-  id: string;
-  name: string;
-  muscleGroup: string;
-  equipment: string;
-  difficulty: string;
-  hasPoseCheck: boolean;
-  verified: boolean;
-  avgRating: number;
-  ratingCount: number;
-  description: string;
-}
+import { initialCommunityPosts, ExercisePostItem } from '@/types/community';
+import { FeedFilterBar } from '@/components/community/FeedFilterBar';
+import { PostComposer } from '@/components/community/PostComposer';
+import { ExercisePost } from '@/components/community/ExercisePost';
+import { ExerciseDetailModal } from '@/components/community/ExerciseDetailModal';
+import { ReportModal } from '@/components/community/ReportModal';
+import { SearchX, Sparkles } from 'lucide-react';
 
 export default function CommunityPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterGroup, setFilterGroup] = useState('all');
   const [onlyPoseCheck, setOnlyPoseCheck] = useState(false);
 
-  const [exercises] = useState<ExerciseItem[]>([
-    {
-      id: '1',
-      name: 'Barbell Back Squat',
-      muscleGroup: 'legs',
-      equipment: 'barbell',
-      difficulty: 'intermediate',
-      hasPoseCheck: true,
-      verified: true,
-      avgRating: 4.9,
-      ratingCount: 142,
-      description: 'Fundamental lower body compound exercise focusing on quadriceps, glutes, and core stability.',
-    },
-    {
-      id: '2',
-      name: 'Standard Push-up',
-      muscleGroup: 'chest',
-      equipment: 'bodyweight',
-      difficulty: 'beginner',
-      hasPoseCheck: true,
-      verified: true,
-      avgRating: 4.8,
-      ratingCount: 98,
-      description: 'Classic calisthenic upper body pushing exercise targeting pectorals, anterior deltoids, and triceps.',
-    },
-    {
-      id: '3',
-      name: 'Forearm Plank Hold',
-      muscleGroup: 'core',
-      equipment: 'bodyweight',
-      difficulty: 'beginner',
-      hasPoseCheck: true,
-      verified: true,
-      avgRating: 4.7,
-      ratingCount: 85,
-      description: 'Isometric core stability posture engaging rectus abdominis, obliques, and spinal erectors.',
-    },
-    {
-      id: '4',
-      name: 'Conventional Deadlift',
-      muscleGroup: 'back',
-      equipment: 'barbell',
-      difficulty: 'advanced',
-      hasPoseCheck: false,
-      verified: true,
-      avgRating: 4.95,
-      ratingCount: 210,
-      description: 'Posterior chain compound powerhouse targeting glutes, hamstrings, and the entire back structure.',
-    },
-    {
-      id: '5',
-      name: 'Incline Dumbbell Press',
-      muscleGroup: 'chest',
-      equipment: 'dumbbell',
-      difficulty: 'intermediate',
-      hasPoseCheck: false,
-      verified: false,
-      avgRating: 4.6,
-      ratingCount: 43,
-      description: 'Upper clavicular head pectoral development with improved range of motion using independent dumbbells.',
-    },
-  ]);
+  // Community posts list state
+  const [posts, setPosts] = useState<ExercisePostItem[]>(initialCommunityPosts);
 
-  const filtered = exercises.filter((ex) => {
-    const matchQuery = ex.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      ex.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchGroup = filterGroup === 'all' || ex.muscleGroup === filterGroup;
-    const matchPose = !onlyPoseCheck || ex.hasPoseCheck;
-    return matchQuery && matchGroup && matchPose;
+  // Modals state
+  const [selectedPostForDetails, setSelectedPostForDetails] = useState<ExercisePostItem | null>(null);
+  const [selectedPostForReport, setSelectedPostForReport] = useState<ExercisePostItem | null>(null);
+
+  // 1. Handle New Post Creation from PostComposer
+  const handlePostCreated = (newPost: ExercisePostItem) => {
+    setPosts((prev) => [newPost, ...prev]);
+  };
+
+  // 2. Handle Rating Exercise
+  const handleRate = (postId: string, rating: number) => {
+    setPosts((prev) =>
+      prev.map((post) => {
+        if (post.id !== postId) return post;
+        const hadPreviousUserRating = typeof post.userRating === 'number';
+        const newCount = hadPreviousUserRating ? post.ratingCount : post.ratingCount + 1;
+        const prevTotal = post.avgRating * post.ratingCount;
+        const adjustedTotal = hadPreviousUserRating ? prevTotal - (post.userRating || 0) + rating : prevTotal + rating;
+        const newAvg = Number((adjustedTotal / newCount).toFixed(1));
+
+        return {
+          ...post,
+          userRating: rating,
+          avgRating: newAvg,
+          ratingCount: newCount,
+        };
+      })
+    );
+
+    // If modal is currently open for this post, update modal state too
+    if (selectedPostForDetails && selectedPostForDetails.id === postId) {
+      setSelectedPostForDetails((prev) => (prev ? { ...prev, userRating: rating } : null));
+    }
+  };
+
+  // 3. Handle Save / Bookmark Exercise
+  const handleToggleSave = (postId: string) => {
+    setPosts((prev) =>
+      prev.map((post) => {
+        if (post.id !== postId) return post;
+        return {
+          ...post,
+          isSaved: !post.isSaved,
+        };
+      })
+    );
+
+    // If modal is currently open for this post, update modal state too
+    if (selectedPostForDetails && selectedPostForDetails.id === postId) {
+      setSelectedPostForDetails((prev) => (prev ? { ...prev, isSaved: !prev.isSaved } : null));
+    }
+  };
+
+  // Filter Logic
+  const filteredPosts = posts.filter((post) => {
+    const query = searchQuery.toLowerCase().trim();
+    const matchesSearch =
+      !query ||
+      post.name.toLowerCase().includes(query) ||
+      post.description.toLowerCase().includes(query) ||
+      (post.tags && post.tags.some((t) => t.toLowerCase().includes(query)));
+
+    const matchesGroup = filterGroup === 'all' || post.muscleGroup.toLowerCase() === filterGroup.toLowerCase();
+    const matchesPose = !onlyPoseCheck || post.hasPoseCheck;
+
+    return matchesSearch && matchesGroup && matchesPose;
   });
 
   return (
-    <main className="flex-1 flex flex-col min-w-0">
+    <main className="flex-1 flex flex-col min-w-0 bg-[#F7F3EA] min-h-screen">
+      {/* 1. Preserved Global TopBar Header */}
       <TopBar user={initialFitnessData.user} streak={initialFitnessData.today.streak} />
 
-      <div className="p-6 space-y-6 max-w-5xl mx-auto w-full">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-black text-[#1F2328] tracking-tight flex items-center gap-2.5">
-              <Users className="w-7 h-7 text-[#FF6B35]" />
-              Exercise Library & Community
-            </h1>
-            <p className="text-xs text-[#76583E] mt-0.5">
-              Discover verified workouts, community submissions, and AI Pose Check enabled movements.
-            </p>
+      {/* 2. Sticky Feed Filter & Search Bar */}
+      <FeedFilterBar
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        filterGroup={filterGroup}
+        onFilterGroupChange={setFilterGroup}
+        onlyPoseCheck={onlyPoseCheck}
+        onOnlyPoseCheckChange={setOnlyPoseCheck}
+        totalResults={filteredPosts.length}
+      />
+
+      {/* 3. Centered Vertical Newsfeed Container (Max width ~680px) */}
+      <div className="flex-1 max-w-[680px] w-full mx-auto px-4 py-6 space-y-5">
+        {/* Post Composer Card */}
+        <PostComposer
+          currentUser={initialFitnessData.user}
+          onPostCreated={handlePostCreated}
+        />
+
+        {/* Feed Header / Sub-title */}
+        <div className="flex items-center justify-between px-1 pt-1">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#FF6B35]" />
+            <h2 className="text-xs font-bold text-[#1F2328] uppercase tracking-wider">
+              Community Feed & Verified Library
+            </h2>
           </div>
-          <button className="bg-[#FF6B35] text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-[#FF6B35]/90 transition-all flex items-center gap-1.5 shadow-sm">
-            <Plus className="w-4 h-4" />
-            Contribute Exercise
-          </button>
+          <span className="text-[11px] text-[#76583E] font-medium">
+            {filteredPosts.length} {filteredPosts.length === 1 ? 'Exercise' : 'Exercises'}
+          </span>
         </div>
 
-        {/* Search & Filter Bar */}
-        <div className="bg-white p-4 rounded-2xl border border-[#B9A78E]/40 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
-          {/* Search Box */}
-          <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-[#76583E] absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search exercises by name or keyword..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-[#F7F3EA] rounded-xl border border-[#B9A78E]/30 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
-            />
-          </div>
-
-          {/* Filters */}
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <select
-              value={filterGroup}
-              onChange={(e) => setFilterGroup(e.target.value)}
-              className="bg-[#F7F3EA] px-3 py-2 rounded-xl border border-[#B9A78E]/30 text-xs font-medium text-[#1F2328]"
-            >
-              <option value="all">All Muscle Groups</option>
-              <option value="chest">Chest</option>
-              <option value="back">Back</option>
-              <option value="legs">Legs</option>
-              <option value="core">Core</option>
-            </select>
-
-            <label className="flex items-center gap-2 text-xs font-semibold text-[#1F2328] cursor-pointer bg-[#F7F3EA] px-3 py-2 rounded-xl border border-[#B9A78E]/30">
-              <input
-                type="checkbox"
-                checked={onlyPoseCheck}
-                onChange={(e) => setOnlyPoseCheck(e.target.checked)}
-                className="rounded text-[#FF6B35] focus:ring-[#FF6B35]"
+        {/* Exercise Posts List */}
+        {filteredPosts.length > 0 ? (
+          <div className="space-y-4">
+            {filteredPosts.map((post) => (
+              <ExercisePost
+                key={post.id}
+                post={post}
+                onRate={handleRate}
+                onToggleSave={handleToggleSave}
+                onOpenReport={(p) => setSelectedPostForReport(p)}
+                onOpenDetails={(p) => setSelectedPostForDetails(p)}
               />
-              <Video className="w-3.5 h-3.5 text-[#FF6B35]" />
-              <span>Pose Check Only</span>
-            </label>
+            ))}
           </div>
-        </div>
-
-        {/* Exercises Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filtered.map((ex) => (
-            <div
-              key={ex.id}
-              className="bg-white rounded-2xl border border-[#B9A78E]/40 p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4"
-            >
-              <div>
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-sm text-[#1F2328]">{ex.name}</h3>
-                      {ex.verified && (
-                        <span className="flex items-center gap-1 text-[10px] font-bold text-[#7FB069] bg-[#7FB069]/15 px-2 py-0.5 rounded-full">
-                          <ShieldCheck className="w-3 h-3" />
-                          Verified
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[11px] text-[#76583E] uppercase font-semibold">
-                      {ex.muscleGroup} • {ex.equipment} • {ex.difficulty}
-                    </span>
-                  </div>
-
-                  {ex.hasPoseCheck && (
-                    <span className="flex items-center gap-1 bg-[#FF6B35]/10 text-[#FF6B35] text-[10px] font-bold px-2.5 py-1 rounded-lg border border-[#FF6B35]/20">
-                      <Video className="w-3 h-3" />
-                      AI Pose Check
-                    </span>
-                  )}
-                </div>
-
-                <p className="text-xs text-[#76583E] mt-3 leading-relaxed">
-                  {ex.description}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between pt-3 border-t border-[#B9A78E]/20 text-xs">
-                <div className="flex items-center gap-1 text-[#F4C95D] font-bold">
-                  <Star className="w-4 h-4 fill-[#F4C95D]" />
-                  <span className="text-[#1F2328]">{ex.avgRating}</span>
-                  <span className="text-[#76583E] font-normal">({ex.ratingCount} reviews)</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button className="text-[11px] text-[#76583E] hover:text-red-500 flex items-center gap-1">
-                    <Flag className="w-3 h-3" />
-                    Report
-                  </button>
-                  <button className="bg-[#E8E1D5] hover:bg-[#FF6B35] hover:text-white text-[#1F2328] px-3 py-1.5 rounded-lg font-bold text-xs transition-colors">
-                    View Details
-                  </button>
-                </div>
-              </div>
+        ) : (
+          /* Empty State */
+          <div className="bg-white rounded-2xl border border-[#B9A78E]/40 p-8 text-center space-y-3 shadow-sm">
+            <div className="w-12 h-12 rounded-full bg-[#E8E1D5] text-[#76583E] flex items-center justify-center mx-auto">
+              <SearchX className="w-6 h-6" />
             </div>
-          ))}
-        </div>
+            <h3 className="text-sm font-bold text-[#1F2328]">No exercises match your search</h3>
+            <p className="text-xs text-[#76583E] max-w-sm mx-auto">
+              We couldn’t find any community posts matching &quot;{searchQuery || filterGroup}&quot;. Try adjusting your keywords or clearing filters.
+            </p>
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setFilterGroup('all');
+                setOnlyPoseCheck(false);
+              }}
+              className="bg-[#FF6B35] hover:bg-[#FF6B35]/90 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-sm"
+            >
+              Reset All Filters
+            </button>
+          </div>
+        )}
       </div>
+
+      {/* Exercise Detail Modal */}
+      <ExerciseDetailModal
+        post={selectedPostForDetails}
+        isOpen={Boolean(selectedPostForDetails)}
+        onClose={() => setSelectedPostForDetails(null)}
+        onToggleSave={handleToggleSave}
+        onRate={handleRate}
+      />
+
+      {/* Report Modal */}
+      <ReportModal
+        post={selectedPostForReport}
+        isOpen={Boolean(selectedPostForReport)}
+        onClose={() => setSelectedPostForReport(null)}
+      />
     </main>
   );
 }
