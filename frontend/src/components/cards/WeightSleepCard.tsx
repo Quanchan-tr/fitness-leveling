@@ -3,8 +3,7 @@
 
 import React from 'react';
 import { WeightSleepData } from '@/types/dashboard.types';
-import { GlassCard } from '@/components/ui/GlassCard';
-import { Activity, Moon, TrendingDown } from 'lucide-react';
+import { Scale, Moon, TrendingDown } from 'lucide-react';
 
 interface WeightSleepCardProps {
   weightSleep?: WeightSleepData;
@@ -31,7 +30,6 @@ export const WeightSleepCard: React.FC<WeightSleepCardProps> = ({
   const firstWeight = weightHistory.length > 0 ? weightHistory[0].weightKg : 68.4;
   const weightDiff = (latestWeight - firstWeight).toFixed(1);
 
-  // Format first & last dates for X-Axis display
   const formatDateLabel = (isoDate: string) => {
     try {
       const d = new Date(isoDate);
@@ -44,106 +42,104 @@ export const WeightSleepCard: React.FC<WeightSleepCardProps> = ({
   const firstDateLabel = weightHistory.length > 0 ? formatDateLabel(weightHistory[0].date) : '';
   const lastDateLabel = weightHistory.length > 0 ? formatDateLabel(weightHistory[weightHistory.length - 1].date) : '';
 
-  // Calculate SVG line chart path
   const weights = weightHistory.map((d) => d.weightKg);
-  const minW = Math.min(...weights) - 0.3;
-  const maxW = Math.max(...weights) + 0.3;
+  const minW = Math.min(...weights) - 0.2;
+  const maxW = Math.max(...weights) + 0.2;
   const svgWidth = 260;
-  const svgHeight = 65;
+  const svgHeight = 52;
 
   const points = weightHistory.map((item, idx) => {
-    const x = 12 + (idx / Math.max(1, weightHistory.length - 1)) * (svgWidth - 24);
-    const y = svgHeight - 12 - ((item.weightKg - minW) / Math.max(0.1, maxW - minW)) * (svgHeight - 24);
+    const x = 10 + (idx / Math.max(1, weightHistory.length - 1)) * (svgWidth - 20);
+    const y = svgHeight - 10 - ((item.weightKg - minW) / Math.max(0.1, maxW - minW)) * (svgHeight - 20);
     return { x, y, ...item };
   });
 
   const polylineStr = points.map((p) => `${p.x},${p.y}`).join(' ');
-  const areaPath = `M ${points[0].x},${svgHeight} L ${points.map((p) => `${p.x},${p.y}`).join(' L ')} L ${points[points.length - 1].x},${svgHeight} Z`;
 
   return (
-    <GlassCard className="w-full flex flex-col justify-between p-3.5 sm:p-4 overflow-hidden shadow-rest hover:shadow-hover transition-all">
+    <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-stone-200/60 pb-2">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#ECFDF5] border border-[#10B981]/30 flex items-center justify-center text-[#10B981]">
-            <Activity className="w-4 h-4" />
-          </div>
-          <h3 className="font-bold text-sm text-[#1A1A1A]">Cân Nặng & Giấc Ngủ</h3>
+          <Scale className="w-4 h-4 text-slate-700" />
+          <h3 className="font-bold text-sm text-slate-900 tracking-tight">
+            Cân nặng &amp; Giấc ngủ
+          </h3>
         </div>
         {onOpenBodyMetrics && (
           <button
             onClick={onOpenBodyMetrics}
-            className="text-[10px] font-bold text-[#FF6B35] hover:underline cursor-pointer"
+            className="text-xs font-semibold text-slate-500 hover:text-[#FF5722] transition-colors cursor-pointer"
           >
-            Chi tiết
+            InBody
           </button>
         )}
       </div>
 
-      {/* Top: Weight Trend with Clean X-Axis (First & Last Date Only) */}
-      <div className="my-1">
-        <div className="flex items-center justify-between">
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-xl font-bold text-[#1A1A1A]">{latestWeight}</span>
-            <span className="text-xs text-[#888888] font-semibold">kg</span>
+      {/* Weight & Sparkline */}
+      <div className="py-3">
+        <div className="flex items-baseline justify-between mb-2">
+          <div className="flex items-baseline gap-1">
+            <span className="text-2xl font-black text-slate-900 tabular-nums">
+              {latestWeight}
+            </span>
+            <span className="text-xs font-semibold text-slate-400">kg</span>
           </div>
-          <span className="text-[10px] font-bold text-[#22C55E] bg-[#ECFDF5] px-2 py-0.5 rounded-lg border border-[#A7F3D0] flex items-center gap-0.5">
-            <TrendingDown className="w-3 h-3" /> {weightDiff} kg (7 ngày)
+          <span className="text-xs font-semibold text-emerald-700 flex items-center gap-1 tabular-nums">
+            <TrendingDown className="w-3.5 h-3.5" />
+            <span>{weightDiff} kg so với 7 ngày trước</span>
           </span>
         </div>
 
-        {/* SVG Line Chart */}
-        <div className="w-full h-15 mt-1 relative">
+        {/* Clean Line Sparkline without decorative gradient fill */}
+        <div className="w-full h-12 relative">
           <svg viewBox={`0 0 ${svgWidth} ${svgHeight}`} className="w-full h-full overflow-visible">
-            <defs>
-              <linearGradient id="weightLineGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#FF6B35" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#FF6B35" stopOpacity="0.0" />
-              </linearGradient>
-            </defs>
-            {/* Area Fill */}
-            <path d={areaPath} fill="url(#weightLineGrad)" />
-            {/* Polyline */}
+            <line
+              x1="0"
+              y1={svgHeight}
+              x2={svgWidth}
+              y2={svgHeight}
+              stroke="#F1F5F9"
+              strokeWidth="1"
+            />
             <polyline
               fill="none"
-              stroke="#FF6B35"
-              strokeWidth="2.5"
+              stroke="#0F172A"
+              strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
               points={polylineStr}
             />
-            {/* Dots */}
             {points.map((pt, i) => (
               <circle
                 key={`dot-${i}`}
                 cx={pt.x}
                 cy={pt.y}
-                r={i === points.length - 1 ? 4 : 2.5}
-                fill={i === points.length - 1 ? '#FF6B35' : '#FFFFFF'}
-                stroke="#FF6B35"
+                r={i === points.length - 1 ? 3.5 : 2}
+                fill={i === points.length - 1 ? '#FF5722' : '#FFFFFF'}
+                stroke={i === points.length - 1 ? '#FF5722' : '#0F172A'}
                 strokeWidth="1.5"
               />
             ))}
           </svg>
         </div>
 
-        {/* X-Axis: First and Last Dates Only to avoid overlapping */}
-        <div className="flex items-center justify-between text-[10px] text-[#888888] font-medium px-1">
+        <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium px-0.5 mt-1">
           <span>{firstDateLabel}</span>
           <span>{lastDateLabel}</span>
         </div>
       </div>
 
-      {/* Bottom: Sleep Last Night */}
-      <div className="flex items-center justify-between border-t border-stone-200/60 pt-2 bg-white/50 px-3 py-1.5 rounded-xl">
-        <div className="flex items-center gap-2">
-          <Moon className="w-4 h-4 text-[#6366F1]" />
-          <span className="text-xs font-semibold text-[#4A4A4A]">Giấc ngủ đêm qua</span>
+      {/* Sleep Sub-metric */}
+      <div className="border-t border-slate-100 pt-3 flex items-center justify-between text-xs">
+        <div className="flex items-center gap-1.5 text-slate-600">
+          <Moon className="w-3.5 h-3.5 text-slate-500" />
+          <span className="font-medium">Giấc ngủ đêm qua:</span>
         </div>
-        <span className="text-sm font-bold text-[#1A1A1A]">
+        <span className="font-bold text-slate-900 tabular-nums">
           {sleepLastNight.hours}h {sleepLastNight.minutes}m
         </span>
       </div>
-    </GlassCard>
+    </div>
   );
 };

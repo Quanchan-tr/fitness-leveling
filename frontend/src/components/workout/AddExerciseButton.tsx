@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Plus, Dumbbell } from 'lucide-react';
+import { Plus } from 'lucide-react';
 
 interface AddExerciseButtonProps {
   onClick: () => void;
@@ -12,12 +12,12 @@ export const AddExerciseButton: React.FC<AddExerciseButtonProps> = ({ onClick })
   return (
     <button
       onClick={onClick}
-      className="w-full py-4 px-4 rounded-2xl border-2 border-dashed border-[#B9A78E]/60 hover:border-[#FF6B35] bg-white/40 hover:bg-[#FFF8F3] text-[#76583E] hover:text-[#FF6B35] transition-all duration-200 flex items-center justify-center gap-2 font-black text-xs sm:text-sm shadow-2xs hover:shadow-sm cursor-pointer group"
+      className="w-full py-3.5 px-4 rounded-xl border border-dashed border-slate-300 hover:border-[#FF5722] bg-white hover:bg-orange-50/30 text-slate-600 hover:text-[#FF5722] transition-colors flex items-center justify-center gap-2 font-bold text-xs sm:text-sm cursor-pointer"
     >
-      <div className="w-7 h-7 rounded-xl bg-[#FAF8F5] group-hover:bg-[#FF6B35] text-[#76583E] group-hover:text-white flex items-center justify-center transition-all shadow-2xs">
-        <Plus className="w-4 h-4 stroke-[2.5]" />
+      <div className="w-6 h-6 rounded-md bg-slate-100 group-hover:bg-[#FF5722] text-slate-700 flex items-center justify-center transition-colors">
+        <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
       </div>
-      <span>Thêm bài tập từ ngân hàng bài tập</span>
+      <span>Thêm bài tập từ ngân hàng</span>
     </button>
   );
 };

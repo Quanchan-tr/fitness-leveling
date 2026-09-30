@@ -7,15 +7,21 @@ import { Character, CharacterOutfit } from './Character';
 import * as THREE from 'three';
 
 interface CharacterCanvasProps {
+  level?: number;
   outfit?: CharacterOutfit;
+  autoRotate?: boolean;
   onClickCharacter?: () => void;
 }
 
 function InteractiveCharacter({
+  level = 17,
   outfit,
+  autoRotate = false,
   onClickCharacter,
 }: {
+  level?: number;
   outfit?: CharacterOutfit;
+  autoRotate?: boolean;
   onClickCharacter?: () => void;
 }) {
   const [rotationY, setRotationY] = useState(0.25);
@@ -24,11 +30,14 @@ function InteractiveCharacter({
   const dragDistanceRef = useRef(0);
   const groupRef = useRef<THREE.Group>(null);
 
-  // Subtle floating levitation
-  useFrame((state) => {
+  // Subtle floating levitation & optional auto-rotation
+  useFrame((state, delta) => {
     const t = state.clock.elapsedTime;
     if (groupRef.current) {
       groupRef.current.position.y = -0.75 + Math.sin(t * 1.8) * 0.02;
+    }
+    if (autoRotate && !isDraggingRef.current) {
+      setRotationY((prev) => prev + delta * 0.6);
     }
   });
 
@@ -70,7 +79,7 @@ function InteractiveCharacter({
       onPointerUp={handlePointerUp}
       onPointerCancel={handlePointerUp}
     >
-      {/* Invisible full-height hit cylinder for effortless 360 rotation */}
+      {/* Invisible hit cylinder for effortless 360 rotation */}
       <mesh position={[0, 0.8, 0]}>
         <cylinderGeometry args={[1.1, 1.1, 2.2, 16]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
@@ -79,25 +88,32 @@ function InteractiveCharacter({
       {/* Sleek Titanium Pedestal */}
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.62, 0.68, 0.04, 32]} />
-        <meshStandardMaterial color="#22252A" metalness={0.8} roughness={0.25} />
+        <meshStandardMaterial color="#1E293B" metalness={0.8} roughness={0.25} />
       </mesh>
 
       {/* Inner Accent Ring */}
       <mesh position={[0, 0.022, 0]} receiveShadow>
         <cylinderGeometry args={[0.56, 0.56, 0.005, 32]} />
-        <meshStandardMaterial color="#FF6B35" emissive="#EA580C" emissiveIntensity={0.6} />
+        <meshStandardMaterial color="#FF5722" emissive="#FF5722" emissiveIntensity={0.6} />
       </mesh>
 
-      {/* 3D Character */}
+      {/* 3D Character with Level-scaled Muscle Definition */}
       <group position={[0, 0.65, 0]}>
-        <Character outfit={outfit} position={[0, 0, 0]} rotation={[0, rotationY, 0]} />
+        <Character
+          level={level}
+          outfit={outfit}
+          position={[0, 0, 0]}
+          rotation={[0, rotationY, 0]}
+        />
       </group>
     </group>
   );
 }
 
 export const CharacterCanvas: React.FC<CharacterCanvasProps> = ({
+  level = 17,
   outfit,
+  autoRotate = false,
   onClickCharacter,
 }) => {
   return (
@@ -108,11 +124,13 @@ export const CharacterCanvas: React.FC<CharacterCanvasProps> = ({
       >
         <ambientLight intensity={0.9} />
         <directionalLight position={[2, 4, 3]} intensity={1.4} castShadow />
-        <directionalLight position={[-2, 2, -1]} intensity={0.5} color="#FF6B35" />
-        <pointLight position={[0, -0.4, 0.8]} intensity={0.8} color="#FF6B35" />
+        <directionalLight position={[-2, 2, -1]} intensity={0.5} color="#FF5722" />
+        <pointLight position={[0, -0.4, 0.8]} intensity={0.8} color="#FF5722" />
         <Suspense fallback={null}>
           <InteractiveCharacter
+            level={level}
             outfit={outfit}
+            autoRotate={autoRotate}
             onClickCharacter={onClickCharacter}
           />
         </Suspense>

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { Sidebar } from '@/components/layout/Sidebar';
+import { ShellLayout } from '@/components/layout/ShellLayout';
 
 export const metadata: Metadata = {
-  title: 'FitTrack AI — 3D Fitness Tracking & AI Coach',
+  title: 'FitTrack AI — Fitness Command Center & 3D Avatar',
   description:
-    'Comprehensive fitness platform with 3D home-gym dashboard, workout tracking, nutrition logging, body metrics, AI recommendations, and AI Pose Check.',
+    'Comprehensive fitness platform with 3D athletic character leveling, workout tracking, nutrition logging, body metrics, AI recommendations, and AI Pose Check.',
 };
 
 export default function RootLayout({
@@ -14,12 +14,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="bg-[#F7F3EA] text-[#1F2328] antialiased flex min-h-screen">
-        <Sidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          {children}
-        </div>
+    <html lang="vi" className="scroll-smooth">
+      <body className="bg-slate-50 text-slate-900 antialiased selection:bg-orange-500/20 selection:text-orange-900">
+        <ShellLayout>{children}</ShellLayout>
       </body>
     </html>
   );

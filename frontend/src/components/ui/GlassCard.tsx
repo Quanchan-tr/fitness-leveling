@@ -17,7 +17,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
 }) => {
   return (
     <div
-      className={`glass-card select-none ${className}`}
+      className={`surface-card bg-white border border-slate-200 rounded-xl p-5 transition-colors select-none ${className}`}
       style={style}
       {...props}
     >

@@ -14,8 +14,10 @@ import { ProgressPhotoModal } from '@/components/home/ProgressPhotoModal';
 import { OutfitModal } from '@/components/home/OutfitModal';
 import { CharacterOutfit } from '@/components/home/3d/Character';
 import { Dumbbell, Sparkles } from 'lucide-react';
+import { useShell } from '@/components/layout/ShellLayout';
 
 export default function WorkoutPage() {
+  const { toggleMobileNav } = useShell();
   const [weeklySessions, setWeeklySessions] = useState<WorkoutSession[]>(initialWeeklySchedule);
   const [selectedDay, setSelectedDay] = useState<WeekDay>('Sun');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -27,15 +29,14 @@ export default function WorkoutPage() {
   const [isOutfitModalOpen, setIsOutfitModalOpen] = useState(false);
 
   const [outfit, setOutfit] = useState<CharacterOutfit>({
-    shirtColor: '#FF6B35',
-    shirtStripeColor: '#F7F3EA',
-    shortsColor: '#303238',
-    headbandColor: '#303238',
-    shoesColor: '#FF6B35',
-    wristbandColor: '#303238',
+    shirtColor: '#FF5722',
+    shirtStripeColor: '#FFFFFF',
+    shortsColor: '#1E293B',
+    headbandColor: '#1E293B',
+    shoesColor: '#FF5722',
+    wristbandColor: '#1E293B',
   });
 
-  // Find currently selected session
   const currentSession = weeklySessions.find((s) => s.day === selectedDay) || weeklySessions[0];
 
   const handleUpdateCurrentSession = (updatedSession: WorkoutSession) => {
@@ -104,7 +105,7 @@ export default function WorkoutPage() {
   };
 
   return (
-    <main className="flex-1 flex flex-col min-w-0 bg-[#F8F6F0] min-h-screen">
+    <main className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen">
       {/* Top Navigation Bar */}
       <TopBar
         user={fitnessData.user}
@@ -113,32 +114,25 @@ export default function WorkoutPage() {
         onOpenBodyMetrics={() => setIsMetricsModalOpen(true)}
         onOpenProgressPhotos={() => setIsPhotosModalOpen(true)}
         onOpenOutfit={() => setIsOutfitModalOpen(true)}
+        onToggleMobileMenu={toggleMobileNav}
       />
 
       {/* Main Content Area */}
-      <div className="p-4 sm:p-6 space-y-5 max-w-5xl mx-auto w-full">
-        {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white/60 backdrop-blur-xs p-4 sm:p-5 rounded-2xl border border-[#B9A78E]/30 shadow-2xs">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl mx-auto w-full">
+        {/* Page Header (Information-first, no card container, no kicker badge) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[11px] font-black uppercase tracking-wider text-[#FF6B35] bg-[#FFF3EB] px-2.5 py-0.5 rounded-md border border-[#FF6B35]/30">
-                Nhật Ký & Lập Lịch Tập
-              </span>
-              <span className="text-xs text-[#76583E] font-medium hidden sm:inline">
-                Hệ thống theo dõi Sets, Reps, RPE và Tải trọng chuẩn thể hình
-              </span>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-black text-[#1F2328] tracking-tight flex items-center gap-2">
-              <Dumbbell className="w-6 h-6 sm:w-7 sm:h-7 text-[#FF6B35]" />
-              Workout Logger & Planner
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+              <Dumbbell className="w-7 h-7 sm:w-8 sm:h-8 text-[#FF5722]" />
+              <span>Luyện tập</span>
             </h1>
           </div>
 
           <button
             onClick={() => setIsDrawerOpen(true)}
-            className="px-4 py-2 bg-[#FF6B35] hover:bg-[#E8551F] text-white text-xs sm:text-sm font-black rounded-xl shadow-md shadow-[#FF6B35]/25 transition-all flex items-center gap-2 cursor-pointer self-start sm:self-center"
+            className="px-4 py-2 bg-[#FF5722] hover:bg-[#E64A19] text-white text-xs sm:text-sm font-bold rounded-lg transition-colors flex items-center gap-2 cursor-pointer self-start sm:self-center"
           >
-            <Sparkles className="w-4 h-4" />
+            <Dumbbell className="w-4 h-4" />
             <span>Ngân hàng bài tập</span>
           </button>
         </div>

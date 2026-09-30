@@ -19,10 +19,10 @@ export const SetRow: React.FC<SetRowProps> = ({
   onToggleComplete,
 }) => {
   const getRpeBgColor = (rpe: number | null) => {
-    if (rpe === null || rpe === undefined) return 'bg-[#FAF8F5] text-[#888888] border-[#B9A78E]/30';
-    if (rpe <= 4) return 'bg-[#22c55e]/15 text-[#16a34a] border-[#22c55e]/40 font-black';
-    if (rpe <= 7) return 'bg-[#f59e0b]/15 text-[#d97706] border-[#f59e0b]/40 font-black';
-    return 'bg-[#ef4444]/15 text-[#dc2626] border-[#ef4444]/40 font-black';
+    if (rpe === null || rpe === undefined) return 'bg-slate-50 text-slate-400 border-slate-200';
+    if (rpe <= 4) return 'bg-emerald-50 text-emerald-700 border-emerald-200 font-bold';
+    if (rpe <= 7) return 'bg-amber-50 text-amber-700 border-amber-200 font-bold';
+    return 'bg-rose-50 text-rose-700 border-rose-200 font-bold';
   };
 
   const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,10 +42,10 @@ export const SetRow: React.FC<SetRowProps> = ({
 
   return (
     <div
-      className={`group relative grid items-center gap-2 px-3 py-2 rounded-xl transition-all duration-200 border ${
+      className={`group relative grid items-center gap-2 px-3 py-1.5 rounded-lg transition-colors border ${
         set.isCompleted
-          ? 'bg-[#dcfce7]/70 border-[#22c55e]/30 shadow-2xs'
-          : 'bg-white/90 hover:bg-white border-[#B9A78E]/25 hover:border-[#B9A78E]/40'
+          ? 'bg-emerald-50/60 border-emerald-200'
+          : 'bg-white hover:bg-slate-50/50 border-slate-200'
       }`}
       style={{
         gridTemplateColumns: '32px minmax(70px, 1fr) minmax(130px, 1.4fr) 68px 38px',
@@ -54,10 +54,10 @@ export const SetRow: React.FC<SetRowProps> = ({
       {/* 1. Set Number */}
       <div className="flex items-center justify-center">
         <span
-          className={`w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black ${
+          className={`w-6 h-6 rounded flex items-center justify-center text-xs font-bold tabular-nums ${
             set.isCompleted
-              ? 'bg-[#22c55e] text-white shadow-2xs'
-              : 'bg-[#FAF8F5] text-[#76583E] border border-[#B9A78E]/30'
+              ? 'bg-emerald-600 text-white'
+              : 'bg-slate-100 text-slate-700 border border-slate-200'
           }`}
         >
           {set.setNumber}
@@ -66,15 +66,15 @@ export const SetRow: React.FC<SetRowProps> = ({
 
       {/* 2. Target Reps x Weight */}
       <div className="flex flex-col">
-        <span className="text-[10px] uppercase font-bold text-[#76583E] tracking-tight">Mục tiêu</span>
-        <span className="text-xs font-black text-[#1F2328]">
+        <span className="text-[10px] uppercase font-bold text-slate-400 tracking-tight">Mục tiêu</span>
+        <span className="text-xs font-bold text-slate-800 tabular-nums">
           {set.targetWeightKg > 0 ? `${set.targetWeightKg}kg` : 'BW'} × {set.targetReps}
         </span>
       </div>
 
       {/* 3. Actual Inputs (Kg & Reps) */}
       <div className="flex items-center gap-1.5">
-        <div className="flex-1 flex items-center gap-1 bg-[#FAF8F5] px-2 py-1 rounded-lg border border-[#B9A78E]/30 focus-within:border-[#FF6B35] focus-within:ring-1 focus-within:ring-[#FF6B35]">
+        <div className="flex-1 flex items-center gap-1 bg-slate-50 px-2 py-1 rounded border border-slate-200 focus-within:border-[#FF5722]">
           <input
             type="number"
             step="0.5"
@@ -82,66 +82,64 @@ export const SetRow: React.FC<SetRowProps> = ({
             placeholder={set.targetWeightKg.toString()}
             value={set.actualWeightKg !== null ? set.actualWeightKg : ''}
             onChange={handleWeightChange}
-            className="w-full bg-transparent text-xs font-black text-[#1F2328] focus:outline-none placeholder:text-[#888888]"
+            className="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none placeholder:text-slate-400 tabular-nums"
           />
-          <span className="text-[10px] font-bold text-[#76583E]">kg</span>
+          <span className="text-[10px] font-medium text-slate-400">kg</span>
         </div>
 
-        <div className="flex-1 flex items-center gap-1 bg-[#FAF8F5] px-2 py-1 rounded-lg border border-[#B9A78E]/30 focus-within:border-[#FF6B35] focus-within:ring-1 focus-within:ring-[#FF6B35]">
+        <div className="flex-1 flex items-center gap-1 bg-slate-50 px-2 py-1 rounded border border-slate-200 focus-within:border-[#FF5722]">
           <input
             type="number"
             min="0"
             placeholder={set.targetReps.toString()}
             value={set.actualReps !== null ? set.actualReps : ''}
             onChange={handleRepsChange}
-            className="w-full bg-transparent text-xs font-black text-[#1F2328] focus:outline-none placeholder:text-[#888888]"
+            className="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none placeholder:text-slate-400 tabular-nums"
           />
-          <span className="text-[10px] font-bold text-[#76583E]">rep</span>
+          <span className="text-[10px] font-medium text-slate-400">rep</span>
         </div>
       </div>
 
-      {/* 4. RPE Select */}
+      {/* 4. RPE Selector */}
       <div>
         <select
-          value={set.rpe !== null && set.rpe !== undefined ? set.rpe : ''}
+          value={set.rpe ?? ''}
           onChange={handleRpeChange}
-          className={`w-full text-[11px] py-1 px-1.5 rounded-lg border focus:outline-none focus:ring-1 focus:ring-[#FF6B35] cursor-pointer transition-all ${getRpeBgColor(
+          className={`w-full text-[11px] px-1 py-1 rounded border cursor-pointer focus:outline-none ${getRpeBgColor(
             set.rpe
           )}`}
-          title="Rate of Perceived Exertion (1 = Rất nhẹ, 10 = Hết sức)"
+          title="Thang đo RPE (6: Dễ, 8: Chuẩn Hypertrophy, 10: Kiệt sức)"
         >
           <option value="">RPE</option>
-          <option value="4">RPE 1-4 (Nhẹ)</option>
-          <option value="5">RPE 5</option>
-          <option value="6">RPE 6</option>
+          <option value="6">RPE 6 (Dễ)</option>
           <option value="7">RPE 7 (Vừa)</option>
-          <option value="8">RPE 8 (Nặng)</option>
-          <option value="9">RPE 9 (Gần max)</option>
-          <option value="10">RPE 10 (Hết sức)</option>
+          <option value="8">RPE 8 (Chuẩn)</option>
+          <option value="9">RPE 9 (Nặng)</option>
+          <option value="10">RPE 10 (Max)</option>
         </select>
       </div>
 
-      {/* 5. Complete Button Checkbox & Delete */}
-      <div className="flex items-center justify-end gap-1">
+      {/* 5. Complete Checkbox / Action */}
+      <div className="flex items-center justify-center gap-1">
         <button
           onClick={onToggleComplete}
-          className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer ${
+          className={`w-7 h-7 rounded flex items-center justify-center transition-colors cursor-pointer border ${
             set.isCompleted
-              ? 'bg-[#22c55e] text-white shadow-sm ring-2 ring-[#22c55e]/30 scale-105'
-              : 'bg-[#FAF8F5] hover:bg-[#FF6B35] text-[#76583E] hover:text-white border border-[#B9A78E]/30'
+              ? 'bg-emerald-600 border-emerald-600 text-white'
+              : 'bg-white hover:bg-slate-100 border-slate-300 text-slate-400'
           }`}
-          title={set.isCompleted ? 'Hủy đánh dấu hoàn thành' : 'Đánh dấu xong set'}
+          title={set.isCompleted ? 'Bỏ chọn hoàn thành' : 'Đánh dấu đã hoàn thành set'}
         >
-          <Check className={`w-4 h-4 ${set.isCompleted ? 'stroke-[3]' : 'stroke-[2]'}`} />
+          <Check className="w-4 h-4 stroke-[3]" />
         </button>
 
         {onDelete && (
           <button
             onClick={onDelete}
-            className="hidden group-hover:flex absolute -right-2 top-1/2 -translate-y-1/2 p-1 rounded-md bg-white text-[#ef4444] border border-[#ef4444]/30 shadow-xs hover:bg-[#ef4444] hover:text-white transition-all cursor-pointer"
+            className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-600 transition-opacity"
             title="Xóa set này"
           >
-            <Trash2 className="w-3 h-3" />
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         )}
       </div>

@@ -10,8 +10,10 @@ import { OutfitModal } from '@/components/home/OutfitModal';
 import { CharacterOutfit } from '@/components/home/3d/Character';
 import { mockDashboardData } from '@/data/mockData';
 import { initialFitnessData, MetricHistoryItem, ProgressPhotoItem } from '@/lib/fitnessData';
+import { useShell } from '@/components/layout/ShellLayout';
 
 export default function DashboardPage() {
+  const { toggleMobileNav } = useShell();
   const [dashboardData, setDashboardData] = useState(mockDashboardData);
   const [extraData, setExtraData] = useState(initialFitnessData);
   const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
@@ -21,12 +23,12 @@ export default function DashboardPage() {
 
   // Avatar Outfit State
   const [outfit, setOutfit] = useState<CharacterOutfit>({
-    shirtColor: '#FF6B35',
-    shirtStripeColor: '#F7F3EA',
-    shortsColor: '#303238',
-    headbandColor: '#303238',
-    shoesColor: '#FF6B35',
-    wristbandColor: '#303238',
+    shirtColor: '#FF5722',
+    shirtStripeColor: '#FFFFFF',
+    shortsColor: '#1E293B',
+    headbandColor: '#1E293B',
+    shoesColor: '#FF5722',
+    wristbandColor: '#1E293B',
   });
 
   const handleToggleAutoRotate = () => {
@@ -84,7 +86,16 @@ export default function DashboardPage() {
     }));
   };
 
-  // Convert UserProfile to TopBar fitnessUser format
+  const handleUpdateName = (newName: string) => {
+    setDashboardData((prev) => ({
+      ...prev,
+      user: {
+        ...prev.user,
+        name: newName,
+      },
+    }));
+  };
+
   const topBarUser = {
     name: dashboardData.user.name,
     level: dashboardData.user.level,
@@ -97,18 +108,16 @@ export default function DashboardPage() {
   };
 
   return (
-    <main className="dashboard-shell flex-1 flex flex-col min-w-0 h-screen overflow-hidden relative bg-[var(--color-bg)]">
-      {/* Top Header Navigation */}
+    <main className="dashboard-shell flex-1 flex flex-col min-w-0 min-h-screen bg-slate-50">
+      {/* Top Header Navigation (Uncluttered on Dashboard) */}
       <TopBar
         user={topBarUser}
         streak={17}
         photoCount={extraData.progressPhotos.length}
-        onOpenBodyMetrics={() => setIsMetricsModalOpen(true)}
-        onOpenProgressPhotos={() => setIsPhotosModalOpen(true)}
-        onOpenOutfit={() => setIsOutfitModalOpen(true)}
+        onToggleMobileMenu={toggleMobileNav}
       />
 
-      {/* Main Grid HUD Layout (3 Columns: Left Cards | Center 3D & HUD | Right Cards) */}
+      {/* Main Athletic Dashboard Grid */}
       <MainGrid
         data={dashboardData}
         outfit={outfit}
@@ -119,9 +128,10 @@ export default function DashboardPage() {
         onOpenProgressPhotos={() => setIsPhotosModalOpen(true)}
         onOpenOutfit={() => setIsOutfitModalOpen(true)}
         onAddWater={handleAddWater}
+        onUpdateName={handleUpdateName}
       />
 
-      {/* ================= INTERACTIVE MODALS ================= */}
+      {/* Interactive Modals */}
       <BodyMetricsModal
         isOpen={isMetricsModalOpen}
         onClose={() => setIsMetricsModalOpen(false)}
@@ -147,5 +157,3 @@ export default function DashboardPage() {
     </main>
   );
 }
-
-

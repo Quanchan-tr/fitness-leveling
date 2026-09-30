@@ -3,10 +3,10 @@
 
 import React from 'react';
 import { NutritionData } from '@/types/dashboard.types';
-import { GlassCard } from '@/components/ui/GlassCard';
 import { CircularProgress } from '@/components/ui/CircularProgress';
 import { LinearProgress } from '@/components/ui/LinearProgress';
 import { Flame } from 'lucide-react';
+import Link from 'next/link';
 
 interface CalorieCardProps {
   nutrition?: NutritionData;
@@ -25,71 +25,86 @@ export const CalorieCard: React.FC<CalorieCardProps> = ({
   const { calories, macros } = nutrition;
   const current = calories?.current ?? 0;
   const target = calories?.target ?? 2400;
+  const remaining = Math.max(0, target - current);
+  const percentage = Math.round((current / target) * 100);
 
   return (
-    <GlassCard className="w-full flex flex-col justify-between p-3.5 sm:p-4 overflow-hidden shadow-rest hover:shadow-hover transition-all">
+    <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-stone-200/60 pb-2">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-[#FFF5ED] border border-[#FF6B35]/30 flex items-center justify-center text-[#FF6B35] shrink-0">
-            <Flame className="w-4 h-4 fill-[#FF6B35]" />
-          </div>
-          <h3 className="font-bold text-sm text-[#1A1A1A]">Năng Lượng & Calo</h3>
+          <Flame className="w-4 h-4 text-[#FF5722]" />
+          <h3 className="font-bold text-sm text-slate-900 tracking-tight">
+            Năng lượng &amp; Calo
+          </h3>
         </div>
-        <span className="text-[10.5px] font-semibold text-[#888888]">
-          Hôm nay
-        </span>
-      </div>
-
-      {/* Main Circular Progress Body */}
-      <div className="flex items-center justify-center py-2">
-        <CircularProgress
-          value={current}
-          max={target}
-          size={98}
-          strokeWidth={8.5}
-          strokeColor="#FF6B35"
-          trackColor="rgba(0,0,0,0.06)"
+        <Link
+          href="/nutrition"
+          className="text-xs font-semibold text-slate-500 hover:text-[#FF5722] transition-colors"
         >
-          <div className="leading-tight">
-            <span className="text-base sm:text-lg font-bold text-[#1A1A1A] block leading-none">
-              {current.toLocaleString()}
-            </span>
-            <span className="text-[9.5px] text-[#888888] font-medium uppercase tracking-wide block mt-0.5">
-              / {target.toLocaleString()} kcal
-            </span>
-          </div>
-        </CircularProgress>
+          Chi tiết
+        </Link>
       </div>
 
-      {/* 3 Macro Linear Progress Bars */}
-      <div className="space-y-1.5 border-t border-stone-200/60 pt-2 pb-0.5">
+      {/* Main Metric Hero */}
+      <div className="flex items-center justify-between py-4 gap-4">
+        <div>
+          <span className="text-3xl font-black text-slate-900 tabular-nums tracking-tight block">
+            {current.toLocaleString()}
+          </span>
+          <div className="text-xs text-slate-500 font-medium mt-0.5">
+            Mục tiêu: <span className="text-slate-700 font-semibold tabular-nums">{target.toLocaleString()} kcal</span>
+          </div>
+          <div className="text-xs text-slate-400 font-medium mt-1">
+            Còn lại <span className="text-slate-700 font-semibold tabular-nums">{remaining.toLocaleString()} kcal</span> hôm nay
+          </div>
+        </div>
+
+        <div className="shrink-0">
+          <CircularProgress
+            value={current}
+            max={target}
+            size={88}
+            strokeWidth={8}
+            strokeColor="#FF5722"
+            trackColor="#F1F5F9"
+          >
+            <div className="text-center">
+              <span className="text-base font-black text-slate-900 tabular-nums">
+                {percentage}%
+              </span>
+            </div>
+          </CircularProgress>
+        </div>
+      </div>
+
+      {/* 3 Macro Distribution Rows */}
+      <div className="space-y-2 border-t border-slate-100 pt-3">
         <LinearProgress
           label="Protein"
           valueLabel={`${macros.protein.current}/${macros.protein.target}g`}
           value={macros.protein.current}
           max={macros.protein.target}
-          height={4.5}
-          fillColor="#FF6B35"
+          height={5}
+          fillColor="#FF5722"
         />
         <LinearProgress
           label="Carbs"
           valueLabel={`${macros.carbs.current}/${macros.carbs.target}g`}
           value={macros.carbs.current}
           max={macros.carbs.target}
-          height={4.5}
-          fillColor="#3B82F6"
+          height={5}
+          fillColor="#0284C7"
         />
         <LinearProgress
           label="Fat"
           valueLabel={`${macros.fat.current}/${macros.fat.target}g`}
           value={macros.fat.current}
           max={macros.fat.target}
-          height={4.5}
+          height={5}
           fillColor="#F59E0B"
         />
       </div>
-    </GlassCard>
+    </div>
   );
 };
-

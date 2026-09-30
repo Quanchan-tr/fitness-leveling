@@ -2,7 +2,7 @@ import { DashboardData } from '@/types/dashboard.types';
 
 export const mockDashboardData: DashboardData = {
   user: {
-    name: "Minh Anh",
+    name: "Quan",
     level: 12,
     exp: { current: 640, max: 1000 },
     stats: { STR: 24, END: 18, AGI: 15 },

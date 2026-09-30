@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { ExerciseDbItem } from '@/types/workout.types';
-import { Plus, Check, Dumbbell, ShieldCheck } from 'lucide-react';
+import { Plus, Check } from 'lucide-react';
 
 interface ExerciseDatabaseItemProps {
   exercise: ExerciseDbItem;
@@ -19,52 +19,54 @@ export const ExerciseDatabaseItem: React.FC<ExerciseDatabaseItemProps> = ({
   const getMuscleBadgeColor = (group: string) => {
     switch (group) {
       case 'Chest':
-        return 'bg-[#EFF6FF] text-[#2563EB] border-[#93C5FD]';
+        return 'bg-blue-50 text-blue-700 border-blue-200';
       case 'Back':
-        return 'bg-[#F0FDF4] text-[#16A34A] border-[#86EFAC]';
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
       case 'Legs':
-        return 'bg-[#FAF5FF] text-[#9333EA] border-[#D8B4FE]';
+        return 'bg-purple-50 text-purple-700 border-purple-200';
       case 'Shoulders':
-        return 'bg-[#FFF7ED] text-[#EA580C] border-[#FDBA74]';
+        return 'bg-orange-50 text-orange-700 border-orange-200';
       case 'Arms':
-        return 'bg-[#FEF2F2] text-[#DC2626] border-[#FCA5A5]';
+        return 'bg-rose-50 text-rose-700 border-rose-200';
       case 'Core':
-        return 'bg-[#ECFEFF] text-[#0891B2] border-[#67E8F9]';
+        return 'bg-cyan-50 text-cyan-700 border-cyan-200';
       default:
-        return 'bg-[#F3F4F6] text-[#4B5563] border-[#E5E7EB]';
+        return 'bg-slate-100 text-slate-700 border-slate-200';
     }
   };
 
   return (
-    <div className="p-3.5 bg-white rounded-xl border border-[#B9A78E]/30 hover:border-[#FF6B35]/50 shadow-2xs hover:shadow-xs transition-all flex items-center justify-between gap-3 group">
+    <div className="p-3 bg-white rounded-lg border border-slate-200 hover:border-slate-300 transition-colors flex items-center justify-between gap-3 group">
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 flex-wrap mb-1">
-          <h4 className="text-xs sm:text-sm font-black text-[#1F2328] group-hover:text-[#FF6B35] transition-colors line-clamp-1">
+        <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+          <h4 className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-[#FF5722] transition-colors truncate">
             {exercise.name}
           </h4>
           <span
-            className={`text-[9.5px] font-black px-1.5 py-0.2 rounded border ${getMuscleBadgeColor(
+            className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${getMuscleBadgeColor(
               exercise.muscleGroup
             )}`}
           >
             {exercise.muscleGroup}
           </span>
-          <span className="text-[9.5px] font-bold text-[#76583E] bg-[#FAF8F5] px-1.5 py-0.2 rounded border border-[#B9A78E]/20">
+          <span className="text-[10px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200">
             {exercise.category}
           </span>
         </div>
 
-        <p className="text-[11px] font-semibold text-[#76583E] mb-1 line-clamp-1">
-          {exercise.nameVi}
-        </p>
+        {exercise.nameVi && (
+          <p className="text-[11px] font-medium text-slate-500 mb-0.5 truncate">
+            {exercise.nameVi}
+          </p>
+        )}
 
-        <div className="flex items-center gap-2 text-[10.5px] text-[#888888]">
+        <div className="flex items-center gap-2 text-[10px] text-slate-400">
           {exercise.equipment && (
-            <span>Dụng cụ: <strong className="text-[#4A4A4A]">{exercise.equipment}</strong></span>
+            <span>Dụng cụ: <strong className="text-slate-600 font-semibold">{exercise.equipment}</strong></span>
           )}
           <span>•</span>
           <span>
-            Đề xuất: <strong className="text-[#4A4A4A]">{exercise.defaultSets} sets × {exercise.defaultReps} reps</strong>
+            Đề xuất: <strong className="text-slate-600 font-semibold">{exercise.defaultSets} sets × {exercise.defaultReps} reps</strong>
           </span>
         </div>
       </div>
@@ -72,10 +74,10 @@ export const ExerciseDatabaseItem: React.FC<ExerciseDatabaseItemProps> = ({
       {/* Add Button */}
       <button
         onClick={() => onAdd(exercise)}
-        className={`flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-black transition-all flex items-center gap-1 cursor-pointer ${
+        className={`flex-shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer border ${
           isRecentlyAdded
-            ? 'bg-[#22c55e] text-white shadow-xs'
-            : 'bg-[#FAF8F5] hover:bg-[#FF6B35] text-[#1F2328] hover:text-white border border-[#B9A78E]/30 hover:border-[#FF6B35] shadow-2xs'
+            ? 'bg-emerald-600 text-white border-emerald-600'
+            : 'bg-slate-50 hover:bg-[#FF5722] text-slate-700 hover:text-white border-slate-200 hover:border-[#FF5722]'
         }`}
       >
         {isRecentlyAdded ? (

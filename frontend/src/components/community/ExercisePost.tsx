@@ -6,7 +6,6 @@ import {
   MoreVertical,
   Flag,
   Copy,
-  EyeOff,
   ShieldCheck,
   Video,
   Star,
@@ -37,7 +36,6 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
   const [copiedLink, setCopiedLink] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Close menu when clicking outside or pressing Escape
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -72,12 +70,12 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
   const currentDisplayRating = hoverRating !== null ? hoverRating : (post.userRating || 0);
 
   return (
-    <article className="bg-white rounded-2xl border border-[#B9A78E]/40 p-5 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col space-y-4">
+    <article className="bg-white rounded-xl border border-slate-200 p-4 sm:p-5 flex flex-col space-y-3.5">
       {/* 1. User Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          <div className="w-10 h-10 rounded-xl bg-[#303238] text-white flex items-center justify-center font-bold text-sm shadow-sm overflow-hidden flex-shrink-0">
+          <div className="w-9 h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-sm overflow-hidden shrink-0">
             {post.author.avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -93,21 +91,21 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
           {/* User Name & Timestamp */}
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-sm text-[#1F2328] hover:text-[#FF6B35] transition-colors cursor-pointer">
+              <span className="font-bold text-sm text-slate-900 hover:text-[#FF5722] transition-colors cursor-pointer">
                 {post.author.name}
               </span>
               {post.author.verified && (
-                <span title="Verified Fitizen">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#7FB069]" />
+                <span title="Thành viên đã xác minh">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 </span>
               )}
               {post.author.level && (
-                <span className="text-[10px] text-[#76583E] bg-[#E8E1D5] px-1.5 py-0.2 rounded font-semibold">
+                <span className="text-[10px] text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded font-semibold tabular-nums">
                   Lv.{post.author.level}
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-1 text-[11px] text-[#76583E]">
+            <div className="flex items-center gap-1 text-[11px] text-slate-400 font-medium">
               {post.author.handle && <span>{post.author.handle}</span>}
               {post.author.handle && <span>•</span>}
               <span>{post.timestamp}</span>
@@ -120,23 +118,23 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
           <button
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-1.5 text-[#76583E] hover:text-[#1F2328] hover:bg-[#F7F3EA] rounded-xl transition-colors"
-            title="Post options"
-            aria-label="Post options"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+            title="Tùy chọn bài viết"
+            aria-label="Tùy chọn bài viết"
             aria-expanded={isMenuOpen}
           >
             <MoreVertical className="w-4 h-4" />
           </button>
 
           {isMenuOpen && (
-            <div className="absolute right-0 top-8 w-44 bg-[#F7F3EA] border border-[#B9A78E]/40 rounded-xl shadow-lg py-1 z-30 animate-fadeIn text-xs">
+            <div className="absolute right-0 top-8 w-44 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-30 text-xs">
               <button
                 type="button"
                 onClick={handleCopyLink}
-                className="w-full text-left px-3.5 py-2 hover:bg-[#E8E1D5] text-[#1F2328] flex items-center gap-2 font-medium transition-colors"
+                className="w-full text-left px-3 py-1.5 hover:bg-slate-50 text-slate-800 flex items-center gap-2 font-medium transition-colors cursor-pointer"
               >
-                {copiedLink ? <Check className="w-3.5 h-3.5 text-[#7FB069]" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedLink ? 'Link copied!' : 'Copy link'}</span>
+                {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                <span>{copiedLink ? 'Đã sao chép link' : 'Sao chép liên kết'}</span>
               </button>
 
               <button
@@ -145,10 +143,10 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
                   setIsMenuOpen(false);
                   onOpenReport(post);
                 }}
-                className="w-full text-left px-3.5 py-2 hover:bg-red-50 text-red-600 flex items-center gap-2 font-medium transition-colors border-t border-[#B9A78E]/20"
+                className="w-full text-left px-3 py-1.5 hover:bg-rose-50 text-rose-600 flex items-center gap-2 font-medium transition-colors border-t border-slate-100 cursor-pointer"
               >
-                <Flag className="w-3.5 h-3.5" />
-                <span>Report post</span>
+                <Flag className="w-4 h-4" />
+                <span>Báo cáo bài viết</span>
               </button>
             </div>
           )}
@@ -156,36 +154,34 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
       </div>
 
       {/* 2. Exercise Title, Tags, Badges & Description */}
-      <div className="space-y-2">
-        {/* Title and Badges */}
-        <div className="flex items-start justify-between gap-2">
+      <div className="space-y-1.5">
+        <div className="flex items-start justify-between gap-3">
           <div>
             <h3
               onClick={() => onOpenDetails(post)}
-              className="text-base font-black text-[#1F2328] tracking-tight hover:text-[#FF6B35] cursor-pointer transition-colors"
+              className="text-base font-bold text-slate-900 tracking-tight hover:text-[#FF5722] cursor-pointer transition-colors"
             >
               {post.name}
             </h3>
-            {/* Categorization Tags: e.g. LEGS • BARBELL • INTERMEDIATE */}
-            <div className="text-[11px] text-[#76583E] font-bold uppercase tracking-wider mt-0.5">
+            <div className="text-[11px] text-slate-400 font-semibold uppercase tracking-wide mt-0.5">
               {post.tags ? post.tags.join(' • ') : `${post.muscleGroup} • ${post.equipment} • ${post.difficulty}`}
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 flex-shrink-0">
+          <div className="flex items-center gap-1.5 shrink-0">
             {post.verified && (
               <span
-                className="flex items-center gap-1 text-[10px] font-bold text-[#7FB069] bg-[#7FB069]/15 px-2.5 py-0.5 rounded-full border border-[#7FB069]/20"
-                title="Exercise verified by FitTrack trainers"
+                className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200"
+                title="Đã được xác minh kỹ thuật bởi FitTrack"
               >
                 <ShieldCheck className="w-3 h-3" />
-                Verified
+                Chuẩn form
               </span>
             )}
             {post.hasPoseCheck && (
               <span
-                className="flex items-center gap-1 bg-[#FF6B35]/10 text-[#FF6B35] text-[10px] font-bold px-2.5 py-0.5 rounded-lg border border-[#FF6B35]/20"
-                title="AI Pose Check available"
+                className="flex items-center gap-1 bg-orange-50 text-[#FF5722] text-[10px] font-semibold px-2 py-0.5 rounded border border-orange-200"
+                title="Có hỗ trợ AI Pose Check"
               >
                 <Video className="w-3 h-3" />
                 AI Pose Check
@@ -194,8 +190,7 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
           </div>
         </div>
 
-        {/* Post Description */}
-        <p className="text-xs text-[#76583E] leading-relaxed pt-1 whitespace-pre-line">
+        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">
           {post.description}
         </p>
       </div>
@@ -204,7 +199,7 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
       {post.mediaUrl ? (
         <div
           onClick={() => onOpenDetails(post)}
-          className="rounded-2xl overflow-hidden border border-[#B9A78E]/30 bg-black/5 aspect-video max-h-72 cursor-pointer group relative"
+          className="rounded-lg overflow-hidden border border-slate-200 bg-slate-950 aspect-video max-h-80 cursor-pointer group relative"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -214,50 +209,49 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
             loading="lazy"
           />
           {post.hasPoseCheck && (
-            <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1.5 shadow">
-              <Video className="w-3 h-3 text-[#FF6B35]" />
-              <span>3D Motion & Form Ready</span>
+            <div className="absolute top-3 left-3 bg-black/75 text-white px-2.5 py-1 rounded text-[10px] font-semibold flex items-center gap-1.5">
+              <Video className="w-3.5 h-3.5 text-[#FF5722]" />
+              <span>Hỗ trợ nhận diện 3D</span>
             </div>
           )}
         </div>
       ) : (
         <div
           onClick={() => onOpenDetails(post)}
-          className="rounded-xl border border-dashed border-[#B9A78E]/40 bg-[#F7F3EA]/60 p-4 flex items-center justify-between cursor-pointer hover:bg-[#F7F3EA] transition-colors"
+          className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-3.5 flex items-center justify-between cursor-pointer hover:bg-slate-100/70 transition-colors"
         >
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-[#E8E1D5] rounded-lg text-[#76583E]">
-              <Dumbbell className="w-4 h-4" />
+            <div className="p-2 bg-white rounded text-slate-700 border border-slate-200">
+              <Dumbbell className="w-4 h-4 text-[#FF5722]" />
             </div>
             <div>
-              <div className="text-xs font-bold text-[#1F2328]">Step-by-step Movement Guide</div>
-              <div className="text-[10px] text-[#76583E]">Tap to view form cues & AI pose calibration</div>
+              <div className="text-xs font-semibold text-slate-900">Xem phân tích kỹ thuật form</div>
+              <div className="text-[11px] text-slate-400">Xem góc khớp và lưu ý từng set</div>
             </div>
           </div>
-          <ChevronRight className="w-4 h-4 text-[#76583E]" />
+          <ChevronRight className="w-4 h-4 text-slate-400" />
         </div>
       )}
 
       {/* 4. Action and Interaction Bar */}
-      <div className="pt-3 border-t border-[#B9A78E]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <div className="pt-2.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
         {/* Rating Interaction */}
         <div className="flex items-center gap-2">
-          {/* Score & Review count */}
-          <div className="flex items-center gap-1.5 text-xs font-bold text-[#1F2328]">
-            <span className="text-[#FF6B35] font-black">{post.avgRating.toFixed(1)}</span>
-            <span className="text-[11px] text-[#76583E] font-normal">
-              ({post.ratingCount} {post.ratingCount === 1 ? 'review' : 'reviews'})
+          <div className="flex items-center gap-1 text-xs font-bold text-slate-900">
+            <span className="text-[#FF5722] font-black text-sm tabular-nums">{post.avgRating.toFixed(1)}</span>
+            <span className="text-[11px] text-slate-400 font-normal tabular-nums">
+              ({post.ratingCount} đánh giá)
             </span>
           </div>
 
-          <div className="h-4 w-[1px] bg-[#B9A78E]/30 mx-1" />
+          <div className="h-3.5 w-[1px] bg-slate-200 mx-1" />
 
           {/* Interactive Stars */}
           <div
             className="flex items-center gap-0.5"
             onMouseLeave={() => setHoverRating(null)}
             role="radiogroup"
-            aria-label="Rate this exercise"
+            aria-label="Đánh giá bài tập"
           >
             {[1, 2, 3, 4, 5].map((star) => {
               const isFilled = currentDisplayRating >= star;
@@ -267,13 +261,13 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
                   type="button"
                   onClick={() => onRate(post.id, star)}
                   onMouseEnter={() => setHoverRating(star)}
-                  className="p-1 text-[#B9A78E] hover:text-[#F4C95D] focus:outline-none focus:scale-125 transition-transform"
-                  title={`Rate ${star} star${star > 1 ? 's' : ''}`}
-                  aria-label={`${star} star`}
+                  className="p-0.5 text-slate-300 hover:text-amber-400 focus:outline-none transition-colors cursor-pointer"
+                  title={`Đánh giá ${star} sao`}
+                  aria-label={`${star} sao`}
                 >
                   <Star
-                    className={`w-3.5 h-3.5 transition-colors ${
-                      isFilled ? 'text-[#F4C95D] fill-[#F4C95D]' : 'text-[#B9A78E]/50'
+                    className={`w-3.5 h-3.5 ${
+                      isFilled ? 'text-amber-400 fill-amber-400' : 'text-slate-200'
                     }`}
                   />
                 </button>
@@ -282,8 +276,8 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
           </div>
 
           {post.userRating && (
-            <span className="text-[10px] text-[#7FB069] font-bold ml-1 hidden sm:inline">
-              Rated {post.userRating}★
+            <span className="text-[11px] text-emerald-700 font-semibold ml-1 hidden sm:inline tabular-nums">
+              Đã chấm {post.userRating}★
             </span>
           )}
         </div>
@@ -293,23 +287,23 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
           <button
             type="button"
             onClick={() => onToggleSave(post.id)}
-            className={`px-3 py-1.5 rounded-xl font-semibold text-xs flex items-center gap-1.5 transition-all shadow-xs ${
+            className={`px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 transition-colors cursor-pointer border ${
               post.isSaved
-                ? 'bg-[#7FB069] text-white'
-                : 'bg-[#F7F3EA] hover:bg-[#E8E1D5] text-[#76583E] hover:text-[#1F2328]'
+                ? 'bg-emerald-600 text-white border-emerald-600'
+                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
             }`}
-            title={post.isSaved ? 'Saved in personal library' : 'Save to my library'}
+            title={post.isSaved ? 'Đã lưu vào kho bài tập' : 'Lưu vào bài tập của tôi'}
           >
             <Bookmark className={`w-3.5 h-3.5 ${post.isSaved ? 'fill-white' : ''}`} />
-            <span>{post.isSaved ? 'Saved' : 'Save'}</span>
+            <span>{post.isSaved ? 'Đã lưu' : 'Lưu'}</span>
           </button>
 
           <button
             type="button"
             onClick={() => onOpenDetails(post)}
-            className="bg-[#E8E1D5] hover:bg-[#FF6B35] hover:text-white text-[#1F2328] px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1"
+            className="bg-slate-50 hover:bg-[#FF5722] hover:text-white text-slate-700 px-3 py-1.5 rounded-lg font-semibold text-xs transition-colors flex items-center gap-1 border border-slate-200 hover:border-[#FF5722] cursor-pointer"
           >
-            <span>View Details</span>
+            <span>Chi tiết</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>

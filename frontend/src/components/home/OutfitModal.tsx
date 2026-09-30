@@ -23,51 +23,51 @@ interface OutfitPreset {
 const PRESETS: OutfitPreset[] = [
   {
     name: 'Blaze Classic',
-    shirtColor: '#FF6B35',
-    shortsColor: '#303238',
-    headbandColor: '#303238',
-    shoesColor: '#FF6B35',
+    shirtColor: '#FF5722',
+    shortsColor: '#1E293B',
+    headbandColor: '#1E293B',
+    shoesColor: '#FF5722',
   },
   {
     name: 'Midnight Stealth',
-    shirtColor: '#2B2D31',
-    shortsColor: '#1A1B1E',
-    headbandColor: '#1A1B1E',
-    shoesColor: '#E8E2D5',
+    shirtColor: '#0F172A',
+    shortsColor: '#1E293B',
+    headbandColor: '#0F172A',
+    shoesColor: '#F8FAFC',
   },
   {
     name: 'Ocean Striker',
-    shirtColor: '#4D96FF',
-    shortsColor: '#2B323D',
-    headbandColor: '#4D96FF',
-    shoesColor: '#4D96FF',
+    shirtColor: '#0284C7',
+    shortsColor: '#0F172A',
+    headbandColor: '#0284C7',
+    shoesColor: '#0284C7',
   },
   {
-    name: 'Forest Runner',
-    shirtColor: '#7FB069',
-    shortsColor: '#303238',
-    headbandColor: '#7FB069',
-    shoesColor: '#7FB069',
+    name: 'Forest Athlete',
+    shirtColor: '#10B981',
+    shortsColor: '#1E293B',
+    headbandColor: '#10B981',
+    shoesColor: '#10B981',
   },
   {
     name: 'Crimson Power',
-    shirtColor: '#E63946',
-    shortsColor: '#222428',
-    headbandColor: '#E63946',
-    shoesColor: '#E63946',
+    shirtColor: '#EF4444',
+    shortsColor: '#1E293B',
+    headbandColor: '#EF4444',
+    shoesColor: '#EF4444',
   },
 ];
 
 const COLOR_PALETTE = [
-  '#FF6B35',
-  '#303238',
-  '#4D96FF',
-  '#7FB069',
-  '#E63946',
-  '#F4C95D',
-  '#8338EC',
-  '#F7F3EA',
-  '#2B2D31',
+  '#FF5722',
+  '#0F172A',
+  '#0284C7',
+  '#10B981',
+  '#EF4444',
+  '#F59E0B',
+  '#8B5CF6',
+  '#F8FAFC',
+  '#475569',
 ];
 
 export const OutfitModal: React.FC<OutfitModalProps> = ({
@@ -99,32 +99,37 @@ export const OutfitModal: React.FC<OutfitModalProps> = ({
 
   const handleReset = () => {
     const defaultOutfit: CharacterOutfit = {
-      shirtColor: '#FF6B35',
-      shortsColor: '#303238',
-      headbandColor: '#303238',
-      shoesColor: '#FF6B35',
+      shirtColor: '#FF5722',
+      shortsColor: '#1E293B',
+      headbandColor: '#1E293B',
+      shoesColor: '#FF5722',
     };
     setCurrentOutfit(defaultOutfit);
     onSaveOutfit(defaultOutfit);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-      <div className="bg-[#F7F3EA] w-full max-w-lg rounded-2xl border border-[#B9A78E]/40 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity">
+      <div className="bg-white w-full max-w-lg rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="px-6 py-4 bg-[#E8E1D5] border-b border-[#B9A78E]/30 flex items-center justify-between">
+        <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-[#FF6B35] text-white shadow-sm">
+            <div className="p-2 rounded-xl bg-[#FF5722] text-white shadow-sm">
               <Shirt className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-[#1F2328]">Gymmer Wardrobe & Outfit</h2>
-              <p className="text-xs text-[#76583E]">Customize Avatar Apparel & Style</p>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900">
+                Tủ Đồ &amp; Trang Phục 3D
+              </h2>
+              <p className="text-xs text-slate-500">
+                Tùy chỉnh màu sắc áo thể thao, quần và phụ kiện
+              </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg text-[#76583E] hover:bg-[#F7F3EA] hover:text-[#1F2328] transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
+            aria-label="Đóng cửa sổ"
           >
             <X className="w-5 h-5" />
           </button>
@@ -135,16 +140,16 @@ export const OutfitModal: React.FC<OutfitModalProps> = ({
           {/* Presets Grid */}
           <div>
             <div className="flex items-center justify-between mb-2.5">
-              <h3 className="text-xs font-bold text-[#1F2328] uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#FF6B35]" />
-                <span>Outfit Presets</span>
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#FF5722]" />
+                <span>Bộ trang phục mẫu</span>
               </h3>
               <button
                 onClick={handleReset}
-                className="text-[11px] font-semibold text-[#76583E] hover:text-[#FF6B35] flex items-center gap-1 transition-colors"
+                className="text-xs font-semibold text-slate-500 hover:text-[#FF5722] flex items-center gap-1 transition-colors cursor-pointer"
               >
-                <RotateCcw className="w-3 h-3" />
-                <span>Reset Default</span>
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Mặc định</span>
               </button>
             </div>
 
@@ -157,10 +162,10 @@ export const OutfitModal: React.FC<OutfitModalProps> = ({
                   <button
                     key={preset.name}
                     onClick={() => handleSelectPreset(preset)}
-                    className={`p-3 rounded-xl border text-left transition-all relative ${
+                    className={`p-3 rounded-2xl border text-left transition-all relative cursor-pointer ${
                       isSelected
-                        ? 'bg-white border-[#FF6B35] shadow-sm ring-1 ring-[#FF6B35]'
-                        : 'bg-white/70 border-[#B9A78E]/30 hover:bg-white hover:border-[#B9A78E]/60'
+                        ? 'bg-orange-50/50 border-[#FF5722] shadow-xs ring-1 ring-[#FF5722]'
+                        : 'bg-slate-50 border-slate-200 hover:bg-white hover:border-slate-300'
                     }`}
                   >
                     <div className="flex items-center gap-1.5 mb-2">
@@ -177,11 +182,11 @@ export const OutfitModal: React.FC<OutfitModalProps> = ({
                         style={{ backgroundColor: preset.shoesColor }}
                       />
                     </div>
-                    <div className="font-bold text-xs text-[#1F2328] leading-tight">
+                    <div className="font-bold text-xs text-slate-900 leading-tight">
                       {preset.name}
                     </div>
                     {isSelected && (
-                      <Check className="w-3.5 h-3.5 text-[#FF6B35] absolute top-2 right-2" />
+                      <Check className="w-3.5 h-3.5 text-[#FF5722] absolute top-2.5 right-2.5" />
                     )}
                   </button>
                 );
@@ -190,24 +195,24 @@ export const OutfitModal: React.FC<OutfitModalProps> = ({
           </div>
 
           {/* Color Customizer */}
-          <div className="bg-white p-4 rounded-xl border border-[#B9A78E]/30 space-y-4">
-            <h3 className="text-xs font-bold text-[#1F2328] uppercase tracking-wider">
-              Piece Customization
+          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-4">
+            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Tùy chỉnh từng chi tiết
             </h3>
 
             {/* Shirt Color */}
             <div>
-              <label className="block text-[11px] font-bold text-[#76583E] mb-1.5">
-                Jersey / Shirt Color
+              <label className="block text-[11px] font-bold text-slate-600 mb-1.5">
+                Màu áo tập (Jersey)
               </label>
               <div className="flex flex-wrap gap-2">
                 {COLOR_PALETTE.map((c) => (
                   <button
                     key={`shirt-${c}`}
                     onClick={() => handleColorChange('shirtColor', c)}
-                    className={`w-7 h-7 rounded-lg border-2 transition-transform ${
+                    className={`w-7 h-7 rounded-lg border-2 transition-transform cursor-pointer ${
                       currentOutfit.shirtColor === c
-                        ? 'border-[#FF6B35] scale-110 shadow-sm'
+                        ? 'border-[#FF5722] scale-110 shadow-sm'
                         : 'border-transparent hover:scale-105'
                     }`}
                     style={{ backgroundColor: c }}
@@ -218,17 +223,17 @@ export const OutfitModal: React.FC<OutfitModalProps> = ({
 
             {/* Shorts Color */}
             <div>
-              <label className="block text-[11px] font-bold text-[#76583E] mb-1.5">
-                Athletic Shorts Color
+              <label className="block text-[11px] font-bold text-slate-600 mb-1.5">
+                Màu quần tập (Shorts)
               </label>
               <div className="flex flex-wrap gap-2">
                 {COLOR_PALETTE.map((c) => (
                   <button
                     key={`shorts-${c}`}
                     onClick={() => handleColorChange('shortsColor', c)}
-                    className={`w-7 h-7 rounded-lg border-2 transition-transform ${
+                    className={`w-7 h-7 rounded-lg border-2 transition-transform cursor-pointer ${
                       currentOutfit.shortsColor === c
-                        ? 'border-[#FF6B35] scale-110 shadow-sm'
+                        ? 'border-[#FF5722] scale-110 shadow-sm'
                         : 'border-transparent hover:scale-105'
                     }`}
                     style={{ backgroundColor: c }}
@@ -240,18 +245,18 @@ export const OutfitModal: React.FC<OutfitModalProps> = ({
             {/* Headband & Shoes Color */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-bold text-[#76583E] mb-1.5">
-                  Headband Color
+                <label className="block text-[11px] font-bold text-slate-600 mb-1.5">
+                  Băng đô / Mũ
                 </label>
                 <div className="flex flex-wrap gap-1.5">
                   {COLOR_PALETTE.slice(0, 6).map((c) => (
                     <button
                       key={`headband-${c}`}
                       onClick={() => handleColorChange('headbandColor', c)}
-                      className={`w-6 h-6 rounded-md border-2 transition-transform ${
+                      className={`w-6 h-6 rounded-md border-2 transition-transform cursor-pointer ${
                         currentOutfit.headbandColor === c
-                          ? 'border-[#FF6B35] scale-110'
-                          : 'border-transparent'
+                          ? 'border-[#FF5722] scale-110 shadow-xs'
+                          : 'border-transparent hover:scale-105'
                       }`}
                       style={{ backgroundColor: c }}
                     />
@@ -260,18 +265,18 @@ export const OutfitModal: React.FC<OutfitModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-[#76583E] mb-1.5">
-                  Sneakers Color
+                <label className="block text-[11px] font-bold text-slate-600 mb-1.5">
+                  Giày tập thể thao
                 </label>
                 <div className="flex flex-wrap gap-1.5">
                   {COLOR_PALETTE.slice(0, 6).map((c) => (
                     <button
                       key={`shoes-${c}`}
                       onClick={() => handleColorChange('shoesColor', c)}
-                      className={`w-6 h-6 rounded-md border-2 transition-transform ${
+                      className={`w-6 h-6 rounded-md border-2 transition-transform cursor-pointer ${
                         currentOutfit.shoesColor === c
-                          ? 'border-[#FF6B35] scale-110'
-                          : 'border-transparent'
+                          ? 'border-[#FF5722] scale-110 shadow-xs'
+                          : 'border-transparent hover:scale-105'
                       }`}
                       style={{ backgroundColor: c }}
                     />
@@ -283,12 +288,12 @@ export const OutfitModal: React.FC<OutfitModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 bg-[#E8E1D5]/60 border-t border-[#B9A78E]/30 flex justify-end">
+        <div className="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
           <button
             onClick={onClose}
-            className="bg-[#FF6B35] hover:bg-[#FF6B35]/90 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-sm"
+            className="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition-colors cursor-pointer"
           >
-            Apply & Close
+            Áp dụng trang phục
           </button>
         </div>
       </div>

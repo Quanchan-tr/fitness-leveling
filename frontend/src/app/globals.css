@@ -3,119 +3,100 @@
 @tailwind utilities;
 
 :root {
-  /* Colors */
-  --color-bg: #F8F6F0;
-  --color-accent: #FF6B35;
-  --color-accent-dark: #E8551F;
-  --color-success: #22c55e;
-  --color-danger: #ef4444;
-  --color-text-primary: #1A1A1A;
-  --color-text-secondary: #4A4A4A;
-  --color-text-caption: #888888;
-  --color-card-bg: rgba(255, 255, 255, 0.85);
-  --color-card-border: rgba(255, 255, 255, 0.6);
+  /* Core Backgrounds & Surfaces */
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #F1F5F9;
+  --color-card-bg: #FFFFFF;
+  --color-card-border: #E2E8F0;
 
-  /* Workout Logger Spec Tokens */
-  --color-rpe-low: #22c55e;
-  --color-rpe-mid: #f59e0b;
-  --color-rpe-high: #ef4444;
-  --color-set-done-bg: #dcfce7;
-  --color-rest-track: rgba(0, 0, 0, 0.06);
+  /* Brand Accents */
+  --color-accent: #FF5722;
+  --color-accent-dark: #E64A19;
+  --color-accent-light: #FFF3E0;
+  --color-ai: #0284C7;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
 
-  /* Typography */
-  --font-family: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-size-base: 16px;
-  --font-size-h1: 24px; --font-weight-h1: 700;
-  --font-size-h2: 20px; --font-weight-h2: 600;
-  --font-size-body: 14px; --font-weight-body: 400;
-  --font-size-caption: 12px; --font-weight-caption: 400;
+  /* Typography Colors */
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-caption: #94A3B8;
 
-  /* 8pt Grid Spacing */
-  --space-1: 8px; --space-2: 16px; --space-3: 24px; --space-4: 32px;
-  --space-5: 40px; --space-6: 48px;
+  /* Workout Set Tokens */
+  --color-rpe-low: #10B981;
+  --color-rpe-mid: #F59E0B;
+  --color-rpe-high: #EF4444;
+  --color-set-done-bg: #ECFDF5;
+  --color-rest-track: rgba(15, 23, 42, 0.06);
 
-  /* Radius */
-  --radius-panel: 24px;
+  /* Radius & Shadows */
+  --radius-panel: 20px;
   --radius-element: 12px;
+  --shadow-rest: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.04);
+}
 
-  /* Shadow */
-  --shadow-rest: 0 8px 32px rgba(0, 0, 0, 0.05);
-  --shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.1);
-
-  /* Layout */
-  --sidebar-width: 260px;
-  --sidebar-width-collapsed: 76px;
-  --side-column-width: 320px;
-  --side-column-width-tablet: 280px;
-
-  /* Z-index scale */
-  --z-sidebar: 10;
-  --z-card: 5;
-  --z-hud-overlay: 20;
-  --z-modal: 100;
+* {
+  box-sizing: border-box;
 }
 
 body {
   color: var(--color-text-primary);
   background: var(--color-bg);
-  font-family: var(--font-family);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Glass Card Base Style */
-.glass-card {
+::selection {
+  background-color: rgba(255, 87, 34, 0.2);
+  color: #0F172A;
+}
+
+/* Tabular figures for numerical metrics */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Modern Card Base Style */
+.glass-card,
+.surface-card {
   background: var(--color-card-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--color-card-border);
   border-radius: var(--radius-panel);
   box-shadow: var(--shadow-rest);
-  padding: var(--space-3);
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  z-index: var(--z-card);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
 }
 
-.glass-card:hover {
-  transform: translateY(-4px);
+.glass-card:hover,
+.surface-card:hover {
   box-shadow: var(--shadow-hover);
+  border-color: #CBD5E1;
 }
 
-@supports not (backdrop-filter: blur(1px)) {
-  .glass-card {
-    background: rgba(255, 255, 255, 0.95);
-  }
-}
-
-/* HUD Overlay */
-.hud-overlay {
-  position: absolute;
-  top: 8%;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: var(--z-hud-overlay);
-  text-align: center;
-  pointer-events: none;
-}
-
-@media (max-width: 768px) {
-  .hud-overlay {
-    top: 8px;
-  }
-}
-
-/* Custom scrollbar */
+/* Custom Slim Athletic Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: var(--color-bg);
-}
-::-webkit-scrollbar-thumb {
-  background: #D1C7B7;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #A89B86;
+  background: transparent;
 }
 
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}

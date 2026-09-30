@@ -2,7 +2,16 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Bell, Flame, Calendar, Clock, Sparkles, Camera, Activity } from 'lucide-react';
+import {
+  Bell,
+  Flame,
+  Calendar,
+  Menu,
+  ChevronDown,
+  User,
+  Settings,
+  LogOut,
+} from 'lucide-react';
 import { FitnessUser } from '@/lib/fitnessData';
 
 interface TopBarProps {
@@ -12,22 +21,29 @@ interface TopBarProps {
   onOpenBodyMetrics?: () => void;
   onOpenProgressPhotos?: () => void;
   onOpenOutfit?: () => void;
+  onToggleMobileMenu?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
   user,
   streak = 17,
-  photoCount = 4,
-  onOpenBodyMetrics,
-  onOpenProgressPhotos,
-  onOpenOutfit,
+  onToggleMobileMenu,
 }) => {
   const [currentDateTime, setCurrentDateTime] = useState<string>('');
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const days = ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
+      const days = [
+        'Chủ Nhật',
+        'Thứ Hai',
+        'Thứ Ba',
+        'Thứ Tư',
+        'Thứ Năm',
+        'Thứ Sáu',
+        'Thứ Bảy',
+      ];
       const dayName = days[now.getDay()];
       const date = now.getDate().toString().padStart(2, '0');
       const month = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -35,7 +51,9 @@ export const TopBar: React.FC<TopBarProps> = ({
       const hours = now.getHours().toString().padStart(2, '0');
       const minutes = now.getMinutes().toString().padStart(2, '0');
 
-      setCurrentDateTime(`${dayName}, ${date}/${month}/${year} • ${hours}:${minutes}`);
+      setCurrentDateTime(
+        `${dayName}, ${date}/${month}/${year} • ${hours}:${minutes}`
+      );
     };
 
     updateTime();
@@ -44,84 +62,110 @@ export const TopBar: React.FC<TopBarProps> = ({
   }, []);
 
   return (
-    <header className="h-16 px-4 sm:px-6 bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#B9A78E]/30 flex items-center justify-between sticky top-0 z-20 shadow-xs select-none">
-      {/* Date & Time (Left) */}
+    <header className="h-16 px-4 sm:px-6 bg-white border-b border-slate-200 flex items-center justify-between sticky top-0 z-30 select-none">
+      {/* Left: Mobile Toggle & Always-Visible Date / Time Box */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 text-xs text-[#76583E] font-bold bg-[#EFE9DF]/80 border border-[#B9A78E]/30 px-3 py-1.5 rounded-xl shadow-2xs">
-          <Calendar className="w-3.5 h-3.5 text-[#FF6B35]" strokeWidth={2} />
-          <span>{currentDateTime || 'Đang cập nhật...'}</span>
-        </div>
-        <div className="hidden xl:flex items-center gap-1.5 text-xs font-bold text-[#1F2328]/70">
-          <span>Chào mừng trở lại,</span>
-          <span className="text-[#FF6B35] font-black">{user.name}</span>
-          <Sparkles className="w-3 h-3 text-[#F59E0B]" />
+        {onToggleMobileMenu && (
+          <button
+            onClick={onToggleMobileMenu}
+            className="lg:hidden p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            aria-label="Mở menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        )}
+
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg shadow-2xs">
+          <Calendar className="w-3.5 h-3.5 text-[#FF5722] shrink-0" strokeWidth={2} />
+          <span className="tabular-nums font-medium text-slate-800">
+            {currentDateTime || 'Đang cập nhật...'}
+          </span>
         </div>
       </div>
 
-      {/* Right Controls: Quick Actions + Streak + Notifications + Profile */}
+      {/* Right Controls: Streak + Notifications + Interactive Profile Menu */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Quick Action: Album Ảnh Tiến Độ */}
-        {onOpenProgressPhotos && (
-          <button
-            onClick={onOpenProgressPhotos}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/85 hover:bg-white border border-[#B9A78E]/40 text-xs font-bold text-[#1F2328] shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
-            title="Mở Album Ảnh Tiến Độ Thể Hình"
-          >
-            <Camera className="w-3.5 h-3.5 text-[#3B82F6] group-hover:scale-110 transition-transform" />
-            <span className="hidden md:inline">Ảnh Tiến Độ</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-[#EFF6FF] text-[#2563EB] font-black">
-              {photoCount}
-            </span>
-          </button>
-        )}
-
-        {/* Quick Action: Cập Nhật Chỉ Số Cơ Thể */}
-        {onOpenBodyMetrics && (
-          <button
-            onClick={onOpenBodyMetrics}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/85 hover:bg-white border border-[#B9A78E]/40 text-xs font-bold text-[#1F2328] shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
-            title="Mở Bảng Đo Chỉ Số Cơ Thể (InBody/BMI)"
-          >
-            <Activity className="w-3.5 h-3.5 text-[#10B981] group-hover:scale-110 transition-transform" />
-            <span className="hidden md:inline">Chỉ Số Cơ Thể</span>
-          </button>
-        )}
-
-        {/* Streak Badge '17 Ngày' */}
-        <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#FFF3EB] to-[#FFE8D6] border border-[#FF6B35]/40 px-3 py-1.5 rounded-xl text-[#E65100] font-black text-xs sm:text-sm shadow-xs hover:scale-102 transition-transform cursor-default">
-          <div className="w-5 h-5 rounded-lg bg-[#FF6B35] flex items-center justify-center text-white shadow-xs">
-            <Flame className="w-3.5 h-3.5 fill-white animate-pulse" />
-          </div>
-          <span className="hidden sm:inline">{streak} Ngày Streak</span>
-          <span className="sm:hidden">{streak}N</span>
+        {/* Streak Indicator (Flat, high-contrast) */}
+        <div className="flex items-center gap-1.5 bg-orange-50 border border-orange-200 px-2.5 py-1.5 rounded-lg text-[#E64A19] font-bold text-xs">
+          <Flame className="w-3.5 h-3.5 text-[#FF5722] fill-[#FF5722]" />
+          <span className="hidden sm:inline tabular-nums">{streak} ngày streak</span>
+          <span className="sm:hidden tabular-nums">{streak}N</span>
         </div>
 
         {/* Notifications Bell */}
         <button
-          className="p-2 sm:p-2.5 rounded-xl bg-white/70 hover:bg-white text-[#1F2328] border border-[#B9A78E]/30 transition-all shadow-2xs relative cursor-pointer group"
+          className="p-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 transition-colors relative cursor-pointer"
+          aria-label="Xem thông báo"
           title="Thông báo hệ thống"
         >
-          <Bell className="w-4 h-4 text-[#76583E] group-hover:text-[#1F2328] transition-colors" strokeWidth={1.75} />
-          <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#FF6B35] rounded-full ring-2 ring-[#FAF8F5] animate-ping opacity-75" />
-          <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#FF6B35] rounded-full ring-2 ring-[#FAF8F5]" />
+          <Bell className="w-4 h-4" strokeWidth={2} />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF5722] rounded-full" />
         </button>
 
-        {/* User Profile Pill */}
-        <div className="flex items-center gap-2 pl-2 border-l border-[#B9A78E]/40">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#303238] to-[#1F2328] text-white flex items-center justify-center font-black text-xs shadow-sm ring-1 ring-white/50">
-            {user.name.slice(0, 1).toUpperCase()}
-          </div>
-          <div className="hidden lg:block text-left">
-            <div className="text-xs font-black text-[#1F2328] leading-tight">
-              {user.name}
+        {/* Interactive User Profile with Dropdown Menu */}
+        <div className="relative pl-2 border-l border-slate-200">
+          <button
+            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity cursor-pointer p-1 rounded-lg hover:bg-slate-50"
+            title="Tài khoản & Tùy chọn"
+            aria-expanded={isProfileMenuOpen}
+          >
+            <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-xs">
+              {user.name.slice(0, 1).toUpperCase()}
             </div>
-            <div className="text-[10px] text-[#76583E] font-bold">
-              Lv. {user.level}
+            <div className="hidden lg:block text-left">
+              <div className="text-xs font-bold text-slate-900 leading-tight flex items-center gap-1">
+                <span>{user.name}</span>
+                <ChevronDown className="w-3 h-3 text-slate-400" />
+              </div>
+              <div className="text-[10px] text-slate-400 font-semibold tabular-nums">
+                Lv. {user.level} • {user.goal === 'gain_muscle' ? 'Tăng cơ' : 'Giảm cân'}
+              </div>
             </div>
-          </div>
+          </button>
+
+          {/* Profile Dropdown Menu */}
+          {isProfileMenuOpen && (
+            <>
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setIsProfileMenuOpen(false)}
+              />
+              <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl border border-slate-200 shadow-xl py-1.5 z-50 animate-in fade-in zoom-in-95 duration-100">
+                <div className="px-3.5 py-2 border-b border-slate-100">
+                  <div className="text-xs font-bold text-slate-900">{user.name}</div>
+                  <div className="text-[11px] text-slate-500">Cấp độ {user.level} • Chiến binh thể hình</div>
+                </div>
+                <div className="py-1">
+                  <button
+                    onClick={() => setIsProfileMenuOpen(false)}
+                    className="w-full px-3.5 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <User className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Hồ sơ cá nhân</span>
+                  </button>
+                  <button
+                    onClick={() => setIsProfileMenuOpen(false)}
+                    className="w-full px-3.5 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <Settings className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Cài đặt ứng dụng</span>
+                  </button>
+                </div>
+                <div className="border-t border-slate-100 pt-1">
+                  <button
+                    onClick={() => setIsProfileMenuOpen(false)}
+                    className="w-full px-3.5 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                    <span>Đăng xuất</span>
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </header>
   );
 };
-

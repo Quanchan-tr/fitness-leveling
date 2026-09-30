@@ -10,9 +10,11 @@ import { PostComposer } from '@/components/community/PostComposer';
 import { ExercisePost } from '@/components/community/ExercisePost';
 import { ExerciseDetailModal } from '@/components/community/ExerciseDetailModal';
 import { ReportModal } from '@/components/community/ReportModal';
-import { SearchX, Sparkles } from 'lucide-react';
+import { SearchX, Users } from 'lucide-react';
+import { useShell } from '@/components/layout/ShellLayout';
 
 export default function CommunityPage() {
+  const { toggleMobileNav } = useShell();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterGroup, setFilterGroup] = useState('all');
   const [onlyPoseCheck, setOnlyPoseCheck] = useState(false);
@@ -24,12 +26,12 @@ export default function CommunityPage() {
   const [selectedPostForDetails, setSelectedPostForDetails] = useState<ExercisePostItem | null>(null);
   const [selectedPostForReport, setSelectedPostForReport] = useState<ExercisePostItem | null>(null);
 
-  // 1. Handle New Post Creation from PostComposer
+  // Handle New Post Creation from PostComposer
   const handlePostCreated = (newPost: ExercisePostItem) => {
     setPosts((prev) => [newPost, ...prev]);
   };
 
-  // 2. Handle Rating Exercise
+  // Handle Rating Exercise
   const handleRate = (postId: string, rating: number) => {
     setPosts((prev) =>
       prev.map((post) => {
@@ -49,13 +51,12 @@ export default function CommunityPage() {
       })
     );
 
-    // If modal is currently open for this post, update modal state too
     if (selectedPostForDetails && selectedPostForDetails.id === postId) {
       setSelectedPostForDetails((prev) => (prev ? { ...prev, userRating: rating } : null));
     }
   };
 
-  // 3. Handle Save / Bookmark Exercise
+  // Handle Save / Bookmark Exercise
   const handleToggleSave = (postId: string) => {
     setPosts((prev) =>
       prev.map((post) => {
@@ -67,7 +68,6 @@ export default function CommunityPage() {
       })
     );
 
-    // If modal is currently open for this post, update modal state too
     if (selectedPostForDetails && selectedPostForDetails.id === postId) {
       setSelectedPostForDetails((prev) => (prev ? { ...prev, isSaved: !prev.isSaved } : null));
     }
@@ -89,43 +89,47 @@ export default function CommunityPage() {
   });
 
   return (
-    <main className="flex-1 flex flex-col min-w-0 bg-[#F7F3EA] min-h-screen">
-      {/* 1. Preserved Global TopBar Header */}
-      <TopBar user={initialFitnessData.user} streak={initialFitnessData.today.streak} />
-
-      {/* 2. Sticky Feed Filter & Search Bar */}
-      <FeedFilterBar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        filterGroup={filterGroup}
-        onFilterGroupChange={setFilterGroup}
-        onlyPoseCheck={onlyPoseCheck}
-        onOnlyPoseCheckChange={setOnlyPoseCheck}
-        totalResults={filteredPosts.length}
+    <main className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen">
+      {/* 1. TopBar Header */}
+      <TopBar
+        user={initialFitnessData.user}
+        streak={initialFitnessData.today.streak}
+        onToggleMobileMenu={toggleMobileNav}
       />
 
-      {/* 3. Centered Vertical Newsfeed Container (Max width ~680px) */}
-      <div className="flex-1 max-w-[680px] w-full mx-auto px-4 py-6 space-y-5">
-        {/* Post Composer Card */}
+      {/* 2. Centered Social Fitness Feed */}
+      <div className="max-w-2xl mx-auto w-full px-4 sm:px-6 py-6 space-y-5">
+        {/* Page Header (Information-first, bold and focused) */}
+        <div className="flex items-center justify-between pb-2 border-b border-slate-200">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight flex items-center gap-2.5">
+              <Users className="w-6 h-6 sm:w-7 sm:h-7 text-[#FF5722]" />
+              <span>Bảng tin</span>
+            </h1>
+          </div>
+          <span className="text-xs font-semibold text-slate-600 bg-white px-2.5 py-1 rounded-lg border border-slate-200 tabular-nums">
+            {posts.length} bài tập
+          </span>
+        </div>
+
+        {/* Filter & Search Bar */}
+        <FeedFilterBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          filterGroup={filterGroup}
+          onFilterGroupChange={setFilterGroup}
+          onlyPoseCheck={onlyPoseCheck}
+          onOnlyPoseCheckChange={setOnlyPoseCheck}
+          totalResults={filteredPosts.length}
+        />
+
+        {/* Inline Post Composer */}
         <PostComposer
           currentUser={initialFitnessData.user}
           onPostCreated={handlePostCreated}
         />
 
-        {/* Feed Header / Sub-title */}
-        <div className="flex items-center justify-between px-1 pt-1">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#FF6B35]" />
-            <h2 className="text-xs font-bold text-[#1F2328] uppercase tracking-wider">
-              Community Feed & Verified Library
-            </h2>
-          </div>
-          <span className="text-[11px] text-[#76583E] font-medium">
-            {filteredPosts.length} {filteredPosts.length === 1 ? 'Exercise' : 'Exercises'}
-          </span>
-        </div>
-
-        {/* Exercise Posts List */}
+        {/* Posts Feed or Empty State */}
         {filteredPosts.length > 0 ? (
           <div className="space-y-4">
             {filteredPosts.map((post) => (
@@ -140,44 +144,51 @@ export default function CommunityPage() {
             ))}
           </div>
         ) : (
-          /* Empty State */
-          <div className="bg-white rounded-2xl border border-[#B9A78E]/40 p-8 text-center space-y-3 shadow-sm">
-            <div className="w-12 h-12 rounded-full bg-[#E8E1D5] text-[#76583E] flex items-center justify-center mx-auto">
+          <div className="p-12 text-center bg-white rounded-xl border border-slate-200 space-y-3">
+            <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 mx-auto">
               <SearchX className="w-6 h-6" />
             </div>
-            <h3 className="text-sm font-bold text-[#1F2328]">No exercises match your search</h3>
-            <p className="text-xs text-[#76583E] max-w-sm mx-auto">
-              We couldn’t find any community posts matching &quot;{searchQuery || filterGroup}&quot;. Try adjusting your keywords or clearing filters.
-            </p>
+            <div>
+              <h3 className="text-base font-bold text-slate-900">
+                Không tìm thấy bài tập nào
+              </h3>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                Không có bài tập nào phù hợp với bộ lọc hiện tại. Thử xóa tìm kiếm hoặc chọn nhóm cơ khác.
+              </p>
+            </div>
             <button
               onClick={() => {
                 setSearchQuery('');
                 setFilterGroup('all');
                 setOnlyPoseCheck(false);
               }}
-              className="bg-[#FF6B35] hover:bg-[#FF6B35]/90 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-sm"
+              className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition-colors cursor-pointer"
             >
-              Reset All Filters
+              Đặt lại bộ lọc
             </button>
           </div>
         )}
       </div>
 
       {/* Exercise Detail Modal */}
-      <ExerciseDetailModal
-        post={selectedPostForDetails}
-        isOpen={Boolean(selectedPostForDetails)}
-        onClose={() => setSelectedPostForDetails(null)}
-        onToggleSave={handleToggleSave}
-        onRate={handleRate}
-      />
+      {selectedPostForDetails && (
+        <ExerciseDetailModal
+          isOpen={true}
+          post={selectedPostForDetails}
+          onClose={() => setSelectedPostForDetails(null)}
+          onRate={handleRate}
+          onToggleSave={handleToggleSave}
+        />
+      )}
 
       {/* Report Modal */}
-      <ReportModal
-        post={selectedPostForReport}
-        isOpen={Boolean(selectedPostForReport)}
-        onClose={() => setSelectedPostForReport(null)}
-      />
+      {selectedPostForReport && (
+        <ReportModal
+          isOpen={true}
+          post={selectedPostForReport}
+          onClose={() => setSelectedPostForReport(null)}
+        />
+      )}
     </main>
   );
 }
