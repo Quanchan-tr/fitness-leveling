@@ -3,184 +3,187 @@
 
 import React, { useState } from 'react';
 import { TopBar } from '@/components/layout/TopBar';
-import { initialFitnessData } from '@/lib/fitnessData';
-import { Dumbbell, Plus, CheckCircle2, Calendar, Clock, Trophy } from 'lucide-react';
-
-interface WorkoutSet {
-  id: string;
-  exerciseName: string;
-  setNumber: number;
-  reps: number;
-  weightKg: number;
-  completed: boolean;
-}
+import { initialFitnessData, MetricHistoryItem, ProgressPhotoItem } from '@/lib/fitnessData';
+import { initialWeeklySchedule, exerciseDatabase } from '@/data/exerciseDatabase';
+import { WorkoutSession, WeekDay, ExerciseDbItem, ExerciseBlockData, SetEntry } from '@/types/workout.types';
+import { WeeklyScheduleRibbon } from '@/components/workout/WeeklyScheduleRibbon';
+import { WorkoutBuilder } from '@/components/workout/WorkoutBuilder';
+import { ExerciseDrawer } from '@/components/workout/ExerciseDrawer';
+import { BodyMetricsModal } from '@/components/home/BodyMetricsModal';
+import { ProgressPhotoModal } from '@/components/home/ProgressPhotoModal';
+import { OutfitModal } from '@/components/home/OutfitModal';
+import { CharacterOutfit } from '@/components/home/3d/Character';
+import { Dumbbell, Sparkles } from 'lucide-react';
+import { useShell } from '@/components/layout/ShellLayout';
 
 export default function WorkoutPage() {
-  const [sets, setSets] = useState<WorkoutSet[]>([
-    { id: '1', exerciseName: 'Barbell Bench Press', setNumber: 1, reps: 10, weightKg: 60, completed: true },
-    { id: '2', exerciseName: 'Barbell Bench Press', setNumber: 2, reps: 8, weightKg: 70, completed: true },
-    { id: '3', exerciseName: 'Barbell Bench Press', setNumber: 3, reps: 6, weightKg: 75, completed: false },
-    { id: '4', exerciseName: 'Incline Dumbbell Flyes', setNumber: 1, reps: 12, weightKg: 16, completed: false },
-    { id: '5', exerciseName: 'Incline Dumbbell Flyes', setNumber: 2, reps: 12, weightKg: 16, completed: false },
-  ]);
+  const { toggleMobileNav } = useShell();
+  const [weeklySessions, setWeeklySessions] = useState<WorkoutSession[]>(initialWeeklySchedule);
+  const [selectedDay, setSelectedDay] = useState<WeekDay>('Sun');
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const [exerciseName, setExerciseName] = useState('Barbell Squat');
-  const [reps, setReps] = useState('10');
-  const [weightKg, setWeightKg] = useState('60');
+  // Extra state for modals synced with initialFitnessData
+  const [fitnessData, setFitnessData] = useState(initialFitnessData);
+  const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
+  const [isPhotosModalOpen, setIsPhotosModalOpen] = useState(false);
+  const [isOutfitModalOpen, setIsOutfitModalOpen] = useState(false);
 
-  const toggleSetComplete = (id: string) => {
-    setSets((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, completed: !s.completed } : s))
+  const [outfit, setOutfit] = useState<CharacterOutfit>({
+    shirtColor: '#FF5722',
+    shirtStripeColor: '#FFFFFF',
+    shortsColor: '#1E293B',
+    headbandColor: '#1E293B',
+    shoesColor: '#FF5722',
+    wristbandColor: '#1E293B',
+  });
+
+  const currentSession = weeklySessions.find((s) => s.day === selectedDay) || weeklySessions[0];
+
+  const handleUpdateCurrentSession = (updatedSession: WorkoutSession) => {
+    setWeeklySessions((prev) =>
+      prev.map((s) => (s.id === updatedSession.id ? updatedSession : s))
     );
   };
 
-  const handleAddSet = (e: React.FormEvent) => {
-    e.preventDefault();
-    const newSet: WorkoutSet = {
-      id: `set-${Date.now()}`,
-      exerciseName,
-      setNumber: sets.filter((s) => s.exerciseName === exerciseName).length + 1,
-      reps: parseInt(reps, 10) || 10,
-      weightKg: parseFloat(weightKg) || 0,
-      completed: false,
+  const handleAddExerciseFromDatabase = (dbItem: ExerciseDbItem) => {
+    const defaultSets: SetEntry[] = Array.from({ length: dbItem.defaultSets }, (_, i) => ({
+      id: `set-${Date.now()}-${i + 1}`,
+      setNumber: i + 1,
+      targetReps: dbItem.defaultReps,
+      targetWeightKg: dbItem.defaultWeightKg || 0,
+      actualReps: null,
+      actualWeightKg: null,
+      rpe: null,
+      isCompleted: false,
+    }));
+
+    const newExercise: ExerciseBlockData = {
+      id: `ex-${Date.now()}`,
+      name: dbItem.name,
+      nameVi: dbItem.nameVi,
+      muscleGroup: dbItem.muscleGroup,
+      category: dbItem.category,
+      sets: defaultSets,
+      notes: dbItem.description,
     };
-    setSets([...sets, newSet]);
+
+    const updatedSession: WorkoutSession = {
+      ...currentSession,
+      status: currentSession.status === 'rest' ? 'planned' : currentSession.status,
+      exercises: [...currentSession.exercises, newExercise],
+    };
+
+    handleUpdateCurrentSession(updatedSession);
+  };
+
+  const handleSaveMetric = (newMetric: MetricHistoryItem) => {
+    setFitnessData((prev) => ({
+      ...prev,
+      body: {
+        ...prev.body,
+        weight: newMetric.weight,
+        bodyFat: newMetric.bodyFat,
+        muscle: newMetric.muscle,
+        bmi: parseFloat((newMetric.weight / Math.pow(prev.body.height / 100, 2)).toFixed(1)),
+      },
+      recentMetrics: [newMetric, ...prev.recentMetrics],
+    }));
+  };
+
+  const handleAddPhoto = (photo: ProgressPhotoItem) => {
+    setFitnessData((prev) => ({
+      ...prev,
+      progressPhotos: [photo, ...prev.progressPhotos],
+    }));
+  };
+
+  const handleDeletePhoto = (id: string) => {
+    setFitnessData((prev) => ({
+      ...prev,
+      progressPhotos: prev.progressPhotos.filter((p) => p.id !== id),
+    }));
   };
 
   return (
-    <main className="flex-1 flex flex-col min-w-0">
-      <TopBar user={initialFitnessData.user} streak={initialFitnessData.today.streak} />
+    <main className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen">
+      {/* Top Navigation Bar */}
+      <TopBar
+        user={fitnessData.user}
+        streak={fitnessData.today.streak}
+        photoCount={fitnessData.progressPhotos.length}
+        onOpenBodyMetrics={() => setIsMetricsModalOpen(true)}
+        onOpenProgressPhotos={() => setIsPhotosModalOpen(true)}
+        onOpenOutfit={() => setIsOutfitModalOpen(true)}
+        onToggleMobileMenu={toggleMobileNav}
+      />
 
-      <div className="p-6 space-y-6 max-w-5xl mx-auto w-full">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+      {/* Main Content Area */}
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl mx-auto w-full">
+        {/* Page Header (Information-first, no card container, no kicker badge) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
           <div>
-            <h1 className="text-2xl font-black text-[#1F2328] tracking-tight flex items-center gap-2.5">
-              <Dumbbell className="w-7 h-7 text-[#FF6B35]" />
-              Workout Logger
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+              <Dumbbell className="w-7 h-7 sm:w-8 sm:h-8 text-[#FF5722]" />
+              <span>Luyện tập</span>
             </h1>
-            <p className="text-xs text-[#76583E] mt-0.5">
-              Track your sets, reps, and resistance in real time.
-            </p>
           </div>
-          <div className="flex items-center gap-2 bg-[#E8E1D5] px-3.5 py-1.5 rounded-xl text-xs font-bold text-[#1F2328]">
-            <Clock className="w-4 h-4 text-[#FF6B35]" />
-            <span>Session: 42 mins</span>
-          </div>
+
+          <button
+            onClick={() => setIsDrawerOpen(true)}
+            className="px-4 py-2 bg-[#FF5722] hover:bg-[#E64A19] text-white text-xs sm:text-sm font-bold rounded-lg transition-colors flex items-center gap-2 cursor-pointer self-start sm:self-center"
+          >
+            <Dumbbell className="w-4 h-4" />
+            <span>Ngân hàng bài tập</span>
+          </button>
         </div>
 
-        {/* Add Set Form */}
-        <form
-          onSubmit={handleAddSet}
-          className="bg-white p-5 rounded-2xl border border-[#B9A78E]/40 shadow-sm space-y-3"
-        >
-          <h3 className="text-xs font-bold text-[#1F2328] uppercase tracking-wider">
-            Add Exercise Set
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <div className="sm:col-span-2">
-              <label className="block text-[11px] font-semibold text-[#76583E] mb-1">
-                Exercise
-              </label>
-              <select
-                value={exerciseName}
-                onChange={(e) => setExerciseName(e.target.value)}
-                className="w-full bg-[#F7F3EA] px-3 py-2 rounded-xl border border-[#B9A78E]/40 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
-              >
-                <option value="Barbell Squat">Barbell Squat (Pose Check Ready)</option>
-                <option value="Barbell Bench Press">Barbell Bench Press</option>
-                <option value="Deadlift">Deadlift</option>
-                <option value="Incline Dumbbell Flyes">Incline Dumbbell Flyes</option>
-                <option value="Push-up">Push-up (Pose Check Ready)</option>
-                <option value="Plank">Plank (Pose Check Ready)</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-[#76583E] mb-1">
-                Reps
-              </label>
-              <input
-                type="number"
-                value={reps}
-                onChange={(e) => setReps(e.target.value)}
-                className="w-full bg-[#F7F3EA] px-3 py-2 rounded-xl border border-[#B9A78E]/40 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-[#76583E] mb-1">
-                Weight (kg)
-              </label>
-              <input
-                type="number"
-                step="0.5"
-                value={weightKg}
-                onChange={(e) => setWeightKg(e.target.value)}
-                className="w-full bg-[#F7F3EA] px-3 py-2 rounded-xl border border-[#B9A78E]/40 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
-              />
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              className="bg-[#FF6B35] text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-[#FF6B35]/90 transition-all flex items-center gap-1.5 shadow-sm"
-            >
-              <Plus className="w-4 h-4" />
-              Add Set
-            </button>
-          </div>
-        </form>
+        {/* 1. Weekly Schedule Ribbon */}
+        <WeeklyScheduleRibbon
+          sessions={weeklySessions}
+          selectedDay={selectedDay}
+          todayDay="Sun"
+          onSelectDay={(day) => setSelectedDay(day)}
+        />
 
-        {/* Sets List Table */}
-        <div className="bg-white rounded-2xl border border-[#B9A78E]/40 overflow-hidden shadow-sm">
-          <div className="p-4 bg-[#E8E1D5]/40 border-b border-[#B9A78E]/30 flex items-center justify-between">
-            <h3 className="text-xs font-bold text-[#1F2328] uppercase tracking-wider">
-              Today's Session Sets
-            </h3>
-            <span className="text-xs text-[#76583E] font-medium">
-              {sets.filter((s) => s.completed).length} / {sets.length} Completed
-            </span>
-          </div>
-
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="border-b border-[#B9A78E]/20 text-[#76583E] font-semibold">
-                <th className="p-3.5">Exercise</th>
-                <th className="p-3.5">Set</th>
-                <th className="p-3.5">Target Reps</th>
-                <th className="p-3.5">Weight</th>
-                <th className="p-3.5 text-right">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#B9A78E]/20">
-              {sets.map((s) => (
-                <tr
-                  key={s.id}
-                  className={`transition-colors ${
-                    s.completed ? 'bg-[#7FB069]/10' : 'hover:bg-[#F7F3EA]'
-                  }`}
-                >
-                  <td className="p-3.5 font-bold text-[#1F2328]">{s.exerciseName}</td>
-                  <td className="p-3.5 text-[#76583E] font-semibold">Set {s.setNumber}</td>
-                  <td className="p-3.5 font-medium">{s.reps} reps</td>
-                  <td className="p-3.5 font-bold text-[#FF6B35]">{s.weightKg} kg</td>
-                  <td className="p-3.5 text-right">
-                    <button
-                      onClick={() => toggleSetComplete(s.id)}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                        s.completed
-                          ? 'bg-[#7FB069] text-white'
-                          : 'bg-[#E8E1D5] text-[#76583E] hover:bg-[#FF6B35] hover:text-white'
-                      }`}
-                    >
-                      {s.completed ? 'Done' : 'Mark Done'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {/* 2. Workout Builder for Selected Day */}
+        <WorkoutBuilder
+          session={currentSession}
+          onUpdateSession={handleUpdateCurrentSession}
+          onOpenDrawer={() => setIsDrawerOpen(true)}
+        />
       </div>
+
+      {/* Exercise Library Slide-Over Drawer */}
+      <ExerciseDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        onAddExercise={handleAddExerciseFromDatabase}
+        database={exerciseDatabase}
+      />
+
+      {/* Modals */}
+      <BodyMetricsModal
+        isOpen={isMetricsModalOpen}
+        onClose={() => setIsMetricsModalOpen(false)}
+        metrics={fitnessData.body}
+        history={fitnessData.recentMetrics}
+        onSaveMetric={handleSaveMetric}
+      />
+
+      <ProgressPhotoModal
+        isOpen={isPhotosModalOpen}
+        onClose={() => setIsPhotosModalOpen(false)}
+        photos={fitnessData.progressPhotos}
+        onAddPhoto={handleAddPhoto}
+        onDeletePhoto={handleDeletePhoto}
+      />
+
+      <OutfitModal
+        isOpen={isOutfitModalOpen}
+        onClose={() => setIsOutfitModalOpen(false)}
+        outfit={outfit}
+        onSaveOutfit={setOutfit}
+      />
     </main>
   );
 }

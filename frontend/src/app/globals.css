@@ -3,30 +3,100 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 31, 35, 40;
-  --background-start-rgb: 247, 243, 234;
-  --background-end-rgb: 232, 225, 213;
+  /* Core Backgrounds & Surfaces */
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-subtle: #F1F5F9;
+  --color-card-bg: #FFFFFF;
+  --color-card-border: #E2E8F0;
+
+  /* Brand Accents */
+  --color-accent: #FF5722;
+  --color-accent-dark: #E64A19;
+  --color-accent-light: #FFF3E0;
+  --color-ai: #0284C7;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-danger: #EF4444;
+
+  /* Typography Colors */
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-caption: #94A3B8;
+
+  /* Workout Set Tokens */
+  --color-rpe-low: #10B981;
+  --color-rpe-mid: #F59E0B;
+  --color-rpe-high: #EF4444;
+  --color-set-done-bg: #ECFDF5;
+  --color-rest-track: rgba(15, 23, 42, 0.06);
+
+  /* Radius & Shadows */
+  --radius-panel: 20px;
+  --radius-element: 12px;
+  --shadow-rest: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 8px 24px -4px rgba(0, 0, 0, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.04);
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: #F7F3EA;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar */
+::selection {
+  background-color: rgba(255, 87, 34, 0.2);
+  color: #0F172A;
+}
+
+/* Tabular figures for numerical metrics */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Modern Card Base Style */
+.glass-card,
+.surface-card {
+  background: var(--color-card-bg);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-rest);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
+}
+
+.glass-card:hover,
+.surface-card:hover {
+  box-shadow: var(--shadow-hover);
+  border-color: #CBD5E1;
+}
+
+/* Custom Slim Athletic Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #F7F3EA;
+  background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #B9A78E;
-  border-radius: 3px;
+  background: #CBD5E1;
+  border-radius: 9999px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #76583E;
+  background: #94A3B8;
+}
+
+/* Focus styles */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }

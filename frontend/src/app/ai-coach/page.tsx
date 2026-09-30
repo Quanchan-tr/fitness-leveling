@@ -4,193 +4,246 @@
 import React, { useState } from 'react';
 import { TopBar } from '@/components/layout/TopBar';
 import { initialFitnessData } from '@/lib/fitnessData';
-import { Sparkles, Video, Bot, Dumbbell, Utensils, CheckCircle2, AlertCircle, Play, RefreshCw, Upload } from 'lucide-react';
+import {
+  Video,
+  Bot,
+  Dumbbell,
+  CheckCircle2,
+  AlertCircle,
+  Play,
+  RefreshCw,
+  Upload,
+} from 'lucide-react';
+import { useShell } from '@/components/layout/ShellLayout';
 
 export default function AiCoachPage() {
-  const [activeTab, setActiveTab] = useState<'workout' | 'meal' | 'pose'>('pose');
+  const { toggleMobileNav } = useShell();
+  const [activeTab, setActiveTab] = useState<'pose' | 'workout'>('pose');
   const [poseExercise, setPoseExercise] = useState('squat');
   const [isCapturing, setIsCapturing] = useState(false);
   const [repCount, setRepCount] = useState(12);
   const [score, setScore] = useState(92);
   const [feedback, setFeedback] = useState([
-    { issue: 'Good depth achieved on all sets', type: 'success' },
-    { issue: 'Slight forward knee drift at Rep 8', type: 'warning' },
+    { issue: 'Độ sâu đùi song song mặt sàn đạt chuẩn 100%', type: 'success' },
+    { issue: 'Lưng thẳng, ngực mở tự nhiên trong suốt 12 reps', type: 'success' },
+    { issue: 'Đầu gối hơi chụm vào trong ở Rep thứ 8 khi phát lực lên', type: 'warning' },
   ]);
 
   // AI Workout Generation state
   const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
-  const [generatedPlan, setGeneratedPlan] = useState<any>(null);
+  const [generatedPlan, setGeneratedPlan] = useState<any>({
+    plan_name: '4-Tuần Hypertrophy Tăng Cơ Nạc & Cải Thiện Thăng Bằng',
+    goal: 'gain_muscle',
+    duration_weeks: 4,
+    sessions: [
+      {
+        day: 'Buổi 1: Thân Trên Đẩy & Tay Sau',
+        exercises: ['Barbell Bench Press (4x8 - 80kg)', 'Incline DB Press (3x10 - 26kg)', 'Tricep Cable Pushdown (3x12)'],
+      },
+      {
+        day: 'Buổi 2: Thân Dưới & Squat Kiểm Tra Form AI',
+        exercises: ['Barbell Squat (4x8 - AI Form Check)', 'Romanian Deadlift (3x10)', 'Calf Raises (4x15)'],
+      },
+      {
+        day: 'Buổi 3: Lưng Xô & Tay Trước (Pull)',
+        exercises: ['Pull-ups (3xMax)', 'Barbell Bent Over Row (4x8)', 'Bicep Barbell Curl (3x10)'],
+      },
+    ],
+  });
 
   const handleGeneratePlan = () => {
     setIsGeneratingPlan(true);
     setTimeout(() => {
       setGeneratedPlan({
-        plan_name: '4-Week Hypertrophy & Core Focus',
+        plan_name: '4-Tuần Hypertrophy Tối Ưu Tải Trọng & Thể Lực',
         goal: 'gain_muscle',
         duration_weeks: 4,
         sessions: [
-          { day: 'Day 1: Upper Body Strength', exercises: ['Barbell Bench Press (4x8)', 'Overhead Press (3x10)', 'Pull-ups (3xMax)'] },
-          { day: 'Day 2: Lower Body & Pose Checked Squats', exercises: ['Barbell Squat (4x8 - AI Form Check)', 'Romanian Deadlift (3x10)', 'Calf Raises (4x15)'] },
-          { day: 'Day 3: Core & Active Recovery', exercises: ['Plank Form Hold (3x60s)', 'Hanging Leg Raises (3x12)'] },
+          {
+            day: 'Buổi 1: Ngực & Vai Trước (Heavy Push)',
+            exercises: ['Flat Barbell Bench (4x6-8)', 'Overhead Dumbbell Press (3x8-10)', 'Dips (3xMax)'],
+          },
+          {
+            day: 'Buổi 2: Đùi & Mông (Quad & Glute Power)',
+            exercises: ['Barbell Back Squat (4x8 - AI Form Check)', 'Bulgarian Split Squat (3x10/bên)', 'Leg Extension (3x12)'],
+          },
+          {
+            day: 'Buổi 3: Lưng Xô & Core Phục Hồi',
+            exercises: ['Deadlift (3x5)', 'Lat Pulldown (3x10)', 'Hanging Leg Raise (3x15)'],
+          },
         ],
       });
       setIsGeneratingPlan(false);
-    }, 1200);
+    }, 1000);
   };
 
   return (
-    <main className="flex-1 flex flex-col min-w-0">
-      <TopBar user={initialFitnessData.user} streak={initialFitnessData.today.streak} />
+    <main className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen">
+      <TopBar
+        user={initialFitnessData.user}
+        streak={initialFitnessData.today.streak}
+        onToggleMobileMenu={toggleMobileNav}
+      />
 
-      <div className="p-6 space-y-6 max-w-5xl mx-auto w-full">
-        {/* Header */}
-        <div className="flex items-center justify-between">
+      <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl mx-auto w-full">
+        {/* Header (Information-first, bold and focused) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
           <div>
-            <h1 className="text-2xl font-black text-[#1F2328] tracking-tight flex items-center gap-2.5">
-              <Sparkles className="w-7 h-7 text-[#FF6B35]" />
-              FitTrack AI Coach Hub
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-3">
+              <Video className="w-7 h-7 sm:w-8 sm:h-8 text-[#FF5722]" />
+              <span>AI Pose Check &amp; Huấn luyện</span>
             </h1>
-            <p className="text-xs text-[#76583E] mt-0.5">
-              Triple-layer validated AI workout recommendations, meal plans, and real-time computer vision Pose Check.
-            </p>
           </div>
         </div>
 
         {/* Tab Selector */}
-        <div className="flex gap-2 bg-[#E8E1D5]/60 p-1.5 rounded-2xl border border-[#B9A78E]/40 w-fit">
+        <div className="flex gap-1.5 bg-slate-200/70 p-1 rounded-lg w-fit">
           <button
             onClick={() => setActiveTab('pose')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer ${
               activeTab === 'pose'
-                ? 'bg-[#FF6B35] text-white shadow-sm'
-                : 'text-[#76583E] hover:text-[#1F2328]'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Video className="w-4 h-4" />
-            AI Pose Check
+            <Video className="w-3.5 h-3.5" />
+            <span>AI Pose Check (Webcam)</span>
           </button>
           <button
             onClick={() => setActiveTab('workout')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer ${
               activeTab === 'workout'
-                ? 'bg-[#FF6B35] text-white shadow-sm'
-                : 'text-[#76583E] hover:text-[#1F2328]'
+                ? 'bg-white text-slate-900 shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <Dumbbell className="w-4 h-4" />
-            AI Workout Planner
-          </button>
-          <button
-            onClick={() => setActiveTab('meal')}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-              activeTab === 'meal'
-                ? 'bg-[#FF6B35] text-white shadow-sm'
-                : 'text-[#76583E] hover:text-[#1F2328]'
-            }`}
-          >
-            <Utensils className="w-4 h-4" />
-            AI Meal Planner
+            <Dumbbell className="w-3.5 h-3.5" />
+            <span>AI Workout Planner</span>
           </button>
         </div>
 
         {/* Tab 1: AI Pose Check Studio */}
         {activeTab === 'pose' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Camera / Video Viewport */}
-            <div className="lg:col-span-2 bg-[#303238] rounded-3xl overflow-hidden shadow-lg border border-[#B9A78E]/30 relative flex flex-col justify-between min-h-[380px]">
-              <div className="p-4 flex items-center justify-between z-10">
-                <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-white text-xs font-bold flex items-center gap-2">
-                  <span className={`w-2.5 h-2.5 rounded-full ${isCapturing ? 'bg-red-500 animate-ping' : 'bg-green-500'}`} />
-                  <span>{isCapturing ? 'Pose Check Active' : 'Edge CV Ready'}</span>
-                </div>
-                <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-white text-xs font-semibold">
-                  Rule Key: <strong className="text-[#FF6B35] uppercase">{poseExercise}_v1</strong>
-                </div>
-              </div>
-
-              {/* Viewport Silhouette / Camera Preview */}
-              <div className="flex flex-col items-center justify-center text-white/80 p-8 space-y-3">
-                <div className="w-24 h-24 rounded-full bg-white/10 flex items-center justify-center border-2 border-dashed border-white/30 animate-pulse">
-                  <Video className="w-10 h-10 text-[#FF6B35]" />
-                </div>
-                <div className="text-center">
-                  <h3 className="font-bold text-sm text-white">Client-Side Edge MediaPipe Engine</h3>
-                  <p className="text-xs text-white/60 max-w-sm mt-1">
-                    Pose landmarks are processed locally on your device in real-time. Zero frames sent to the server.
-                  </p>
-                </div>
-              </div>
-
-              {/* Controls bar */}
-              <div className="p-4 bg-black/60 backdrop-blur-md flex items-center justify-between">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* Camera / Video Viewport Studio (8 cols) */}
+            <div className="lg:col-span-8 bg-slate-950 rounded-xl overflow-hidden border border-slate-800 relative flex flex-col justify-between min-h-[440px]">
+              {/* Top Viewport HUD Bar */}
+              <div className="p-3.5 flex items-center justify-between z-10 bg-slate-900/90 border-b border-slate-800">
                 <div className="flex items-center gap-2">
+                  <span
+                    className={`w-2.5 h-2.5 rounded-full ${
+                      isCapturing ? 'bg-red-500 animate-ping' : 'bg-emerald-500'
+                    }`}
+                  />
+                  <span className="text-white text-xs font-bold tracking-wide">
+                    {isCapturing ? 'Đang chấm điểm trực tiếp' : 'MediaPipe CV Sẵn sàng'}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
+                  <span>Quy tắc:</span>
+                  <span className="text-slate-200 font-bold uppercase px-2 py-0.5 rounded bg-slate-800">
+                    {poseExercise}_v1.2
+                  </span>
+                </div>
+              </div>
+
+              {/* Viewport Viewfinder with Reticle Overlay */}
+              <div className="relative flex-1 flex flex-col items-center justify-center text-white/90 p-8 my-auto">
+                {/* Viewfinder Target Corners */}
+                <div className="absolute top-6 left-6 w-8 h-8 border-t-2 border-l-2 border-orange-500/60" />
+                <div className="absolute top-6 right-6 w-8 h-8 border-t-2 border-r-2 border-orange-500/60" />
+                <div className="absolute bottom-6 left-6 w-8 h-8 border-b-2 border-l-2 border-orange-500/60" />
+                <div className="absolute bottom-6 right-6 w-8 h-8 border-b-2 border-r-2 border-orange-500/60" />
+
+                {/* Center Camera Icon with Orange Circle */}
+                <div className="w-20 h-20 rounded-full bg-slate-900/80 border-2 border-[#FF5722] flex items-center justify-center shadow-lg shadow-orange-500/20">
+                  <Video className="w-9 h-9 text-[#FF5722]" />
+                </div>
+              </div>
+
+              {/* Bottom Control Dock */}
+              <div className="p-3.5 bg-slate-900/90 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
                   <button
                     onClick={() => setIsCapturing(!isCapturing)}
-                    className={`px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all ${
+                    className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-2 transition-colors cursor-pointer ${
                       isCapturing
-                        ? 'bg-red-500 text-white hover:bg-red-600'
-                        : 'bg-[#FF6B35] text-white hover:bg-[#FF6B35]/90'
+                        ? 'bg-rose-600 hover:bg-rose-700 text-white'
+                        : 'bg-[#FF5722] hover:bg-[#E64A19] text-white'
                     }`}
                   >
-                    <Play className="w-4 h-4" />
-                    {isCapturing ? 'Finish Set & Send Summary' : 'Start Realtime Check'}
+                    <Play className="w-4 h-4 fill-current" />
+                    <span>{isCapturing ? 'Kết thúc & Lưu kết quả' : 'Bật Webcam & Bắt đầu'}</span>
                   </button>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button className="bg-white/15 text-white hover:bg-white/25 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5">
+                  <button className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-colors cursor-pointer">
                     <Upload className="w-3.5 h-3.5" />
-                    Upload Video (Async)
+                    <span>Tải video phân tích</span>
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Live Metrics & Kinematic Feedback */}
-            <div className="bg-white p-5 rounded-3xl border border-[#B9A78E]/40 shadow-sm space-y-5">
+            {/* Live Metrics & Kinematic Feedback (4 cols) */}
+            <div className="lg:col-span-4 bg-white p-5 rounded-xl border border-slate-200 space-y-4">
               <div>
-                <span className="text-xs font-bold text-[#76583E] uppercase tracking-wider">Exercise Selected</span>
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1.5">
+                  Chọn bài tập kiểm tra form
+                </label>
                 <select
                   value={poseExercise}
                   onChange={(e) => setPoseExercise(e.target.value)}
-                  className="w-full bg-[#F7F3EA] mt-1.5 px-3.5 py-2.5 rounded-xl border border-[#B9A78E]/40 text-xs font-bold text-[#1F2328]"
+                  className="w-full bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#FF5722]"
                 >
-                  <option value="squat">Barbell / Bodyweight Squat</option>
-                  <option value="pushup">Standard Push-up</option>
-                  <option value="plank">Isometric Plank</option>
+                  <option value="squat">Barbell Squat / Bodyweight Squat</option>
+                  <option value="pushup">Hít đất (Standard Push-up)</option>
+                  <option value="plank">Plank tĩnh (Isometric Plank)</option>
                 </select>
               </div>
 
               {/* Score & Reps Grid */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-[#E8E1D5]/40 p-4 rounded-2xl border border-[#B9A78E]/30 text-center">
-                  <span className="text-[11px] font-bold text-[#76583E]">Valid Reps</span>
-                  <div className="text-3xl font-black text-[#1F2328] mt-1">{repCount}</div>
+                <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-center">
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                    Số Rep Hợp Lệ
+                  </span>
+                  <div className="text-3xl font-black text-slate-900 mt-0.5 tabular-nums">
+                    {repCount}
+                  </div>
                 </div>
-                <div className="bg-[#7FB069]/15 p-4 rounded-2xl border border-[#7FB069]/30 text-center">
-                  <span className="text-[11px] font-bold text-[#7FB069]">Form Score</span>
-                  <div className="text-3xl font-black text-[#7FB069] mt-1">{score}%</div>
+                <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-center">
+                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                    Điểm Form Chuẩn
+                  </span>
+                  <div className="text-3xl font-black text-slate-900 mt-0.5 tabular-nums">
+                    {score}%
+                  </div>
                 </div>
               </div>
 
               {/* Realtime Form Warnings / Feedback */}
               <div className="space-y-2">
-                <span className="text-xs font-bold text-[#1F2328] block">Kinematic Feedback</span>
+                <span className="text-xs font-bold uppercase tracking-wide text-slate-700 block">
+                  Phân tích động học (Kinematic Cues)
+                </span>
                 {feedback.map((f, i) => (
                   <div
                     key={i}
-                    className={`p-3 rounded-xl text-xs font-medium flex items-start gap-2 ${
+                    className={`p-3 rounded-lg text-xs font-medium flex items-start gap-2.5 border ${
                       f.type === 'success'
-                        ? 'bg-[#7FB069]/15 text-[#1F2328]'
-                        : 'bg-[#F4C95D]/25 text-[#1F2328]'
+                        ? 'bg-emerald-50 text-emerald-950 border-emerald-200'
+                        : 'bg-amber-50 text-amber-950 border-amber-200'
                     }`}
                   >
                     {f.type === 'success' ? (
-                      <CheckCircle2 className="w-4 h-4 text-[#7FB069] flex-shrink-0 mt-0.5" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                     ) : (
-                      <AlertCircle className="w-4 h-4 text-[#FF6B35] flex-shrink-0 mt-0.5" />
+                      <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                     )}
-                    <span>{f.issue}</span>
+                    <span className="leading-snug">{f.issue}</span>
                   </div>
                 ))}
               </div>
@@ -200,41 +253,51 @@ export default function AiCoachPage() {
 
         {/* Tab 2: AI Workout Planner */}
         {activeTab === 'workout' && (
-          <div className="bg-white p-6 rounded-3xl border border-[#B9A78E]/40 shadow-sm space-y-6">
-            <div className="flex items-center justify-between">
+          <div className="bg-white p-6 rounded-xl border border-slate-200 space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
               <div>
-                <h3 className="font-bold text-base text-[#1F2328]">Tailored AI Exercise Plan</h3>
-                <p className="text-xs text-[#76583E]">
-                  Context: Age 26, BMI 22.3, Goal: Muscle Gain, Activity: Moderate.
+                <h3 className="font-bold text-base sm:text-lg text-slate-900 tracking-tight">
+                  Kế hoạch tập luyện cá nhân hóa (AI Workout Plan)
+                </h3>
+                <p className="text-xs text-slate-500 font-normal mt-0.5">
+                  Ngữ cảnh: 26 tuổi • BMI 22.4 • Mục tiêu: Tăng cơ nạc • Tần suất: 3 buổi/tuần.
                 </p>
               </div>
               <button
                 onClick={handleGeneratePlan}
                 disabled={isGeneratingPlan}
-                className="bg-[#FF6B35] text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-[#FF6B35]/90 transition-all flex items-center gap-2 shadow-sm"
+                className="bg-[#FF5722] hover:bg-[#E64A19] text-white px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors flex items-center gap-2 cursor-pointer self-start sm:self-center"
               >
                 <RefreshCw className={`w-4 h-4 ${isGeneratingPlan ? 'animate-spin' : ''}`} />
-                {isGeneratingPlan ? 'Analyzing & Validating...' : 'Generate New Plan'}
+                <span>{isGeneratingPlan ? 'Đang phân tích dữ liệu...' : 'Sinh lịch tập mới'}</span>
               </button>
             </div>
 
             {generatedPlan ? (
               <div className="space-y-4">
-                <div className="bg-[#E8E1D5]/40 p-4 rounded-2xl border border-[#B9A78E]/30">
-                  <h4 className="font-bold text-sm text-[#1F2328]">{generatedPlan.plan_name}</h4>
-                  <span className="text-xs text-[#FF6B35] font-semibold">
-                    Duration: {generatedPlan.duration_weeks} Weeks • Goal: {generatedPlan.goal}
+                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-sm text-slate-900">{generatedPlan.plan_name}</h4>
+                    <span className="text-xs text-slate-500 font-medium">
+                      Thời lượng: {generatedPlan.duration_weeks} tuần • Mục tiêu: Tăng cơ bắp nạc
+                    </span>
+                  </div>
+                  <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                    Đã kiểm duyệt cấu trúc
                   </span>
                 </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {generatedPlan.sessions.map((sess: any, idx: number) => (
-                    <div key={idx} className="bg-[#F7F3EA] p-4 rounded-2xl border border-[#B9A78E]/30 space-y-2">
-                      <h5 className="font-bold text-xs text-[#1F2328]">{sess.day}</h5>
-                      <ul className="text-xs space-y-1 text-[#76583E]">
+                    <div key={idx} className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-2.5">
+                      <h5 className="font-bold text-xs text-slate-900 uppercase tracking-wide">
+                        {sess.day}
+                      </h5>
+                      <ul className="text-xs space-y-1.5 text-slate-600">
                         {sess.exercises.map((ex: string, i: number) => (
-                          <li key={i} className="flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
-                            {ex}
+                          <li key={i} className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#FF5722]" />
+                            <span className="font-medium text-slate-800">{ex}</span>
                           </li>
                         ))}
                       </ul>
@@ -243,46 +306,13 @@ export default function AiCoachPage() {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-10 bg-[#F7F3EA] rounded-2xl border border-[#B9A78E]/30 space-y-2">
-                <Bot className="w-10 h-10 text-[#FF6B35] mx-auto" />
-                <p className="text-xs font-semibold text-[#1F2328]">
-                  Click "Generate New Plan" to request a structured plan from the AI Engine.
+              <div className="text-center py-12 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
+                <Bot className="w-8 h-8 text-slate-400 mx-auto" />
+                <p className="text-xs font-bold text-slate-700">
+                  Bấm &quot;Sinh lịch tập mới&quot; để nhận đề xuất bài tập tối ưu từ mô hình AI.
                 </p>
               </div>
             )}
-          </div>
-        )}
-
-        {/* Tab 3: AI Meal Planner */}
-        {activeTab === 'meal' && (
-          <div className="bg-white p-6 rounded-3xl border border-[#B9A78E]/40 shadow-sm space-y-6">
-            <h3 className="font-bold text-base text-[#1F2328]">Personalized AI Meal Guidance</h3>
-            <p className="text-xs text-[#76583E]">
-              Calorie Target: 2,400 kcal (Protein: 160g, Carbs: 260g, Fat: 75g)
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-[#F7F3EA] p-4 rounded-2xl border border-[#B9A78E]/30 space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-[#FF6B35]/15 text-[#FF6B35] px-2 py-0.5 rounded">
-                  Breakfast • 600 kcal
-                </span>
-                <h4 className="font-bold text-xs text-[#1F2328]">High-Protein Power Oats</h4>
-                <p className="text-xs text-[#76583E]">80g Rolled Oats, 1 Scoop Whey Protein, 100g Berries, 15g Peanut Butter.</p>
-              </div>
-              <div className="bg-[#F7F3EA] p-4 rounded-2xl border border-[#B9A78E]/30 space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-[#F4C95D]/25 text-[#1F2328] px-2 py-0.5 rounded">
-                  Lunch • 850 kcal
-                </span>
-                <h4 className="font-bold text-xs text-[#1F2328]">Grilled Steak Rice Bowl</h4>
-                <p className="text-xs text-[#76583E]">180g Lean Flank Steak, 200g Jasmine Rice, Roasted Asparagus & Olive Oil.</p>
-              </div>
-              <div className="bg-[#F7F3EA] p-4 rounded-2xl border border-[#B9A78E]/30 space-y-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-[#4D96FF]/15 text-[#4D96FF] px-2 py-0.5 rounded">
-                  Dinner • 650 kcal
-                </span>
-                <h4 className="font-bold text-xs text-[#1F2328]">Salmon & Sweet Potato Mash</h4>
-                <p className="text-xs text-[#76583E]">200g Wild Salmon, 200g Baked Sweet Potato, Steamed Broccoli with Lemon.</p>
-              </div>
-            </div>
           </div>
         )}
       </div>
