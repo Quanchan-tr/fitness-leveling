@@ -36,8 +36,10 @@ export async function apiRequest<T>(
   options: RequestInit & { requiresAuth?: boolean; useIdempotency?: boolean } = {}
 ): Promise<T> {
   const token = typeof window !== 'undefined' ? localStorage.getItem('fittrack_token') : null;
+  // Don't set Content-Type for FormData — the browser adds multipart boundary automatically.
+  const isFormData = options.body instanceof FormData;
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     Accept: 'application/json',
     ...(options.headers as Record<string, string>),
   };

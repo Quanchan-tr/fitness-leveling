@@ -1,9 +1,14 @@
-'use strict';
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { TopBar } from '@/components/layout/TopBar';
 import { initialFitnessData } from '@/lib/fitnessData';
+import { apiRequest, generateUUID } from '@/lib/api';
+import {
+  usePoseDetection,
+  type ExerciseType,
+  type PoseFeedbackIssue,
+} from '@/hooks/usePoseDetection';
 import {
   Video,
   Bot,
@@ -11,70 +16,234 @@ import {
   CheckCircle2,
   AlertCircle,
   Play,
+  Square,
   RefreshCw,
   Upload,
+  Wifi,
+  WifiOff,
+  Activity,
+  Target,
+  Timer,
+  Zap,
+  Camera,
+  CameraOff,
 } from 'lucide-react';
 import { useShell } from '@/components/layout/ShellLayout';
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type TabType = 'pose' | 'workout';
+
+interface RepLog {
+  repNumber: number;
+  score: number;
+  issues: PoseFeedbackIssue[];
+  timestamp: number;
+}
+
+// ─── Score colour helper ──────────────────────────────────────────────────────
+
+function scoreColour(score: number): string {
+  if (score >= 85) return 'text-emerald-500';
+  if (score >= 65) return 'text-amber-400';
+  return 'text-rose-500';
+}
+
+function scoreBgColour(score: number): string {
+  if (score >= 85) return 'bg-emerald-500';
+  if (score >= 65) return 'bg-amber-400';
+  return 'bg-rose-500';
+}
+
+// ─── Page Component ───────────────────────────────────────────────────────────
+
 export default function AiCoachPage() {
   const { toggleMobileNav } = useShell();
-  const [activeTab, setActiveTab] = useState<'pose' | 'workout'>('pose');
-  const [poseExercise, setPoseExercise] = useState('squat');
-  const [isCapturing, setIsCapturing] = useState(false);
-  const [repCount, setRepCount] = useState(12);
-  const [score, setScore] = useState(92);
-  const [feedback, setFeedback] = useState([
-    { issue: 'Độ sâu đùi song song mặt sàn đạt chuẩn 100%', type: 'success' },
-    { issue: 'Lưng thẳng, ngực mở tự nhiên trong suốt 12 reps', type: 'success' },
-    { issue: 'Đầu gối hơi chụm vào trong ở Rep thứ 8 khi phát lực lên', type: 'warning' },
-  ]);
+  const [activeTab, setActiveTab] = useState<TabType>('pose');
+  const [poseExercise, setPoseExercise] = useState<ExerciseType>('squat');
+  const [sessionActive, setSessionActive] = useState(false);
+  const [repLogs, setRepLogs] = useState<RepLog[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadAnalyzing, setIsUploadAnalyzing] = useState(false);
+  const [uploadResult, setUploadResult] = useState<any>(null);
 
-  // AI Workout Generation state
-  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
-  const [generatedPlan, setGeneratedPlan] = useState<any>({
-    plan_name: '4-Tuần Hypertrophy Tăng Cơ Nạc & Cải Thiện Thăng Bằng',
-    goal: 'gain_muscle',
-    duration_weeks: 4,
-    sessions: [
-      {
-        day: 'Buổi 1: Thân Trên Đẩy & Tay Sau',
-        exercises: ['Barbell Bench Press (4x8 - 80kg)', 'Incline DB Press (3x10 - 26kg)', 'Tricep Cable Pushdown (3x12)'],
-      },
-      {
-        day: 'Buổi 2: Thân Dưới & Squat Kiểm Tra Form AI',
-        exercises: ['Barbell Squat (4x8 - AI Form Check)', 'Romanian Deadlift (3x10)', 'Calf Raises (4x15)'],
-      },
-      {
-        day: 'Buổi 3: Lưng Xô & Tay Trước (Pull)',
-        exercises: ['Pull-ups (3xMax)', 'Barbell Bent Over Row (4x8)', 'Bicep Barbell Curl (3x10)'],
-      },
-    ],
+  // Rep completion callback
+  const handleRepCompleted = useCallback(
+    (repNum: number, score: number, issues: PoseFeedbackIssue[]) => {
+      setRepLogs((prev) => [
+        ...prev,
+        { repNumber: repNum, score, issues, timestamp: Date.now() },
+      ]);
+    },
+    []
+  );
+
+  // MediaPipe hook
+  const {
+    videoRef,
+    canvasRef,
+    isModelLoading,
+    isRunning,
+    error: poseError,
+    metrics,
+    start,
+    stop,
+    reset,
+  } = usePoseDetection({
+    exercise: poseExercise,
+    onRepCompleted: handleRepCompleted,
   });
 
-  const handleGeneratePlan = () => {
+  // Start / Stop handler
+  const handleToggleSession = async () => {
+    if (isRunning) {
+      // Stop and save session
+      const finalState = stop();
+      setSessionActive(false);
+
+      if (metrics.repCount > 0) {
+        await saveSession(finalState);
+      }
+    } else {
+      // Start new session
+      setRepLogs([]);
+      setSaveSuccess(false);
+      reset();
+      setSessionActive(true);
+      await start();
+    }
+  };
+
+  // Save session to backend
+  const saveSession = async (finalState: any) => {
+    setIsSaving(true);
+    try {
+      const exerciseIdMap: Record<ExerciseType, string> = {
+        // These should match real exercise UUIDs from your DB; using placeholder
+        squat: '00000000-0000-0000-0000-000000000001',
+        pushup: '00000000-0000-0000-0000-000000000002',
+        plank: '00000000-0000-0000-0000-000000000003',
+      };
+
+      const feedbackJson = {
+        rep_count: metrics.repCount,
+        score: metrics.score,
+        rep_feedback: repLogs.map((r) => ({
+          rep_number: r.repNumber,
+          score: r.score,
+          issues: r.issues.map((i) => ({
+            issue_code: i.issueCode,
+            severity: i.severity,
+            message: i.message,
+          })),
+        })),
+      };
+
+      await apiRequest('/pose-check/realtime/result', {
+        method: 'POST',
+        body: JSON.stringify({
+          exercise_id: exerciseIdMap[poseExercise],
+          rep_count: metrics.repCount,
+          score: metrics.score,
+          feedback_json: feedbackJson,
+        }),
+        useIdempotency: true,
+      });
+
+      setSaveSuccess(true);
+    } catch (err) {
+      console.warn('[AiCoachPage] Save session failed (non-blocking):', err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Exercise change resets state
+  const handleExerciseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (isRunning) return; // Can't change mid-session
+    setPoseExercise(e.target.value as ExerciseType);
+    reset();
+    setRepLogs([]);
+  };
+
+  // Upload video for server-side analysis
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadAnalyzing(true);
+    setUploadResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('video', file);
+      formData.append('exercise_id', '00000000-0000-0000-0000-000000000001');
+
+      const result = await apiRequest<{ data: { session_id: string; status: string } }>(
+        '/pose-check/upload',
+        {
+          method: 'POST',
+          body: formData,
+          headers: {
+            // Don't set Content-Type manually for FormData
+            Accept: 'application/json',
+            'Idempotency-Key': generateUUID(),
+          },
+        }
+      );
+      setUploadResult(result.data);
+    } catch (err: any) {
+      console.error('[AiCoachPage] Upload failed:', err);
+      setUploadResult({ error: err.message });
+    } finally {
+      setIsUploadAnalyzing(false);
+    }
+  };
+
+  // ─── AI Workout Planner state ─────────────────────────────────────────────
+
+  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
+  const [generatedPlan, setGeneratedPlan] = useState<any>(null);
+
+  const handleGeneratePlan = async () => {
     setIsGeneratingPlan(true);
-    setTimeout(() => {
+    try {
+      const result = await apiRequest<{ data: any }>('/ai/exercise-plan', {
+        method: 'POST',
+        useIdempotency: true,
+      });
+      setGeneratedPlan(result.data);
+    } catch (err) {
+      console.warn('[AiCoachPage] Exercise plan generation failed:', err);
+      // Fallback plan
       setGeneratedPlan({
-        plan_name: '4-Tuần Hypertrophy Tối Ưu Tải Trọng & Thể Lực',
-        goal: 'gain_muscle',
+        plan_name: 'Kế hoạch tập luyện cơ bản',
         duration_weeks: 4,
         sessions: [
           {
-            day: 'Buổi 1: Ngực & Vai Trước (Heavy Push)',
-            exercises: ['Flat Barbell Bench (4x6-8)', 'Overhead Dumbbell Press (3x8-10)', 'Dips (3xMax)'],
-          },
-          {
-            day: 'Buổi 2: Đùi & Mông (Quad & Glute Power)',
-            exercises: ['Barbell Back Squat (4x8 - AI Form Check)', 'Bulgarian Split Squat (3x10/bên)', 'Leg Extension (3x12)'],
-          },
-          {
-            day: 'Buổi 3: Lưng Xô & Core Phục Hồi',
-            exercises: ['Deadlift (3x5)', 'Lat Pulldown (3x10)', 'Hanging Leg Raise (3x15)'],
+            day_label: 'Buổi 1',
+            focus_area: 'Toàn thân',
+            exercises: [
+              { exercise_name: 'Squat', sets: 3, reps: '12 reps', rest_seconds: 60 },
+              { exercise_name: 'Push-up', sets: 3, reps: '10 reps', rest_seconds: 60 },
+              { exercise_name: 'Plank', sets: 3, reps: '45s', rest_seconds: 30 },
+            ],
           },
         ],
       });
+    } finally {
       setIsGeneratingPlan(false);
-    }, 1000);
+    }
+  };
+
+  // ─── Render ───────────────────────────────────────────────────────────────
+
+  const exerciseLabel: Record<ExerciseType, string> = {
+    squat: 'Squat (Đứng ngồi)',
+    pushup: 'Push-up (Hít đất)',
+    plank: 'Plank (Tĩnh)',
   };
 
   return (
@@ -86,19 +255,23 @@ export default function AiCoachPage() {
       />
 
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl mx-auto w-full">
-        {/* Header (Information-first, bold and focused) */}
+        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">
           <div>
             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-3">
               <Video className="w-7 h-7 sm:w-8 sm:h-8 text-[#FF5722]" />
               <span>AI Pose Check &amp; Huấn luyện</span>
             </h1>
+            <p className="text-sm text-slate-500 mt-1">
+              Phân tích tư thế thời gian thực bằng MediaPipe BlazePose
+            </p>
           </div>
         </div>
 
         {/* Tab Selector */}
         <div className="flex gap-1.5 bg-slate-200/70 p-1 rounded-lg w-fit">
           <button
+            id="tab-pose"
             onClick={() => setActiveTab('pose')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer ${
               activeTab === 'pose'
@@ -110,6 +283,7 @@ export default function AiCoachPage() {
             <span>AI Pose Check (Webcam)</span>
           </button>
           <button
+            id="tab-workout"
             onClick={() => setActiveTab('workout')}
             className={`flex items-center gap-2 px-3.5 py-1.5 rounded-md text-xs font-bold transition-colors cursor-pointer ${
               activeTab === 'workout'
@@ -122,136 +296,356 @@ export default function AiCoachPage() {
           </button>
         </div>
 
-        {/* Tab 1: AI Pose Check Studio */}
+        {/* ── Tab 1: AI Pose Check Studio ─────────────────────────────────── */}
         {activeTab === 'pose' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* Camera / Video Viewport Studio (8 cols) */}
-            <div className="lg:col-span-8 bg-slate-950 rounded-xl overflow-hidden border border-slate-800 relative flex flex-col justify-between min-h-[440px]">
-              {/* Top Viewport HUD Bar */}
+            {/* Camera / Skeleton Viewport (8 cols) */}
+            <div className="lg:col-span-8 bg-slate-950 rounded-xl overflow-hidden border border-slate-800 relative flex flex-col min-h-[460px]">
+              {/* HUD Top Bar */}
               <div className="p-3.5 flex items-center justify-between z-10 bg-slate-900/90 border-b border-slate-800">
                 <div className="flex items-center gap-2">
                   <span
                     className={`w-2.5 h-2.5 rounded-full ${
-                      isCapturing ? 'bg-red-500 animate-ping' : 'bg-emerald-500'
+                      isRunning
+                        ? 'bg-red-500 animate-pulse'
+                        : isModelLoading
+                        ? 'bg-amber-400 animate-pulse'
+                        : 'bg-emerald-500'
                     }`}
                   />
                   <span className="text-white text-xs font-bold tracking-wide">
-                    {isCapturing ? 'Đang chấm điểm trực tiếp' : 'MediaPipe CV Sẵn sàng'}
+                    {isRunning
+                      ? 'Đang phân tích realtime'
+                      : isModelLoading
+                      ? 'Đang tải mô hình AI...'
+                      : 'MediaPipe BlazePose Sẵn sàng'}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs font-medium text-slate-400">
-                  <span>Quy tắc:</span>
-                  <span className="text-slate-200 font-bold uppercase px-2 py-0.5 rounded bg-slate-800">
-                    {poseExercise}_v1.2
-                  </span>
+                <div className="flex items-center gap-3">
+                  {isRunning && (
+                    <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                      <Activity className="w-3 h-3 text-emerald-400" />
+                      <span className="text-emerald-400 font-bold tabular-nums">
+                        {metrics.fps} FPS
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                    <span>Quy tắc:</span>
+                    <span className="text-slate-200 font-bold uppercase px-2 py-0.5 rounded bg-slate-800">
+                      {poseExercise}_v2
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* Viewport Viewfinder with Reticle Overlay */}
-              <div className="relative flex-1 flex flex-col items-center justify-center text-white/90 p-8 my-auto">
-                {/* Viewfinder Target Corners */}
-                <div className="absolute top-6 left-6 w-8 h-8 border-t-2 border-l-2 border-orange-500/60" />
-                <div className="absolute top-6 right-6 w-8 h-8 border-t-2 border-r-2 border-orange-500/60" />
-                <div className="absolute bottom-6 left-6 w-8 h-8 border-b-2 border-l-2 border-orange-500/60" />
-                <div className="absolute bottom-6 right-6 w-8 h-8 border-b-2 border-r-2 border-orange-500/60" />
+              {/* Video + Canvas Overlay */}
+              <div className="relative flex-1 flex items-center justify-center bg-slate-950 min-h-[360px]">
+                {/* Hidden video element for webcam stream */}
+                <video
+                  ref={videoRef}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ transform: 'scaleX(-1)', display: isRunning ? 'block' : 'none' }}
+                  playsInline
+                  muted
+                />
 
-                {/* Center Camera Icon with Orange Circle */}
-                <div className="w-20 h-20 rounded-full bg-slate-900/80 border-2 border-[#FF5722] flex items-center justify-center shadow-lg shadow-orange-500/20">
-                  <Video className="w-9 h-9 text-[#FF5722]" />
-                </div>
+                {/* Canvas for skeleton overlay */}
+                <canvas
+                  ref={canvasRef}
+                  width={640}
+                  height={480}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ display: isRunning ? 'block' : 'none' }}
+                />
+
+                {/* Placeholder when camera is off */}
+                {!isRunning && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white/80 p-8">
+                    {/* Viewfinder corners */}
+                    <div className="absolute top-6 left-6 w-8 h-8 border-t-2 border-l-2 border-orange-500/50" />
+                    <div className="absolute top-6 right-6 w-8 h-8 border-t-2 border-r-2 border-orange-500/50" />
+                    <div className="absolute bottom-6 left-6 w-8 h-8 border-b-2 border-l-2 border-orange-500/50" />
+                    <div className="absolute bottom-6 right-6 w-8 h-8 border-b-2 border-r-2 border-orange-500/50" />
+
+                    {isModelLoading ? (
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="w-12 h-12 border-2 border-[#FF5722] border-t-transparent rounded-full animate-spin" />
+                        <p className="text-sm font-semibold text-slate-300">
+                          Đang tải mô hình MediaPipe...
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-4 text-center">
+                        <div className="w-20 h-20 rounded-full bg-slate-900/80 border-2 border-[#FF5722] flex items-center justify-center shadow-lg shadow-orange-500/20">
+                          <Camera className="w-9 h-9 text-[#FF5722]" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-200 text-base">
+                            Camera chưa được bật
+                          </p>
+                          <p className="text-slate-500 text-xs mt-1">
+                            Nhấn &quot;Bắt đầu phân tích&quot; để mở camera và chạy AI
+                          </p>
+                        </div>
+                        {poseError && (
+                          <div className="bg-rose-900/50 border border-rose-700 rounded-lg px-4 py-2 text-xs text-rose-300 max-w-xs">
+                            {poseError}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Realtime score overlay (when running) */}
+                {isRunning && (
+                  <div className="absolute top-3 left-3 flex gap-2">
+                    <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-700">
+                      <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">
+                        Reps
+                      </div>
+                      <div className="text-2xl font-black text-white tabular-nums leading-none">
+                        {metrics.repCount}
+                      </div>
+                    </div>
+                    <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-700">
+                      <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">
+                        Điểm
+                      </div>
+                      <div
+                        className={`text-2xl font-black tabular-nums leading-none ${scoreColour(metrics.score)}`}
+                      >
+                        {metrics.score}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* In-rep indicator */}
+                {isRunning && metrics.isInRep && (
+                  <div className="absolute top-3 right-3 bg-[#FF5722]/90 text-white text-xs font-bold px-2 py-1 rounded animate-pulse">
+                    ● RẬP ĐANG THỰC HIỆN
+                  </div>
+                )}
               </div>
 
               {/* Bottom Control Dock */}
               <div className="p-3.5 bg-slate-900/90 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <button
-                    onClick={() => setIsCapturing(!isCapturing)}
-                    className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-2 transition-colors cursor-pointer ${
-                      isCapturing
+                    id="btn-start-stop"
+                    onClick={handleToggleSession}
+                    disabled={isModelLoading || isSaving}
+                    className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-2 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${
+                      isRunning
                         ? 'bg-rose-600 hover:bg-rose-700 text-white'
                         : 'bg-[#FF5722] hover:bg-[#E64A19] text-white'
                     }`}
                   >
-                    <Play className="w-4 h-4 fill-current" />
-                    <span>{isCapturing ? 'Kết thúc & Lưu kết quả' : 'Bật Webcam & Bắt đầu'}</span>
+                    {isRunning ? (
+                      <>
+                        <Square className="w-4 h-4 fill-current" />
+                        <span>
+                          {isSaving ? 'Đang lưu...' : 'Kết thúc & Lưu kết quả'}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 fill-current" />
+                        <span>
+                          {isModelLoading ? 'Đang tải...' : 'Bắt đầu phân tích'}
+                        </span>
+                      </>
+                    )}
                   </button>
+
+                  {saveSuccess && (
+                    <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      Đã lưu!
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <button className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-colors cursor-pointer">
+                  <label className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-colors cursor-pointer">
                     <Upload className="w-3.5 h-3.5" />
-                    <span>Tải video phân tích</span>
-                  </button>
+                    <span>
+                      {isUploadAnalyzing ? 'Đang phân tích...' : 'Tải video phân tích'}
+                    </span>
+                    <input
+                      ref={uploadInputRef}
+                      type="file"
+                      accept="video/mp4,video/mov,video/quicktime"
+                      className="hidden"
+                      onChange={handleVideoUpload}
+                      disabled={isUploadAnalyzing}
+                    />
+                  </label>
                 </div>
               </div>
+
+              {/* Upload result notification */}
+              {uploadResult && (
+                <div
+                  className={`px-4 py-2.5 text-xs font-semibold border-t ${
+                    uploadResult.error
+                      ? 'bg-rose-900/30 text-rose-300 border-rose-800'
+                      : 'bg-emerald-900/30 text-emerald-300 border-emerald-800'
+                  }`}
+                >
+                  {uploadResult.error ? (
+                    <span>⚠ Lỗi upload: {uploadResult.error}</span>
+                  ) : (
+                    <span>
+                      ✓ Video đang được phân tích trên server (Session:{' '}
+                      {uploadResult.session_id?.slice(0, 8)}...). Kết quả sẽ
+                      có sau vài phút.
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Live Metrics & Kinematic Feedback (4 cols) */}
-            <div className="lg:col-span-4 bg-white p-5 rounded-xl border border-slate-200 space-y-4">
-              <div>
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-1.5">
+            {/* Right Panel: Metrics + Feedback (4 cols) */}
+            <div className="lg:col-span-4 space-y-4">
+              {/* Exercise selector */}
+              <div className="bg-white p-4 rounded-xl border border-slate-200">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wide block mb-2">
                   Chọn bài tập kiểm tra form
                 </label>
                 <select
+                  id="exercise-select"
                   value={poseExercise}
-                  onChange={(e) => setPoseExercise(e.target.value)}
-                  className="w-full bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#FF5722]"
+                  onChange={handleExerciseChange}
+                  disabled={isRunning}
+                  className="w-full bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#FF5722] disabled:opacity-50"
                 >
                   <option value="squat">Barbell Squat / Bodyweight Squat</option>
                   <option value="pushup">Hít đất (Standard Push-up)</option>
                   <option value="plank">Plank tĩnh (Isometric Plank)</option>
                 </select>
+                <p className="text-[11px] text-slate-400 mt-1.5">
+                  {poseExercise === 'squat' &&
+                    'Đứng thẳng trước camera • Toàn thân trong khung hình'}
+                  {poseExercise === 'pushup' &&
+                    'Nghiêng người • Camera nhìn từ bên cạnh để tốt nhất'}
+                  {poseExercise === 'plank' && 'Nằm nghiêng • Camera nhìn từ bên hông'}
+                </p>
               </div>
 
-              {/* Score & Reps Grid */}
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-center">
-                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
-                    Số Rep Hợp Lệ
-                  </span>
-                  <div className="text-3xl font-black text-slate-900 mt-0.5 tabular-nums">
-                    {repCount}
+              {/* Score + Rep Metrics */}
+              <div className="bg-white p-4 rounded-xl border border-slate-200">
+                <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-3">
+                  Thống kê phiên tập
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-center">
+                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                      Số Rep Hợp Lệ
+                    </span>
+                    <div className="text-3xl font-black text-slate-900 mt-0.5 tabular-nums">
+                      {metrics.repCount}
+                    </div>
+                  </div>
+                  <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-center">
+                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                      Điểm Form
+                    </span>
+                    <div
+                      className={`text-3xl font-black mt-0.5 tabular-nums ${scoreColour(metrics.score)}`}
+                    >
+                      {metrics.score}%
+                    </div>
                   </div>
                 </div>
-                <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-center">
-                  <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
-                    Điểm Form Chuẩn
-                  </span>
-                  <div className="text-3xl font-black text-slate-900 mt-0.5 tabular-nums">
-                    {score}%
+
+                {/* Score bar */}
+                <div className="mt-3">
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${scoreBgColour(metrics.score)}`}
+                      style={{ width: `${metrics.score}%` }}
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Realtime Form Warnings / Feedback */}
-              <div className="space-y-2">
+              {/* Realtime Feedback Issues */}
+              <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
                 <span className="text-xs font-bold uppercase tracking-wide text-slate-700 block">
-                  Phân tích động học (Kinematic Cues)
+                  Phân tích động học (Realtime)
                 </span>
-                {feedback.map((f, i) => (
-                  <div
-                    key={i}
-                    className={`p-3 rounded-lg text-xs font-medium flex items-start gap-2.5 border ${
-                      f.type === 'success'
-                        ? 'bg-emerald-50 text-emerald-950 border-emerald-200'
-                        : 'bg-amber-50 text-amber-950 border-amber-200'
-                    }`}
-                  >
-                    {f.type === 'success' ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                    )}
-                    <span className="leading-snug">{f.issue}</span>
+
+                {metrics.issues.length === 0 ? (
+                  <div className="p-3 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center gap-2.5 text-xs text-emerald-900">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span className="font-medium">
+                      {isRunning
+                        ? 'Tư thế tốt! Tiếp tục duy trì.'
+                        : 'Bắt đầu phiên tập để xem phân tích.'}
+                    </span>
                   </div>
-                ))}
+                ) : (
+                  metrics.issues.map((issue, i) => (
+                    <div
+                      key={i}
+                      className={`p-3 rounded-lg text-xs font-medium flex items-start gap-2.5 border ${
+                        issue.severity === 'high'
+                          ? 'bg-rose-50 text-rose-950 border-rose-200'
+                          : 'bg-amber-50 text-amber-950 border-amber-200'
+                      }`}
+                    >
+                      <AlertCircle
+                        className={`w-4 h-4 shrink-0 mt-0.5 ${
+                          issue.severity === 'high' ? 'text-rose-600' : 'text-amber-600'
+                        }`}
+                      />
+                      <span className="leading-snug">{issue.message}</span>
+                    </div>
+                  ))
+                )}
               </div>
+
+              {/* Rep History Log */}
+              {repLogs.length > 0 && (
+                <div className="bg-white p-4 rounded-xl border border-slate-200">
+                  <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-3">
+                    Lịch sử reps ({repLogs.length})
+                  </h3>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {repLogs.map((rep) => (
+                      <div
+                        key={rep.repNumber}
+                        className="flex items-center justify-between text-xs py-1.5 border-b border-slate-100 last:border-0"
+                      >
+                        <span className="font-semibold text-slate-700">
+                          Rep #{rep.repNumber}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          {rep.issues.length > 0 && (
+                            <span className="text-amber-600 text-[10px]">
+                              {rep.issues.length} lỗi
+                            </span>
+                          )}
+                          <span
+                            className={`font-black tabular-nums ${scoreColour(rep.score)}`}
+                          >
+                            {rep.score}%
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* Tab 2: AI Workout Planner */}
+        {/* ── Tab 2: AI Workout Planner ────────────────────────────────────── */}
         {activeTab === 'workout' && (
           <div className="bg-white p-6 rounded-xl border border-slate-200 space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
@@ -260,13 +654,14 @@ export default function AiCoachPage() {
                   Kế hoạch tập luyện cá nhân hóa (AI Workout Plan)
                 </h3>
                 <p className="text-xs text-slate-500 font-normal mt-0.5">
-                  Ngữ cảnh: 26 tuổi • BMI 22.4 • Mục tiêu: Tăng cơ nạc • Tần suất: 3 buổi/tuần.
+                  Dựa trên hồ sơ cá nhân: tuổi, BMI, mục tiêu, tần suất tập luyện.
                 </p>
               </div>
               <button
+                id="btn-generate-plan"
                 onClick={handleGeneratePlan}
                 disabled={isGeneratingPlan}
-                className="bg-[#FF5722] hover:bg-[#E64A19] text-white px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors flex items-center gap-2 cursor-pointer self-start sm:self-center"
+                className="bg-[#FF5722] hover:bg-[#E64A19] text-white px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors flex items-center gap-2 cursor-pointer self-start sm:self-center disabled:opacity-60"
               >
                 <RefreshCw className={`w-4 h-4 ${isGeneratingPlan ? 'animate-spin' : ''}`} />
                 <span>{isGeneratingPlan ? 'Đang phân tích dữ liệu...' : 'Sinh lịch tập mới'}</span>
@@ -279,7 +674,7 @@ export default function AiCoachPage() {
                   <div>
                     <h4 className="font-bold text-sm text-slate-900">{generatedPlan.plan_name}</h4>
                     <span className="text-xs text-slate-500 font-medium">
-                      Thời lượng: {generatedPlan.duration_weeks} tuần • Mục tiêu: Tăng cơ bắp nạc
+                      Thời lượng: {generatedPlan.duration_weeks} tuần
                     </span>
                   </div>
                   <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
@@ -288,16 +683,28 @@ export default function AiCoachPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {generatedPlan.sessions.map((sess: any, idx: number) => (
-                    <div key={idx} className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-2.5">
-                      <h5 className="font-bold text-xs text-slate-900 uppercase tracking-wide">
-                        {sess.day}
-                      </h5>
+                  {generatedPlan.sessions?.map((sess: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-2.5"
+                    >
+                      <div>
+                        <h5 className="font-bold text-xs text-slate-900 uppercase tracking-wide">
+                          {sess.day_label || sess.day || `Buổi ${idx + 1}`}
+                        </h5>
+                        {sess.focus_area && (
+                          <p className="text-[11px] text-slate-500 mt-0.5">{sess.focus_area}</p>
+                        )}
+                      </div>
                       <ul className="text-xs space-y-1.5 text-slate-600">
-                        {sess.exercises.map((ex: string, i: number) => (
-                          <li key={i} className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#FF5722]" />
-                            <span className="font-medium text-slate-800">{ex}</span>
+                        {(sess.exercises || []).map((ex: any, i: number) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#FF5722] mt-1.5 shrink-0" />
+                            <span className="font-medium text-slate-800">
+                              {typeof ex === 'string'
+                                ? ex
+                                : `${ex.exercise_name} — ${ex.sets}x${ex.reps}`}
+                            </span>
                           </li>
                         ))}
                       </ul>
@@ -306,11 +713,16 @@ export default function AiCoachPage() {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-12 bg-slate-50 rounded-lg border border-slate-200 space-y-2">
-                <Bot className="w-8 h-8 text-slate-400 mx-auto" />
-                <p className="text-xs font-bold text-slate-700">
-                  Bấm &quot;Sinh lịch tập mới&quot; để nhận đề xuất bài tập tối ưu từ mô hình AI.
-                </p>
+              <div className="text-center py-12 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
+                <Bot className="w-10 h-10 text-slate-300 mx-auto" />
+                <div>
+                  <p className="text-sm font-bold text-slate-700">
+                    Chưa có kế hoạch tập luyện
+                  </p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Nhấn &quot;Sinh lịch tập mới&quot; để nhận đề xuất cá nhân hóa từ AI.
+                  </p>
+                </div>
               </div>
             )}
           </div>

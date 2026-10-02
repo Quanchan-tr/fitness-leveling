@@ -1,19 +1,21 @@
+import base64
 import logging
 import os
 
+import cv2
 import numpy as np
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import config
+from app.cv.mediapipe_extractor import get_extractor, _mp_pose
 from app.rules.plank_rule import PlankRule
 from app.rules.pushup_rule import PushupRule
 from app.rules.squat_rule import SquatRule
-from app.schemas.request import ProcessVideoRequest
+from app.schemas.request import AnalyzeFrameRequest, ProcessVideoRequest
 from app.schemas.response import (
+    AnalyzeFrameResponse,
     PoseFeedbackResponse,
-    PoseIssue,
-    RepFeedback,
     WorkerTaskResult,
 )
 
@@ -104,36 +106,50 @@ async def process_video_task(payload: ProcessVideoRequest):
     rule_key = payload.exercise_type.lower()
     rule_engine = RULES_REGISTRY.get(rule_key, SquatRule())
 
-    # --- Process video from local filesystem ---
-    # `video_path` is read directly via OpenCV from the shared Docker volume.
-    # Previously this would have required downloading from S3 via boto3.
+    # --- Process video from local filesystem via MediaPipe ---
     logger.info(
-        f"Processing video from local path: {payload.video_path} "
+        f"Extracting pose landmarks from: {payload.video_path} "
         f"(session={payload.session_id})"
     )
 
-    # Synthetic / simulated landmark evaluation for the worker pipeline.
-    # TODO: Replace with real cv2.VideoCapture(payload.video_path) + MediaPipe
-    #       landmark extraction when the full CV pipeline is implemented.
-    simulated_landmarks = []
-    for f in range(60):  # 60 frames ~ 2 seconds at 30 fps
-        knee_y = 0.5 + 0.15 * np.sin(f / 10.0)
-        simulated_landmarks.append(
-            {
-                "11": {"x": 0.45, "y": 0.25},
-                "13": {"x": 0.40, "y": 0.40},
-                "15": {"x": 0.38, "y": 0.55},
-                "23": {"x": 0.48, "y": 0.50},
-                "25": {"x": 0.49, "y": float(knee_y)},
-                "27": {"x": 0.50, "y": 0.85},
-            }
+    try:
+        extractor = get_extractor(model_complexity=1, frame_skip=1)
+        frames_landmarks, video_meta = extractor.extract(payload.video_path)
+    except RuntimeError as exc:
+        logger.error(
+            f"MediaPipe extraction failed for session={payload.session_id}: {exc}"
+        )
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": "VIDEO_EXTRACTION_FAILED",
+                "message": str(exc),
+            },
+        )
+    except Exception as exc:
+        logger.exception(
+            f"Unexpected error during landmark extraction (session={payload.session_id})"
+        )
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": "INTERNAL_EXTRACTION_ERROR",
+                "message": f"Landmark extraction raised an unexpected error: {exc}",
+            },
         )
 
-    feedback_result = rule_engine.process_landmarks_sequence(simulated_landmarks, fps=30.0)
+    # Use real fps from the video metadata
+    effective_fps = video_meta.fps
+
+    # Feed extracted landmarks into the rule engine
+    feedback_result = rule_engine.process_landmarks_sequence(
+        frames_landmarks, fps=effective_fps
+    )
 
     logger.info(
         f"Session {payload.session_id} processed | "
-        f"reps={feedback_result.rep_count} score={feedback_result.score}"
+        f"reps={feedback_result.rep_count} score={feedback_result.score} "
+        f"frames={len(frames_landmarks)} fps={effective_fps:.1f}"
     )
 
     return WorkerTaskResult(
@@ -143,4 +159,61 @@ async def process_video_task(payload: ProcessVideoRequest):
         score=feedback_result.score,
         feedback_json=feedback_result,
         worker_version=config.version,
+    )
+
+
+@app.post("/v1/analyze-frame", response_model=AnalyzeFrameResponse)
+async def analyze_frame(payload: AnalyzeFrameRequest):
+    """
+    Analyze a single webcam frame for pose landmarks.
+
+    The frontend sends a base64-encoded JPEG/PNG image captured from the
+    user's webcam. This endpoint runs MediaPipe Pose on the frame and
+    returns the extracted landmark coordinates.
+
+    The client is responsible for:
+    - Counting reps using the returned landmarks
+    - Displaying skeleton overlay on the canvas
+    - Accumulating landmarks for a full-session summary to send to /pose-check/realtime/result
+
+    This design keeps the heavy model computation server-side while
+    allowing low-latency streaming from the browser.
+    """
+    try:
+        # Decode base64 image
+        img_bytes = base64.b64decode(payload.frame_b64)
+        img_array = np.frombuffer(img_bytes, dtype=np.uint8)
+        bgr_frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+
+        if bgr_frame is None:
+            raise HTTPException(
+                status_code=422,
+                detail={
+                    "error": "INVALID_FRAME",
+                    "message": "Could not decode the provided base64 image. Ensure it is a valid JPEG or PNG.",
+                },
+            )
+    except Exception as exc:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": "FRAME_DECODE_ERROR",
+                "message": f"Failed to decode frame: {exc}",
+            },
+        )
+
+    extractor = get_extractor(model_complexity=0, frame_skip=1)  # Use fastest model for realtime
+
+    with _mp_pose.Pose(
+        model_complexity=0,
+        min_detection_confidence=0.5,
+        min_tracking_confidence=0.5,
+        smooth_landmarks=True,
+    ) as pose:
+        lm_dict = extractor._process_frame(bgr_frame, pose)
+
+    return AnalyzeFrameResponse(
+        landmarks=lm_dict,
+        pose_detected=bool(lm_dict),
+        exercise_type=payload.exercise_type,
     )

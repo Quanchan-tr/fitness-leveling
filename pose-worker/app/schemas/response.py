@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
 class PoseIssue(BaseModel):
@@ -26,3 +26,12 @@ class WorkerTaskResult(BaseModel):
     worker_version: str = "2.0.0"
     error_code: Optional[str] = None
     error_message: Optional[str] = None
+
+class AnalyzeFrameResponse(BaseModel):
+    """
+    Response for POST /v1/analyze-frame.
+    Returns raw landmark coordinates for realtime frontend use.
+    """
+    landmarks: Dict[str, Any]  # landmark_index -> {x, y, z, visibility}
+    pose_detected: bool
+    exercise_type: str
