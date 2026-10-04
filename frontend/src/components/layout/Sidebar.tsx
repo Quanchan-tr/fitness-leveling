@@ -15,6 +15,7 @@ import {
   Flame,
   ShieldCheck,
   X,
+  User,
 } from 'lucide-react';
 
 interface NavItem {
@@ -31,6 +32,7 @@ const navItems: NavItem[] = [
   { name: 'Dinh dưỡng', href: '/nutrition', icon: Utensils },
   { name: 'Huấn luyện viên AI', href: '/ai-coach', icon: Video, badge: 'AI' },
   { name: 'Bảng tin', href: '/community', icon: Users },
+  { name: 'Hồ sơ cá nhân', href: '/profile', icon: User },
 ];
 
 interface SidebarProps {
@@ -143,7 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Footer Info & System Version */}
-        <div className="p-3 border-t border-slate-100">
+        <div className="p-3 border-t border-slate-100 space-y-2">
           <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-200 text-left">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">

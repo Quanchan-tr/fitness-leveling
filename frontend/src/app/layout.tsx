@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { ShellLayout } from '@/components/layout/ShellLayout';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { FitnessProvider } from '@/contexts/FitnessContext';
 
 export const metadata: Metadata = {
   title: 'FitTrack AI — Fitness Command Center & 3D Avatar',
@@ -16,7 +18,11 @@ export default function RootLayout({
   return (
     <html lang="vi" className="scroll-smooth">
       <body className="bg-slate-50 text-slate-900 antialiased selection:bg-orange-500/20 selection:text-orange-900">
-        <ShellLayout>{children}</ShellLayout>
+        <AuthProvider>
+          <FitnessProvider>
+            <ShellLayout>{children}</ShellLayout>
+          </FitnessProvider>
+        </AuthProvider>
       </body>
     </html>
   );

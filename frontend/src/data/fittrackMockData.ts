@@ -1,0 +1,631 @@
+import {
+  Exercise,
+  RoutineItem,
+  RoutineFolder,
+  DaySchedule,
+  CommunityPost,
+  SuggestedAthlete,
+  WorkoutHistoryRecord,
+} from '@/types/fittrack.types';
+
+export const initialExercises: Exercise[] = [
+  // Chest
+  {
+    id: 'ex-bench-press',
+    name: 'Barbell Bench Press',
+    nameVi: 'Đẩy ngực ngang đòn tạ',
+    targetMuscles: ['chest', 'triceps', 'shoulders'],
+    equipment: 'barbell',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&auto=format&fit=crop&q=80',
+    description: 'Hạ đòn chạm xương ức nhẹ nhàng, phát lực đẩy thẳng tay mà không khóa khớp khuỷu.',
+  },
+  {
+    id: 'ex-incline-db-press',
+    name: 'Incline Dumbbell Press',
+    nameVi: 'Đẩy ngực trên với tạ đôi',
+    targetMuscles: ['chest', 'shoulders', 'triceps'],
+    equipment: 'dumbbell',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&auto=format&fit=crop&q=80',
+    description: 'Góc ghế 30-45 độ, căng dãn tối đa lồng ngực khi hạ tạ.',
+  },
+  {
+    id: 'ex-cable-fly',
+    name: 'Cable Chest Fly',
+    nameVi: 'Ép ngực cáp',
+    targetMuscles: ['chest'],
+    equipment: 'cable',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80',
+    description: 'Giữ khuỷu tay hơi cong cố định, tập trung co thắt đỉnh cơ ngực.',
+  },
+  {
+    id: 'ex-push-up',
+    name: 'Standard Push-up',
+    nameVi: 'Hít đất chuẩn',
+    targetMuscles: ['chest', 'triceps', 'abs'],
+    equipment: 'bodyweight',
+    type: 'bodyweight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1598971639058-fab3c3109a00?w=600&auto=format&fit=crop&q=80',
+    description: 'Toàn thân tạo thành đường thẳng, siết chặt cơ mông và cơ bụng.',
+  },
+  {
+    id: 'ex-dips',
+    name: 'Parallel Bar Dips',
+    nameVi: 'Chống xà kép',
+    targetMuscles: ['chest', 'triceps'],
+    equipment: 'bodyweight',
+    type: 'bodyweight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&auto=format&fit=crop&q=80',
+    description: 'Hơi đổ người về phía trước để kích hoạt tối đa phần ngực dưới.',
+  },
+
+  // Back
+  {
+    id: 'ex-deadlift',
+    name: 'Conventional Deadlift',
+    nameVi: 'Deadlift truyền thống',
+    targetMuscles: ['back', 'hamstrings', 'glutes', 'traps'],
+    equipment: 'barbell',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80',
+    description: 'Giữ cột sống trung tính, kéo tạ sát cẳng chân và mở rộng hông ở đỉnh động tác.',
+  },
+  {
+    id: 'ex-lat-pulldown',
+    name: 'Lat Pulldown',
+    nameVi: 'Kéo xô máy cáp',
+    targetMuscles: ['back', 'biceps'],
+    equipment: 'machine',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?w=600&auto=format&fit=crop&q=80',
+    description: 'Kéo thanh đòn về phía xương quai xanh, ghì chặt xương bả vai.',
+  },
+  {
+    id: 'ex-barbell-row',
+    name: 'Barbell Bent-Over Row',
+    nameVi: 'Kéo lưng gập người tạ đòn',
+    targetMuscles: ['back', 'biceps', 'traps'],
+    equipment: 'barbell',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&auto=format&fit=crop&q=80',
+    description: 'Lưng thẳng góc khoảng 45 độ, kéo thanh đòn hướng về rốn.',
+  },
+  {
+    id: 'ex-pull-up',
+    name: 'Pull-up',
+    nameVi: 'Hít xà đơn',
+    targetMuscles: ['back', 'biceps'],
+    equipment: 'bodyweight',
+    type: 'bodyweight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=600&auto=format&fit=crop&q=80',
+    description: 'Nâng cằm vượt qua xà, kiểm soát nhịp hạ xuống trong 2 giây.',
+  },
+
+  // Legs
+  {
+    id: 'ex-squat',
+    name: 'Barbell Back Squat',
+    nameVi: 'Gánh đùi tạ đòn',
+    targetMuscles: ['quads', 'glutes', 'hamstrings'],
+    equipment: 'barbell',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=600&auto=format&fit=crop&q=80',
+    description: 'Hạ hông xuống sâu ngang hoặc dưới đầu gối, đẩy lực qua giữa bàn chân.',
+  },
+  {
+    id: 'ex-rdl',
+    name: 'Romanian Deadlift (RDL)',
+    nameVi: 'RDL đùi sau & mông',
+    targetMuscles: ['hamstrings', 'glutes'],
+    equipment: 'barbell',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&auto=format&fit=crop&q=80',
+    description: 'Đẩy hông ra sau, cảm nhận độ căng sâu của cơ đùi sau.',
+  },
+  {
+    id: 'ex-leg-press',
+    name: 'Leg Press 45°',
+    nameVi: 'Đạp đùi máy nghiêng',
+    targetMuscles: ['quads', 'glutes'],
+    equipment: 'machine',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=600&auto=format&fit=crop&q=80',
+    description: 'Không khóa cứng khớp gối khi duỗi thẳng chân.',
+  },
+  {
+    id: 'ex-calf-raise',
+    name: 'Standing Calf Raise',
+    nameVi: 'Nhón bắp chân đứng',
+    targetMuscles: ['calves'],
+    equipment: 'machine',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80',
+    description: 'Nhón cao hết biên độ và dừng lại 1 giây ở đỉnh để co bóp cơ bắp chuối.',
+  },
+
+  // Shoulders & Arms
+  {
+    id: 'ex-ohp',
+    name: 'Overhead Press (OHP)',
+    nameVi: 'Đẩy vai đòn qua đầu',
+    targetMuscles: ['shoulders', 'triceps', 'traps'],
+    equipment: 'barbell',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1532384748853-8f54a8f476e2?w=600&auto=format&fit=crop&q=80',
+    description: 'Đẩy tạ thẳng đứng, khóa chặt cơ bụng và cơ mông để giữ thăng bằng.',
+  },
+  {
+    id: 'ex-lateral-raise',
+    name: 'Dumbbell Lateral Raise',
+    nameVi: 'Dang tạ đôi vai giữa',
+    targetMuscles: ['shoulders'],
+    equipment: 'dumbbell',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=600&auto=format&fit=crop&q=80',
+    description: 'Nâng tạ ngang vai như đang rót nước, tránh vung người lấy đà.',
+  },
+  {
+    id: 'ex-bicep-curl',
+    name: 'Barbell Biceps Curl',
+    nameVi: 'Cuốn tay trước tạ đòn',
+    targetMuscles: ['biceps'],
+    equipment: 'barbell',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&auto=format&fit=crop&q=80',
+    description: 'Cố định cùi chỏ sát mạn sườn, cuộn tạ siết chặt cơ bắp tay trước.',
+  },
+  {
+    id: 'ex-tricep-pushdown',
+    name: 'Cable Triceps Pushdown',
+    nameVi: 'Kéo cáp tay sau',
+    targetMuscles: ['triceps'],
+    equipment: 'cable',
+    type: 'weight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&auto=format&fit=crop&q=80',
+    description: 'Khóa chặt cùi chỏ, duỗi thẳng tay hướng xuống sàn.',
+  },
+
+  // Core & Timed
+  {
+    id: 'ex-plank',
+    name: 'Forearm Plank Hold',
+    nameVi: 'Plank chống khuỷu giữ',
+    targetMuscles: ['abs'],
+    equipment: 'bodyweight',
+    type: 'duration',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600&auto=format&fit=crop&q=80',
+    description: 'Gồng chặt cơ lõi, duy trì nhịp thở đều đặn và không võng lưng.',
+  },
+  {
+    id: 'ex-hanging-leg-raise',
+    name: 'Hanging Leg Raise',
+    nameVi: 'Treo người nâng chân',
+    targetMuscles: ['abs'],
+    equipment: 'bodyweight',
+    type: 'bodyweight_reps',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=600&auto=format&fit=crop&q=80',
+    description: 'Hạn chế đung đưa người, cuộn xương chậu lên để ép cơ bụng dưới.',
+  },
+
+  // Cardio / Distance & Duration
+  {
+    id: 'ex-treadmill-running',
+    name: 'Treadmill Running',
+    nameVi: 'Chạy bộ máy',
+    targetMuscles: ['quads', 'calves'],
+    equipment: 'cardio',
+    type: 'distance_duration',
+    gifPlaceholderUrl: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=600&auto=format&fit=crop&q=80',
+    description: 'Chạy nhịp nhàng duy trì vùng nhịp tim Zone 2/3 để tăng sức bền tim phổi.',
+  },
+];
+
+export const initialFolders: RoutineFolder[] = [
+  { id: 'folder-1', name: 'Khối Cơ Đẩy & Kéo', isExpanded: true },
+  { id: 'folder-2', name: 'Hạ Thể & Bụng', isExpanded: true },
+  { id: 'folder-3', name: 'Sức Bền & Đốt Mỡ', isExpanded: true },
+];
+
+export const initialRoutines: RoutineItem[] = [
+  {
+    id: 'routine-chest-triceps',
+    title: 'Ngực & Tay Sau Cắt Nét',
+    folderId: 'folder-1',
+    notes: 'Tập trung co thắt đỉnh cơ ngực và kiểm soát nhịp hạ tạ 2s.',
+    restTimerSeconds: 90,
+    createdBy: {
+      userId: 'user-me',
+      username: 'Quan Tran',
+      avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+    },
+    exercises: [
+      {
+        exercise: initialExercises.find((e) => e.id === 'ex-bench-press')!,
+        pinnedNote: 'Khởi động 2 set nhẹ trước khi vào set chính 70kg',
+        restTimerSeconds: 90,
+        sets: [
+          { setNumber: 1, weightKg: 60, reps: 10, isCompleted: true },
+          { setNumber: 2, weightKg: 65, reps: 8, isCompleted: true },
+          { setNumber: 3, weightKg: 70, reps: 8, isCompleted: false },
+          { setNumber: 4, weightKg: 75, reps: 6, isCompleted: false },
+        ],
+      },
+      {
+        exercise: initialExercises.find((e) => e.id === 'ex-incline-db-press')!,
+        pinnedNote: 'Góc ghế nghiêng 30 độ, siết cơ ngực trên',
+        restTimerSeconds: 60,
+        sets: [
+          { setNumber: 1, weightKg: 22, reps: 10, isCompleted: false },
+          { setNumber: 2, weightKg: 24, reps: 10, isCompleted: false },
+          { setNumber: 3, weightKg: 26, reps: 8, isCompleted: false },
+        ],
+      },
+      {
+        exercise: initialExercises.find((e) => e.id === 'ex-tricep-pushdown')!,
+        pinnedNote: 'Kéo cáp khóa cùi chỏ sát thân',
+        restTimerSeconds: 45,
+        sets: [
+          { setNumber: 1, weightKg: 20, reps: 12, isCompleted: false },
+          { setNumber: 2, weightKg: 22.5, reps: 12, isCompleted: false },
+          { setNumber: 3, weightKg: 25, reps: 10, isCompleted: false },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'routine-back-biceps',
+    title: 'Lưng Xô & Bắp Tay Trước',
+    folderId: 'folder-1',
+    notes: 'Phát triển độ rộng lưng V-Taper và đỉnh bắp tay.',
+    restTimerSeconds: 90,
+    createdBy: {
+      userId: 'user-me',
+      username: 'Quan Tran',
+      avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+    },
+    exercises: [
+      {
+        exercise: initialExercises.find((e) => e.id === 'ex-deadlift')!,
+        pinnedNote: 'Giữ lưng thẳng, siết mông ở đỉnh',
+        restTimerSeconds: 120,
+        sets: [
+          { setNumber: 1, weightKg: 90, reps: 6, isCompleted: true },
+          { setNumber: 2, weightKg: 100, reps: 6, isCompleted: true },
+          { setNumber: 3, weightKg: 110, reps: 5, isCompleted: true },
+        ],
+      },
+      {
+        exercise: initialExercises.find((e) => e.id === 'ex-lat-pulldown')!,
+        pinnedNote: 'Kéo thanh đòn sát ngực trên',
+        restTimerSeconds: 60,
+        sets: [
+          { setNumber: 1, weightKg: 50, reps: 10, isCompleted: true },
+          { setNumber: 2, weightKg: 55, reps: 10, isCompleted: true },
+          { setNumber: 3, weightKg: 60, reps: 8, isCompleted: true },
+        ],
+      },
+      {
+        exercise: initialExercises.find((e) => e.id === 'ex-bicep-curl')!,
+        pinnedNote: 'Tập trung cô lập tay trước',
+        restTimerSeconds: 60,
+        sets: [
+          { setNumber: 1, weightKg: 25, reps: 10, isCompleted: true },
+          { setNumber: 2, weightKg: 30, reps: 8, isCompleted: true },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'routine-legs-core',
+    title: 'Chân Mông & Cơ Bụng Toàn Diện',
+    folderId: 'folder-2',
+    notes: 'Buổi tập cường độ cao xây dựng nền tảng thân dưới vững chãi.',
+    restTimerSeconds: 90,
+    createdBy: {
+      userId: 'user-me',
+      username: 'Quan Tran',
+      avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+    },
+    exercises: [
+      {
+        exercise: initialExercises.find((e) => e.id === 'ex-squat')!,
+        pinnedNote: 'Hít sâu gồng bụng trước khi hạ người',
+        restTimerSeconds: 120,
+        sets: [
+          { setNumber: 1, weightKg: 75, reps: 8, isCompleted: true },
+          { setNumber: 2, weightKg: 80, reps: 8, isCompleted: true },
+          { setNumber: 3, weightKg: 85, reps: 6, isCompleted: true },
+        ],
+      },
+      {
+        exercise: initialExercises.find((e) => e.id === 'ex-rdl')!,
+        pinnedNote: 'Căng đùi sau tối đa',
+        restTimerSeconds: 90,
+        sets: [
+          { setNumber: 1, weightKg: 60, reps: 10, isCompleted: true },
+          { setNumber: 2, weightKg: 65, reps: 10, isCompleted: true },
+        ],
+      },
+      {
+        exercise: initialExercises.find((e) => e.id === 'ex-plank')!,
+        pinnedNote: 'Gồng cứng cơ bụng, siết mông',
+        restTimerSeconds: 60,
+        sets: [
+          { setNumber: 1, durationSeconds: 60, isCompleted: true },
+          { setNumber: 2, durationSeconds: 60, isCompleted: true },
+          { setNumber: 3, durationSeconds: 75, isCompleted: true },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'routine-cardio-burn',
+    title: 'Cardio & Chạy Bộ Đốt Mỡ Zone 2',
+    folderId: 'folder-3',
+    notes: 'Duy trì nhịp tim ổn định để tối ưu quá trình chuyển hóa chất béo.',
+    restTimerSeconds: 60,
+    createdBy: {
+      userId: 'user-me',
+      username: 'Quan Tran',
+      avatarUrl: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+    },
+    exercises: [
+      {
+        exercise: initialExercises.find((e) => e.id === 'ex-treadmill-running')!,
+        pinnedNote: 'Tốc độ 8.5 km/h, độ dốc 1.5%',
+        sets: [
+          { setNumber: 1, distanceKm: 5.0, durationSeconds: 1800, isCompleted: true },
+        ],
+      },
+      {
+        exercise: initialExercises.find((e) => e.id === 'ex-hanging-leg-raise')!,
+        sets: [
+          { setNumber: 1, reps: 15, isCompleted: true },
+          { setNumber: 2, reps: 15, isCompleted: true },
+          { setNumber: 3, reps: 12, isCompleted: true },
+        ],
+      },
+    ],
+  },
+];
+
+export const initialSchedule: DaySchedule[] = [
+  {
+    dayOfWeek: 'Thứ 2',
+    dateStr: '28/09',
+    assignedRoutine: initialRoutines[0],
+    status: 'completed',
+  },
+  {
+    dayOfWeek: 'Thứ 3',
+    dateStr: '29/09',
+    assignedRoutine: initialRoutines[1],
+    status: 'completed',
+  },
+  {
+    dayOfWeek: 'Thứ 4',
+    dateStr: '30/09',
+    assignedRoutine: initialRoutines[2],
+    status: 'completed',
+  },
+  {
+    dayOfWeek: 'Thứ 5',
+    dateStr: '01/10',
+    assignedRoutine: undefined,
+    status: 'rest',
+  },
+  {
+    dayOfWeek: 'Thứ 6',
+    dateStr: '02/10',
+    assignedRoutine: initialRoutines[0],
+    status: 'completed',
+  },
+  {
+    dayOfWeek: 'Thứ 7',
+    dateStr: '03/10',
+    assignedRoutine: initialRoutines[3],
+    status: 'completed',
+  },
+  {
+    dayOfWeek: 'Chủ nhật',
+    dateStr: '04/10',
+    assignedRoutine: initialRoutines[0],
+    status: 'planned', // Today's scheduled spotlight routine!
+  },
+];
+
+export const initialCommunityPosts: CommunityPost[] = [
+  {
+    id: 'post-com-1',
+    title: 'Buổi tập Đẩy Ngực & Tay Sau phá kỷ lục 80kg!',
+    content: 'Hôm nay cảm giác cơ bắp rất tốt, form ổn định không bị đau khớp cổ tay. Mình áp dụng tempo hãm tạ 2 giây và nghỉ 90s giữa các hiệp nặng, hiệu quả hơn hẳn.',
+    author: {
+      id: 'ath-1',
+      name: 'Alex Morgan',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      level: 24,
+      badge: 'Coach Pro',
+    },
+    createdAt: '2 giờ trước',
+    images: [
+      'https://images.unsplash.com/photo-1574680096145-d05b474e2155?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=800&auto=format&fit=crop&q=80',
+    ],
+    attachedRoutine: initialRoutines[0],
+    metrics: {
+      durationMinutes: 48,
+      volumeKg: 2840,
+      personalRecords: ['Bench Press 80kg × 6'],
+    },
+    likesCount: 38,
+    isLiked: false,
+    hasPoseCheck: true,
+    tags: ['NGỰC', 'TAY SAU', 'SỨC MẠNH'],
+    comments: [
+      {
+        id: 'c-1',
+        authorName: 'Hoàng Nam',
+        authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+        text: 'Form đỉnh quá anh ơi, set 80kg nhìn rất nhẹ nhàng!',
+        createdAt: '1 giờ trước',
+      },
+      {
+        id: 'c-2',
+        authorName: 'Thảo Linh',
+        authorAvatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+        text: 'Routine này em đã lưu lại để tập vào thứ 4 tới!',
+        createdAt: '30 phút trước',
+      },
+    ],
+  },
+  {
+    id: 'post-com-2',
+    title: 'Deadlift 110kg V-Taper Lưng Xô',
+    content: 'Tập trung kéo lưng gập người và Deadlift. Lưng xô sau 8 tuần có độ dày rõ rệt. Cảm ơn giáo án FitTrack AI đã gợi ý mức tạ tiến bộ theo tuần.',
+    author: {
+      id: 'ath-2',
+      name: 'Jamie Carter',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+      level: 19,
+      badge: 'Powerlifter',
+    },
+    createdAt: '5 giờ trước',
+    images: [
+      'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&auto=format&fit=crop&q=80',
+    ],
+    attachedRoutine: initialRoutines[1],
+    metrics: {
+      durationMinutes: 52,
+      volumeKg: 3450,
+      personalRecords: ['Deadlift 110kg × 5'],
+    },
+    likesCount: 45,
+    isLiked: true,
+    hasPoseCheck: true,
+    tags: ['LƯNG XÔ', 'DEADLIFT', 'V-TAPER'],
+    comments: [
+      {
+        id: 'c-3',
+        authorName: 'Minh Tuấn',
+        authorAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+        text: 'Độ dày cơ lưng quá khủng! Anh có đeo đai lưng không?',
+        createdAt: '3 giờ trước',
+      },
+    ],
+  },
+  {
+    id: 'post-com-3',
+    title: 'Chạy bộ 5km Zone 2 sáng chủ nhật mát mẻ',
+    content: 'Khởi đầu ngày mới với 30 phút chạy bộ máy nhẹ nhàng. Giữ nhịp tim dưới 140 bpm để tối ưu đốt mỡ và hồi phục hệ thần kinh.',
+    author: {
+      id: 'ath-3',
+      name: 'Taylor Lee',
+      avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+      level: 16,
+      badge: 'Runner',
+    },
+    createdAt: 'Hôm qua',
+    images: [
+      'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&auto=format&fit=crop&q=80',
+    ],
+    attachedRoutine: initialRoutines[3],
+    metrics: {
+      durationMinutes: 32,
+      distanceKm: 5.2,
+    },
+    likesCount: 29,
+    isLiked: false,
+    hasPoseCheck: false,
+    tags: ['CARDIO', 'CHẠY BỘ', 'ZONE 2'],
+    comments: [],
+  },
+];
+
+export const initialSuggestedAthletes: SuggestedAthlete[] = [
+  {
+    id: 'ath-1',
+    name: 'Alex Morgan',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    level: 24,
+    badge: 'Coach Pro',
+    followersCount: 1420,
+    isFollowing: false,
+  },
+  {
+    id: 'ath-2',
+    name: 'Jamie Carter',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
+    level: 19,
+    badge: 'Powerlifter',
+    followersCount: 890,
+    isFollowing: true,
+  },
+  {
+    id: 'ath-3',
+    name: 'Taylor Lee',
+    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80',
+    level: 16,
+    badge: 'Runner',
+    followersCount: 520,
+    isFollowing: false,
+  },
+  {
+    id: 'ath-4',
+    name: 'Elena Rostova',
+    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+    level: 21,
+    badge: 'Calisthenics Master',
+    followersCount: 2100,
+    isFollowing: false,
+  },
+];
+
+export const initialWorkoutHistory: WorkoutHistoryRecord[] = [
+  {
+    id: 'hist-1',
+    routineId: 'routine-chest-triceps',
+    routineTitle: 'Ngực & Tay Sau Cắt Nét',
+    completedAt: '2026-10-02T09:30:00.000Z',
+    durationSeconds: 2700, // 45 mins
+    totalVolumeKg: 2680,
+    totalSets: 10,
+    totalReps: 86,
+    exercisesSummary: ['Barbell Bench Press', 'Incline Dumbbell Press', 'Cable Triceps Pushdown'],
+  },
+  {
+    id: 'hist-2',
+    routineId: 'routine-cardio-burn',
+    routineTitle: 'Cardio & Chạy Bộ Đốt Mỡ Zone 2',
+    completedAt: '2026-10-03T07:15:00.000Z',
+    durationSeconds: 1920, // 32 mins
+    totalVolumeKg: 0,
+    totalSets: 4,
+    totalReps: 42,
+    exercisesSummary: ['Treadmill Running (5km)', 'Hanging Leg Raise'],
+  },
+  {
+    id: 'hist-3',
+    routineId: 'routine-back-biceps',
+    routineTitle: 'Lưng Xô & Bắp Tay Trước',
+    completedAt: '2026-09-29T18:00:00.000Z',
+    durationSeconds: 3120, // 52 mins
+    totalVolumeKg: 3450,
+    totalSets: 8,
+    totalReps: 64,
+    exercisesSummary: ['Conventional Deadlift', 'Lat Pulldown', 'Barbell Biceps Curl'],
+  },
+  {
+    id: 'hist-4',
+    routineId: 'routine-legs-core',
+    routineTitle: 'Chân Mông & Cơ Bụng Toàn Diện',
+    completedAt: '2026-09-30T17:30:00.000Z',
+    durationSeconds: 3600, // 60 mins
+    totalVolumeKg: 3820,
+    totalSets: 8,
+    totalReps: 70,
+    exercisesSummary: ['Barbell Back Squat', 'Romanian Deadlift', 'Forearm Plank Hold'],
+  },
+];

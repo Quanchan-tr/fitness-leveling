@@ -8,14 +8,18 @@ export interface FitnessUser {
   mob: number;
   avatarUrl?: string;
   goal: string;
+  age?: number;
+  gender?: 'male' | 'female';
 }
 
 export interface BodyMetricsData {
   weight: number;
   bodyFat: number;
-  muscle: number;
+  muscle?: number;
   height: number;
   bmi: number;
+  age?: number;
+  gender?: 'male' | 'female';
 }
 
 export interface TodayStats {
@@ -32,7 +36,7 @@ export interface MetricHistoryItem {
   date: string;
   weight: number;
   bodyFat: number;
-  muscle: number;
+  muscle?: number;
 }
 
 export interface ProgressPhotoItem {
@@ -62,6 +66,8 @@ export const initialFitnessData: FitnessDataState = {
     end: 74,
     mob: 58,
     goal: "gain_muscle",
+    age: 22,
+    gender: "male",
   },
   body: {
     weight: 68.4,
@@ -69,6 +75,8 @@ export const initialFitnessData: FitnessDataState = {
     muscle: 54.2,
     height: 175,
     bmi: 22.3,
+    age: 22,
+    gender: "male",
   },
   today: {
     calories: 1820,

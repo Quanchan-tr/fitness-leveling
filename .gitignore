@@ -100,3 +100,8 @@ coverage/
 .nyc_output/
 .phpunit.result.cache
 */*tests/
+
+# --- Temporary & Agent Scratch ---
+scratch/
+*.tsbuildinfo
+.agents/

@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { TopBar } from '@/components/layout/TopBar';
 import { MainGrid } from '@/components/layout/MainGrid';
 import { BodyMetricsModal } from '@/components/home/BodyMetricsModal';
@@ -11,9 +12,14 @@ import { CharacterOutfit } from '@/components/home/3d/Character';
 import { mockDashboardData } from '@/data/mockData';
 import { initialFitnessData, MetricHistoryItem, ProgressPhotoItem } from '@/lib/fitnessData';
 import { useShell } from '@/components/layout/ShellLayout';
+import { useAuth } from '@/contexts/AuthContext';
+import { LandingPage } from '@/components/landing/LandingPage';
 
-export default function DashboardPage() {
+export default function RootPage() {
+  const { user, isLoading, signOut } = useAuth();
   const { toggleMobileNav } = useShell();
+  const router = useRouter();
+
   const [dashboardData, setDashboardData] = useState(mockDashboardData);
   const [extraData, setExtraData] = useState(initialFitnessData);
   const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
@@ -21,7 +27,6 @@ export default function DashboardPage() {
   const [isOutfitModalOpen, setIsOutfitModalOpen] = useState(false);
   const [isAutoRotating, setIsAutoRotating] = useState(false);
 
-  // Avatar Outfit State
   const [outfit, setOutfit] = useState<CharacterOutfit>({
     shirtColor: '#FF5722',
     shirtStripeColor: '#FFFFFF',
@@ -96,8 +101,43 @@ export default function DashboardPage() {
     }));
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    router.refresh();
+  };
+
+  // Still restoring session from localStorage
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center min-h-screen bg-slate-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-slate-200 border-t-slate-900 rounded-full animate-spin" />
+          <p className="text-xs text-slate-400 font-semibold">Đang tải…</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Not logged in → show landing page
+  if (!user) {
+    return <LandingPage />;
+  }
+
+  // Logged in but not verified → prompt
+  if (!user.isEmailVerified) {
+    router.replace('/auth/verify');
+    return null;
+  }
+
+  // Verified but hasn't done onboarding → redirect
+  if (!user.hasCompletedOnboarding) {
+    router.replace('/onboarding');
+    return null;
+  }
+
+  // ── Full dashboard for authenticated users ──────────────────────────────────
   const topBarUser = {
-    name: dashboardData.user.name,
+    name: user.displayName || dashboardData.user.name,
     level: dashboardData.user.level,
     xp: dashboardData.user.exp.current,
     nextLevelXp: dashboardData.user.exp.max,
@@ -109,17 +149,15 @@ export default function DashboardPage() {
 
   return (
     <main className="dashboard-shell flex-1 flex flex-col min-w-0 min-h-screen bg-slate-50">
-      {/* Top Header Navigation (Uncluttered on Dashboard) */}
       <TopBar
         user={topBarUser}
         streak={17}
         photoCount={extraData.progressPhotos.length}
         onToggleMobileMenu={toggleMobileNav}
+        onSignOut={handleSignOut}
       />
 
-      {/* Main Athletic Dashboard Grid */}
       <MainGrid
-        data={dashboardData}
         outfit={outfit}
         photoCount={extraData.progressPhotos.length}
         isAutoRotating={isAutoRotating}
@@ -127,11 +165,9 @@ export default function DashboardPage() {
         onOpenBodyMetrics={() => setIsMetricsModalOpen(true)}
         onOpenProgressPhotos={() => setIsPhotosModalOpen(true)}
         onOpenOutfit={() => setIsOutfitModalOpen(true)}
-        onAddWater={handleAddWater}
         onUpdateName={handleUpdateName}
       />
 
-      {/* Interactive Modals */}
       <BodyMetricsModal
         isOpen={isMetricsModalOpen}
         onClose={() => setIsMetricsModalOpen(false)}
