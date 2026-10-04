@@ -23,6 +23,7 @@ from app.cv.angle_math import calculate_angle_2d, calculate_vertical_angle
 from app.schemas.response import (
     PoseFeedbackResponse,
     RepFeedback,
+    RepStatus,
     PoseIssue,
     VisibilityWarning,
     BreathingCue,
@@ -195,6 +196,9 @@ class PushupRule(BasePoseRule):
 
                 if ea <= self.ELBOW_CONFIRM_BOTTOM:
                     state = "BOTTOM"
+                elif ea > current_min_elbow + 15.0 and current_min_elbow > self.ELBOW_CONFIRM_BOTTOM:
+                    # Rose without reaching bottom — movement cycle continues to ASCENDING to evaluate ROM/form
+                    state = "ASCENDING"
 
             elif state == "BOTTOM":
                 current_min_elbow = min(current_min_elbow, ea)
@@ -237,9 +241,13 @@ class PushupRule(BasePoseRule):
         )
 
         total_score = float(np.mean([r.score for r in reps])) if reps else 0.0
+        valid_count = sum(1 for r in reps if r.is_rep_valid)
+        good_count = sum(1 for r in reps if r.status == RepStatus.GOOD_REP)
 
         return PoseFeedbackResponse(
             rep_count=len(reps),
+            valid_rep_count=valid_count,
+            good_rep_count=good_count,
             score=round(total_score, 2),
             rep_feedback=reps,
             session_summary=session_summary,
@@ -259,19 +267,19 @@ class PushupRule(BasePoseRule):
         rep_num = len(reps) + 1
         issues: List[PoseIssue] = []
         score = 100.0
-        is_rep_valid = True
 
-        # Rule 1: Depth
-        if min_elbow_angle > self.ELBOW_HALF_REP_MIN:
+        # --- Rule 1: Range of Motion (ROM / Depth) ---
+        is_rom_sufficient = min_elbow_angle <= self.ELBOW_HALF_REP_MIN
+
+        if not is_rom_sufficient:
             score -= 35.0
-            is_rep_valid = False
             issues.append(PoseIssue(
                 issue_code="HALF_REP",
                 severity="high",
-                message=f"Bien do qua nho (khuyu tay {int(min_elbow_angle)} deg). Rep chua hop le.",
+                message=f"Hạ chưa đủ sâu (khuỷu tay {int(min_elbow_angle)}°). Chưa đạt biên độ tối thiểu.",
                 detail=(
-                    "Ban chi nhap nho nua duong hoac gat dau xuong san thay vi ha toan bo than tren. "
-                    "Ha nguoi cho den khi khuyu tay tao goc ~90 deg hoac nguc gan cham san."
+                    "Bạn chưa hạ đủ biên độ tối thiểu để tính là 1 rep hợp lệ. "
+                    "Hãy hạ người cho đến khi khuỷu tay tạo góc ~90° hoặc ngực gần chạm sàn."
                 ),
             ))
         elif min_elbow_angle > self.ELBOW_CONFIRM_BOTTOM:
@@ -279,15 +287,14 @@ class PushupRule(BasePoseRule):
             issues.append(PoseIssue(
                 issue_code="INSUFFICIENT_DEPTH",
                 severity="medium",
-                message=f"Chua du sau (khuyu tay {int(min_elbow_angle)} deg). Co gang ha xuong ~90 deg.",
+                message=f"Chưa hạ đủ sâu (khuỷu tay {int(min_elbow_angle)}°). Cố gắng hạ xuống ~90°.",
                 detail=(
-                    f"Khuyu tay chi dat {int(min_elbow_angle)} deg thay vi 90 deg tro xuong. "
-                    "Ha nguoi sau hon de kich hoat toi da co nguc va co tay sau (triceps)."
+                    f"Khuỷu tay chỉ đạt {int(min_elbow_angle)}° thay vì 90° trở xuống. "
+                    "Hạ người sâu hơn để kích hoạt tối đa cơ ngực và cơ tay sau (triceps)."
                 ),
             ))
 
-        # Rule 2: Body alignment
-        avg_alignment = float(np.mean(body_alignments)) if body_alignments else 180.0
+        # --- Rule 2: Body alignment (Cơ thể thẳng hàng) ---
         min_alignment = float(np.min(body_alignments)) if body_alignments else 180.0
         max_alignment = float(np.max(body_alignments)) if body_alignments else 180.0
 
@@ -297,11 +304,11 @@ class PushupRule(BasePoseRule):
             issues.append(PoseIssue(
                 issue_code="HIPS_SAGGING",
                 severity=sag_severity,
-                message=f"Hong bi vong ({int(min_alignment)} deg). Siet co bung va mong.",
+                message=f"Lưng bị võng quá mức ({int(min_alignment)}°). Siết cơ bụng và mông!",
                 detail=(
-                    "Hong bi xe xuong khien cot song that lung bi uon qua muc (hyperextension). "
-                    "Dieu nay tao ap luc lon len dia dem cot song, co the dan den dau lung duoi man tinh. "
-                    "Siet chat co core (bung + mong) de giu co the thang nhu mot tam van."
+                    "Hông bị xệ xuống khiến cột sống thắt lưng bị uốn quá mức (hyperextension). "
+                    "Điều này tạo áp lực lớn lên đĩa đệm cột sống, có thể dẫn đến đau lưng dưới mãn tính. "
+                    "Siết chặt cơ core (bụng + mông) để giữ cơ thể thẳng như một tấm ván."
                 ),
             ))
         elif max_alignment > self.BODY_PIKE_THRESHOLD:
@@ -309,14 +316,14 @@ class PushupRule(BasePoseRule):
             issues.append(PoseIssue(
                 issue_code="HIPS_PIKING",
                 severity="medium",
-                message=f"Hong nho len qua cao ({int(max_alignment)} deg). Ha hong xuong ngang than.",
+                message=f"Hông nhô lên quá cao ({int(max_alignment)}°). Hạ hông xuống ngang thân.",
                 detail=(
-                    "Hong nho len cao khien tai trong don ve vai thay vi phan bo deu. "
-                    "Ha hong xuong sao cho co the tao thanh duong thang tu dau den got chan."
+                    "Hông nhô lên cao khiến tải trọng dồn về vai thay vì phân bổ đều. "
+                    "Hạ hông xuống sao cho cơ thể tạo thành đường thẳng từ đầu đến gót chân."
                 ),
             ))
 
-        # Rule 3: Elbow flare
+        # --- Rule 3: Elbow flare (Góc mở khuỷu tay) ---
         max_flare = float(np.max(elbow_flares)) if elbow_flares else 45.0
 
         if max_flare > self.ELBOW_FLARE_DANGER:
@@ -324,12 +331,12 @@ class PushupRule(BasePoseRule):
             issues.append(PoseIssue(
                 issue_code="ELBOW_FLARE_T_SHAPE",
                 severity="high",
-                message=f"Khuyu tay xoe ngang {int(max_flare)} deg — tu the chu T nguy hiem!",
+                message=f"Khuỷu tay xòe ngang {int(max_flare)}° — tư thế chữ T nguy hiểm!",
                 detail=(
-                    "Canh tay xoe ngang tao thanh hinh chu T so voi than nguoi (~90 deg). "
-                    "Tu the nay gay ap luc cuc lon len khop vai va chop xoay (rotator cuff), "
-                    "de dan den viem gan, rach chop xoay hoac trat khop vai. "
-                    "Hay khep khuyu tay vao khoang 45 deg so voi than — tao hinh mui ten (up) thay vi chu T."
+                    "Cánh tay xòe ngang tạo thành hình chữ T so với thân người (~90°). "
+                    "Tư thế này gây áp lực cực lớn lên khớp vai và chóp xoay (rotator cuff), "
+                    "dễ dẫn đến viêm gân, rách chóp xoay hoặc chấn thương vai. "
+                    "Hãy khép khuỷu tay vào khoảng 45° so với thân — tạo hình mũi tên thay vì chữ T."
                 ),
             ))
         elif max_flare > self.ELBOW_FLARE_WARNING:
@@ -337,24 +344,24 @@ class PushupRule(BasePoseRule):
             issues.append(PoseIssue(
                 issue_code="ELBOW_FLARE_WIDE",
                 severity="medium",
-                message=f"Khuyu tay hoi xoe rong ({int(max_flare)} deg). Khep vao khoang 45 deg.",
+                message=f"Khuỷu tay hơi xòe rộng ({int(max_flare)}°). Khép vào khoảng 45°.",
                 detail=(
-                    f"Khuyu tay dang o goc {int(max_flare)} deg so voi than, hoi rong. "
-                    "Muc tieu ly tuong: khoang 45 deg — tao hinh mui ten."
+                    f"Khuỷu tay đang ở góc {int(max_flare)}° so với thân, hơi rộng. "
+                    "Mục tiêu lý tưởng: khoảng 45° — tạo hình mũi tên."
                 ),
             ))
 
-        # Rule 4: Head drop
+        # --- Rule 4: Head drop (Cúi đầu) ---
         avg_head_drop = float(np.mean(head_drops)) if head_drops else 0.0
         if avg_head_drop > self.HEAD_DROP_THRESHOLD:
             score -= 10.0
             issues.append(PoseIssue(
                 issue_code="HEAD_DROPPING",
                 severity="low",
-                message="Dau cui xuong qua nhieu. Giu dau thang hang voi cot song.",
+                message="Đầu cúi xuống quá nhiều. Giữ đầu thẳng hàng với cột sống.",
                 detail=(
-                    "Khi hit dat, dau nen giu thang hang voi cot song — nhin xuong san "
-                    "cach tay khoang 15-20cm phia truoc. Cui dau qua muc gay cang co co."
+                    "Khi hít đất, đầu nên giữ thẳng hàng với cột sống — nhìn xuống sàn "
+                    "cách tay khoảng 15-20cm phía trước. Cúi đầu quá mức gây căng cơ cổ."
                 ),
             ))
 
@@ -365,9 +372,27 @@ class PushupRule(BasePoseRule):
         )
 
         score = max(0.0, min(100.0, score))
+
+        # --- Form Quality Analyzer: Phân biệt "Form đúng" và "Rep hợp lệ" ---
+        has_high_severity = any(i.severity == "high" for i in issues if i.issue_code != "HALF_REP")
+
+        if not is_rom_sufficient:
+            # Chưa đủ biên độ: Ghi nhận chu kỳ vận động nhưng đánh dấu NO_REP
+            status = RepStatus.NO_REP
+            is_rep_valid = False
+        elif has_high_severity or score < 75.0:
+            # Đủ biên độ nhưng sai form kỹ thuật (lưng cong, xòe chữ T, v.v.)
+            status = RepStatus.BAD_FORM
+            is_rep_valid = True
+        else:
+            # Đủ biên độ và form chuẩn
+            status = RepStatus.GOOD_REP
+            is_rep_valid = True
+
         reps.append(RepFeedback(
             rep_number=rep_num,
             score=score,
+            status=status,
             is_rep_valid=is_rep_valid,
             timestamp_sec=round(frame_idx / max(fps, 1.0), 2),
             issues=issues,

@@ -23,6 +23,7 @@ from app.cv.angle_math import calculate_angle_2d, calculate_vertical_angle
 from app.schemas.response import (
     PoseFeedbackResponse,
     RepFeedback,
+    RepStatus,
     PoseIssue,
     VisibilityWarning,
     BreathingCue,
@@ -115,7 +116,7 @@ class SquatRule(BasePoseRule):
 
             raw_lean = 0.0
             if l_shoulder is not None:
-                raw_lean = calculate_vertical_angle(l_shoulder, l_hip)
+                raw_lean = calculate_vertical_angle(l_hip, l_shoulder)
 
             # Knee valgus ratio (raw — no EMA)
             hip_width = abs(l_hip[0] - r_hip[0]) + 1e-7
@@ -142,8 +143,8 @@ class SquatRule(BasePoseRule):
 
                 if ka <= self.KNEE_CONFIRM_BOTTOM:
                     state = "BOTTOM"
-                elif ka > current_min_knee + 20 and current_min_knee > self.KNEE_HALF_SQUAT:
-                    # Rose without reaching bottom — still try to finalize
+                elif ka > current_min_knee + 15 and current_min_knee > self.KNEE_CONFIRM_BOTTOM:
+                    # Rose without reaching bottom — movement cycle continues to ASCENDING to evaluate ROM/form
                     state = "ASCENDING"
 
             elif state == "BOTTOM":
@@ -180,9 +181,13 @@ class SquatRule(BasePoseRule):
             reps, visibility_warnings, len(frames_landmarks), "Squat"
         )
         total_score = float(np.mean([r.score for r in reps])) if reps else 0.0
+        valid_count = sum(1 for r in reps if r.is_rep_valid)
+        good_count = sum(1 for r in reps if r.status == RepStatus.GOOD_REP)
 
         return PoseFeedbackResponse(
             rep_count=len(reps),
+            valid_rep_count=valid_count,
+            good_rep_count=good_count,
             score=round(total_score, 2),
             rep_feedback=reps,
             session_summary=session_summary,
@@ -201,19 +206,19 @@ class SquatRule(BasePoseRule):
         rep_num = len(reps) + 1
         issues: List[PoseIssue] = []
         score = 100.0
-        is_rep_valid = True
 
-        # Rule 1: Depth
-        if min_knee_angle > self.KNEE_HALF_SQUAT:
+        # --- Rule 1: Range of Motion (ROM / Depth) ---
+        is_rom_sufficient = min_knee_angle <= self.KNEE_HALF_SQUAT
+
+        if not is_rom_sufficient:
             score -= 30.0
-            is_rep_valid = False
             issues.append(PoseIssue(
                 issue_code="HALF_SQUAT",
                 severity="high",
-                message=f"Squat qua nong ({int(min_knee_angle)} deg). Chua dat bien do toi thieu.",
+                message=f"Hạ chưa đủ sâu (góc gối {int(min_knee_angle)}°). Chưa đạt biên độ tối thiểu.",
                 detail=(
-                    f"Dau goi chi gap den {int(min_knee_angle)} deg — chua du sau de tinh la 1 rep hop le. "
-                    "Ha nguoi cho den khi nep gap hong ngang hoac duoi dau goi (goc dau goi <= 90 deg)."
+                    f"Đầu gối chỉ gập đến {int(min_knee_angle)}° — chưa đủ sâu để tính là 1 rep hợp lệ. "
+                    "Hạ người cho đến khi nếp gấp hông ngang hoặc dưới đầu gối (góc đầu gối <= 90°)."
                 ),
             ))
         elif min_knee_angle > self.KNEE_CONFIRM_BOTTOM:
@@ -221,25 +226,25 @@ class SquatRule(BasePoseRule):
             issues.append(PoseIssue(
                 issue_code="INSUFFICIENT_DEPTH",
                 severity="medium",
-                message=f"Chua du sau ({int(min_knee_angle)} deg). Ha them de dat song song.",
+                message=f"Chưa hạ đủ sâu ({int(min_knee_angle)}°). Hạ thêm để đạt song song.",
                 detail=(
-                    f"Dau goi dat {int(min_knee_angle)} deg, gan song song nhung chua du. "
-                    "Ha them vai cm de nep gap hong ngang dau goi."
+                    f"Đầu gối đạt {int(min_knee_angle)}°, gần song song nhưng chưa đủ. "
+                    "Hạ thêm vài cm để nếp gấp hông ngang đầu gối."
                 ),
             ))
 
-        # Rule 2: Torso lean
+        # --- Rule 2: Torso lean (Độ nghiêng thân trên) ---
         max_lean = float(np.max(torso_leans)) if torso_leans else 0.0
         if max_lean > self.TORSO_LEAN_DANGER:
             score -= 25.0
             issues.append(PoseIssue(
                 issue_code="EXCESSIVE_FORWARD_LEAN",
                 severity="high",
-                message=f"Than tren nga qua nhieu ({int(max_lean)} deg). Giu nguc thang!",
+                message=f"Lưng bị gập quá mức (thân nghiêng {int(max_lean)}°). Giữ ngực thẳng!",
                 detail=(
-                    "Than tren nga ve phia truoc qua muc, tao ap luc lon len cot song that lung. "
-                    "Tap lau dai voi tu the nay co the dan den thoat vi dia dem hoac dau lung duoi. "
-                    "Giu nguc uon, mat nhin thang, siet core de than tren dung thang hon."
+                    "Thân trên ngả về phía trước quá mức, tạo áp lực lớn lên cột sống thắt lưng. "
+                    "Tập lâu dài với tư thế này có thể dẫn đến thoái hóa hoặc đau lưng dưới. "
+                    "Giữ ngực ưỡn, mắt nhìn thẳng, siết core để thân trên đứng thẳng hơn."
                 ),
             ))
         elif max_lean > self.TORSO_LEAN_WARNING:
@@ -247,13 +252,13 @@ class SquatRule(BasePoseRule):
             issues.append(PoseIssue(
                 issue_code="FORWARD_LEAN",
                 severity="medium",
-                message=f"Than tren hoi nga ve truoc ({int(max_lean)} deg). Giu nguc thang hon.",
+                message=f"Thân trên hơi ngả về trước ({int(max_lean)}°). Giữ ngực thẳng hơn.",
                 detail=(
-                    "Than tren nga nhe ve phia truoc. Cai thien se giup phan bo tai trong deu hon."
+                    "Thân trên ngả nhẹ về phía trước. Cải thiện sẽ giúp phân bổ tải trọng đều hơn."
                 ),
             ))
 
-        # Rule 3: Knee valgus
+        # --- Rule 3: Knee valgus (Khớp gối chụm vào trong) ---
         if knee_valgus_ratios:
             bottom_half = knee_valgus_ratios[len(knee_valgus_ratios) // 2:]
             min_ratio = float(np.min(bottom_half)) if bottom_half else 1.0
@@ -263,24 +268,42 @@ class SquatRule(BasePoseRule):
                 issues.append(PoseIssue(
                     issue_code="KNEE_VALGUS",
                     severity=severity,
-                    message="Dau goi bi kep vao trong (valgus). Day goi ra ngoai!",
+                    message="Đầu gối chụm vào trong (valgus). Đẩy gối ra ngoài!",
                     detail=(
-                        "Dau goi bi khep vao trong khi squat (knee valgus), dac biet nguy hiem o day squat. "
-                        "Dieu nay tao luc xoan lon len day chang cheo truoc (ACL) va sun chem, "
-                        "tang nguy co chan thuong dau goi nghiem trong. "
-                        "Hay y thuc day dau goi ra ngoai theo huong ngon chan."
+                        "Đầu gối bị khép vào trong khi squat (knee valgus), đặc biệt nguy hiểm ở đáy squat. "
+                        "Điều này tạo lực xoắn lớn lên dây chằng chéo trước (ACL) và sụn chêm, "
+                        "tăng nguy cơ chấn thương đầu gối nghiêm trọng. "
+                        "Hãy ý thức đẩy đầu gối ra ngoài theo hướng ngón chân."
                     ),
                 ))
 
         breathing = BreathingCue(
             phase="ASCENDING",
-            instruction="Hit vao sau khi ha nguoi xuong. Tho ra manh khi dung len.",
+            instruction="Hít vào sâu khi hạ người xuống. Thở ra mạnh khi đứng lên.",
         )
 
         score = max(0.0, min(100.0, score))
+
+        # --- Form Quality Analyzer: Phân biệt "Form đúng" và "Rep hợp lệ" ---
+        has_high_severity = any(i.severity == "high" for i in issues if i.issue_code != "HALF_SQUAT")
+
+        if not is_rom_sufficient:
+            # Chưa đủ biên độ: Ghi nhận chu kỳ vận động nhưng đánh dấu NO_REP
+            status = RepStatus.NO_REP
+            is_rep_valid = False
+        elif has_high_severity or score < 75.0:
+            # Đủ biên độ nhưng sai form kỹ thuật (gập lưng, gối chụm, v.v.)
+            status = RepStatus.BAD_FORM
+            is_rep_valid = True
+        else:
+            # Đủ biên độ và form chuẩn
+            status = RepStatus.GOOD_REP
+            is_rep_valid = True
+
         reps.append(RepFeedback(
             rep_number=rep_num,
             score=score,
+            status=status,
             is_rep_valid=is_rep_valid,
             timestamp_sec=round(frame_idx / max(fps, 1.0), 2),
             issues=issues,

@@ -8,6 +8,7 @@ import {
   usePoseDetection,
   type ExerciseType,
   type PoseFeedbackIssue,
+  type RepStatus,
 } from '@/hooks/usePoseDetection';
 import {
   Video,
@@ -37,6 +38,8 @@ type TabType = 'pose' | 'workout';
 interface RepLog {
   repNumber: number;
   score: number;
+  status: RepStatus;
+  isRepValid: boolean;
   issues: PoseFeedbackIssue[];
   timestamp: number;
 }
@@ -71,10 +74,16 @@ export default function AiCoachPage() {
 
   // Rep completion callback
   const handleRepCompleted = useCallback(
-    (repNum: number, score: number, issues: PoseFeedbackIssue[]) => {
+    (
+      repNum: number,
+      score: number,
+      issues: PoseFeedbackIssue[],
+      status: RepStatus = 'GOOD_REP',
+      isRepValid: boolean = true,
+    ) => {
       setRepLogs((prev) => [
         ...prev,
-        { repNumber: repNum, score, issues, timestamp: Date.now() },
+        { repNumber: repNum, score, issues, status, isRepValid, timestamp: Date.now() },
       ]);
     },
     []
@@ -129,10 +138,14 @@ export default function AiCoachPage() {
 
       const feedbackJson = {
         rep_count: metrics.repCount,
+        valid_rep_count: metrics.validRepCount,
+        good_rep_count: metrics.goodRepCount,
         score: metrics.score,
         rep_feedback: repLogs.map((r) => ({
           rep_number: r.repNumber,
           score: r.score,
+          status: r.status,
+          is_rep_valid: r.isRepValid,
           issues: r.issues.map((i) => ({
             issue_code: i.issueCode,
             severity: i.severity,
@@ -404,7 +417,7 @@ export default function AiCoachPage() {
                   <div className="absolute top-3 left-3 flex gap-2">
                     <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-700">
                       <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">
-                        Reps
+                        Chu kỳ
                       </div>
                       <div className="text-2xl font-black text-white tabular-nums leading-none">
                         {metrics.repCount}
@@ -412,21 +425,48 @@ export default function AiCoachPage() {
                     </div>
                     <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-700">
                       <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">
-                        Điểm
+                        Hợp lệ (ROM)
+                      </div>
+                      <div className="text-2xl font-black text-emerald-400 tabular-nums leading-none">
+                        {metrics.validRepCount}
+                      </div>
+                    </div>
+                    <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-700">
+                      <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">
+                        Điểm Form
                       </div>
                       <div
                         className={`text-2xl font-black tabular-nums leading-none ${scoreColour(metrics.score)}`}
                       >
-                        {metrics.score}
+                        {metrics.score}%
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* In-rep indicator */}
-                {isRunning && metrics.isInRep && (
-                  <div className="absolute top-3 right-3 bg-[#FF5722]/90 text-white text-xs font-bold px-2 py-1 rounded animate-pulse">
-                    ● RẬP ĐANG THỰC HIỆN
+                {/* Status indicator (In rep / Last rep badge) */}
+                {isRunning && (
+                  <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5">
+                    {metrics.isInRep && (
+                      <div className="bg-[#FF5722]/90 text-white text-xs font-bold px-2.5 py-1 rounded shadow animate-pulse">
+                        ● ĐANG THỰC HIỆN
+                      </div>
+                    )}
+                    {metrics.lastRepStatus && (
+                      <div
+                        className={`text-xs font-black px-2.5 py-1 rounded-md shadow-lg flex items-center gap-1.5 transition-all ${
+                          metrics.lastRepStatus === 'GOOD_REP'
+                            ? 'bg-emerald-600 text-white border border-emerald-400'
+                            : metrics.lastRepStatus === 'BAD_FORM'
+                            ? 'bg-amber-600 text-white border border-amber-400'
+                            : 'bg-rose-600 text-white border border-rose-400'
+                        }`}
+                      >
+                        {metrics.lastRepStatus === 'GOOD_REP' && '✓ GOOD REP'}
+                        {metrics.lastRepStatus === 'BAD_FORM' && '⚠ BAD FORM'}
+                        {metrics.lastRepStatus === 'NO_REP' && '✕ NO REP'}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -541,21 +581,29 @@ export default function AiCoachPage() {
                 <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-3">
                   Thống kê phiên tập
                 </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-center">
-                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
-                      Số Rep Hợp Lệ
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-center">
+                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block">
+                      Chu kỳ
                     </span>
-                    <div className="text-3xl font-black text-slate-900 mt-0.5 tabular-nums">
+                    <div className="text-2xl font-black text-slate-900 mt-0.5 tabular-nums">
                       {metrics.repCount}
                     </div>
                   </div>
-                  <div className="bg-slate-50 p-3.5 rounded-lg border border-slate-200 text-center">
-                    <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">
+                  <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-center">
+                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block">
+                      Hợp Lệ
+                    </span>
+                    <div className="text-2xl font-black text-emerald-600 mt-0.5 tabular-nums">
+                      {metrics.validRepCount}
+                    </div>
+                  </div>
+                  <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 text-center">
+                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wide block">
                       Điểm Form
                     </span>
                     <div
-                      className={`text-3xl font-black mt-0.5 tabular-nums ${scoreColour(metrics.score)}`}
+                      className={`text-2xl font-black mt-0.5 tabular-nums ${scoreColour(metrics.score)}`}
                     >
                       {metrics.score}%
                     </div>
@@ -612,30 +660,64 @@ export default function AiCoachPage() {
               {/* Rep History Log */}
               {repLogs.length > 0 && (
                 <div className="bg-white p-4 rounded-xl border border-slate-200">
-                  <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide mb-3">
-                    Lịch sử reps ({repLogs.length})
-                  </h3>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                      Lịch sử reps ({repLogs.length})
+                    </h3>
+                    <div className="flex items-center gap-2 text-[10px] font-semibold text-slate-500">
+                      <span className="text-emerald-600">
+                        {repLogs.filter((r) => r.status === 'GOOD_REP').length} Good
+                      </span>
+                      <span>•</span>
+                      <span className="text-amber-600">
+                        {repLogs.filter((r) => r.status === 'BAD_FORM').length} Bad Form
+                      </span>
+                      <span>•</span>
+                      <span className="text-rose-600">
+                        {repLogs.filter((r) => r.status === 'NO_REP').length} No Rep
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-2 max-h-56 overflow-y-auto">
                     {repLogs.map((rep) => (
                       <div
                         key={rep.repNumber}
-                        className="flex items-center justify-between text-xs py-1.5 border-b border-slate-100 last:border-0"
+                        className="p-2 rounded-lg bg-slate-50 border border-slate-100 space-y-1 text-xs"
                       >
-                        <span className="font-semibold text-slate-700">
-                          Rep #{rep.repNumber}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          {rep.issues.length > 0 && (
-                            <span className="text-amber-600 text-[10px]">
-                              {rep.issues.length} lỗi
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-slate-800">
+                              Rep #{rep.repNumber}
                             </span>
-                          )}
+                            <span
+                              className={`text-[10px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                                rep.status === 'GOOD_REP'
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                  : rep.status === 'BAD_FORM'
+                                  ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                                  : 'bg-rose-100 text-rose-800 border border-rose-300'
+                              }`}
+                            >
+                              {rep.status === 'GOOD_REP' && 'GOOD REP'}
+                              {rep.status === 'BAD_FORM' && 'BAD FORM'}
+                              {rep.status === 'NO_REP' && 'NO REP'}
+                            </span>
+                          </div>
                           <span
                             className={`font-black tabular-nums ${scoreColour(rep.score)}`}
                           >
                             {rep.score}%
                           </span>
                         </div>
+                        {rep.issues.length > 0 && (
+                          <div className="text-[11px] text-slate-600 pl-1 border-l-2 border-slate-300">
+                            {rep.issues.map((iss, idx) => (
+                              <div key={idx} className="leading-tight text-slate-700">
+                                • {iss.message}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>

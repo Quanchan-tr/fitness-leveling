@@ -1,5 +1,13 @@
+from enum import Enum
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
+
+
+class RepStatus(str, Enum):
+    """Decoupled rep classification: Range of Motion (ROM) vs Technical Form."""
+    GOOD_REP = "GOOD_REP"      # Đủ biên độ & Form chuẩn
+    BAD_FORM = "BAD_FORM"      # Đủ biên độ nhưng sai form kỹ thuật (lưng cong, gối chụm, v.v.)
+    NO_REP = "NO_REP"          # Chưa đủ biên độ vận động tối thiểu (hạ chưa đủ sâu)
 
 
 class PoseIssue(BaseModel):
@@ -28,7 +36,8 @@ class VisibilityWarning(BaseModel):
 class RepFeedback(BaseModel):
     rep_number: int = Field(..., ge=1)
     score: float = Field(..., ge=0, le=100)
-    is_rep_valid: bool = True  # False if rep didn't meet minimum criteria
+    status: RepStatus = RepStatus.GOOD_REP  # GOOD_REP | BAD_FORM | NO_REP
+    is_rep_valid: bool = True  # True if met minimum ROM (GOOD_REP or BAD_FORM), False if NO_REP
     timestamp_sec: Optional[float] = None
     issues: List[PoseIssue] = []
     breathing_cue: Optional[BreathingCue] = None  # Breathing guidance for this rep's phase
@@ -42,6 +51,9 @@ class SessionSummary(BaseModel):
     """
     total_reps: int = 0
     valid_reps: int = 0
+    good_reps: int = 0
+    bad_form_reps: int = 0
+    no_reps: int = 0
     average_score: float = 0.0
     overall_grade: str = "B"  # A / B / C / D / F
     strengths: List[str] = []  # Things done well
@@ -52,6 +64,8 @@ class SessionSummary(BaseModel):
 
 class PoseFeedbackResponse(BaseModel):
     rep_count: int = Field(..., ge=0, le=500)
+    valid_rep_count: int = 0
+    good_rep_count: int = 0
     score: float = Field(..., ge=0, le=100)
     rep_feedback: List[RepFeedback] = []
     session_summary: Optional[SessionSummary] = None

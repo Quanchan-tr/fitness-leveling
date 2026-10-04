@@ -28,6 +28,7 @@ import type {
 
 export type ExerciseType = 'squat' | 'pushup' | 'plank';
 export type IssueSeverity = 'low' | 'medium' | 'high';
+export type RepStatus = 'GOOD_REP' | 'BAD_FORM' | 'NO_REP';
 
 export interface PoseFeedbackIssue {
   issueCode: string;
@@ -41,7 +42,10 @@ export interface VisibilityWarning {
 }
 
 export interface PoseMetrics {
-  repCount: number;
+  repCount: number;         // Tổng số chu kỳ chuyển động hoàn thành
+  validRepCount: number;    // Số rep đạt biên độ tối thiểu (GOOD_REP hoặc BAD_FORM)
+  goodRepCount: number;     // Số rep form chuẩn (GOOD_REP)
+  lastRepStatus: RepStatus | null; // Trạng thái rep vừa hoàn thành (GOOD_REP | BAD_FORM | NO_REP)
   score: number;           // 0-100 overall form score
   isInRep: boolean;        // currently mid-rep
   currentRepScore: number;
@@ -53,6 +57,23 @@ export interface PoseMetrics {
   visibilityWarning: VisibilityWarning | null;
 }
 
+function createInitialMetrics(): PoseMetrics {
+  return {
+    repCount: 0,
+    validRepCount: 0,
+    goodRepCount: 0,
+    lastRepStatus: null,
+    score: 100,
+    isInRep: false,
+    currentRepScore: 100,
+    issues: [],
+    landmarks: null,
+    fps: 0,
+    isFrameValid: false,
+    visibilityWarning: null,
+  };
+}
+
 export interface NormalisedLandmark {
   x: number;
   y: number;
@@ -62,7 +83,13 @@ export interface NormalisedLandmark {
 
 interface UsePoseDetectionOptions {
   exercise: ExerciseType;
-  onRepCompleted?: (repNum: number, score: number, issues: PoseFeedbackIssue[]) => void;
+  onRepCompleted?: (
+    repNum: number,
+    score: number,
+    issues: PoseFeedbackIssue[],
+    status?: RepStatus,
+    isRepValid?: boolean,
+  ) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -220,6 +247,9 @@ type RepState = 'READY' | 'DESCENDING' | 'BOTTOM' | 'ASCENDING' | 'TOP';
 interface RepEngineState {
   state: RepState;
   repCount: number;
+  validRepCount: number;
+  goodRepCount: number;
+  lastRepStatus: RepStatus | null;
   score: number;
   currentRepScore: number;
   isInRep: boolean;
@@ -238,6 +268,9 @@ function createRepState(): RepEngineState {
   return {
     state: 'READY',
     repCount: 0,
+    validRepCount: 0,
+    goodRepCount: 0,
+    lastRepStatus: null,
     score: 100,
     currentRepScore: 100,
     isInRep: false,
@@ -268,7 +301,7 @@ function processSquatFrame(
   state: RepEngineState,
   prevEma: EmaAngles,
   nowMs: number,
-  onRep: (s: RepEngineState) => void,
+  onRep: (s: RepEngineState, status: RepStatus, isRepValid: boolean) => void,
 ): { state: RepEngineState; ema: EmaAngles } {
   const s = { ...state };
 
@@ -278,7 +311,7 @@ function processSquatFrame(
   const shoulder = midpoint(lms[LM.LEFT_SHOULDER], lms[LM.RIGHT_SHOULDER]);
 
   const rawKnee = angle2D(hip, knee, ankle);
-  const rawLean = verticalAngle(shoulder, hip);
+  const rawLean = verticalAngle(hip, shoulder);
 
   const newEma: EmaAngles = {
     ...prevEma,
@@ -306,8 +339,8 @@ function processSquatFrame(
       s.maxLeanAngle = Math.max(s.maxLeanAngle, la);
       if (ka <= 90) {
         s.state = 'BOTTOM';
-      } else if (ka > s.minKneeAngle + 20 && s.minKneeAngle > 100) {
-        // Rose back up without reaching bottom — partial rep
+      } else if (ka > s.minKneeAngle + 15 && s.minKneeAngle > 90) {
+        // Rose back up without reaching bottom — partial rep cycle continues to ASCENDING
         s.state = 'ASCENDING';
       }
       break;
@@ -328,45 +361,72 @@ function processSquatFrame(
           const issues: PoseFeedbackIssue[] = [];
           let repScore = 100;
 
-          if (s.minKneeAngle > 120) {
+          // Rule 1: Range of motion (ROM / Depth)
+          const isRomSufficient = s.minKneeAngle <= 120;
+          if (!isRomSufficient) {
             repScore -= 30;
             issues.push({
               issueCode: 'HALF_SQUAT',
               severity: 'high',
-              message: `Chua du sau (goc goi ${Math.round(s.minKneeAngle)} deg). Xuat xuong <= 90 deg.`,
+              message: `Hạ chưa đủ sâu (góc gối ${Math.round(s.minKneeAngle)}°). Chưa đạt biên độ tối thiểu.`,
             });
-          } else if (s.minKneeAngle > 100) {
+          } else if (s.minKneeAngle > 90) {
             repScore -= 15;
             issues.push({
               issueCode: 'INSUFFICIENT_DEPTH',
               severity: 'medium',
-              message: `Chua du sau (goc goi ${Math.round(s.minKneeAngle)} deg). Can xuong <= 90 deg.`,
+              message: `Chưa hạ đủ sâu (góc gối ${Math.round(s.minKneeAngle)}°). Cần xuống <= 90°.`,
             });
           }
+
+          // Rule 2: Torso lean
           if (s.maxLeanAngle > 55) {
             repScore -= 25;
             issues.push({
               issueCode: 'EXCESSIVE_FORWARD_LEAN',
               severity: 'high',
-              message: 'Than nguoi do ve truoc qua nhieu. Giu nguc thang.',
+              message: `Lưng bị gập quá mức (thân nghiêng ${Math.round(s.maxLeanAngle)}°). Giữ ngực thẳng!`,
             });
           } else if (s.maxLeanAngle > 45) {
             repScore -= 10;
             issues.push({
               issueCode: 'FORWARD_LEAN',
               severity: 'medium',
-              message: 'Than nguoi hoi nga ve truoc. Giu nguc thang hon.',
+              message: `Thân trên hơi ngả về trước (${Math.round(s.maxLeanAngle)}°). Giữ ngực thẳng hơn.`,
             });
           }
 
+          repScore = Math.max(0, repScore);
+
+          // Form Quality Analyzer
+          const hasHighSeverity = issues.some(
+            (i) => i.severity === 'high' && i.issueCode !== 'HALF_SQUAT',
+          );
+          let repStatus: RepStatus = 'GOOD_REP';
+          let isRepValid = true;
+
+          if (!isRomSufficient) {
+            repStatus = 'NO_REP';
+            isRepValid = false;
+          } else if (hasHighSeverity || repScore < 75) {
+            repStatus = 'BAD_FORM';
+            isRepValid = true;
+          } else {
+            repStatus = 'GOOD_REP';
+            isRepValid = true;
+          }
+
           s.repCount += 1;
-          s.currentRepScore = Math.max(0, repScore);
+          if (isRepValid) s.validRepCount += 1;
+          if (repStatus === 'GOOD_REP') s.goodRepCount += 1;
+          s.lastRepStatus = repStatus;
+          s.currentRepScore = repScore;
           s.score = Math.round(
             (s.score * (s.repCount - 1) + s.currentRepScore) / s.repCount,
           );
           s.issues = issues;
           s.lastRepTime = nowMs;
-          onRep(s);
+          onRep(s, repStatus, isRepValid);
         }
         // Reset regardless (valid or timing-rejected)
         s.state = 'READY';
@@ -395,7 +455,7 @@ function processPushupFrame(
   state: RepEngineState,
   prevEma: EmaAngles,
   nowMs: number,
-  onRep: (s: RepEngineState) => void,
+  onRep: (s: RepEngineState, status: RepStatus, isRepValid: boolean) => void,
 ): { state: RepEngineState; ema: EmaAngles } {
   const s = { ...state };
 
@@ -447,6 +507,9 @@ function processPushupFrame(
       s.maxElbowFlare = Math.max(s.maxElbowFlare, rawFlare);
       if (ea <= 90) {
         s.state = 'BOTTOM';
+      } else if (ea > s.minElbowAngle + 15 && s.minElbowAngle > 90) {
+        // Rose back up without reaching bottom — partial rep cycle continues to ASCENDING
+        s.state = 'ASCENDING';
       }
       break;
 
@@ -466,62 +529,89 @@ function processPushupFrame(
           const issues: PoseFeedbackIssue[] = [];
           let repScore = 100;
 
-          if (s.minElbowAngle > 120) {
+          // Rule 1: Range of motion (ROM / Depth)
+          const isRomSufficient = s.minElbowAngle <= 120;
+          if (!isRomSufficient) {
             repScore -= 35;
             issues.push({
               issueCode: 'HALF_REP',
               severity: 'high',
-              message: `Bien do qua nho (khuyu tay ${Math.round(s.minElbowAngle)} deg). Rep chua hop le.`,
+              message: `Hạ chưa đủ sâu (khuỷu tay ${Math.round(s.minElbowAngle)}°). Chưa đạt biên độ tối thiểu.`,
             });
           } else if (s.minElbowAngle > 90) {
             repScore -= 15;
             issues.push({
               issueCode: 'INSUFFICIENT_DEPTH',
               severity: 'medium',
-              message: `Chua du sau (khuyu tay ${Math.round(s.minElbowAngle)} deg). Huong den <= 90 deg.`,
+              message: `Chưa hạ đủ sâu (khuỷu tay ${Math.round(s.minElbowAngle)}°). Hướng đến <= 90°.`,
             });
           }
 
+          // Rule 2: Body alignment
           if (ba < 160) {
             repScore -= 25;
             issues.push({
               issueCode: 'HIPS_SAGGING',
               severity: 'high',
-              message: 'Hong dang chay xe. Siet core va mong de giu thang nguoi.',
+              message: 'Lưng bị võng quá mức. Siết core và mông để giữ thẳng người!',
             });
           } else if (ba > 205) {
             repScore -= 20;
             issues.push({
               issueCode: 'HIPS_PIKING',
               severity: 'medium',
-              message: 'Hong dang nho qua cao. Ha xuong chau xuong.',
+              message: 'Hông nhô lên quá cao. Hạ hông xuống ngang thân.',
             });
           }
 
+          // Rule 3: Elbow flare
           if (s.maxElbowFlare > 80) {
             repScore -= 25;
             issues.push({
               issueCode: 'ELBOW_FLARE_T_SHAPE',
               severity: 'high',
-              message: `Khuyu tay xoe ngang ${Math.round(s.maxElbowFlare)} deg tu the chu T! De chan thuong vai.`,
+              message: `Khuỷu tay xòe ngang ${Math.round(s.maxElbowFlare)}° chữ T nguy hiểm! Khép vào ~45°.`,
             });
           } else if (s.maxElbowFlare > 65) {
             repScore -= 10;
             issues.push({
               issueCode: 'ELBOW_FLARE_WIDE',
               severity: 'medium',
-              message: `Khuyu tay hoi xoe rong (${Math.round(s.maxElbowFlare)} deg). Khep vao ~45 deg.`,
+              message: `Khuỷu tay hơi xòe rộng (${Math.round(s.maxElbowFlare)}°). Khép vào ~45°.`,
             });
           }
 
+          repScore = Math.max(0, repScore);
+
+          // Form Quality Analyzer: Phân biệt "Form đúng" và "Rep hợp lệ"
+          const hasHighSeverity = issues.some(
+            (i) => i.severity === 'high' && i.issueCode !== 'HALF_REP',
+          );
+          let repStatus: RepStatus = 'GOOD_REP';
+          let isRepValid = true;
+
+          if (!isRomSufficient) {
+            repStatus = 'NO_REP';
+            isRepValid = false;
+          } else if (hasHighSeverity || repScore < 75) {
+            repStatus = 'BAD_FORM';
+            isRepValid = true;
+          } else {
+            repStatus = 'GOOD_REP';
+            isRepValid = true;
+          }
+
           s.repCount += 1;
-          s.currentRepScore = Math.max(0, repScore);
+          if (isRepValid) s.validRepCount += 1;
+          if (repStatus === 'GOOD_REP') s.goodRepCount += 1;
+          s.lastRepStatus = repStatus;
+          s.currentRepScore = repScore;
           s.score = Math.round(
             (s.score * (s.repCount - 1) + s.currentRepScore) / s.repCount,
           );
           s.issues = issues;
           s.lastRepTime = nowMs;
-          onRep(s);
+          onRep(s, repStatus, isRepValid);
         }
         // Reset regardless
         s.state = 'TOP';
@@ -544,7 +634,7 @@ function processPlankFrame(
   state: RepEngineState,
   prevEma: EmaAngles,
   _nowMs: number,
-  _onRep: (s: RepEngineState) => void,
+  _onRep: (s: RepEngineState, status: RepStatus, isRepValid: boolean) => void,
 ): { state: RepEngineState; ema: EmaAngles } {
   const s = { ...state };
 
@@ -569,14 +659,14 @@ function processPlankFrame(
     issues.push({
       issueCode: 'HIPS_SAGGING',
       severity: ba < 150 ? 'high' : 'medium',
-      message: 'Lung duoi dang vong. Siet co bung va giu duong thang vai-hong-got.',
+      message: 'Lưng dưới đang võng. Siết cơ bụng và giữ đường thẳng vai-hông-gót.',
     });
   } else if (ba > 195) {
     s.badBodyFrames += 1;
     issues.push({
       issueCode: 'HIPS_PIKING',
       severity: 'medium',
-      message: 'Hong dang nho cao. Ha xuong chau nhe de cang co bung.',
+      message: 'Hông đang nhô cao. Hạ xương chậu nhẹ để căng cơ bụng.',
     });
   }
 
@@ -586,6 +676,13 @@ function processPlankFrame(
     const badRatio = s.badBodyFrames / s.totalBodyFrames;
     s.score = Math.max(0, Math.round(100 - badRatio * 100));
     s.currentRepScore = s.score;
+    const hasSevere = issues.some((i) => i.severity === 'high');
+    s.lastRepStatus = s.score >= 75 && !hasSevere ? 'GOOD_REP' : s.score >= 40 ? 'BAD_FORM' : 'NO_REP';
+    s.validRepCount = s.totalBodyFrames >= 150 ? 1 : 0; // 5s at 30fps
+    s.repCount = s.validRepCount;
+    if (s.lastRepStatus === 'GOOD_REP' && s.validRepCount > 0) {
+      s.goodRepCount = 1;
+    }
   }
 
   return { state: s, ema: newEma };
@@ -672,17 +769,7 @@ export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionO
   const [isModelLoading, setIsModelLoading] = useState(false);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [metrics, setMetrics] = useState<PoseMetrics>({
-    repCount: 0,
-    score: 100,
-    isInRep: false,
-    currentRepScore: 100,
-    issues: [],
-    landmarks: null,
-    fps: 0,
-    isFrameValid: false,
-    visibilityWarning: null,
-  });
+  const [metrics, setMetrics] = useState<PoseMetrics>(createInitialMetrics());
 
   const loadModel = useCallback(async () => {
     if (landmarkerRef.current) return;
@@ -761,8 +848,8 @@ export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionO
 
       // ── Rule Engine (only runs on valid frames) ───────────────────────
       const nowMs = performance.now();
-      const onRep = (s: RepEngineState) => {
-        onRepCompleted?.(s.repCount, s.currentRepScore, s.issues);
+      const onRep = (s: RepEngineState, status: RepStatus, isRepValid: boolean) => {
+        onRepCompleted?.(s.repCount, s.currentRepScore, s.issues, status, isRepValid);
       };
 
       let engineResult: { state: RepEngineState; ema: EmaAngles };
@@ -787,6 +874,9 @@ export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionO
       const ns = engineResult.state;
       setMetrics({
         repCount: ns.repCount,
+        validRepCount: ns.validRepCount,
+        goodRepCount: ns.goodRepCount,
+        lastRepStatus: ns.lastRepStatus,
         score: ns.score,
         isInRep: ns.isInRep,
         currentRepScore: ns.currentRepScore,
@@ -824,17 +914,7 @@ export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionO
 
     repStateRef.current = createRepState();
     emaRef.current = createEmaAngles();
-    setMetrics({
-      repCount: 0,
-      score: 100,
-      isInRep: false,
-      currentRepScore: 100,
-      issues: [],
-      landmarks: null,
-      fps: 0,
-      isFrameValid: false,
-      visibilityWarning: null,
-    });
+    setMetrics(createInitialMetrics());
 
     setIsRunning(true);
     animFrameRef.current = requestAnimationFrame(processFrame);
@@ -854,17 +934,7 @@ export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionO
   const reset = useCallback(() => {
     repStateRef.current = createRepState();
     emaRef.current = createEmaAngles();
-    setMetrics({
-      repCount: 0,
-      score: 100,
-      isInRep: false,
-      currentRepScore: 100,
-      issues: [],
-      landmarks: null,
-      fps: 0,
-      isFrameValid: false,
-      visibilityWarning: null,
-    });
+    setMetrics(createInitialMetrics());
   }, []);
 
   useEffect(() => {

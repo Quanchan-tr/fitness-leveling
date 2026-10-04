@@ -22,6 +22,7 @@ from app.cv.angle_math import calculate_angle_2d, calculate_vertical_angle
 from app.schemas.response import (
     PoseFeedbackResponse,
     RepFeedback,
+    RepStatus,
     PoseIssue,
     VisibilityWarning,
     BreathingCue,
@@ -256,9 +257,18 @@ class PlankRule(BasePoseRule):
         )
 
         score = max(0.0, min(100.0, score))
+
+        if not is_valid_hold:
+            status = RepStatus.NO_REP
+        elif score < 75.0 or any(i.severity == "high" for i in issues):
+            status = RepStatus.BAD_FORM
+        else:
+            status = RepStatus.GOOD_REP
+
         rep = RepFeedback(
             rep_number=1,
             score=score,
+            status=status,
             is_rep_valid=is_valid_hold,
             timestamp_sec=hold_duration_sec,
             issues=issues,
@@ -270,14 +280,16 @@ class PlankRule(BasePoseRule):
             reps, visibility_warnings, len(frames_landmarks), "Plank"
         )
         if is_valid_hold:
-            session_summary.strengths.insert(0, f"Giu plank duoc {hold_duration_sec}s.")
+            session_summary.strengths.insert(0, f"Giữ plank được {hold_duration_sec}s.")
         else:
             session_summary.improvement_areas.insert(
-                0, f"Thoi gian giu chi {hold_duration_sec}s — can toi thieu {self.MIN_HOLD_SEC}s."
+                0, f"Thời gian giữ chỉ {hold_duration_sec}s — cần tối thiểu {self.MIN_HOLD_SEC}s."
             )
 
         return PoseFeedbackResponse(
             rep_count=1 if is_valid_hold else 0,
+            valid_rep_count=1 if is_valid_hold else 0,
+            good_rep_count=1 if (is_valid_hold and status == RepStatus.GOOD_REP) else 0,
             score=score,
             rep_feedback=reps,
             session_summary=session_summary,

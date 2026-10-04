@@ -10,6 +10,7 @@ from app.schemas.response import (
     PoseFeedbackResponse,
     PoseIssue,
     RepFeedback,
+    RepStatus,
     VisibilityWarning,
     SessionSummary,
     BreathingCue,
@@ -153,6 +154,9 @@ class BasePoseRule(ABC):
         This is shown AFTER the user finishes exercising.
         """
         valid_reps = [r for r in reps if r.is_rep_valid]
+        good_reps = [r for r in reps if r.status == RepStatus.GOOD_REP]
+        bad_form_reps = [r for r in reps if r.status == RepStatus.BAD_FORM]
+        no_reps = [r for r in reps if r.status == RepStatus.NO_REP]
         scores = [r.score for r in reps] if reps else [0.0]
         avg_score = float(np.mean(scores))
 
@@ -187,7 +191,9 @@ class BasePoseRule(ABC):
 
         # Strengths — identify what went well
         strengths: List[str] = []
-        if len(valid_reps) == len(reps) and reps:
+        if len(good_reps) == len(reps) and reps:
+            strengths.append(f"Xuất sắc! Tất cả {len(reps)} rep đều chuẩn form và đạt biên độ.")
+        elif len(valid_reps) == len(reps) and reps:
             strengths.append(f"Tất cả {len(reps)} rep đều đạt tiêu chuẩn biên độ.")
         elif valid_reps:
             strengths.append(f"{len(valid_reps)}/{len(reps)} rep đạt tiêu chuẩn biên độ.")
@@ -201,6 +207,11 @@ class BasePoseRule(ABC):
 
         # Improvement areas — detailed post-session tips with injury context
         improvement_areas: List[str] = []
+        if bad_form_reps:
+            improvement_areas.append(f"{len(bad_form_reps)} rep hoàn thành nhưng sai kỹ thuật form. Cần chỉnh lại tư thế.")
+        if no_reps:
+            improvement_areas.append(f"{len(no_reps)} rep bị tính NO REP do chưa đạt biên độ (cần hạ sâu hơn).")
+
         for issue in common_issues:
             if issue.detail:
                 improvement_areas.append(issue.detail)
@@ -225,6 +236,9 @@ class BasePoseRule(ABC):
         return SessionSummary(
             total_reps=len(reps),
             valid_reps=len(valid_reps),
+            good_reps=len(good_reps),
+            bad_form_reps=len(bad_form_reps),
+            no_reps=len(no_reps),
             average_score=round(avg_score, 2),
             overall_grade=grade,
             strengths=strengths,
