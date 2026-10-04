@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import Counter
+from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional, Set, Tuple
 
 import numpy as np
@@ -13,6 +14,47 @@ from app.schemas.response import (
     SessionSummary,
     BreathingCue,
 )
+
+# ---------------------------------------------------------------------------
+# EMA state — passed in and out each frame so rule classes stay stateless
+# ---------------------------------------------------------------------------
+
+@dataclass
+class EmaState:
+    """Per-exercise exponential moving average angle state."""
+    knee_angle: float = 170.0
+    elbow_angle: float = 170.0
+    body_alignment: float = 180.0
+    lean_angle: float = 0.0
+
+    # EMA smoothing factor: higher = more responsive, lower = smoother
+    alpha: float = 0.40
+
+    def update_knee(self, raw: float) -> float:
+        self.knee_angle = self.alpha * raw + (1 - self.alpha) * self.knee_angle
+        return self.knee_angle
+
+    def update_elbow(self, raw: float) -> float:
+        self.elbow_angle = self.alpha * raw + (1 - self.alpha) * self.elbow_angle
+        return self.elbow_angle
+
+    def update_body(self, raw: float) -> float:
+        self.body_alignment = self.alpha * raw + (1 - self.alpha) * self.body_alignment
+        return self.body_alignment
+
+    def update_lean(self, raw: float) -> float:
+        self.lean_angle = self.alpha * raw + (1 - self.alpha) * self.lean_angle
+        return self.lean_angle
+
+
+# ---------------------------------------------------------------------------
+# Temporal constraint helpers
+# ---------------------------------------------------------------------------
+
+# Minimum frames a rep must span (at 30fps: 0.8s = 24 frames)
+DEFAULT_MIN_REP_FRAMES = 24
+# Minimum frames cooldown between counted reps (at 30fps: 0.5s = 15 frames)
+DEFAULT_REP_COOLDOWN_FRAMES = 15
 
 
 class BasePoseRule(ABC):

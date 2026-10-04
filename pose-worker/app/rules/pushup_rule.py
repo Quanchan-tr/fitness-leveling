@@ -2,20 +2,23 @@
 pushup_rule.py — Comprehensive push-up form analysis.
 
 Evaluates multiple biomechanical rules per rep:
-1. Body alignment (shoulder-hip-ankle should form ~180° straight line, ±15° tolerance)
-2. Elbow flare angle (upper arm vs. torso — ideal ~45°, warning at ~80-90° = T-shape)
-3. Depth (elbow angle at bottom — must reach ≤90° for full ROM)
-4. Head/neck alignment (ear-shoulder angle, avoid excessive head drop)
+1. Body alignment (shoulder-hip-ankle straight line, ±15 deg tolerance)
+2. Elbow flare angle (upper arm vs. torso — ideal ~45 deg, T-shape > 80 deg)
+3. Depth (elbow angle at bottom — must reach <= 90 deg for full ROM)
+4. Head/neck alignment (nose-shoulder angle)
 5. Breathing cues (inhale on descent, exhale on push-up)
 
-Visibility: checks all required landmarks each frame, emits VisibilityWarning if occluded.
-Post-session: detailed SessionSummary with injury risk explanations.
+Robustness features:
+- Visibility Gatekeeper: all required landmarks must have visibility >= 0.65
+- EMA angle smoothing (alpha=0.4) before state machine transitions
+- Hysteresis bands: separate enter/exit thresholds (65 deg gap)
+- Temporal constraints: min rep duration (0.8s) and cooldown (0.5s)
 """
 
 import numpy as np
 from typing import List, Dict, Any
 
-from app.rules.base_rule import BasePoseRule
+from app.rules.base_rule import BasePoseRule, EmaState, DEFAULT_MIN_REP_FRAMES, DEFAULT_REP_COOLDOWN_FRAMES
 from app.cv.angle_math import calculate_angle_2d, calculate_vertical_angle
 from app.schemas.response import (
     PoseFeedbackResponse,
@@ -28,7 +31,7 @@ from app.schemas.response import (
 
 class PushupRule(BasePoseRule):
     """
-    Multi-rule push-up evaluator.
+    Multi-rule push-up evaluator with EMA smoothing and temporal constraints.
 
     MediaPipe landmark indices used:
       0  = NOSE
@@ -39,29 +42,25 @@ class PushupRule(BasePoseRule):
       27 = LEFT_ANKLE        28 = RIGHT_ANKLE
     """
 
-    # Landmarks required for full push-up evaluation
+    # --- Required landmarks (all must be visible >= 0.65) ---
     REQUIRED_LANDMARKS = ["11", "13", "15", "23", "27"]
+    # At least one hip and one ankle side
+    HIP_ALTERNATIVES = [["23"], ["24"]]
+    ANKLE_ALTERNATIVES = [["27"], ["28"]]
 
-    # --- Thresholds with tolerances ---
-    # Body alignment: shoulder-hip-ankle angle
-    BODY_ALIGNMENT_IDEAL = 180.0
-    BODY_ALIGNMENT_TOLERANCE = 15.0  # ±15° is acceptable
-    BODY_SAG_THRESHOLD = 160.0       # Below this = hips sagging
-    BODY_PIKE_THRESHOLD = 200.0      # Above this = hips piking
+    # --- State machine thresholds with hysteresis (65 deg gap) ---
+    ELBOW_ENTER_DESCENT = 145.0   # arms start bending (enter DESCENDING)
+    ELBOW_CONFIRM_BOTTOM = 90.0   # full depth confirmed (enter BOTTOM)
+    ELBOW_START_ASCENT = 105.0    # rising from bottom (enter ASCENDING)
+    ELBOW_REP_COMPLETE = 155.0    # arms extended again (rep done)
 
-    # Elbow angle thresholds for state transitions
-    ELBOW_TOP_THRESHOLD = 155.0      # Above this = arms extended (top position)
-    ELBOW_DESCEND_THRESHOLD = 140.0  # Below this = entering descent
-    ELBOW_FULL_DEPTH = 90.0          # At or below this = full depth achieved
-    ELBOW_HALF_REP_MIN = 120.0       # Above this at bottom = half rep / head bobbing
-
-    # Elbow flare: angle between upper-arm vector and torso vector
-    ELBOW_FLARE_IDEAL = 45.0
-    ELBOW_FLARE_WARNING = 70.0       # Getting wide
-    ELBOW_FLARE_DANGER = 80.0        # T-shape, injury risk
-
-    # Head alignment: nose-shoulder vs vertical
-    HEAD_DROP_THRESHOLD = 35.0       # Excessive head drop angle
+    # --- Form thresholds ---
+    BODY_SAG_THRESHOLD = 160.0
+    BODY_PIKE_THRESHOLD = 205.0
+    ELBOW_FLARE_DANGER = 80.0
+    ELBOW_FLARE_WARNING = 65.0
+    HEAD_DROP_THRESHOLD = 35.0
+    ELBOW_HALF_REP_MIN = 120.0    # above this at bottom = half rep
 
     def _calculate_elbow_flare(
         self,
@@ -69,14 +68,49 @@ class PushupRule(BasePoseRule):
         elbow: np.ndarray,
         hip: np.ndarray,
     ) -> float:
-        """
-        Calculate the angle between the upper arm and the torso.
-        This represents how much the elbow flares out from the body.
-
-        Ideal push-up: ~45° (diamond to shoulder-width)
-        Dangerous: ~90° (T-shape, stresses rotator cuff)
-        """
         return calculate_angle_2d(elbow, shoulder, hip)
+
+    def _check_pushup_visibility(
+        self,
+        lm: Dict[str, Any],
+        frame_idx: int,
+        fps: float,
+    ):
+        """
+        Push-up specific gating: upper body all required, lower body at least
+        one hip + one ankle side.
+        """
+        if not lm:
+            return False, VisibilityWarning(
+                warning_code="POSE_NOT_DETECTED",
+                message="Khong phat hien duoc tu the. Hay dung vao khung hinh.",
+                frame_index=frame_idx,
+                timestamp_sec=round(frame_idx / max(fps, 1.0), 2),
+            )
+
+        upper_required = ["11", "13", "15"]
+        missing_upper = [k for k in upper_required if k not in lm]
+        if missing_upper:
+            return False, VisibilityWarning(
+                warning_code="INCOMPLETE_BODY_VISIBLE",
+                message="Camera can thay ro vai, khuyu tay va co tay. Dieu chinh goc camera.",
+                affected_landmarks=missing_upper,
+                frame_index=frame_idx,
+                timestamp_sec=round(frame_idx / max(fps, 1.0), 2),
+            )
+
+        has_hip = "23" in lm or "24" in lm
+        has_ankle = "27" in lm or "28" in lm
+        if not has_hip or not has_ankle:
+            return False, VisibilityWarning(
+                warning_code="INCOMPLETE_BODY_VISIBLE",
+                message="Camera can thay hong va mat ca de kiem tra duong thang co the. Lui camera ra xa.",
+                affected_landmarks=[k for k in ["23", "27"] if k not in lm],
+                frame_index=frame_idx,
+                timestamp_sec=round(frame_idx / max(fps, 1.0), 2),
+            )
+
+        return True, None
 
     def process_landmarks_sequence(
         self, frames_landmarks: List[Dict[str, Any]], fps: float
@@ -85,26 +119,33 @@ class PushupRule(BasePoseRule):
         reps: List[RepFeedback] = []
         visibility_warnings: List[VisibilityWarning] = []
 
-        state = "TOP"  # TOP -> DESCENDING -> BOTTOM -> TOP
+        # EMA state
+        ema = EmaState()
+
+        # FSM state
+        state = "TOP"
         current_min_elbow = 180.0
         rep_body_alignments: List[float] = []
         rep_elbow_flares: List[float] = []
         rep_head_drops: List[float] = []
-        rep_start_frame = 0
 
-        # Consecutive frame counters for visibility
+        # Temporal constraints (frame-based)
+        min_rep_frames = max(DEFAULT_MIN_REP_FRAMES, int(fps * 0.8))
+        cooldown_frames = max(DEFAULT_REP_COOLDOWN_FRAMES, int(fps * 0.5))
+        rep_start_frame = 0
+        last_rep_end_frame = -cooldown_frames  # allow first rep immediately
+
         consecutive_missing = 0
-        MAX_CONSECUTIVE_MISSING = 10  # ~0.33s at 30fps
+        MAX_CONSECUTIVE_MISSING = 10
 
         for frame_idx, lm in enumerate(frames_landmarks):
-            # --- Visibility check ---
-            all_present, vis_warning = self.check_required_landmarks(
-                lm, self.REQUIRED_LANDMARKS, frame_idx, fps
-            )
+            # --- Visibility gating (push-up specific) ---
+            all_present, vis_warning = self._check_pushup_visibility(lm, frame_idx, fps)
             if not all_present:
                 consecutive_missing += 1
                 if vis_warning and consecutive_missing == MAX_CONSECUTIVE_MISSING:
                     visibility_warnings.append(vis_warning)
+                # Freeze state — do NOT advance FSM
                 continue
 
             consecutive_missing = 0
@@ -113,59 +154,89 @@ class PushupRule(BasePoseRule):
             shoulder = np.array([lm["11"]["x"], lm["11"]["y"]])
             elbow = np.array([lm["13"]["x"], lm["13"]["y"]])
             wrist = np.array([lm["15"]["x"], lm["15"]["y"]])
-            hip = np.array([lm["23"]["x"], lm["23"]["y"]])
-            ankle = np.array([lm["27"]["x"], lm["27"]["y"]])
 
-            # Optional landmarks
+            # Use left hip/ankle, fall back to right
+            hip_lm = lm.get("23") or lm.get("24")
+            ankle_lm = lm.get("27") or lm.get("28")
+            hip = np.array([hip_lm["x"], hip_lm["y"]])
+            ankle = np.array([ankle_lm["x"], ankle_lm["y"]])
+
             nose = np.array([lm["0"]["x"], lm["0"]["y"]]) if "0" in lm else None
 
-            # --- Calculate angles ---
-            elbow_angle = calculate_angle_2d(shoulder, elbow, wrist)
-            body_alignment = calculate_angle_2d(shoulder, hip, ankle)
-            elbow_flare = self._calculate_elbow_flare(shoulder, elbow, hip)
+            # --- Raw angles ---
+            raw_elbow = calculate_angle_2d(shoulder, elbow, wrist)
+            raw_body = calculate_angle_2d(shoulder, hip, ankle)
+            raw_flare = self._calculate_elbow_flare(shoulder, elbow, hip)
 
-            # Head drop: angle between nose-shoulder line and vertical
             head_drop = 0.0
             if nose is not None:
                 head_drop = calculate_vertical_angle(nose, shoulder)
 
-            # --- State machine ---
+            # --- EMA smoothing ---
+            ea = ema.update_elbow(raw_elbow)
+            ba = ema.update_body(raw_body)
+            # Note: flare and head drop use raw (no EMA) — they're accumulators
+
+            # --- FSM with hysteresis ---
             if state == "TOP":
-                if elbow_angle < self.ELBOW_DESCEND_THRESHOLD:
+                if ea < self.ELBOW_ENTER_DESCENT:
                     state = "DESCENDING"
                     rep_start_frame = frame_idx
-                    current_min_elbow = elbow_angle
-                    rep_body_alignments = [body_alignment]
-                    rep_elbow_flares = [elbow_flare]
+                    current_min_elbow = ea
+                    rep_body_alignments = [ba]
+                    rep_elbow_flares = [raw_flare]
                     rep_head_drops = [head_drop]
 
             elif state == "DESCENDING":
-                current_min_elbow = min(current_min_elbow, elbow_angle)
-                rep_body_alignments.append(body_alignment)
-                rep_elbow_flares.append(elbow_flare)
+                current_min_elbow = min(current_min_elbow, ea)
+                rep_body_alignments.append(ba)
+                rep_elbow_flares.append(raw_flare)
                 rep_head_drops.append(head_drop)
 
-                if elbow_angle >= self.ELBOW_TOP_THRESHOLD:
-                    # Completed a rep (went down and came back up)
-                    self._finalize_rep(
-                        reps, frame_idx, fps,
-                        current_min_elbow, rep_body_alignments,
-                        rep_elbow_flares, rep_head_drops, state="ASCENDING"
-                    )
+                if ea <= self.ELBOW_CONFIRM_BOTTOM:
+                    state = "BOTTOM"
+
+            elif state == "BOTTOM":
+                current_min_elbow = min(current_min_elbow, ea)
+                rep_body_alignments.append(ba)
+                rep_elbow_flares.append(raw_flare)
+                rep_head_drops.append(head_drop)
+
+                if ea > self.ELBOW_START_ASCENT:
+                    state = "ASCENDING"
+
+            elif state == "ASCENDING":
+                rep_body_alignments.append(ba)
+                rep_elbow_flares.append(raw_flare)
+                rep_head_drops.append(head_drop)
+
+                if ea >= self.ELBOW_REP_COMPLETE:
+                    # Temporal constraint check
+                    rep_duration = frame_idx - rep_start_frame
+                    cooldown_ok = frame_idx - last_rep_end_frame >= cooldown_frames
+
+                    if rep_duration >= min_rep_frames and cooldown_ok:
+                        self._finalize_rep(
+                            reps, frame_idx, fps,
+                            current_min_elbow, rep_body_alignments,
+                            rep_elbow_flares, rep_head_drops,
+                        )
+                        last_rep_end_frame = frame_idx
+                    # else: timing-rejected — silently discard this cycle
+
+                    # Reset state regardless
                     state = "TOP"
                     current_min_elbow = 180.0
-
-            # Note: we don't need an explicit BOTTOM state — we just track
-            # the minimum elbow angle throughout the descent+ascent.
+                    rep_body_alignments = []
+                    rep_elbow_flares = []
+                    rep_head_drops = []
 
         # --- Build session summary ---
         session_summary = self.build_session_summary(
             reps, visibility_warnings, len(frames_landmarks), "Push-up"
         )
 
-        total_score = (
-            float(np.mean([r.score for r in reps])) if reps else 0.0
-        )
+        total_score = float(np.mean([r.score for r in reps])) if reps else 0.0
 
         return PoseFeedbackResponse(
             rep_count=len(reps),
@@ -184,63 +255,53 @@ class PushupRule(BasePoseRule):
         body_alignments: List[float],
         elbow_flares: List[float],
         head_drops: List[float],
-        state: str,
     ) -> None:
-        """Evaluate all rules for a completed rep and append to reps list."""
-
         rep_num = len(reps) + 1
         issues: List[PoseIssue] = []
         score = 100.0
         is_rep_valid = True
 
-        # ------------------------------------------------------------------
-        # Rule 1: Depth check — did the elbow reach ≤90°?
-        # ------------------------------------------------------------------
+        # Rule 1: Depth
         if min_elbow_angle > self.ELBOW_HALF_REP_MIN:
-            # Barely moved — head bobbing or minimal descent
             score -= 35.0
             is_rep_valid = False
             issues.append(PoseIssue(
                 issue_code="HALF_REP",
                 severity="high",
-                message=f"Biên độ quá nhỏ (khuỷu tay {int(min_elbow_angle)}°). Rep không hợp lệ.",
+                message=f"Bien do qua nho (khuyu tay {int(min_elbow_angle)} deg). Rep chua hop le.",
                 detail=(
-                    "Bạn chỉ nhấp nhô nửa đường hoặc gật đầu xuống sàn thay vì hạ toàn bộ thân trên. "
-                    "Biên độ không đủ khiến bài tập kém hiệu quả và không kích hoạt được cơ ngực, cơ tay sau đúng mức. "
-                    "Hãy hạ người xuống cho đến khi khuỷu tay tạo góc khoảng 90° hoặc ngực gần chạm sàn."
+                    "Ban chi nhap nho nua duong hoac gat dau xuong san thay vi ha toan bo than tren. "
+                    "Ha nguoi cho den khi khuyu tay tao goc ~90 deg hoac nguc gan cham san."
                 ),
             ))
-        elif min_elbow_angle > self.ELBOW_FULL_DEPTH:
+        elif min_elbow_angle > self.ELBOW_CONFIRM_BOTTOM:
             score -= 15.0
             issues.append(PoseIssue(
                 issue_code="INSUFFICIENT_DEPTH",
                 severity="medium",
-                message=f"Chưa đủ sâu (khuỷu tay {int(min_elbow_angle)}°). Cố gắng hạ xuống ~90°.",
+                message=f"Chua du sau (khuyu tay {int(min_elbow_angle)} deg). Co gang ha xuong ~90 deg.",
                 detail=(
-                    f"Khuỷu tay chỉ đạt {int(min_elbow_angle)}° thay vì 90° trở xuống. "
-                    "Hạ người sâu hơn để kích hoạt tối đa cơ ngực và cơ tay sau (triceps)."
+                    f"Khuyu tay chi dat {int(min_elbow_angle)} deg thay vi 90 deg tro xuong. "
+                    "Ha nguoi sau hon de kich hoat toi da co nguc va co tay sau (triceps)."
                 ),
             ))
 
-        # ------------------------------------------------------------------
-        # Rule 2: Body alignment — is the body a straight line?
-        # ------------------------------------------------------------------
+        # Rule 2: Body alignment
         avg_alignment = float(np.mean(body_alignments)) if body_alignments else 180.0
         min_alignment = float(np.min(body_alignments)) if body_alignments else 180.0
         max_alignment = float(np.max(body_alignments)) if body_alignments else 180.0
 
         if min_alignment < self.BODY_SAG_THRESHOLD:
             sag_severity = "high" if min_alignment < 150.0 else "medium"
-            penalty = 25.0 if sag_severity == "high" else 15.0
-            score -= penalty
+            score -= 25.0 if sag_severity == "high" else 15.0
             issues.append(PoseIssue(
                 issue_code="HIPS_SAGGING",
                 severity=sag_severity,
-                message=f"Hông bị võng ({int(min_alignment)}°). Siết cơ bụng và mông.",
+                message=f"Hong bi vong ({int(min_alignment)} deg). Siet co bung va mong.",
                 detail=(
-                    "Hông bị xệ xuống khiến cột sống thắt lưng bị ưỡn quá mức (hyperextension). "
-                    "Điều này tạo áp lực lớn lên đĩa đệm cột sống, có thể dẫn đến đau lưng dưới mạn tính. "
-                    "Hãy siết chặt cơ core (bụng + mông) để giữ cơ thể thẳng như một tấm ván từ đầu đến gót chân."
+                    "Hong bi xe xuong khien cot song that lung bi uon qua muc (hyperextension). "
+                    "Dieu nay tao ap luc lon len dia dem cot song, co the dan den dau lung duoi man tinh. "
+                    "Siet chat co core (bung + mong) de giu co the thang nhu mot tam van."
                 ),
             ))
         elif max_alignment > self.BODY_PIKE_THRESHOLD:
@@ -248,18 +309,14 @@ class PushupRule(BasePoseRule):
             issues.append(PoseIssue(
                 issue_code="HIPS_PIKING",
                 severity="medium",
-                message=f"Hông nhô lên quá cao ({int(max_alignment)}°). Hạ hông xuống ngang thân.",
+                message=f"Hong nho len qua cao ({int(max_alignment)} deg). Ha hong xuong ngang than.",
                 detail=(
-                    "Hông nhô lên cao khiến tải trọng dồn về vai thay vì phân bổ đều, "
-                    "giảm hiệu quả tập luyện cho cơ ngực. Hạ hông xuống sao cho cơ thể "
-                    "tạo thành đường thẳng từ đầu đến gót chân."
+                    "Hong nho len cao khien tai trong don ve vai thay vi phan bo deu. "
+                    "Ha hong xuong sao cho co the tao thanh duong thang tu dau den got chan."
                 ),
             ))
 
-        # ------------------------------------------------------------------
-        # Rule 3: Elbow flare — T-shape detection
-        # ------------------------------------------------------------------
-        avg_flare = float(np.mean(elbow_flares)) if elbow_flares else 45.0
+        # Rule 3: Elbow flare
         max_flare = float(np.max(elbow_flares)) if elbow_flares else 45.0
 
         if max_flare > self.ELBOW_FLARE_DANGER:
@@ -267,12 +324,12 @@ class PushupRule(BasePoseRule):
             issues.append(PoseIssue(
                 issue_code="ELBOW_FLARE_T_SHAPE",
                 severity="high",
-                message=f"Khuỷu tay xòe ngang {int(max_flare)}° — tư thế chữ T nguy hiểm!",
+                message=f"Khuyu tay xoe ngang {int(max_flare)} deg — tu the chu T nguy hiem!",
                 detail=(
-                    "Cánh tay xòe ngang tạo thành hình chữ T so với thân người (góc ~90°). "
-                    "Tư thế này gây áp lực cực lớn lên khớp vai và chóp xoay (rotator cuff), "
-                    "dễ dẫn đến viêm gân, rách chóp xoay hoặc trật khớp vai. "
-                    "Hãy khép khuỷu tay vào khoảng 45° so với thân — tạo hình mũi tên (↑) thay vì chữ T."
+                    "Canh tay xoe ngang tao thanh hinh chu T so voi than nguoi (~90 deg). "
+                    "Tu the nay gay ap luc cuc lon len khop vai va chop xoay (rotator cuff), "
+                    "de dan den viem gan, rach chop xoay hoac trat khop vai. "
+                    "Hay khep khuyu tay vao khoang 45 deg so voi than — tao hinh mui ten (up) thay vi chu T."
                 ),
             ))
         elif max_flare > self.ELBOW_FLARE_WARNING:
@@ -280,42 +337,34 @@ class PushupRule(BasePoseRule):
             issues.append(PoseIssue(
                 issue_code="ELBOW_FLARE_WIDE",
                 severity="medium",
-                message=f"Khuỷu tay hơi xòe rộng ({int(max_flare)}°). Khép vào khoảng 45°.",
+                message=f"Khuyu tay hoi xoe rong ({int(max_flare)} deg). Khep vao khoang 45 deg.",
                 detail=(
-                    f"Khuỷu tay đang ở góc {int(max_flare)}° so với thân, hơi rộng. "
-                    "Tuy chưa nguy hiểm nhưng nếu duy trì lâu dài có thể gây mỏi khớp vai. "
-                    "Mục tiêu lý tưởng: khoảng 45° — tạo hình mũi tên."
+                    f"Khuyu tay dang o goc {int(max_flare)} deg so voi than, hoi rong. "
+                    "Muc tieu ly tuong: khoang 45 deg — tao hinh mui ten."
                 ),
             ))
 
-        # ------------------------------------------------------------------
-        # Rule 4: Head/neck alignment
-        # ------------------------------------------------------------------
+        # Rule 4: Head drop
         avg_head_drop = float(np.mean(head_drops)) if head_drops else 0.0
-        if avg_head_drop > self.HEAD_DROP_THRESHOLD and head_drops:
+        if avg_head_drop > self.HEAD_DROP_THRESHOLD:
             score -= 10.0
             issues.append(PoseIssue(
                 issue_code="HEAD_DROPPING",
                 severity="low",
-                message="Đầu cúi xuống quá nhiều. Giữ đầu thẳng hàng với cột sống.",
+                message="Dau cui xuong qua nhieu. Giu dau thang hang voi cot song.",
                 detail=(
-                    "Khi hít đất, đầu nên giữ thẳng hàng với cột sống — nhìn xuống sàn "
-                    "cách tay khoảng 15-20cm phía trước. Cúi đầu quá mức gây căng cơ cổ "
-                    "và phá vỡ sự thẳng hàng của cơ thể."
+                    "Khi hit dat, dau nen giu thang hang voi cot song — nhin xuong san "
+                    "cach tay khoang 15-20cm phia truoc. Cui dau qua muc gay cang co co."
                 ),
             ))
 
-        # ------------------------------------------------------------------
         # Breathing cue
-        # ------------------------------------------------------------------
         breathing = BreathingCue(
             phase="ASCENDING",
-            instruction="Thở ra khi đẩy lên. Hít vào khi hạ người xuống.",
+            instruction="Hít vào khi hạ người xuống. Thở ra mạnh khi đẩy lên.",
         )
 
-        # --- Clamp score ---
         score = max(0.0, min(100.0, score))
-
         reps.append(RepFeedback(
             rep_number=rep_num,
             score=score,

@@ -60,7 +60,7 @@ class MediaPipeExtractor:
     # Only keep the 17 landmarks actually used by the rule engines.
     LANDMARK_INDICES = {0, 11, 12, 13, 14, 15, 16, 23, 24, 25, 26, 27, 28}
     # Minimum visibility threshold — landmarks below this are treated as absent.
-    VISIBILITY_THRESHOLD = 0.5
+    VISIBILITY_THRESHOLD = 0.65  # Raised: must match frontend gatekeeper (0.65)
 
     def __init__(
         self,

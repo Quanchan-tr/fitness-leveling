@@ -99,3 +99,4 @@ Thumbs.db
 coverage/
 .nyc_output/
 .phpunit.result.cache
+*/*tests/
