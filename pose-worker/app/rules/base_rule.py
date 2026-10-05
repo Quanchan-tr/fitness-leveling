@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Dict, Any, Optional, Set, Tuple
 
 import numpy as np
 
-from app.cv.angle_math import calculate_angle_2d
 from app.schemas.response import (
     PoseFeedbackResponse,
     PoseIssue,
@@ -27,24 +26,25 @@ class EmaState:
     elbow_angle: float = 170.0
     body_alignment: float = 180.0
     lean_angle: float = 0.0
-
-    # EMA smoothing factor: higher = more responsive, lower = smoother
     alpha: float = 0.40
 
+    def _smooth(self, current: float, raw: float) -> float:
+        return self.alpha * raw + (1.0 - self.alpha) * current
+
     def update_knee(self, raw: float) -> float:
-        self.knee_angle = self.alpha * raw + (1 - self.alpha) * self.knee_angle
+        self.knee_angle = self._smooth(self.knee_angle, raw)
         return self.knee_angle
 
     def update_elbow(self, raw: float) -> float:
-        self.elbow_angle = self.alpha * raw + (1 - self.alpha) * self.elbow_angle
+        self.elbow_angle = self._smooth(self.elbow_angle, raw)
         return self.elbow_angle
 
     def update_body(self, raw: float) -> float:
-        self.body_alignment = self.alpha * raw + (1 - self.alpha) * self.body_alignment
+        self.body_alignment = self._smooth(self.body_alignment, raw)
         return self.body_alignment
 
     def update_lean(self, raw: float) -> float:
-        self.lean_angle = self.alpha * raw + (1 - self.alpha) * self.lean_angle
+        self.lean_angle = self._smooth(self.lean_angle, raw)
         return self.lean_angle
 
 
@@ -52,24 +52,12 @@ class EmaState:
 # Temporal constraint helpers
 # ---------------------------------------------------------------------------
 
-# Minimum frames a rep must span (at 30fps: 0.8s = 24 frames)
-DEFAULT_MIN_REP_FRAMES = 24
-# Minimum frames cooldown between counted reps (at 30fps: 0.5s = 15 frames)
-DEFAULT_REP_COOLDOWN_FRAMES = 15
+DEFAULT_MIN_REP_FRAMES = 24       # at 30fps: 0.8s
+DEFAULT_REP_COOLDOWN_FRAMES = 15  # at 30fps: 0.5s
 
 
 class BasePoseRule(ABC):
-    """
-    Base class for all exercise-specific pose rules.
-
-    Subclasses implement `process_landmarks_sequence` which evaluates
-    a sequence of per-frame landmarks and returns detailed feedback.
-
-    Provides helper methods for:
-    - Landmark visibility checking
-    - Angle tolerance comparison
-    - Session summary generation
-    """
+    """Base class for all exercise-specific pose rules."""
 
     # ---------------------------------------------------------------
     # Visibility helpers
@@ -82,12 +70,7 @@ class BasePoseRule(ABC):
         frame_idx: int,
         fps: float,
     ) -> Tuple[bool, Optional[VisibilityWarning]]:
-        """
-        Verify that all required landmark indices are present in the frame data.
-
-        Returns:
-            (all_present, warning_or_none)
-        """
+        """Verify that all required landmark indices are present in the frame data."""
         if not lm:
             return False, VisibilityWarning(
                 warning_code="POSE_NOT_DETECTED",
@@ -99,7 +82,6 @@ class BasePoseRule(ABC):
 
         missing = [idx for idx in required_indices if idx not in lm]
         if missing:
-            # Map landmark indices to human-readable names
             landmark_names = {
                 "0": "mũi", "11": "vai trái", "12": "vai phải",
                 "13": "khuỷu tay trái", "14": "khuỷu tay phải",
@@ -120,23 +102,48 @@ class BasePoseRule(ABC):
         return True, None
 
     # ---------------------------------------------------------------
-    # Angle tolerance helpers
+    # Rep evaluation helpers
     # ---------------------------------------------------------------
 
     @staticmethod
-    def angle_in_range(angle: float, target: float, tolerance: float) -> bool:
-        """Check if an angle is within ±tolerance of a target value."""
-        return abs(angle - target) <= tolerance
+    def classify_rep(
+        is_rom_sufficient: bool,
+        score: float,
+        issues: List[PoseIssue],
+        rom_issue_codes: Set[str] = ("HALF_SQUAT", "HALF_REP"),
+    ) -> Tuple[RepStatus, bool]:
+        """Classify rep into GOOD_REP, BAD_FORM, or NO_REP."""
+        if not is_rom_sufficient:
+            return RepStatus.NO_REP, False
+        has_high_severity = any(
+            i.severity == "high" for i in issues if i.issue_code not in rom_issue_codes
+        )
+        if has_high_severity or score < 75.0:
+            return RepStatus.BAD_FORM, True
+        return RepStatus.GOOD_REP, True
 
-    @staticmethod
-    def angle_exceeds(angle: float, threshold: float) -> bool:
-        """Check if an angle exceeds a threshold."""
-        return angle > threshold
+    def build_rep_response(
+        self,
+        reps: List[RepFeedback],
+        visibility_warnings: List[VisibilityWarning],
+        total_frames: int,
+        exercise_name: str = "",
+    ) -> PoseFeedbackResponse:
+        """Build PoseFeedbackResponse for rep-based exercises."""
+        session_summary = self.build_session_summary(
+            reps, visibility_warnings, total_frames, exercise_name
+        )
+        avg_score = float(np.mean([r.score for r in reps])) if reps else 0.0
+        return PoseFeedbackResponse(
+            rep_count=len(reps),
+            valid_rep_count=sum(1 for r in reps if r.is_rep_valid),
+            good_rep_count=sum(1 for r in reps if r.status == RepStatus.GOOD_REP),
+            score=round(avg_score, 2),
+            rep_feedback=reps,
+            session_summary=session_summary,
+            visibility_warnings=visibility_warnings,
+        )
 
-    @staticmethod
-    def angle_below(angle: float, threshold: float) -> bool:
-        """Check if an angle is below a threshold."""
-        return angle < threshold
 
     # ---------------------------------------------------------------
     # Session summary builder
@@ -173,21 +180,17 @@ class BasePoseRule(ABC):
             grade = "F"
 
         # Collect all issues across reps
-        all_issues: List[PoseIssue] = []
-        for r in reps:
-            all_issues.extend(r.issues)
+        all_issues = [i for r in reps for i in r.issues]
 
-        # Find most common issues
-        issue_counter = Counter(i.issue_code for i in all_issues)
-        common_issue_codes = [code for code, _ in issue_counter.most_common(5)]
-
-        # Deduplicate — keep the richest PoseIssue for each common code
+        # Find most common issues (keep richest PoseIssue for each code)
+        top_codes = {code for code, _ in Counter(i.issue_code for i in all_issues).most_common(5)}
         seen_codes: Set[str] = set()
         common_issues: List[PoseIssue] = []
         for issue in all_issues:
-            if issue.issue_code in common_issue_codes and issue.issue_code not in seen_codes:
+            if issue.issue_code in top_codes and issue.issue_code not in seen_codes:
                 seen_codes.add(issue.issue_code)
                 common_issues.append(issue)
+
 
         # Strengths — identify what went well
         strengths: List[str] = []

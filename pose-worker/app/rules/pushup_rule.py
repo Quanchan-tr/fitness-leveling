@@ -23,7 +23,6 @@ from app.cv.angle_math import calculate_angle_2d, calculate_vertical_angle
 from app.schemas.response import (
     PoseFeedbackResponse,
     RepFeedback,
-    RepStatus,
     PoseIssue,
     VisibilityWarning,
     BreathingCue,
@@ -43,12 +42,6 @@ class PushupRule(BasePoseRule):
       27 = LEFT_ANKLE        28 = RIGHT_ANKLE
     """
 
-    # --- Required landmarks (all must be visible >= 0.65) ---
-    REQUIRED_LANDMARKS = ["11", "13", "15", "23", "27"]
-    # At least one hip and one ankle side
-    HIP_ALTERNATIVES = [["23"], ["24"]]
-    ANKLE_ALTERNATIVES = [["27"], ["28"]]
-
     # --- State machine thresholds with hysteresis (65 deg gap) ---
     ELBOW_ENTER_DESCENT = 145.0   # arms start bending (enter DESCENDING)
     ELBOW_CONFIRM_BOTTOM = 90.0   # full depth confirmed (enter BOTTOM)
@@ -63,52 +56,39 @@ class PushupRule(BasePoseRule):
     HEAD_DROP_THRESHOLD = 35.0
     ELBOW_HALF_REP_MIN = 120.0    # above this at bottom = half rep
 
-    def _calculate_elbow_flare(
-        self,
-        shoulder: np.ndarray,
-        elbow: np.ndarray,
-        hip: np.ndarray,
-    ) -> float:
-        return calculate_angle_2d(elbow, shoulder, hip)
-
+    @staticmethod
     def _check_pushup_visibility(
-        self,
         lm: Dict[str, Any],
         frame_idx: int,
         fps: float,
     ):
-        """
-        Push-up specific gating: upper body all required, lower body at least
-        one hip + one ankle side.
-        """
+        """Upper body required, lower body at least one hip + one ankle."""
+        ts = round(frame_idx / max(fps, 1.0), 2)
         if not lm:
             return False, VisibilityWarning(
                 warning_code="POSE_NOT_DETECTED",
                 message="Khong phat hien duoc tu the. Hay dung vao khung hinh.",
                 frame_index=frame_idx,
-                timestamp_sec=round(frame_idx / max(fps, 1.0), 2),
+                timestamp_sec=ts,
             )
 
-        upper_required = ["11", "13", "15"]
-        missing_upper = [k for k in upper_required if k not in lm]
+        missing_upper = [k for k in ("11", "13", "15") if k not in lm]
         if missing_upper:
             return False, VisibilityWarning(
                 warning_code="INCOMPLETE_BODY_VISIBLE",
                 message="Camera can thay ro vai, khuyu tay va co tay. Dieu chinh goc camera.",
                 affected_landmarks=missing_upper,
                 frame_index=frame_idx,
-                timestamp_sec=round(frame_idx / max(fps, 1.0), 2),
+                timestamp_sec=ts,
             )
 
-        has_hip = "23" in lm or "24" in lm
-        has_ankle = "27" in lm or "28" in lm
-        if not has_hip or not has_ankle:
+        if not ("23" in lm or "24" in lm) or not ("27" in lm or "28" in lm):
             return False, VisibilityWarning(
                 warning_code="INCOMPLETE_BODY_VISIBLE",
                 message="Camera can thay hong va mat ca de kiem tra duong thang co the. Lui camera ra xa.",
-                affected_landmarks=[k for k in ["23", "27"] if k not in lm],
+                affected_landmarks=[k for k in ("23", "27") if k not in lm],
                 frame_index=frame_idx,
-                timestamp_sec=round(frame_idx / max(fps, 1.0), 2),
+                timestamp_sec=ts,
             )
 
         return True, None
@@ -167,7 +147,7 @@ class PushupRule(BasePoseRule):
             # --- Raw angles ---
             raw_elbow = calculate_angle_2d(shoulder, elbow, wrist)
             raw_body = calculate_angle_2d(shoulder, hip, ankle)
-            raw_flare = self._calculate_elbow_flare(shoulder, elbow, hip)
+            raw_flare = calculate_angle_2d(elbow, shoulder, hip)
 
             head_drop = 0.0
             if nose is not None:
@@ -235,23 +215,8 @@ class PushupRule(BasePoseRule):
                     rep_elbow_flares = []
                     rep_head_drops = []
 
-        # --- Build session summary ---
-        session_summary = self.build_session_summary(
+        return self.build_rep_response(
             reps, visibility_warnings, len(frames_landmarks), "Push-up"
-        )
-
-        total_score = float(np.mean([r.score for r in reps])) if reps else 0.0
-        valid_count = sum(1 for r in reps if r.is_rep_valid)
-        good_count = sum(1 for r in reps if r.status == RepStatus.GOOD_REP)
-
-        return PoseFeedbackResponse(
-            rep_count=len(reps),
-            valid_rep_count=valid_count,
-            good_rep_count=good_count,
-            score=round(total_score, 2),
-            rep_feedback=reps,
-            session_summary=session_summary,
-            visibility_warnings=visibility_warnings,
         )
 
     def _finalize_rep(
@@ -373,21 +338,12 @@ class PushupRule(BasePoseRule):
 
         score = max(0.0, min(100.0, score))
 
-        # --- Form Quality Analyzer: Phân biệt "Form đúng" và "Rep hợp lệ" ---
-        has_high_severity = any(i.severity == "high" for i in issues if i.issue_code != "HALF_REP")
-
-        if not is_rom_sufficient:
-            # Chưa đủ biên độ: Ghi nhận chu kỳ vận động nhưng đánh dấu NO_REP
-            status = RepStatus.NO_REP
-            is_rep_valid = False
-        elif has_high_severity or score < 75.0:
-            # Đủ biên độ nhưng sai form kỹ thuật (lưng cong, xòe chữ T, v.v.)
-            status = RepStatus.BAD_FORM
-            is_rep_valid = True
-        else:
-            # Đủ biên độ và form chuẩn
-            status = RepStatus.GOOD_REP
-            is_rep_valid = True
+        status, is_rep_valid = self.classify_rep(
+            is_rom_sufficient=is_rom_sufficient,
+            score=score,
+            issues=issues,
+            rom_issue_codes={"HALF_REP"},
+        )
 
         reps.append(RepFeedback(
             rep_number=rep_num,

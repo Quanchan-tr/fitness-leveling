@@ -94,9 +94,14 @@ Thumbs.db
 *.sln
 *.swp
 *.swo
+.agent/*
+.agents/*
+graphify-out/*
 
 # --- Testing & Coverage ---
 coverage/
 .nyc_output/
 .phpunit.result.cache
 */*tests/
+
+

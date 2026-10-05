@@ -25,19 +25,23 @@ import numpy as np
 
 logger = logging.getLogger("fittrack-pose-worker")
 
+from dataclasses import dataclass
+
 # MediaPipe initialisation (module-level, reused across requests)
 _mp_pose = mp.solutions.pose
 
 
+@dataclass
 class VideoMetadata:
     """Holds basic metadata about the opened video."""
+    fps: float
+    frame_count: int
+    width: int
+    height: int
 
-    def __init__(self, fps: float, frame_count: int, width: int, height: int):
-        self.fps = fps
-        self.frame_count = frame_count
-        self.width = width
-        self.height = height
-        self.duration_sec = frame_count / max(fps, 1.0)
+    @property
+    def duration_sec(self) -> float:
+        return self.frame_count / max(self.fps, 1.0)
 
     def __repr__(self) -> str:
         return (
@@ -157,6 +161,16 @@ class MediaPipeExtractor:
 
         return frames_landmarks, meta
 
+    def extract_frame(self, bgr_frame: np.ndarray) -> Dict[str, Any]:
+        """Run pose detection on a single BGR frame and return landmarks dict."""
+        with _mp_pose.Pose(
+            model_complexity=self.model_complexity,
+            min_detection_confidence=self.min_detection_confidence,
+            min_tracking_confidence=self.min_tracking_confidence,
+            smooth_landmarks=True,
+        ) as pose:
+            return self._process_frame(bgr_frame, pose)
+
     # ------------------------------------------------------------------
     # Private helpers
     # ------------------------------------------------------------------
@@ -193,21 +207,22 @@ class MediaPipeExtractor:
 
 
 # ---------------------------------------------------------------------------
-# Module-level singleton — avoids repeated Pose() initialisation across calls.
+# Module-level extractor cache by config
 # ---------------------------------------------------------------------------
 
-_default_extractor: Optional[MediaPipeExtractor] = None
+_extractors: Dict[Tuple[int, int], MediaPipeExtractor] = {}
 
 
 def get_extractor(
     model_complexity: int = 1,
     frame_skip: int = 1,
 ) -> MediaPipeExtractor:
-    """Return (and lazily create) the module-level extractor singleton."""
-    global _default_extractor
-    if _default_extractor is None:
-        _default_extractor = MediaPipeExtractor(
+    """Return (and lazily create) the extractor singleton for the given config."""
+    key = (model_complexity, frame_skip)
+    if key not in _extractors:
+        _extractors[key] = MediaPipeExtractor(
             model_complexity=model_complexity,
             frame_skip=frame_skip,
         )
-    return _default_extractor
+    return _extractors[key]
+

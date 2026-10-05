@@ -23,7 +23,6 @@ from app.cv.angle_math import calculate_angle_2d, calculate_vertical_angle
 from app.schemas.response import (
     PoseFeedbackResponse,
     RepFeedback,
-    RepStatus,
     PoseIssue,
     VisibilityWarning,
     BreathingCue,
@@ -107,10 +106,6 @@ class SquatRule(BasePoseRule):
             r_knee = np.array([lm["26"]["x"], lm["26"]["y"]])
             l_ankle = np.array([lm["27"]["x"], lm["27"]["y"]])
 
-            # Midpoints for left-side analysis
-            hip_mid = (l_hip + r_hip) / 2
-            knee_mid = (l_knee + r_knee) / 2
-
             # --- Raw angles ---
             raw_knee = calculate_angle_2d(l_hip, l_knee, l_ankle)
 
@@ -177,21 +172,8 @@ class SquatRule(BasePoseRule):
                     rep_torso_leans = []
                     rep_valgus_ratios = []
 
-        session_summary = self.build_session_summary(
+        return self.build_rep_response(
             reps, visibility_warnings, len(frames_landmarks), "Squat"
-        )
-        total_score = float(np.mean([r.score for r in reps])) if reps else 0.0
-        valid_count = sum(1 for r in reps if r.is_rep_valid)
-        good_count = sum(1 for r in reps if r.status == RepStatus.GOOD_REP)
-
-        return PoseFeedbackResponse(
-            rep_count=len(reps),
-            valid_rep_count=valid_count,
-            good_rep_count=good_count,
-            score=round(total_score, 2),
-            rep_feedback=reps,
-            session_summary=session_summary,
-            visibility_warnings=visibility_warnings,
         )
 
     def _finalize_rep(
@@ -284,21 +266,12 @@ class SquatRule(BasePoseRule):
 
         score = max(0.0, min(100.0, score))
 
-        # --- Form Quality Analyzer: Phân biệt "Form đúng" và "Rep hợp lệ" ---
-        has_high_severity = any(i.severity == "high" for i in issues if i.issue_code != "HALF_SQUAT")
-
-        if not is_rom_sufficient:
-            # Chưa đủ biên độ: Ghi nhận chu kỳ vận động nhưng đánh dấu NO_REP
-            status = RepStatus.NO_REP
-            is_rep_valid = False
-        elif has_high_severity or score < 75.0:
-            # Đủ biên độ nhưng sai form kỹ thuật (gập lưng, gối chụm, v.v.)
-            status = RepStatus.BAD_FORM
-            is_rep_valid = True
-        else:
-            # Đủ biên độ và form chuẩn
-            status = RepStatus.GOOD_REP
-            is_rep_valid = True
+        status, is_rep_valid = self.classify_rep(
+            is_rom_sufficient=is_rom_sufficient,
+            score=score,
+            issues=issues,
+            rom_issue_codes={"HALF_SQUAT"},
+        )
 
         reps.append(RepFeedback(
             rep_number=rep_num,

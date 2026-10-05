@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import config
-from app.cv.mediapipe_extractor import get_extractor, _mp_pose
+from app.cv.mediapipe_extractor import get_extractor
 from app.rules.plank_rule import PlankRule
 from app.rules.pushup_rule import PushupRule
 from app.rules.squat_rule import SquatRule
@@ -37,14 +37,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+_squat, _pushup, _plank = SquatRule(), PushupRule(), PlankRule()
 RULES_REGISTRY = {
-    "squat_v1": SquatRule(),
-    "squat": SquatRule(),
-    "pushup_v1": PushupRule(),
-    "pushup": PushupRule(),
-    "plank_v1": PlankRule(),
-    "plank": PlankRule(),
+    "squat_v1": _squat,
+    "squat": _squat,
+    "pushup_v1": _pushup,
+    "pushup": _pushup,
+    "plank_v1": _plank,
+    "plank": _plank,
 }
+
 
 
 @app.get("/health")
@@ -104,7 +106,7 @@ async def process_video_task(payload: ProcessVideoRequest):
 
     # --- Select rule engine ---
     rule_key = payload.exercise_type.lower()
-    rule_engine = RULES_REGISTRY.get(rule_key, SquatRule())
+    rule_engine = RULES_REGISTRY.get(rule_key, _squat)
 
     # --- Process video from local filesystem via MediaPipe ---
     logger.info(
@@ -202,15 +204,8 @@ async def analyze_frame(payload: AnalyzeFrameRequest):
             },
         )
 
-    extractor = get_extractor(model_complexity=0, frame_skip=1)  # Use fastest model for realtime
-
-    with _mp_pose.Pose(
-        model_complexity=0,
-        min_detection_confidence=0.5,
-        min_tracking_confidence=0.5,
-        smooth_landmarks=True,
-    ) as pose:
-        lm_dict = extractor._process_frame(bgr_frame, pose)
+    extractor = get_extractor(model_complexity=0, frame_skip=1)
+    lm_dict = extractor.extract_frame(bgr_frame)
 
     return AnalyzeFrameResponse(
         landmarks=lm_dict,

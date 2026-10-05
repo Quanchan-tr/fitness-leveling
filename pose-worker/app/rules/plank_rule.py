@@ -95,16 +95,9 @@ class PlankRule(BasePoseRule):
             consecutive_missing = 0
 
             # --- Extract landmarks ---
-            l_shoulder = np.array([lm["11"]["x"], lm["11"]["y"]])
-            r_shoulder = np.array([lm["12"]["x"], lm["12"]["y"]])
-            l_hip = np.array([lm["23"]["x"], lm["23"]["y"]])
-            r_hip = np.array([lm["24"]["x"], lm["24"]["y"]])
-            l_ankle = np.array([lm["27"]["x"], lm["27"]["y"]])
-            r_ankle = np.array([lm["28"]["x"], lm["28"]["y"]])
-
-            shoulder = (l_shoulder + r_shoulder) / 2
-            hip = (l_hip + r_hip) / 2
-            ankle = (l_ankle + r_ankle) / 2
+            shoulder = np.array([(lm["11"]["x"] + lm["12"]["x"]) / 2, (lm["11"]["y"] + lm["12"]["y"]) / 2])
+            hip = np.array([(lm["23"]["x"] + lm["24"]["x"]) / 2, (lm["23"]["y"] + lm["24"]["y"]) / 2])
+            ankle = np.array([(lm["27"]["x"] + lm["28"]["x"]) / 2, (lm["27"]["y"] + lm["28"]["y"]) / 2])
 
             nose = np.array([lm["0"]["x"], lm["0"]["y"]]) if "0" in lm else None
 
@@ -258,12 +251,7 @@ class PlankRule(BasePoseRule):
 
         score = max(0.0, min(100.0, score))
 
-        if not is_valid_hold:
-            status = RepStatus.NO_REP
-        elif score < 75.0 or any(i.severity == "high" for i in issues):
-            status = RepStatus.BAD_FORM
-        else:
-            status = RepStatus.GOOD_REP
+        status, _ = self.classify_rep(is_valid_hold, score, issues, rom_issue_codes=set())
 
         rep = RepFeedback(
             rep_number=1,
