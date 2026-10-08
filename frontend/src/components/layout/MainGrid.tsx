@@ -76,15 +76,15 @@ export const MainGrid: React.FC<MainGridProps> = ({
   const stepPercentage = Math.min(100, Math.round((vitals.steps / stepTarget) * 100));
 
   return (
-    <div className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-4">
       {/* 1. Information-First Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2 border-b border-slate-200">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 flex items-center gap-3">
-            <LayoutDashboard className="w-7 h-7 sm:w-8 sm:h-8 text-[#FF5722]" />
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 flex items-center gap-2.5">
+            <LayoutDashboard className="w-6 h-6 sm:w-7 sm:h-7 text-[#FF5722]" />
             <span>Bảng điều khiển</span>
           </h1>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm sm:text-base text-slate-600 mt-1.5 font-medium">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-slate-600 mt-1 font-medium">
             <span>
               Mục tiêu tuần: <strong className="text-slate-900 font-bold">5/7 buổi</strong>
             </span>
@@ -107,10 +107,10 @@ export const MainGrid: React.FC<MainGridProps> = ({
         </div>
       </div>
 
-      {/* 2. Main Grid: 3D Avatar (5 cols) | Fitness Command & Vitals (7 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* ================= LEFT COLUMN: 3D AVATAR FOCAL CARD (5 cols) ================= */}
-        <div className="lg:col-span-5">
+      {/* 2. Main Grid: 3D Avatar + Weight & Sleep (5 cols) | Fitness Command & Vitals (7 cols) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* ================= LEFT COLUMN: 3D AVATAR & WEIGHT/SLEEP (5 cols) ================= */}
+        <div className="lg:col-span-5 space-y-4">
           <AvatarHeroCard
             user={{
               name: profile.name,
@@ -127,12 +127,21 @@ export const MainGrid: React.FC<MainGridProps> = ({
             onOpenProgressPhotos={onOpenProgressPhotos}
             onUpdateName={handleUpdateHeroName}
           />
+
+          {/* Section: Cân nặng & Giấc ngủ moved directly under 3D character */}
+          <WeightSleepCard
+            weightHistory={vitals.weightHistory}
+            sleepLastNight={vitals.sleep}
+            onUpdateWeight={updateWeight}
+            onUpdateSleep={updateSleep}
+            onOpenBodyMetrics={onOpenBodyMetrics}
+          />
         </div>
 
         {/* ================= RIGHT COLUMN: WORKOUT & VITALS (7 cols) ================= */}
-        <div className="lg:col-span-7 space-y-5">
+        <div className="lg:col-span-7 space-y-4">
           {/* Section 6.1: Today's Workout Spotlight */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200/80 text-[#FF5722] flex items-center justify-center shrink-0">
@@ -162,7 +171,7 @@ export const MainGrid: React.FC<MainGridProps> = ({
             </div>
 
             {/* Routine details */}
-            <div className="flex items-center justify-between py-4">
+            <div className="flex items-center justify-between py-3.5">
               <div className="flex items-center gap-4 text-xs sm:text-sm text-slate-600 font-medium">
                 <span className="flex items-center gap-1.5 font-bold text-slate-900">
                   <Dumbbell className="w-4 h-4 text-[#FF5722]" />
@@ -209,7 +218,7 @@ export const MainGrid: React.FC<MainGridProps> = ({
           </div>
 
           {/* Section 6.4: Activity & Streak bar */}
-          <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-sm">
+          <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-sm">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Streak */}
               <div className="flex items-center gap-3.5 bg-orange-50/70 border border-orange-200/70 p-3.5 rounded-xl">
@@ -247,7 +256,7 @@ export const MainGrid: React.FC<MainGridProps> = ({
             </div>
           </div>
 
-          {/* Section 6.2 & 6.3: Quick Log Vitals (Water, Weight/Sleep, Nutrition) */}
+          {/* Section 6.2 & 6.3: Quick Log Vitals (Nutrition & Water) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <CalorieCard nutrition={vitals.nutrition} />
 
@@ -258,16 +267,6 @@ export const MainGrid: React.FC<MainGridProps> = ({
               }}
               onAddWater={addWater}
             />
-
-            <div className="sm:col-span-2">
-              <WeightSleepCard
-                weightHistory={vitals.weightHistory}
-                sleepLastNight={vitals.sleep}
-                onUpdateWeight={updateWeight}
-                onUpdateSleep={updateSleep}
-                onOpenBodyMetrics={onOpenBodyMetrics}
-              />
-            </div>
           </div>
         </div>
       </div>

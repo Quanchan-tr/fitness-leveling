@@ -6,19 +6,21 @@ export interface ApiError {
   details?: Record<string, string[]>;
 }
 
-export class FitTrackApiException extends Error {
+export class FitnessLevelingApiException extends Error {
   code: string;
   details?: Record<string, string[]>;
   status: number;
 
   constructor(status: number, error: ApiError) {
     super(error.message);
-    this.name = 'FitTrackApiException';
+    this.name = 'FitnessLevelingApiException';
     this.status = status;
     this.code = error.code || 'INTERNAL_SERVER_ERROR';
     this.details = error.details;
   }
 }
+
+export const FitTrackApiException = FitnessLevelingApiException;
 
 export function generateUUID(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -35,7 +37,10 @@ export async function apiRequest<T>(
   endpoint: string,
   options: RequestInit & { requiresAuth?: boolean; useIdempotency?: boolean } = {}
 ): Promise<T> {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('fittrack_token') : null;
+  const token =
+    typeof window !== 'undefined'
+      ? localStorage.getItem('fitnessleveling_token') || localStorage.getItem('fittrack_token')
+      : null;
   // Don't set Content-Type for FormData — the browser adds multipart boundary automatically.
   const isFormData = options.body instanceof FormData;
   const headers: Record<string, string> = {
@@ -70,15 +75,15 @@ export async function apiRequest<T>(
         message: data?.message || response.statusText || 'An error occurred during the request.',
         details: data?.errors,
       };
-      throw new FitTrackApiException(response.status, errorPayload);
+      throw new FitnessLevelingApiException(response.status, errorPayload);
     }
 
     return data as T;
   } catch (err) {
-    if (err instanceof FitTrackApiException) {
+    if (err instanceof FitnessLevelingApiException) {
       throw err;
     }
-    throw new FitTrackApiException(500, {
+    throw new FitnessLevelingApiException(500, {
       code: 'NETWORK_ERROR',
       message: (err as Error).message || 'Unable to communicate with the server.',
     });

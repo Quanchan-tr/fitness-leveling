@@ -9,7 +9,7 @@ import React, {
   useCallback,
   type ReactNode,
 } from 'react';
-import { authService, type AuthUser, type FitnessProfile, type RegisterPayload } from '@/lib/auth';
+import { authService, type AuthUser, type FitnessProfile, type RegisterPayload, type LoginPayload } from '@/lib/auth';
 
 // ─── Context shape ─────────────────────────────────────────────────────────────
 
@@ -20,6 +20,8 @@ interface AuthContextValue {
   fitnessProfile: FitnessProfile | null;
   /** True while the initial session is being restored from storage. */
   isLoading: boolean;
+  /** Log in with an existing account. */
+  login: (payload: LoginPayload) => Promise<AuthUser>;
   /** Register a new account and navigate to the verification screen. */
   register: (payload: RegisterPayload) => Promise<AuthUser>;
   /** Confirm email verification (mock). */
@@ -49,6 +51,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setUser(savedUser);
     setFitnessProfile(savedProfile);
     setIsLoading(false);
+  }, []);
+
+  const login = useCallback(async (payload: LoginPayload): Promise<AuthUser> => {
+    const loggedUser = await authService.login(payload);
+    setUser(loggedUser);
+    return loggedUser;
   }, []);
 
   const register = useCallback(async (payload: RegisterPayload): Promise<AuthUser> => {
@@ -90,6 +98,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         user,
         fitnessProfile,
         isLoading,
+        login,
         register,
         verifyEmail,
         resendVerificationEmail,

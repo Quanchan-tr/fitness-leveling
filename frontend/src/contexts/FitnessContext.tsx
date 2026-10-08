@@ -23,7 +23,7 @@ import {
   CommunityPost,
   CommunityComment,
   SuggestedAthlete,
-} from '@/types/fittrack.types';
+} from '@/types/fitnessleveling.types';
 import {
   initialExercises,
   initialFolders,
@@ -32,7 +32,7 @@ import {
   initialCommunityPosts,
   initialSuggestedAthletes,
   initialWorkoutHistory,
-} from '@/data/fittrackMockData';
+} from '@/data/fitnesslevelingMockData';
 import { playRestTimerBeep } from '@/lib/soundUtils';
 
 export interface UserFitnessProfile {
@@ -113,6 +113,7 @@ interface FitnessContextType {
   addWater: (amountLiters: number) => void;
   updateWeight: (weightKg: number) => void;
   updateSleep: (hours: number, minutes: number) => void;
+  updateNutrition: (nutrition: VitalsState['nutrition']) => void;
 
   // Community
   posts: CommunityPost[];
@@ -138,12 +139,17 @@ interface FitnessContextType {
 
 const FitnessContext = createContext<FitnessContextType | null>(null);
 
-const STORAGE_KEY_WORKOUT = 'fittrack_active_workout';
-const STORAGE_KEY_ROUTINES = 'fittrack_routines';
-const STORAGE_KEY_FOLDERS = 'fittrack_folders';
-const STORAGE_KEY_SCHEDULE = 'fittrack_schedule';
-const STORAGE_KEY_HISTORY = 'fittrack_history';
-const STORAGE_KEY_VITALS = 'fittrack_vitals';
+const STORAGE_KEY_WORKOUT = 'fitnessleveling_active_workout';
+const STORAGE_KEY_ROUTINES = 'fitnessleveling_routines';
+const STORAGE_KEY_FOLDERS = 'fitnessleveling_folders';
+const STORAGE_KEY_SCHEDULE = 'fitnessleveling_schedule';
+const STORAGE_KEY_HISTORY = 'fitnessleveling_history';
+const STORAGE_KEY_VITALS = 'fitnessleveling_vitals';
+
+function getSavedStorage(key: string, fallbackKey: string): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(key) || localStorage.getItem(fallbackKey);
+}
 
 export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // 1. Exercises
@@ -153,7 +159,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [folders, setFolders] = useState<RoutineFolder[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY_FOLDERS);
+        const saved = getSavedStorage(STORAGE_KEY_FOLDERS, 'fittrack_folders');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.error('Failed reading folders from localStorage', e);
@@ -176,7 +182,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [routines, setRoutines] = useState<RoutineItem[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY_ROUTINES);
+        const saved = getSavedStorage(STORAGE_KEY_ROUTINES, 'fittrack_routines');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.error('Failed reading routines from localStorage', e);
@@ -200,7 +206,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [schedule, setSchedule] = useState<DaySchedule[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY_SCHEDULE);
+        const saved = getSavedStorage(STORAGE_KEY_SCHEDULE, 'fittrack_schedule');
         if (saved) {
           const parsed: DaySchedule[] = JSON.parse(saved);
           return parsed.map((day) => ({
@@ -260,7 +266,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistoryRecord[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY_HISTORY);
+        const saved = getSavedStorage(STORAGE_KEY_HISTORY, 'fittrack_history');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.error('Failed reading history from localStorage', e);
@@ -283,7 +289,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [vitals, setVitals] = useState<VitalsState>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY_VITALS);
+        const saved = getSavedStorage(STORAGE_KEY_VITALS, 'fittrack_vitals');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.error('Failed reading vitals from localStorage', e);
@@ -327,7 +333,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [activeWorkout, setActiveWorkout] = useState<ActiveWorkoutSession | null>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY_WORKOUT);
+        const saved = getSavedStorage(STORAGE_KEY_WORKOUT, 'fittrack_active_workout');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.error('Failed restoring active workout session', e);
@@ -344,6 +350,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
           localStorage.setItem(STORAGE_KEY_WORKOUT, JSON.stringify(activeWorkout));
         } else {
           localStorage.removeItem(STORAGE_KEY_WORKOUT);
+          localStorage.removeItem('fittrack_active_workout');
         }
       } catch (e) {
         console.error('Failed writing active workout session to localStorage', e);
@@ -897,6 +904,27 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }));
   }, []);
 
+  const updateNutrition = useCallback((nutrition: VitalsState['nutrition']) => {
+    setVitals((prev) => {
+      if (
+        prev.nutrition.calories.current === nutrition.calories.current &&
+        prev.nutrition.calories.target === nutrition.calories.target &&
+        prev.nutrition.macros.protein.current === nutrition.macros.protein.current &&
+        prev.nutrition.macros.protein.target === nutrition.macros.protein.target &&
+        prev.nutrition.macros.carbs.current === nutrition.macros.carbs.current &&
+        prev.nutrition.macros.carbs.target === nutrition.macros.carbs.target &&
+        prev.nutrition.macros.fat.current === nutrition.macros.fat.current &&
+        prev.nutrition.macros.fat.target === nutrition.macros.fat.target
+      ) {
+        return prev;
+      }
+      return {
+        ...prev,
+        nutrition,
+      };
+    });
+  }, []);
+
   // ----------------------------------------------------
   // Community Handlers
   // ----------------------------------------------------
@@ -951,7 +979,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         likesCount: 0,
         isLiked: false,
         hasPoseCheck: postData.hasPoseCheck || false,
-        tags: postData.tags || ['FITTRACK', 'LUYỆN TẬP'],
+        tags: postData.tags || ['FITNESSLEVELING', 'LUYỆN TẬP'],
         comments: [],
       };
 
@@ -1046,6 +1074,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         addWater,
         updateWeight,
         updateSleep,
+        updateNutrition,
         posts,
         createPost,
         toggleLikePost,

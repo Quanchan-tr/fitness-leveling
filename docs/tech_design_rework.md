@@ -1,4 +1,4 @@
-# FITTRACK AI — TÀI LIỆU THIẾT KẾ KỸ THUẬT HỆ THỐNG (SYSTEM ARCHITECTURE SPECIFICATION)
+# FITNESSLEVELING AI — TÀI LIỆU THIẾT KẾ KỸ THUẬT HỆ THỐNG (SYSTEM ARCHITECTURE SPECIFICATION)
 ### Enterprise Architecture · Database ERD · API Specification · AI Orchestration · Computer Vision Engine · Security & DevOps
 
 **Phiên bản:** 2.0 (Refactored Architecture) — Ngày cập nhật: 18/09/2026  
@@ -10,7 +10,7 @@
 ## 1. TỔNG QUAN KIẾN TRÚC HỆ THỐNG (SYSTEM ARCHITECTURE)
 
 ### 1.1 Nguyên lý thiết kế cốt lõi
-Hệ thống **FitTrack AI v2.0** được thiết kế theo mô hình **Service-Oriented Asynchronous Architecture** nhằm giải quyết bài toán tải cao, tính toán Computer Vision phức tạp và tích hợp LLM an toàn.
+Hệ thống **FitnessLeveling AI v2.0** được thiết kế theo mô hình **Service-Oriented Asynchronous Architecture** nhằm giải quyết bài toán tải cao, tính toán Computer Vision phức tạp và tích hợp LLM an toàn.
 1. **Single Entry Point API:** Laravel Backend là API Gateway và Application Backend duy nhất phục vụ cả Web Client (SPA/PWA) và Mobile Client (iOS/Android). Không có client nào truy cập trực tiếp vào DB, Cache, S3 hay AI/Worker.
 2. **Zero-Trust AI & Sanitization:** LLM (Large Language Model) được xem là thành phần sinh dữ liệu không tin cậy (*untrusted content generator*). Toàn bộ dữ liệu LLM phải đi qua pipeline xác thực cấu trúc (JSON Schema) và ngữ nghĩa (Semantic Validation) trước khi vào cơ sở dữ liệu hoặc trả về client.
 3. **Decoupled Heavy Computation:** Phân tách hoàn toàn tác vụ I/O nhẹ (Web/Mobile REST API) khỏi tác vụ xử lý đồ họa/video nặng (Computer Vision & Pose Estimation). Video upload được xử lý bất đồng bộ qua Queue.
@@ -73,7 +73,7 @@ Hệ thống **FitTrack AI v2.0** được thiết kế theo mô hình **Service
 | **S3-Compatible Storage** | Lưu trữ nhị phân video upload từ người dùng (MinIO on Premise / AWS S3). | Private 100%. Nhận video từ Laravel; Cung cấp video cho Python Worker qua Pre-signed URL; Cấp link xem video tạm thời cho Client. |
 | **Laravel Queue Worker** | Tiến trình nền giám sát Redis Queue; Xử lý retries, dead-letter jobs, timeout, cleanup dữ liệu tạm; Gọi dịch vụ Python Worker để phân tích video. | Chạy nội bộ, giao tiếp với Redis, PostgreSQL và Python Worker. |
 | **Python Pose Worker** | Service nội bộ chuyên trách: Giải mã video (OpenCV), trích xuất 33 landmarks từng frame (MediaPipe), chạy Kinematic Rules Engine, chấm điểm form và tính timestamp lỗi. | Không mở cổng Public. Chỉ lắng nghe yêu cầu nội bộ từ Laravel Queue Worker (qua HTTP Microservice nội bộ hoặc direct Redis task). |
-| **External LLM Service** | Tiếp nhận prompt có cấu trúc từ Laravel để sinh lịch tập (Exercise Plan) và thực đơn (Meal Plan) dưới dạng JSON thuần túy. | Được gọi ra ngoài từ Laravel HTTP Client; Không có bất kỳ quyền hạn nào trên hệ thống FitTrack. |
+| **External LLM Service** | Tiếp nhận prompt có cấu trúc từ Laravel để sinh lịch tập (Exercise Plan) và thực đơn (Meal Plan) dưới dạng JSON thuần túy. | Được gọi ra ngoài từ Laravel HTTP Client; Không có bất kỳ quyền hạn nào trên hệ thống FitnessLeveling. |
 
 ---
 
@@ -1286,18 +1286,18 @@ Dưới đây là danh mục các biến cấu hình chuẩn trong file `.env.ex
 
 ```ini
 # --- APPLICATION CONFIGURATION ---
-APP_NAME="FitTrack AI"
+APP_NAME="FitnessLeveling AI"
 APP_ENV=production
 APP_KEY=base64:YOUR_32_CHARACTER_GENERATED_APP_KEY_HERE
 APP_DEBUG=false
-APP_URL=https://api.fittrack.example.com
+APP_URL=https://api.fitnessleveling.example.com
 
 # --- DATABASE CONFIGURATION (POSTGRESQL) ---
 DB_CONNECTION=pgsql
 DB_HOST=postgres
 DB_PORT=5432
-DB_DATABASE=fittrack_prod
-DB_USERNAME=fittrack_app
+DB_DATABASE=fitnessleveling_prod
+DB_USERNAME=fitnessleveling_app
 DB_PASSWORD=YOUR_SECURE_STRONG_DB_PASSWORD_HERE
 
 # --- REDIS CONFIGURATION ---
@@ -1317,7 +1317,7 @@ FILESYSTEM_DISK=s3
 AWS_ACCESS_KEY_ID=YOUR_S3_ACCESS_KEY_ID
 AWS_SECRET_ACCESS_KEY=YOUR_S3_SECRET_ACCESS_KEY
 AWS_DEFAULT_REGION=us-east-1
-AWS_BUCKET=fittrack-user-assets
+AWS_BUCKET=fitnessleveling-user-assets
 AWS_USE_PATH_STYLE_ENDPOINT=false
 # AWS_ENDPOINT=http://minio:9000  # Sử dụng dòng này khi chạy MinIO nội bộ
 

@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { RoutineItem } from '@/types/fittrack.types';
+import { RoutineItem } from '@/types/fitnessleveling.types';
 import { MuscleHeatmapSvg } from './MuscleHeatmapSvg';
 import { MuscleDetailModal } from './MuscleDetailModal';
 import {
@@ -243,7 +243,7 @@ export const RoutineDetailView: React.FC<RoutineDetailViewProps> = ({
                   {routine.createdBy.username}
                 </h5>
                 <span className="text-xs text-slate-400 font-medium">
-                  Chiến binh thể hình FitTrack
+                  Chiến binh thể hình FitnessLeveling
                 </span>
               </div>
             </div>

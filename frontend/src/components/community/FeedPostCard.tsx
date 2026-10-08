@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CommunityPost, RoutineItem } from '@/types/fittrack.types';
+import { CommunityPost, RoutineItem } from '@/types/fitnessleveling.types';
 import { useFitness } from '@/contexts/FitnessContext';
 import {
   Heart,

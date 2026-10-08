@@ -1,5 +1,5 @@
 /**
- * FitTrack AI — Mock Authentication Service
+ * FitnessLeveling — Mock Authentication Service
  *
  * This module provides a mock authentication layer that mirrors the shape of a
  * real backend integration. All state is persisted to localStorage so that a
@@ -26,6 +26,11 @@ export interface RegisterPayload {
   displayName: string;
 }
 
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
 export interface FitnessProfile {
   /** Biological sex for metabolic calculations */
   gender: 'male' | 'female';
@@ -49,9 +54,9 @@ export interface AuthState {
 // ─── Storage Keys ─────────────────────────────────────────────────────────────
 
 const STORAGE_KEYS = {
-  user: 'fittrack_auth_user',
-  fitnessProfile: 'fittrack_fitness_profile',
-  token: 'fittrack_token',
+  user: 'fitnessleveling_auth_user',
+  fitnessProfile: 'fitnessleveling_fitness_profile',
+  token: 'fitnessleveling_token',
 } as const;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -68,7 +73,8 @@ function _saveToStorage<T>(key: string, value: T): void {
 function _readFromStorage<T>(key: string): T | null {
   if (typeof window === 'undefined') return null;
   try {
-    const raw = localStorage.getItem(key);
+    const fallbackKey = key.replace('fitnessleveling_', 'fittrack_');
+    const raw = localStorage.getItem(key) || localStorage.getItem(fallbackKey);
     return raw ? (JSON.parse(raw) as T) : null;
   } catch {
     return null;
@@ -125,6 +131,32 @@ export const authService = {
   },
 
   /**
+   * Log in with email and password.
+   */
+  async login(payload: LoginPayload): Promise<AuthUser> {
+    await _mockApiCall(600);
+
+    const existing = _readFromStorage<AuthUser>(STORAGE_KEYS.user);
+    if (existing && existing.email.toLowerCase() === payload.email.toLowerCase()) {
+      _saveToStorage(STORAGE_KEYS.token, `mock_token_${existing.id}`);
+      return existing;
+    }
+
+    const user: AuthUser = {
+      id: generateUUID(),
+      email: payload.email,
+      displayName: payload.email.split('@')[0],
+      isEmailVerified: true,
+      hasCompletedOnboarding: true,
+      createdAt: new Date().toISOString(),
+    };
+
+    _saveToStorage(STORAGE_KEYS.user, user);
+    _saveToStorage(STORAGE_KEYS.token, `mock_token_${user.id}`);
+    return user;
+  },
+
+  /**
    * Simulate email verification confirmation.
    * In a real system this would call POST /auth/verify-email.
    */
@@ -145,6 +177,22 @@ export const authService = {
   async resendVerificationEmail(): Promise<void> {
     await _mockApiCall(600);
     // In a real system: POST /auth/resend-verification
+  },
+
+  /**
+   * Simulate requesting password reset OTP/email.
+   */
+  async requestPasswordReset(email: string): Promise<void> {
+    await _mockApiCall(600);
+    // In a real system: POST /auth/forgot-password
+  },
+
+  /**
+   * Simulate updating password.
+   */
+  async resetPassword(email: string, newPassword: string): Promise<void> {
+    await _mockApiCall(700);
+    // In a real system: POST /auth/reset-password
   },
 
   /**
@@ -169,7 +217,7 @@ export const authService = {
   async loginDemo(): Promise<AuthUser> {
     const demoUser: AuthUser = {
       id: 'demo-user-quan',
-      email: 'demo@fittrack.ai',
+      email: 'demo@fitnessleveling.com',
       displayName: 'Quân Trần',
       isEmailVerified: true,
       hasCompletedOnboarding: true,

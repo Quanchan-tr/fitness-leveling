@@ -7,7 +7,7 @@ import {
   getMuscleHeatmapColor,
   MUSCLE_LABELS_VI,
 } from '@/lib/muscleHeatmap';
-import { Exercise } from '@/types/fittrack.types';
+import { Exercise } from '@/types/fitnessleveling.types';
 import { Maximize2 } from 'lucide-react';
 
 interface MuscleHeatmapSvgProps {

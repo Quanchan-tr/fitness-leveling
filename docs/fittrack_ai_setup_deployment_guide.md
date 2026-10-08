@@ -1,6 +1,6 @@
-# FitTrack AI — Setup & Deployment Guide
+# FitnessLeveling AI — Setup & Deployment Guide
 
-This guide outlines how to configure, run, and validate the FitTrack AI full-stack platform across Windows (Command Prompt / PowerShell) and Linux/macOS environments.
+This guide outlines how to configure, run, and validate the FitnessLeveling AI full-stack platform across Windows (Command Prompt / PowerShell) and Linux/macOS environments.
 
 ---
 
@@ -50,7 +50,7 @@ docker compose up -d --build
 - **Laravel 11 Backend API:** [http://localhost:8000/api/v1](http://localhost:8000/api/v1)
 - **Python Pose Worker Docs:** [http://localhost:8001/docs](http://localhost:8001/docs)
 - **MinIO Object Storage Console:** [http://localhost:9001](http://localhost:9001) (User: `minioadmin` / Pass: `minioadmin`)
-- **PostgreSQL 16:** Port `5432` (`fittrack` db, `fittrack_user` / `fittrack_password`)
+- **PostgreSQL 16:** Port `5432` (`fitnessleveling` db, `fitnessleveling_user` / `fitnessleveling_password`)
 - **Redis 7.2:** Port `6379`
 - **Laravel Queue Worker:** Running background jobs for `pose_processing` and `default`
 

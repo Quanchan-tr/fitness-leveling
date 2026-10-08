@@ -97,7 +97,7 @@ export const WeightSleepCard: React.FC<WeightSleepCardProps> = ({
   const polylineStr = points.map((p) => `${p.x},${p.y}`).join(' ');
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 flex flex-col justify-between relative">
+    <div className="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 shadow-sm flex flex-col justify-between relative">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">

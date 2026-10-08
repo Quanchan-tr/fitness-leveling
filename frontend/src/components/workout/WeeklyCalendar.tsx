@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { DaySchedule, WeekDayVi, ScheduleStatus, RoutineItem } from '@/types/fittrack.types';
+import { DaySchedule, WeekDayVi, ScheduleStatus, RoutineItem } from '@/types/fitnessleveling.types';
 import { useFitness } from '@/contexts/FitnessContext';
 import {
   Calendar,
@@ -51,7 +51,10 @@ export const WeeklyCalendar: React.FC<WeeklyCalendarProps> = ({
   const handleDrop = (e: React.DragEvent, dayOfWeek: WeekDayVi) => {
     e.preventDefault();
     setDragOverDay(null);
-    const routineId = e.dataTransfer.getData('text/plain') || e.dataTransfer.getData('application/fittrack-routine');
+    const routineId =
+      e.dataTransfer.getData('text/plain') ||
+      e.dataTransfer.getData('application/fitnessleveling-routine') ||
+      e.dataTransfer.getData('application/fittrack-routine');
     if (routineId) {
       assignRoutineToDay(dayOfWeek, routineId);
     }

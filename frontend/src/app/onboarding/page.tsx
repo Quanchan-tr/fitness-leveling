@@ -527,7 +527,7 @@ export default function OnboardingPage() {
             <Flame className="w-3.5 h-3.5 fill-white text-white" strokeWidth={1.5} />
           </div>
           <span className="font-black text-base tracking-tight text-slate-900">
-            FitTrack<span className="text-[#FF5722]">AI</span>
+            Fitness<span className="text-[#FF5722]">Leveling</span>
           </span>
         </Link>
         <span className="text-xs text-slate-400 font-semibold">

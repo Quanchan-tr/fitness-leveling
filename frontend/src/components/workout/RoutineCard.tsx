@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { RoutineItem } from '@/types/fittrack.types';
+import { RoutineItem } from '@/types/fitnessleveling.types';
 import {
   MoreVertical,
   Pencil,
@@ -37,6 +37,7 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
 
   const handleDragStart = (e: React.DragEvent) => {
     e.dataTransfer.setData('text/plain', routine.id);
+    e.dataTransfer.setData('application/fitnessleveling-routine', routine.id);
     e.dataTransfer.setData('application/fittrack-routine', routine.id);
     e.dataTransfer.effectAllowed = 'copy';
   };

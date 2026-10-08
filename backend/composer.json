@@ -1,8 +1,8 @@
 {
-    "name": "fittrack/backend",
+    "name": "fitnessleveling/backend",
     "type": "project",
-    "description": "FitTrack AI Laravel 11 Monolith API",
-    "keywords": ["fittrack", "laravel", "fitness", "ai"],
+    "description": "FitnessLeveling AI Laravel 11 Monolith API",
+    "keywords": ["fitnessleveling", "laravel", "fitness", "ai"],
     "license": "MIT",
     "require": {
         "php": "^8.3",

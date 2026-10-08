@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { TopBar } from '@/components/layout/TopBar';
 import { useFitness } from '@/contexts/FitnessContext';
 import { useShell } from '@/components/layout/ShellLayout';
-import { RoutineItem } from '@/types/fittrack.types';
+import { RoutineItem } from '@/types/fitnessleveling.types';
 import { WeeklyCalendar } from '@/components/workout/WeeklyCalendar';
 import { RoutineCard } from '@/components/workout/RoutineCard';
 import { RoutineEditor } from '@/components/workout/RoutineEditor';
@@ -49,6 +49,7 @@ export default function WorkoutPage() {
   // Page view mode: 'overview' | 'editor' | 'detail'
   const [viewMode, setViewMode] = useState<'overview' | 'editor' | 'detail'>('overview');
   const [editingRoutine, setEditingRoutine] = useState<RoutineItem | undefined>(undefined);
+  const [targetFolderId, setTargetFolderId] = useState<string | undefined>(undefined);
   const [selectedRoutineForDetail, setSelectedRoutineForDetail] = useState<RoutineItem | undefined>(
     undefined
   );
@@ -67,8 +68,9 @@ export default function WorkoutPage() {
     router.push('/workout/live');
   };
 
-  const handleOpenEditor = (routine?: RoutineItem) => {
+  const handleOpenEditor = (routine?: RoutineItem, folderId?: string) => {
     setEditingRoutine(routine);
+    setTargetFolderId(folderId || routine?.folderId);
     setViewMode('editor');
   };
 
@@ -78,16 +80,20 @@ export default function WorkoutPage() {
   };
 
   const handleSaveRoutine = (routineData: Omit<RoutineItem, 'id' | 'createdBy'>) => {
-    if (editingRoutine) {
+    if (editingRoutine && editingRoutine.id) {
       updateRoutine({
         ...editingRoutine,
         ...routineData,
       });
     } else {
-      createRoutine(routineData);
+      createRoutine({
+        ...routineData,
+        folderId: routineData.folderId || targetFolderId,
+      });
     }
     setViewMode('overview');
     setEditingRoutine(undefined);
+    setTargetFolderId(undefined);
   };
 
   const handleCreateFolderSubmit = (e: React.FormEvent) => {
@@ -122,10 +128,12 @@ export default function WorkoutPage() {
         {viewMode === 'editor' && (
           <RoutineEditor
             initialRoutine={editingRoutine}
+            initialFolderId={targetFolderId}
             onSave={handleSaveRoutine}
             onCancel={() => {
               setViewMode('overview');
               setEditingRoutine(undefined);
+              setTargetFolderId(undefined);
             }}
           />
         )}
@@ -279,17 +287,10 @@ export default function WorkoutPage() {
                                 type="button"
                                 onClick={() => {
                                   setOpenFolderMenuId(null);
-                                  setEditingRoutine({
-                                    id: '',
-                                    title: '',
-                                    category: 'hypertrophy',
-                                    targetMuscles: [],
-                                    difficulty: 'intermediate',
-                                    estimatedMinutes: 45,
-                                    folderId: folder.id,
-                                    exercises: [],
-                                  } as any);
-                                  setViewMode('editor');
+                                  if (!folder.isExpanded) {
+                                    toggleFolder(folder.id);
+                                  }
+                                  handleOpenEditor(undefined, folder.id);
                                 }}
                                 className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer transition-colors"
                               >

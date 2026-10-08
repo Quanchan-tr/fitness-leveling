@@ -1,0 +1,145 @@
+import { FoodItem, SavedCombo, MacroTargets } from '@/types/nutrition.types';
+
+export const defaultMacroTargets: MacroTargets = {
+  calories: 2000,
+  protein: 120,
+  carbs: 220,
+  fat: 70,
+};
+
+export const vietnameseFoods: FoodItem[] = [
+  {
+    id: 'pho-bo',
+    name: 'Phở bò tái nạm',
+    category: 'Món nước',
+    base_serving: '1 tô vừa',
+    base_calories: 450,
+    base_macros: {
+      protein: 28,
+      carbs: 52,
+      fat: 14,
+    },
+    min_multiplier: 0.75,
+    max_multiplier: 1.3,
+    description: 'Bánh phở tươi, thịt bò tái nạm mềm, nước dùng xương hầm thanh ngọt thảo mộc.',
+    tags: ['Bò', 'Món nước', 'Bữa sáng', 'Truyền thống'],
+  },
+  {
+    id: 'com-tam-suon',
+    name: 'Cơm tấm sườn nướng',
+    category: 'Cơm',
+    base_serving: '1 đĩa tiêu chuẩn',
+    base_calories: 580,
+    base_macros: {
+      protein: 34,
+      carbs: 68,
+      fat: 18,
+    },
+    min_multiplier: 0.8,
+    max_multiplier: 1.4,
+    description: 'Gạo tấm thơm dẻo kèm sườn cốt lết nướng than hoa đậm đà mật ong và mỡ hành.',
+    tags: ['Cơm', 'Heo', 'Bữa trưa', 'Giàu đạm'],
+  },
+  {
+    id: 'banh-mi-thit',
+    name: 'Bánh mì thịt pate',
+    category: 'Bánh mì',
+    base_serving: '1 ổ vừa',
+    base_calories: 410,
+    base_macros: {
+      protein: 19,
+      carbs: 48,
+      fat: 16,
+    },
+    min_multiplier: 0.7,
+    max_multiplier: 1.25,
+    description: 'Vỏ giòn rụm nhân thịt nguội, pate gan béo ngậy, dưa leo và đồ chua tươi mát.',
+    tags: ['Tiện lợi', 'Bánh mì', 'Bữa sáng', 'Nhanh gọn'],
+  },
+  {
+    id: 'bun-bo-hue',
+    name: 'Bún bò Huế',
+    category: 'Món nước',
+    base_serving: '1 tô lớn',
+    base_calories: 520,
+    base_macros: {
+      protein: 31,
+      carbs: 58,
+      fat: 17,
+    },
+    min_multiplier: 0.8,
+    max_multiplier: 1.35,
+    description: 'Sợi bún to, bắp bò hoa, chả cua, nước lèo thơm nồng sả ruốc đậm đà miền Trung.',
+    tags: ['Cay nồng', 'Món nước', 'Đậm đà', 'Bò'],
+  },
+  {
+    id: 'com-ga-hoi-an',
+    name: 'Cơm gà xé Hội An',
+    category: 'Cơm',
+    base_serving: '1 đĩa',
+    base_calories: 490,
+    base_macros: {
+      protein: 32,
+      carbs: 62,
+      fat: 12,
+    },
+    min_multiplier: 0.75,
+    max_multiplier: 1.3,
+    description: 'Cơm nấu nước luộc gà thơm nghệ vàng óng, thịt gà ta xé phay bóp rau răm chua ngọt.',
+    tags: ['Gà', 'Cơm', 'Ít mỡ', 'Bữa trưa'],
+  },
+  {
+    id: 'canh-cai-thit-bam',
+    name: 'Canh cải thịt bằm',
+    category: 'Món canh',
+    base_serving: '1 bát',
+    base_calories: 95,
+    base_macros: {
+      protein: 8,
+      carbs: 6,
+      fat: 4,
+    },
+    min_multiplier: 0.5,
+    max_multiplier: 1.5,
+    description: 'Rau cải xanh tươi mát nấu cùng thịt nạc xay thanh đạm.',
+    tags: ['Canh', 'Rau xanh', 'Kèm cơm', 'Ít calo'],
+  },
+  {
+    id: 'trung-op-la',
+    name: 'Trứng ốp la',
+    category: 'Món thêm',
+    base_serving: '1 quả',
+    base_calories: 85,
+    base_macros: {
+      protein: 6,
+      carbs: 1,
+      fat: 7,
+    },
+    min_multiplier: 1.0,
+    max_multiplier: 2.0,
+    description: 'Trứng gà ốp la lòng đào giàu protein và chất béo lành mạnh.',
+    tags: ['Trứng', 'Món thêm', 'Giàu đạm'],
+  },
+];
+
+export const initialDefaultCombos: SavedCombo[] = [
+  {
+    id: 'combo-com-tam-nang-luong',
+    name: 'Combo Cơm tấm năng lượng',
+    items: [
+      { foodId: 'com-tam-suon', multiplier: 1.0 },
+      { foodId: 'trung-op-la', multiplier: 1.0 },
+      { foodId: 'canh-cai-thit-bam', multiplier: 1.0 },
+    ],
+    createdAt: '2026-10-01T08:00:00.000Z',
+  },
+  {
+    id: 'combo-bua-sang-pho-bo',
+    name: 'Combo Phở bò đậm đà',
+    items: [
+      { foodId: 'pho-bo', multiplier: 1.1 },
+      { foodId: 'trung-op-la', multiplier: 1.0 },
+    ],
+    createdAt: '2026-10-02T08:00:00.000Z',
+  },
+];

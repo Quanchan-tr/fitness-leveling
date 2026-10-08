@@ -65,7 +65,7 @@ export const CommunityPostComposer: React.FC = () => {
       images: images.length > 0 ? images : undefined,
       videoUrl: videoUrl.trim() || undefined,
       hasPoseCheck,
-      tags: ['CỘNG ĐỒNG', selectedRoutine ? 'ROUTINE' : 'FITTRACK'],
+      tags: ['CỘNG ĐỒNG', selectedRoutine ? 'ROUTINE' : 'FITNESSLEVELING'],
     });
 
     // Reset form

@@ -23,7 +23,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
-logger = logging.getLogger("fittrack-pose-worker")
+logger = logging.getLogger("fitnessleveling-pose-worker")
 
 # MediaPipe initialisation (module-level, reused across requests)
 _mp_pose = mp.solutions.pose

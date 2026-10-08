@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Exercise, EquipmentType, ExerciseType } from '@/types/fittrack.types';
+import { Exercise, EquipmentType, ExerciseType } from '@/types/fitnessleveling.types';
 import { X, Plus, Dumbbell } from 'lucide-react';
 
 interface CustomExerciseModalProps {

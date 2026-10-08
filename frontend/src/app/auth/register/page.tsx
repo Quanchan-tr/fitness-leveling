@@ -119,7 +119,7 @@ export default function RegisterPage() {
           </div>
           <div>
             <span className="font-black text-xl tracking-tight text-white block leading-none">
-              FitTrack<span className="text-[#FF5722]">AI</span>
+              Fitness<span className="text-[#FF5722]">Leveling</span>
             </span>
             <span className="text-[11px] text-slate-500 font-semibold tracking-widest uppercase">
               Command Center
@@ -169,7 +169,7 @@ export default function RegisterPage() {
               <Flame className="w-4 h-4 fill-white text-white" strokeWidth={1.5} />
             </div>
             <span className="font-black text-lg tracking-tight text-slate-900">
-              FitTrack<span className="text-[#FF5722]">AI</span>
+              Fitness<span className="text-[#FF5722]">Leveling</span>
             </span>
           </Link>
 

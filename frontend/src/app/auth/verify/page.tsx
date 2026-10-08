@@ -90,7 +90,7 @@ export default function VerifyPage() {
             <Flame className="w-4.5 h-4.5 fill-white text-white" strokeWidth={1.5} />
           </div>
           <span className="font-black text-lg tracking-tight text-slate-900">
-            FitTrack<span className="text-[#FF5722]">AI</span>
+            Fitness<span className="text-[#FF5722]">Leveling</span>
           </span>
         </div>
 

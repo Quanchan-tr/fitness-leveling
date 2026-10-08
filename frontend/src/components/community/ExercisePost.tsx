@@ -172,7 +172,7 @@ export const ExercisePost: React.FC<ExercisePostProps> = ({
             {post.verified && (
               <span
                 className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200"
-                title="Đã được xác minh kỹ thuật bởi FitTrack"
+                title="Đã được xác minh kỹ thuật bởi FitnessLeveling"
               >
                 <ShieldCheck className="w-3 h-3" />
                 Chuẩn form

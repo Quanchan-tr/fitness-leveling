@@ -9,7 +9,7 @@ import {
   ExerciseSet,
   RoutineFolder,
   EquipmentType,
-} from '@/types/fittrack.types';
+} from '@/types/fitnessleveling.types';
 import { useFitness } from '@/contexts/FitnessContext';
 import { MuscleHeatmapSvg } from './MuscleHeatmapSvg';
 import { MuscleDetailModal } from './MuscleDetailModal';
@@ -30,6 +30,7 @@ import {
 
 interface RoutineEditorProps {
   initialRoutine?: RoutineItem;
+  initialFolderId?: string;
   onSave: (routineData: Omit<RoutineItem, 'id' | 'createdBy'>) => void;
   onCancel: () => void;
 }
@@ -39,6 +40,7 @@ const REST_TIMER_OPTIONS = Array.from({ length: 20 }, (_, i) => (i + 1) * 15);
 
 export const RoutineEditor: React.FC<RoutineEditorProps> = ({
   initialRoutine,
+  initialFolderId,
   onSave,
   onCancel,
 }) => {
@@ -46,7 +48,7 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
 
   const [title, setTitle] = useState(initialRoutine?.title || '');
   const [folderId, setFolderId] = useState<string | undefined>(
-    initialRoutine?.folderId || (folders.length > 0 ? folders[0].id : undefined)
+    initialRoutine?.folderId || initialFolderId || (folders.length > 0 ? folders[0].id : undefined)
   );
   const [notes, setNotes] = useState(initialRoutine?.notes || '');
   const [routineRestTimer, setRoutineRestTimer] = useState<number>(
@@ -228,7 +230,7 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
           </button>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              {initialRoutine ? 'Chỉnh sửa Routine' : 'Tạo Routine mới'}
+              {initialRoutine?.id ? 'Chỉnh sửa Routine' : 'Tạo Routine mới'}
             </h1>
             <p className="text-xs text-slate-500">
               Thiết lập bài tập, số hiệp linh hoạt theo loại và theo dõi heatmap cơ bắp thời gian thực

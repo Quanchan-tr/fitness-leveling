@@ -22,7 +22,7 @@ const ShellContext = createContext<ShellContextType>({
 export const useShell = () => useContext(ShellContext);
 
 /** Routes that render their own full-screen layout without the app shell */
-const SHELL_EXCLUDED_PREFIXES = ['/auth', '/onboarding'];
+const SHELL_EXCLUDED_PREFIXES = ['/auth', '/onboarding', '/landing'];
 
 export const ShellLayout: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -34,8 +34,8 @@ export const ShellLayout: React.FC<{ children: React.ReactNode }> = ({
   const toggleMobileNav = () => setIsMobileNavOpen((prev) => !prev);
   const closeMobileNav = () => setIsMobileNavOpen(false);
 
-  // If user is not authenticated or hasn't finished onboarding on root '/', it's the Landing Page -> no sidebar
-  const isLandingPage = pathname === '/' && (isLoading || !user || !user.hasCompletedOnboarding);
+  // Root '/' is the public Landing Page -> no sidebar shell
+  const isLandingPage = pathname === '/';
 
   const isShellExcluded =
     isLandingPage ||
