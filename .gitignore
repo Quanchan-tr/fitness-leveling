@@ -96,6 +96,7 @@ Thumbs.db
 *.swo
 .agent/*
 .agents/*
+graphify-out
 graphify-out/*
 
 # --- Testing & Coverage ---

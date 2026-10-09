@@ -89,6 +89,8 @@ export default function AiCoachPage() {
     []
   );
 
+  const saveSessionRef = useRef<(finalState: any) => Promise<void>>();
+
   // MediaPipe hook
   const {
     videoRef,
@@ -103,7 +105,62 @@ export default function AiCoachPage() {
   } = usePoseDetection({
     exercise: poseExercise,
     onRepCompleted: handleRepCompleted,
+    onVideoEnded: (finalState) => {
+      setSessionActive(false);
+      if (finalState?.repCount > 0) {
+        saveSessionRef.current?.(finalState);
+      }
+    },
   });
+
+  // Save session to backend
+  const saveSession = useCallback(async (finalState: any) => {
+    setIsSaving(true);
+    try {
+      const exerciseIdMap: Record<ExerciseType, string> = {
+        squat: '00000000-0000-0000-0000-000000000001',
+        pushup: '00000000-0000-0000-0000-000000000002',
+        plank: '00000000-0000-0000-0000-000000000003',
+      };
+
+      const feedbackJson = {
+        rep_count: finalState?.repCount ?? metrics.repCount,
+        valid_rep_count: finalState?.validRepCount ?? metrics.validRepCount,
+        good_rep_count: finalState?.goodRepCount ?? metrics.goodRepCount,
+        score: finalState?.score ?? metrics.score,
+        rep_feedback: repLogs.map((r) => ({
+          rep_number: r.repNumber,
+          score: r.score,
+          status: r.status,
+          is_rep_valid: r.isRepValid,
+          issues: r.issues.map((i) => ({
+            issue_code: i.issueCode,
+            severity: i.severity,
+            message: i.message,
+          })),
+        })),
+      };
+
+      await apiRequest('/pose-check/realtime/result', {
+        method: 'POST',
+        body: JSON.stringify({
+          exercise_id: exerciseIdMap[poseExercise],
+          rep_count: finalState?.repCount ?? metrics.repCount,
+          score: finalState?.score ?? metrics.score,
+          feedback_json: feedbackJson,
+        }),
+        useIdempotency: true,
+      });
+
+      setSaveSuccess(true);
+    } catch (err) {
+      console.warn('[AiCoachPage] Save session failed (non-blocking):', err);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [metrics, poseExercise, repLogs]);
+
+  saveSessionRef.current = saveSession;
 
   // Start / Stop handler
   const handleToggleSession = async () => {
@@ -125,54 +182,6 @@ export default function AiCoachPage() {
     }
   };
 
-  // Save session to backend
-  const saveSession = async (finalState: any) => {
-    setIsSaving(true);
-    try {
-      const exerciseIdMap: Record<ExerciseType, string> = {
-        // These should match real exercise UUIDs from your DB; using placeholder
-        squat: '00000000-0000-0000-0000-000000000001',
-        pushup: '00000000-0000-0000-0000-000000000002',
-        plank: '00000000-0000-0000-0000-000000000003',
-      };
-
-      const feedbackJson = {
-        rep_count: metrics.repCount,
-        valid_rep_count: metrics.validRepCount,
-        good_rep_count: metrics.goodRepCount,
-        score: metrics.score,
-        rep_feedback: repLogs.map((r) => ({
-          rep_number: r.repNumber,
-          score: r.score,
-          status: r.status,
-          is_rep_valid: r.isRepValid,
-          issues: r.issues.map((i) => ({
-            issue_code: i.issueCode,
-            severity: i.severity,
-            message: i.message,
-          })),
-        })),
-      };
-
-      await apiRequest('/pose-check/realtime/result', {
-        method: 'POST',
-        body: JSON.stringify({
-          exercise_id: exerciseIdMap[poseExercise],
-          rep_count: metrics.repCount,
-          score: metrics.score,
-          feedback_json: feedbackJson,
-        }),
-        useIdempotency: true,
-      });
-
-      setSaveSuccess(true);
-    } catch (err) {
-      console.warn('[AiCoachPage] Save session failed (non-blocking):', err);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   // Exercise change resets state
   const handleExerciseChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (isRunning) return; // Can't change mid-session
@@ -181,7 +190,7 @@ export default function AiCoachPage() {
     setRepLogs([]);
   };
 
-  // Upload video for server-side analysis
+  // Upload video for analysis (supports local client-side analysis when backend is unavailable)
   const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -189,6 +198,10 @@ export default function AiCoachPage() {
     setIsUploadAnalyzing(true);
     setUploadResult(null);
 
+    let sessionId = generateUUID();
+    let isServerUploaded = false;
+
+    // 1. Optional background sync with backend if running (non-blocking)
     try {
       const formData = new FormData();
       formData.append('video', file);
@@ -199,21 +212,39 @@ export default function AiCoachPage() {
         {
           method: 'POST',
           body: formData,
-          headers: {
-            // Don't set Content-Type manually for FormData
-            Accept: 'application/json',
-            'Idempotency-Key': generateUUID(),
-          },
+          useIdempotency: true,
         }
       );
-      setUploadResult(result.data);
+      if (result?.data?.session_id) {
+        sessionId = result.data.session_id;
+        isServerUploaded = true;
+      }
+    } catch (err) {
+      console.warn('[AiCoachPage] Server upload offline (using direct MediaPipe analysis):', err);
+    }
+
+    // 2. Run local MediaPipe AI analysis on uploaded video directly in the viewport
+    try {
+      setRepLogs([]);
+      setSaveSuccess(false);
+      reset();
+      setSessionActive(true);
+      await start(file);
+      setUploadResult({
+        session_id: sessionId,
+        message: isServerUploaded
+          ? `Video đã tải lên server và đang phân tích trực tiếp bằng MediaPipe AI (Session: ${sessionId.slice(0, 8)}...).`
+          : `Đang phát và phân tích video trực tiếp bằng MediaPipe AI (Session: ${sessionId.slice(0, 8)}...).`,
+      });
     } catch (err: any) {
-      console.error('[AiCoachPage] Upload failed:', err);
-      setUploadResult({ error: err.message });
+      console.error('[AiCoachPage] Local video analysis failed:', err);
+      setUploadResult({ error: err?.message || 'Không thể xử lý file video.' });
     } finally {
       setIsUploadAnalyzing(false);
+      if (uploadInputRef.current) uploadInputRef.current.value = '';
     }
   };
+
 
   // ─── AI Workout Planner state ─────────────────────────────────────────────
 
@@ -540,9 +571,7 @@ export default function AiCoachPage() {
                     <span>⚠ Lỗi upload: {uploadResult.error}</span>
                   ) : (
                     <span>
-                      ✓ Video đang được phân tích trên server (Session:{' '}
-                      {uploadResult.session_id?.slice(0, 8)}...). Kết quả sẽ
-                      có sau vài phút.
+                      ✓ {uploadResult.message || `Video đang được phân tích (Session: ${uploadResult.session_id?.slice(0, 8)}...).`}
                     </span>
                   )}
                 </div>

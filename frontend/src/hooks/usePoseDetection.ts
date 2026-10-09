@@ -90,6 +90,7 @@ interface UsePoseDetectionOptions {
     status?: RepStatus,
     isRepValid?: boolean,
   ) => void;
+  onVideoEnded?: (finalState: RepEngineState) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -714,6 +715,7 @@ function drawSkeleton(
   canvasHeight: number,
   score: number,
   isFrameValid: boolean,
+  isMirrored: boolean = false,
 ) {
   // Dim skeleton when frame is gated (not valid)
   const alpha = isFrameValid ? 1.0 : 0.3;
@@ -726,14 +728,17 @@ function drawSkeleton(
   ctx.lineWidth = 3;
   ctx.lineCap = 'round';
 
+  const getX = (lm: NormalisedLandmark) => isMirrored ? (1 - lm.x) * canvasWidth : lm.x * canvasWidth;
+  const getY = (lm: NormalisedLandmark) => lm.y * canvasHeight;
+
   for (const [a, b] of POSE_CONNECTIONS) {
     const la = lms[a];
     const lb = lms[b];
     if (!la || !lb) continue;
     if ((la.visibility ?? 1) < 0.35 || (lb.visibility ?? 1) < 0.35) continue;
     ctx.beginPath();
-    ctx.moveTo(la.x * canvasWidth, la.y * canvasHeight);
-    ctx.lineTo(lb.x * canvasWidth, lb.y * canvasHeight);
+    ctx.moveTo(getX(la), getY(la));
+    ctx.lineTo(getX(lb), getY(lb));
     ctx.stroke();
   }
 
@@ -744,7 +749,7 @@ function drawSkeleton(
     const radius = isKeyJoint ? 5 : 3;
     ctx.fillStyle = isKeyJoint ? colour : 'rgba(255,255,255,0.5)';
     ctx.beginPath();
-    ctx.arc(lm.x * canvasWidth, lm.y * canvasHeight, radius, 0, Math.PI * 2);
+    ctx.arc(getX(lm), getY(lm), radius, 0, Math.PI * 2);
     ctx.fill();
   }
 
@@ -755,12 +760,14 @@ function drawSkeleton(
 // Hook
 // ---------------------------------------------------------------------------
 
-export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionOptions) {
+export function usePoseDetection({ exercise, onRepCompleted, onVideoEnded }: UsePoseDetectionOptions) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const landmarkerRef = useRef<PoseLandmarker | null>(null);
   const animFrameRef = useRef<number>(0);
   const streamRef = useRef<MediaStream | null>(null);
+  const videoUrlRef = useRef<string | null>(null);
+  const isVideoFileRef = useRef<boolean>(false);
   const repStateRef = useRef<RepEngineState>(createRepState());
   const emaRef = useRef<EmaAngles>(createEmaAngles());
   const lastFrameTimeRef = useRef<number>(0);
@@ -801,8 +808,21 @@ export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionO
       const landmarker = landmarkerRef.current;
 
       if (!video || !canvas || !landmarker || video.readyState < 2) {
-        animFrameRef.current = requestAnimationFrame(processFrame);
+        if (!video?.ended) {
+          animFrameRef.current = requestAnimationFrame(processFrame);
+        }
         return;
+      }
+
+      if (video.ended) {
+        setIsRunning(false);
+        cancelAnimationFrame(animFrameRef.current);
+        return;
+      }
+
+      if (video.videoWidth > 0 && canvas.width !== video.videoWidth) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
       }
 
       const dt = timestamp - lastFrameTimeRef.current;
@@ -816,11 +836,15 @@ export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionO
         return;
       }
 
-      // Mirror video to canvas
+      // Draw video to canvas (mirrored for webcam, unmirrored for uploaded video)
       ctx.save();
-      ctx.scale(-1, 1);
-      ctx.translate(-canvas.width, 0);
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      if (isVideoFileRef.current) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      } else {
+        ctx.scale(-1, 1);
+        ctx.translate(-canvas.width, 0);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      }
       ctx.restore();
 
       const lms = (result.landmarks?.[0] ?? null) as NormalisedLandmark[] | null;
@@ -830,7 +854,15 @@ export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionO
       const isFrameValid = visWarning === null;
 
       if (lms) {
-        drawSkeleton(ctx, lms, canvas.width, canvas.height, repStateRef.current.score, isFrameValid);
+        drawSkeleton(
+          ctx,
+          lms,
+          canvas.width,
+          canvas.height,
+          repStateRef.current.score,
+          isFrameValid,
+          !isVideoFileRef.current
+        );
       }
 
       if (!isFrameValid || !lms) {
@@ -871,7 +903,7 @@ export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionO
       repStateRef.current = engineResult.state;
       emaRef.current = engineResult.ema;
 
-      const ns = engineResult.state;
+      const ns = repStateRef.current;
       setMetrics({
         repCount: ns.repCount,
         validRepCount: ns.validRepCount,
@@ -892,23 +924,73 @@ export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionO
     [exercise, onRepCompleted],
   );
 
-  const start = useCallback(async () => {
+  const stop = useCallback(() => {
+    cancelAnimationFrame(animFrameRef.current);
+    setIsRunning(false);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.srcObject = null;
+      if (videoUrlRef.current) {
+        URL.revokeObjectURL(videoUrlRef.current);
+        videoUrlRef.current = null;
+        videoRef.current.src = '';
+      }
+    }
+    return repStateRef.current;
+  }, []);
+
+  const start = useCallback(async (videoFile?: File) => {
     setError(null);
     if (!landmarkerRef.current) await loadModel();
     if (!landmarkerRef.current) return;
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480, facingMode: 'user' },
-        audio: false,
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+      if (videoFile) {
+        isVideoFileRef.current = true;
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((t) => t.stop());
+          streamRef.current = null;
+        }
+        if (videoRef.current) {
+          if (videoUrlRef.current) {
+            URL.revokeObjectURL(videoUrlRef.current);
+          }
+          const url = URL.createObjectURL(videoFile);
+          videoUrlRef.current = url;
+          videoRef.current.srcObject = null;
+          videoRef.current.src = url;
+          videoRef.current.muted = true;
+          videoRef.current.playsInline = true;
+          videoRef.current.onended = () => {
+            stop();
+            onVideoEnded?.(repStateRef.current);
+          };
+          await videoRef.current.play();
+        }
+      } else {
+        isVideoFileRef.current = false;
+        if (videoUrlRef.current) {
+          URL.revokeObjectURL(videoUrlRef.current);
+          videoUrlRef.current = null;
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 640, height: 480, facingMode: 'user' },
+          audio: false,
+        });
+        streamRef.current = stream;
+        if (videoRef.current) {
+          videoRef.current.onended = null;
+          videoRef.current.src = '';
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play();
+        }
       }
     } catch {
-      setError('Khong the truy cap webcam. Vui long cap quyen camera.');
+      setError(videoFile ? 'Không thể phát video đã tải lên.' : 'Khong the truy cap webcam. Vui long cap quyen camera.');
       return;
     }
 
@@ -918,18 +1000,7 @@ export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionO
 
     setIsRunning(true);
     animFrameRef.current = requestAnimationFrame(processFrame);
-  }, [loadModel, processFrame]);
-
-  const stop = useCallback(() => {
-    cancelAnimationFrame(animFrameRef.current);
-    setIsRunning(false);
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) videoRef.current.srcObject = null;
-    return repStateRef.current;
-  }, []);
+  }, [loadModel, onVideoEnded, processFrame, stop]);
 
   const reset = useCallback(() => {
     repStateRef.current = createRepState();
@@ -941,6 +1012,9 @@ export function usePoseDetection({ exercise, onRepCompleted }: UsePoseDetectionO
     return () => {
       cancelAnimationFrame(animFrameRef.current);
       streamRef.current?.getTracks().forEach((t) => t.stop());
+      if (videoUrlRef.current) {
+        URL.revokeObjectURL(videoUrlRef.current);
+      }
     };
   }, []);
 

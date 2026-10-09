@@ -7,4 +7,10 @@ return [
     'timeout' => (int) env('POSE_WORKER_TIMEOUT_SECONDS', 180),
     'max_video_size_mb' => (int) env('POSE_VIDEO_MAX_SIZE_MB', 100),
     'max_duration_sec' => (int) env('POSE_VIDEO_MAX_DURATION_SEC', 60),
+    // Root of the private storage disk as seen by the backend container.
+    // PoseWorkerClient rewrites this prefix to worker_storage_root before
+    // passing the video_path to the Python worker.
+    'backend_storage_root' => env('POSE_BACKEND_STORAGE_ROOT', '/var/www/html/storage/app/private'),
+    // Mount point of the same named volume inside the pose-worker container.
+    'worker_storage_root'  => env('POSE_WORKER_STORAGE_ROOT', '/app/private_storage'),
 ];

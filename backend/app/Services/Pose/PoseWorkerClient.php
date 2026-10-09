@@ -42,10 +42,16 @@ class PoseWorkerClient
      */
     public function processVideo(string $sessionId, string $videoAbsPath, string $exerciseType): array
     {
+        // The backend resolves paths under its own storage root (e.g.
+        // /var/www/html/storage/app/private), but the pose-worker accesses the
+        // same named Docker volume at a different mount point (/app/private_storage).
+        // Rewrite the prefix so the Python worker can actually find the file.
+        $workerPath = $this->rewritePathForWorker($videoAbsPath);
+
         $response = Http::timeout($this->timeout)
             ->post("{$this->baseUrl}/v1/process-video", [
                 'session_id'    => $sessionId,
-                'video_path'    => $videoAbsPath,
+                'video_path'    => $workerPath,
                 'exercise_type' => $exerciseType,
             ]);
 
@@ -56,5 +62,32 @@ class PoseWorkerClient
         }
 
         return $response->json();
+    }
+
+    /**
+     * Translate a backend-absolute path to the equivalent path inside the
+     * pose-worker container.
+     *
+     * Both services share the same Docker named volume (private_storage) but
+     * mount it at different paths:
+     *   backend:     /var/www/html/storage/app/private  (Laravel private disk root)
+     *   pose-worker: /app/private_storage
+     *
+     * Example:
+     *   In:  /var/www/html/storage/app/private/pose-videos/uuid/abc.mp4
+     *   Out: /app/private_storage/pose-videos/uuid/abc.mp4
+     */
+    private function rewritePathForWorker(string $backendAbsPath): string
+    {
+        $backendRoot = rtrim((string) config('pose.backend_storage_root', '/var/www/html/storage/app/private'), '/');
+        $workerRoot  = rtrim((string) config('pose.worker_storage_root', '/app/private_storage'), '/');
+
+        if (str_starts_with($backendAbsPath, $backendRoot)) {
+            return $workerRoot . substr($backendAbsPath, strlen($backendRoot));
+        }
+
+        // Path doesn't match the expected prefix — return as-is and let the
+        // worker's own validation produce a clear error.
+        return $backendAbsPath;
     }
 }
