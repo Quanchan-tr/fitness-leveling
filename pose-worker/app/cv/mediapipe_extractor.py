@@ -23,7 +23,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
-logger = logging.getLogger("fittrack-pose-worker")
+logger = logging.getLogger("fitnessleveling-pose-worker")
 
 from dataclasses import dataclass
 

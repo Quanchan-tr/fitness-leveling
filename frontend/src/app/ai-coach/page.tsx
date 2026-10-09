@@ -285,9 +285,9 @@ export default function AiCoachPage() {
   // ─── Render ───────────────────────────────────────────────────────────────
 
   const exerciseLabel: Record<ExerciseType, string> = {
-    squat: 'Squat (Đứng ngồi)',
-    pushup: 'Push-up (Hít đất)',
-    plank: 'Plank (Tĩnh)',
+    squat: 'Squat',
+    pushup: 'Push-up',
+    plank: 'Plank',
   };
 
   return (
@@ -306,9 +306,6 @@ export default function AiCoachPage() {
               <Video className="w-7 h-7 sm:w-8 sm:h-8 text-[#FF5722]" />
               <span>AI Pose Check &amp; Huấn luyện</span>
             </h1>
-            <p className="text-sm text-slate-500 mt-1">
-              Phân tích tư thế thời gian thực bằng MediaPipe BlazePose
-            </p>
           </div>
         </div>
 

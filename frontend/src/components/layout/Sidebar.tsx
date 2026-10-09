@@ -15,6 +15,7 @@ import {
   Flame,
   ShieldCheck,
   X,
+  User,
 } from 'lucide-react';
 
 interface NavItem {
@@ -25,12 +26,13 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Luyện tập', href: '/workout', icon: Dumbbell },
   { name: 'Chỉ số cơ thể', href: '/metrics', icon: Activity },
   { name: 'Dinh dưỡng', href: '/nutrition', icon: Utensils },
   { name: 'Huấn luyện viên AI', href: '/ai-coach', icon: Video, badge: 'AI' },
   { name: 'Bảng tin', href: '/community', icon: Users },
+  { name: 'Hồ sơ cá nhân', href: '/profile', icon: User },
 ];
 
 interface SidebarProps {
@@ -69,7 +71,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
               <div>
                 <span className="font-black text-lg tracking-tight text-slate-900 block leading-none">
-                  FitTrack<span className="text-[#FF5722]"> AI</span>
+                  Fitness<span className="text-[#FF5722]">Leveling</span>
                 </span>
                 <span className="text-[10px] text-slate-400 font-semibold tracking-wide uppercase">
                   Command Center
@@ -102,6 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <Link
                     key={item.name}
                     href={item.href}
+                    prefetch={true}
                     onClick={onCloseMobile}
                     className={`flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-colors ${
                       isActive
@@ -143,12 +146,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Footer Info & System Version */}
-        <div className="p-3 border-t border-slate-100">
+        <div className="p-3 border-t border-slate-100 space-y-2">
           <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-200 text-left">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>FitTrack AI v2.5</span>
+                <span>FitnessLeveling v2.5</span>
               </div>
               <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
                 Online

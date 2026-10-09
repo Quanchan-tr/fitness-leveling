@@ -1,8 +1,8 @@
-# FitTrack AI — 3D Fitness Tracking & AI Pose Check Platform
+# FitnessLeveling AI — 3D Fitness Tracking & AI Pose Check Platform
 
 <div align="center">
 
-![FitTrack Banner](https://img.shields.io/badge/FitTrack%20AI-v2.0_Course_MVP-FF6B35?style=for-the-badge&logo=flame&logoColor=white)
+![FitnessLeveling Banner](https://img.shields.io/badge/FitnessLeveling%20AI-v2.0_Course_MVP-FF6B35?style=for-the-badge&logo=flame&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js%2014-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![Three.js](https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel%2011-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
@@ -20,9 +20,9 @@
 
 ## 📖 Giới thiệu (Overview)
 
-**FitTrack AI** là giải pháp toàn diện kết hợp giữa công cụ ghi chép thể hình (Workout & Nutrition Logging), trợ lý AI lập kế hoạch cá nhân hóa, công nghệ thị giác máy tính chấm form tập trực tiếp trên trình duyệt (Edge MediaPipe) và phân tích chuyên sâu qua video bất đồng bộ (Python CV Worker), cùng không gian trải nghiệm **3D Home-Gym Dashboard** trực quan.
+**FitnessLeveling AI** là giải pháp toàn diện kết hợp giữa công cụ ghi chép thể hình (Workout & Nutrition Logging), trợ lý AI lập kế hoạch cá nhân hóa, công nghệ thị giác máy tính chấm form tập trực tiếp trên trình duyệt (Edge MediaPipe) và phân tích chuyên sâu qua video bất đồng bộ (Python CV Worker), cùng không gian trải nghiệm **3D Home-Gym Dashboard** trực quan.
 
-Dự án được xây dựng và chuẩn hóa theo tài liệu kiến trúc **FitTrack AI System Design v2.0 (Course Project MVP)**:
+Dự án được xây dựng và chuẩn hóa theo tài liệu kiến trúc **FitnessLeveling AI System Design v2.0 (Course Project MVP)**:
 - **Tối giản hạ tầng (Infrastructure Simplification)**: Loại bỏ các dependency phức tạp bên ngoài như Redis, MinIO/AWS S3, Nginx proxy, tập trung vào **PostgreSQL 16 làm Single Source of Truth** (lưu trữ nghiệp vụ, Database Queue `jobs`, Database Cache & Atomic Locks, Idempotency Records).
 - **Lưu trữ video an toàn**: Sử dụng **Laravel Private Local Storage** trên Docker Named Volume (`private_storage`) dùng chung giữa Backend, Queue Worker và Python Pose Worker, loại bỏ sự phụ thuộc vào S3 presigned URL.
 - **Ranh giới hệ thống rõ ràng**: Unified Laravel Monolith API + Decoupled Asynchronous Python CV Worker + Client-Side Edge Inference (Next.js 14 App Router + Three.js).

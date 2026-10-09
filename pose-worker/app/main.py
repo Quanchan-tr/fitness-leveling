@@ -20,7 +20,7 @@ from app.schemas.response import (
 )
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("fittrack-pose-worker")
+logger = logging.getLogger("fitnessleveling-pose-worker")
 
 app = FastAPI(
     title=config.app_name,

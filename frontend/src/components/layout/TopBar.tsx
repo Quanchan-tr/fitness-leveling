@@ -2,17 +2,18 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Bell,
   Flame,
   Calendar,
   Menu,
   ChevronDown,
-  User,
   Settings,
   LogOut,
 } from 'lucide-react';
 import { FitnessUser } from '@/lib/fitnessData';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface TopBarProps {
   user: FitnessUser;
@@ -22,15 +23,33 @@ interface TopBarProps {
   onOpenProgressPhotos?: () => void;
   onOpenOutfit?: () => void;
   onToggleMobileMenu?: () => void;
+  onSignOut?: () => void;
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
   user,
   streak = 17,
   onToggleMobileMenu,
+  onSignOut,
 }) => {
+  const { signOut } = useAuth();
   const [currentDateTime, setCurrentDateTime] = useState<string>('');
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsProfileMenuOpen(false);
+    try {
+      if (onSignOut) {
+        await onSignOut();
+      }
+      await signOut();
+    } catch (err) {
+      console.error('Error during sign out:', err);
+    }
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
+  };
 
   useEffect(() => {
     const updateTime = () => {
@@ -141,20 +160,14 @@ export const TopBar: React.FC<TopBarProps> = ({
                     onClick={() => setIsProfileMenuOpen(false)}
                     className="w-full px-3.5 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors cursor-pointer"
                   >
-                    <User className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Hồ sơ cá nhân</span>
-                  </button>
-                  <button
-                    onClick={() => setIsProfileMenuOpen(false)}
-                    className="w-full px-3.5 py-2 text-left text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2 transition-colors cursor-pointer"
-                  >
                     <Settings className="w-3.5 h-3.5 text-slate-500" />
                     <span>Cài đặt ứng dụng</span>
                   </button>
                 </div>
                 <div className="border-t border-slate-100 pt-1">
                   <button
-                    onClick={() => setIsProfileMenuOpen(false)}
+                    type="button"
+                    onClick={handleSignOut}
                     className="w-full px-3.5 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5 text-rose-500" />

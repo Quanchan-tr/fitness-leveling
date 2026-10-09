@@ -4,7 +4,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: fittrack-frontend
+    container_name: fitnessleveling-frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -26,7 +26,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: fittrack-backend
+    container_name: fitnessleveling-backend
     restart: unless-stopped
     ports:
       - "8000:8000"
@@ -47,7 +47,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: fittrack-queue-worker
+    container_name: fitnessleveling-queue-worker
     restart: unless-stopped
     command: ["php", "artisan", "queue:work", "database", "--queue=pose_processing,default", "--tries=2", "--timeout=180"]
     env_file:
@@ -68,7 +68,7 @@ services:
     build:
       context: ./pose-worker
       dockerfile: Dockerfile
-    container_name: fittrack-pose-worker
+    container_name: fitnessleveling-pose-worker
     restart: unless-stopped
     ports:
       - "8001:8001"
@@ -87,12 +87,12 @@ services:
   # Single source of truth: business data + database queue (jobs table).
   postgres:
     image: postgres:16-alpine
-    container_name: fittrack-postgres
+    container_name: fitnessleveling-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: fittrack
-      POSTGRES_USER: fittrack_user
-      POSTGRES_PASSWORD: fittrack_password
+      POSTGRES_DB: fitnessleveling
+      POSTGRES_USER: fitnessleveling_user
+      POSTGRES_PASSWORD: fitnessleveling_password
     ports:
       - "5432:5432"
     volumes:

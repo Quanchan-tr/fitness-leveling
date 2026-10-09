@@ -1,4 +1,4 @@
-# FitTrack AI — UI/UX Redesign Specification & Design System
+# FitnessLeveling AI — UI/UX Redesign Specification & Design System
 
 > **Document Version:** 2.0 (Post-Audit Design System Baseline)  
 > **Status:** Approved for Implementation  
@@ -9,7 +9,7 @@
 
 ## 1. Product Identity & Design Tone
 
-FitTrack AI is a modern personal fitness command center. It bridges data tracking, computer-vision AI, and visual character progression.
+FitnessLeveling AI is a modern personal fitness command center. It bridges data tracking, computer-vision AI, and visual character progression.
 
 - **Tone & Mood:** Athletic, Data-Driven, Crisp, Confident, Modern, Slightly Futuristic.
 - **Visual Stance:**
@@ -92,7 +92,7 @@ FitTrack AI is a modern personal fitness command center. It bridges data trackin
 
 ```
 +------------------------------------------------------------------------------------+
-|  [FitTrack AI]  | TopBar: Date/Time | Streak | Quick Actions | Notifications | User |
+|  [FitnessLeveling AI]  | TopBar: Date/Time | Streak | Quick Actions | Notifications | User |
 +-----------------+------------------------------------------------------------------+
 | Sidebar (240px) | Main Scrollable Workspace (Content Area)                         |
 |                 |                                                                  |

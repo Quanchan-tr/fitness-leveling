@@ -33,14 +33,24 @@ export const HydrationStepsCard: React.FC<HydrationStepsCardProps> = ({
           </h3>
         </div>
         {onAddWater && (
-          <button
-            onClick={() => onAddWater(0.25)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer border border-slate-200"
-            title="Thêm 250ml nước"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>+250ml</span>
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => onAddWater(0.25)}
+              className="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition-colors cursor-pointer border border-sky-200"
+              title="Thêm 250ml nước"
+            >
+              <Plus className="w-3 h-3" />
+              <span>250ml</span>
+            </button>
+            <button
+              onClick={() => onAddWater(0.5)}
+              className="flex items-center gap-0.5 px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition-colors cursor-pointer border border-sky-200"
+              title="Thêm 500ml nước"
+            >
+              <Plus className="w-3 h-3" />
+              <span>500ml</span>
+            </button>
+          </div>
         )}
       </div>
 

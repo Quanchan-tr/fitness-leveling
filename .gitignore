@@ -105,4 +105,11 @@ coverage/
 .phpunit.result.cache
 */*tests/
 
+<<<<<<< HEAD
 
+=======
+# --- Temporary & Agent Scratch ---
+scratch/
+*.tsbuildinfo
+.agents/
+>>>>>>> bd7c162d997788db399c1b176b3f528900d31669

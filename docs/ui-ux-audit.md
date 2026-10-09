@@ -1,15 +1,15 @@
-# FitTrack AI — UI/UX Audit & Comprehensive Evaluation Report
+# FitnessLeveling AI — UI/UX Audit & Comprehensive Evaluation Report
 
 > **Audit Date:** September 2026  
 > **Auditor:** Senior UI/UX Designer & Impeccable Design System Architect  
-> **Target:** FitTrack AI Web Application (`frontend/src`)  
+> **Target:** FitnessLeveling AI Web Application (`frontend/src`)  
 > **Standard:** WCAG 2.1 AA, Impeccable Craft Floor, Athletic Modern SaaS Standards  
 
 ---
 
 ## 1. Executive Summary
 
-FitTrack AI combines personal fitness tracking, 3D character progression, AI coaching recommendations, and computer-vision Pose Check. While the core concept and technical foundations (Next.js 14, React Three Fiber, Tailwind CSS) are solid, the existing user interface suffers from a fundamental conceptual mismatch: **the full-screen 3D bedroom/gym room environment dominates the interface**, turning the dashboard into an awkward 3D game room with floating glass cards overlaid on top.
+FitnessLeveling AI combines personal fitness tracking, 3D character progression, AI coaching recommendations, and computer-vision Pose Check. While the core concept and technical foundations (Next.js 14, React Three Fiber, Tailwind CSS) are solid, the existing user interface suffers from a fundamental conceptual mismatch: **the full-screen 3D bedroom/gym room environment dominates the interface**, turning the dashboard into an awkward 3D game room with floating glass cards overlaid on top.
 
 This audit establishes the baseline for a complete frontend redesign that:
 1. **Eliminates the 3D room completely** (walls, floor, ceiling, bed, city backdrop, furniture).
