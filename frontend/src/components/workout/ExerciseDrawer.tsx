@@ -1,27 +1,59 @@
 'use strict';
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { ExerciseDbItem } from '@/types/workout.types';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Exercise } from '@/types/workout.types';
+import { fetchExercises } from '@/lib/api';
 import { ExerciseDatabaseItem } from './ExerciseDatabaseItem';
-import { Search, X, Dumbbell } from 'lucide-react';
+import { Search, X, Dumbbell, Sparkles, Loader2, ChevronDown } from 'lucide-react';
 
 interface ExerciseDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddExercise: (exercise: ExerciseDbItem) => void;
-  database: ExerciseDbItem[];
+  onAddExercise: (exercise: Exercise) => void;
+  database?: Exercise[];
 }
+
+const CATEGORIES = [
+  { label: 'Tất cả nhóm cơ', value: 'all' },
+  { label: 'Ngực (Chest)', value: 'chest' },
+  { label: 'Lưng xô (Back)', value: 'back' },
+  { label: 'Đùi / Mông (Legs)', value: 'upper legs' },
+  { label: 'Bắp chân (Calves)', value: 'lower legs' },
+  { label: 'Vai (Shoulders)', value: 'shoulders' },
+  { label: 'Tay (Arms)', value: 'upper arms' },
+  { label: 'Bụng & Eo (Core)', value: 'waist' },
+  { label: 'Cardio', value: 'cardio' },
+];
+
+const EQUIPMENTS = [
+  { label: 'Tất cả dụng cụ', value: 'all' },
+  { label: 'Bodyweight', value: 'body weight' },
+  { label: 'Barbell', value: 'barbell' },
+  { label: 'Dumbbell', value: 'dumbbell' },
+  { label: 'Cable Machine', value: 'cable' },
+  { label: 'Leverage Machine', value: 'leverage machine' },
+  { label: 'Resistance Band', value: 'band' },
+  { label: 'Kettlebell', value: 'kettlebell' },
+];
 
 export const ExerciseDrawer: React.FC<ExerciseDrawerProps> = ({
   isOpen,
   onClose,
   onAddExercise,
-  database,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedMuscle, setSelectedMuscle] = useState<string>('all');
+  const [selectedEquipment, setSelectedEquipment] = useState<string>('all');
+  const [filterAiOnly, setFilterAiOnly] = useState<boolean>(false);
+
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [lastPage, setLastPage] = useState<number>(1);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [recentlyAddedIds, setRecentlyAddedIds] = useState<string[]>([]);
 
   // Body scroll lock
@@ -37,42 +69,65 @@ export const ExerciseDrawer: React.FC<ExerciseDrawerProps> = ({
     };
   }, [isOpen]);
 
-  const categories: { label: string; value: string }[] = [
-    { label: 'Tất cả', value: 'all' },
-    { label: 'Gym', value: 'Gym' },
-    { label: 'Calisthenics', value: 'Calisthenics' },
-    { label: 'Cardio', value: 'Cardio' },
-    { label: 'Core', value: 'Core' },
-  ];
+  // Debounce search input (300ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm.trim());
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-  const muscleGroups: { label: string; value: string }[] = [
-    { label: 'Tất cả nhóm cơ', value: 'all' },
-    { label: 'Ngực (Chest)', value: 'Chest' },
-    { label: 'Lưng (Back)', value: 'Back' },
-    { label: 'Đùi/Mông (Legs)', value: 'Legs' },
-    { label: 'Vai (Shoulders)', value: 'Shoulders' },
-    { label: 'Tay (Arms)', value: 'Arms' },
-    { label: 'Bụng (Core)', value: 'Core' },
-  ];
+  // Fetch exercises from API
+  const loadExercises = useCallback(
+    async (targetPage: number, append: boolean = false) => {
+      if (append) {
+        setIsLoadingMore(true);
+      } else {
+        setIsLoading(true);
+      }
 
-  const filteredExercises = useMemo(() => {
-    return database.filter((ex) => {
-      const matchesSearch =
-        ex.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ex.nameVi.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ex.muscleGroup.toLowerCase().includes(searchTerm.toLowerCase());
+      try {
+        const response = await fetchExercises({
+          q: debouncedSearch || undefined,
+          category: selectedCategory !== 'all' ? selectedCategory : undefined,
+          equipment: selectedEquipment !== 'all' ? selectedEquipment : undefined,
+          has_ai: filterAiOnly || undefined,
+          page: targetPage,
+          per_page: 24,
+        });
 
-      const matchesCategory =
-        selectedCategory === 'all' || ex.category === selectedCategory;
+        if (append) {
+          setExercises((prev) => [...prev, ...response.data]);
+        } else {
+          setExercises(response.data);
+        }
 
-      const matchesMuscle =
-        selectedMuscle === 'all' || ex.muscleGroup === selectedMuscle;
+        setPage(response.current_page);
+        setLastPage(response.last_page);
+        setTotalCount(response.total);
+      } catch (err) {
+        console.error('Failed to load exercises from backend API:', err);
+      } finally {
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }
+    },
+    [debouncedSearch, selectedCategory, selectedEquipment, filterAiOnly]
+  );
 
-      return matchesSearch && matchesCategory && matchesMuscle;
-    });
-  }, [database, searchTerm, selectedCategory, selectedMuscle]);
+  // Trigger search/filter changes
+  useEffect(() => {
+    if (!isOpen) return;
+    loadExercises(1, false);
+  }, [isOpen, debouncedSearch, selectedCategory, selectedEquipment, filterAiOnly, loadExercises]);
 
-  const handleAdd = (exercise: ExerciseDbItem) => {
+  const handleLoadMore = () => {
+    if (page < lastPage && !isLoadingMore) {
+      loadExercises(page + 1, true);
+    }
+  };
+
+  const handleAdd = (exercise: Exercise) => {
     onAddExercise(exercise);
     setRecentlyAddedIds((prev) => [...prev, exercise.id]);
     setTimeout(() => {
@@ -90,21 +145,21 @@ export const ExerciseDrawer: React.FC<ExerciseDrawerProps> = ({
         className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-200"
       />
 
-      {/* Drawer Content */}
+      {/* Drawer Container */}
       <div className="fixed inset-y-0 right-0 max-w-full flex">
-        <div className="w-screen sm:w-[440px] bg-slate-50 shadow-xl flex flex-col border-l border-slate-200 animate-in slide-in-from-right duration-300">
+        <div className="w-screen sm:w-[500px] bg-slate-50 shadow-2xl flex flex-col border-l border-slate-200 animate-in slide-in-from-right duration-300">
           {/* Header */}
           <div className="p-4 bg-white border-b border-slate-200 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#FF5722] text-white flex items-center justify-center">
-                <Dumbbell className="w-4 h-4" />
+              <div className="w-9 h-9 rounded-xl bg-[#FF5722] text-white flex items-center justify-center shadow-xs">
+                <Dumbbell className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-900 leading-tight">
+                <h3 className="text-base font-black text-slate-900 leading-tight">
                   Ngân hàng bài tập
                 </h3>
                 <p className="text-xs text-slate-400 font-medium">
-                  Chọn bài tập thêm vào lịch luyện tập
+                  Hơn 1.300+ bài tập chuẩn hóa kèm GIF động
                 </p>
               </div>
             </div>
@@ -117,17 +172,17 @@ export const ExerciseDrawer: React.FC<ExerciseDrawerProps> = ({
             </button>
           </div>
 
-          {/* Filter & Search Area */}
+          {/* Filter & Search Bar */}
           <div className="p-4 bg-white border-b border-slate-200 space-y-3">
-            {/* Search Bar */}
+            {/* Search Input */}
             <div className="relative">
               <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Tìm theo tên bài tập, nhóm cơ..."
+                placeholder="Tìm bài tập (squat, push up, bench press...)..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-slate-50 pl-9 pr-8 py-2 rounded-lg border border-slate-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#FF5722]"
+                className="w-full bg-slate-50 pl-9 pr-8 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#FF5722]"
               />
               {searchTerm && (
                 <button
@@ -139,74 +194,127 @@ export const ExerciseDrawer: React.FC<ExerciseDrawerProps> = ({
               )}
             </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-              {categories.map((cat) => (
-                <button
-                  key={cat.value}
-                  onClick={() => setSelectedCategory(cat.value)}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer border ${
-                    selectedCategory === cat.value
-                      ? 'bg-[#FF5722] text-white border-[#FF5722]'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-600 border-slate-200'
-                  }`}
-                >
-                  {cat.label}
-                </button>
-              ))}
+            {/* Quick Filter: AI Pose Check Toggle */}
+            <div className="flex items-center justify-between gap-2">
+              <button
+                type="button"
+                onClick={() => setFilterAiOnly((prev) => !prev)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
+                  filterAiOnly
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                    : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Chỉ bài có AI Pose Check</span>
+              </button>
+
+              <span className="text-[11px] font-semibold text-slate-400">
+                {totalCount} bài tập
+              </span>
             </div>
 
-            {/* Muscle Group Filter Select */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">
-                Nhóm cơ:
-              </span>
-              <select
-                value={selectedMuscle}
-                onChange={(e) => setSelectedMuscle(e.target.value)}
-                className="flex-1 bg-slate-50 text-xs font-semibold text-slate-900 px-2.5 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-[#FF5722]"
-              >
-                {muscleGroups.map((mg) => (
-                  <option key={mg.value} value={mg.value}>
-                    {mg.label}
-                  </option>
-                ))}
-              </select>
+            {/* Dropdowns for Muscle & Equipment */}
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  Nhóm cơ
+                </label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full bg-slate-50 text-xs font-semibold text-slate-800 px-2 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-[#FF5722]"
+                >
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  Dụng cụ
+                </label>
+                <select
+                  value={selectedEquipment}
+                  onChange={(e) => setSelectedEquipment(e.target.value)}
+                  className="w-full bg-slate-50 text-xs font-semibold text-slate-800 px-2 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:border-[#FF5722]"
+                >
+                  {EQUIPMENTS.map((eq) => (
+                    <option key={eq.value} value={eq.value}>
+                      {eq.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
           {/* Exercises List */}
           <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            {filteredExercises.length > 0 ? (
-              filteredExercises.map((exercise) => (
-                <ExerciseDatabaseItem
-                  key={exercise.id}
-                  exercise={exercise}
-                  onAdd={handleAdd}
-                  isRecentlyAdded={recentlyAddedIds.includes(exercise.id)}
-                />
-              ))
+            {isLoading ? (
+              <div className="py-20 flex flex-col items-center justify-center gap-2 text-slate-400">
+                <Loader2 className="w-7 h-7 animate-spin text-[#FF5722]" />
+                <span className="text-xs font-medium">Đang tải danh sách bài tập...</span>
+              </div>
+            ) : exercises.length > 0 ? (
+              <>
+                {exercises.map((exercise) => (
+                  <ExerciseDatabaseItem
+                    key={exercise.id}
+                    exercise={exercise}
+                    onAdd={handleAdd}
+                    isRecentlyAdded={recentlyAddedIds.includes(exercise.id)}
+                  />
+                ))}
+
+                {/* Load More Button */}
+                {page < lastPage && (
+                  <div className="pt-3 pb-2 text-center">
+                    <button
+                      type="button"
+                      onClick={handleLoadMore}
+                      disabled={isLoadingMore}
+                      className="w-full py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-xs font-bold text-slate-700 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shadow-2xs"
+                    >
+                      {isLoadingMore ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-[#FF5722]" />
+                          <span>Đang tải thêm...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>Tải thêm ({exercises.length}/{totalCount})</span>
+                          <ChevronDown className="w-3.5 h-3.5" />
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </>
             ) : (
-              <div className="text-center py-12 text-slate-500">
-                <Dumbbell className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-                <p className="text-xs font-bold text-slate-700">
+              <div className="text-center py-16 text-slate-500">
+                <Dumbbell className="w-10 h-10 mx-auto text-slate-300 mb-2" />
+                <p className="text-sm font-bold text-slate-700">
                   Không tìm thấy bài tập phù hợp
                 </p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  Thử đổi từ khóa hoặc bộ lọc nhóm cơ
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Thử đổi từ khóa hoặc bộ lọc nhóm cơ / dụng cụ
                 </p>
               </div>
             )}
           </div>
 
-          {/* Footer Summary */}
+          {/* Footer */}
           <div className="p-3.5 bg-white border-t border-slate-200 flex items-center justify-between text-xs">
             <span className="text-slate-500 font-medium">
-              Tìm thấy <strong className="text-slate-900">{filteredExercises.length}</strong> bài tập
+              Đang hiển thị <strong className="text-slate-900">{exercises.length}</strong> / {totalCount} bài tập
             </span>
             <button
               onClick={onClose}
-              className="px-4 py-1.5 rounded-lg bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors cursor-pointer"
+              className="px-4 py-1.5 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors cursor-pointer"
             >
               Đóng
             </button>

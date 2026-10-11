@@ -1,3 +1,5 @@
+import { PaginatedExercisesResponse } from '@/types/workout.types';
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
 
 export interface ApiError {
@@ -89,3 +91,34 @@ export async function apiRequest<T>(
     });
   }
 }
+
+export interface FetchExercisesParams {
+  q?: string;
+  category?: string;
+  body_part?: string;
+  equipment?: string;
+  has_ai?: boolean;
+  page?: number;
+  per_page?: number;
+}
+
+export async function fetchExercises(
+  params?: FetchExercisesParams
+): Promise<PaginatedExercisesResponse> {
+  const searchParams = new URLSearchParams();
+  if (params?.q) searchParams.set('q', params.q);
+  if (params?.category && params.category !== 'all') searchParams.set('category', params.category);
+  if (params?.body_part && params.body_part !== 'all') searchParams.set('body_part', params.body_part);
+  if (params?.equipment && params.equipment !== 'all') searchParams.set('equipment', params.equipment);
+  if (params?.has_ai) searchParams.set('has_ai', 'true');
+  if (params?.page) searchParams.set('page', params.page.toString());
+  if (params?.per_page) searchParams.set('per_page', params.per_page.toString());
+
+  const queryString = searchParams.toString();
+  const endpoint = `/exercises${queryString ? `?${queryString}` : ''}`;
+
+  return apiRequest<PaginatedExercisesResponse>(endpoint, {
+    requiresAuth: false,
+  });
+}
+

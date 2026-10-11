@@ -14,6 +14,8 @@ import { useFitness } from '@/contexts/FitnessContext';
 import { MuscleHeatmapSvg } from './MuscleHeatmapSvg';
 import { MuscleDetailModal } from './MuscleDetailModal';
 import { CustomExerciseModal } from './CustomExerciseModal';
+import { ExerciseDrawer } from './ExerciseDrawer';
+import { Exercise as ApiExercise } from '@/types/workout.types';
 import {
   ArrowLeft,
   Plus,
@@ -66,9 +68,27 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
   // Modals
   const [isCustomExerciseModalOpen, setIsCustomExerciseModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Custom rest timer active input map
   const [customRestMap, setCustomRestMap] = useState<Record<number, boolean>>({});
+
+  const handleAddFromDrawer = (drawerEx: ApiExercise) => {
+    const ex: Exercise = {
+      id: drawerEx.id,
+      name: drawerEx.name,
+      nameVi: drawerEx.nameVi,
+      targetMuscles: [drawerEx.target_muscle || drawerEx.body_part || drawerEx.category || 'chest'],
+      equipment: (drawerEx.equipment || 'bodyweight').toLowerCase() as any,
+      type: 'weight_reps',
+      gifPlaceholderUrl: drawerEx.gif_url || drawerEx.thumbnail_url,
+      description:
+        typeof drawerEx.instructions === 'string'
+          ? drawerEx.instructions
+          : drawerEx.description || drawerEx.name,
+    };
+    handleAddExerciseToRoutine(ex);
+  };
 
   // Add exercise from library into routine
   const handleAddExerciseToRoutine = (ex: Exercise) => {
@@ -338,16 +358,30 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
 
           {/* Exercise List in Routine */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <h3 className="font-extrabold text-base text-slate-900 tracking-tight">
                 Danh sách bài tập ({routineExercises.length})
               </h3>
-              {routineExercises.length === 0 && (
-                <span className="text-xs text-amber-600 font-semibold">
-                  Chọn bài tập từ thư viện bên phải để thêm vào routine
-                </span>
-              )}
+              <button
+                type="button"
+                onClick={() => setIsDrawerOpen(true)}
+                className="px-3 py-1.5 rounded-xl bg-[#FF5722] hover:bg-[#E64A19] text-white text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>+ Thêm bài tập (Ngân hàng)</span>
+              </button>
             </div>
+
+            {routineExercises.length === 0 && (
+              <div
+                onClick={() => setIsDrawerOpen(true)}
+                className="p-8 text-center bg-white rounded-2xl border-2 border-dashed border-slate-200 hover:border-[#FF5722] hover:bg-orange-50/20 transition-all cursor-pointer space-y-2 group"
+              >
+                <Dumbbell className="w-8 h-8 mx-auto text-slate-300 group-hover:text-[#FF5722] transition-colors" />
+                <p className="text-xs font-bold text-slate-700">Chưa có bài tập nào trong Routine</p>
+                <p className="text-[11px] text-slate-400">Nhấn vào đây hoặc nút trên để mở Ngân hàng chọn bài tập</p>
+              </div>
+            )}
 
             {routineExercises.map((item, exIdx) => {
               const ex = item.exercise;
@@ -361,11 +395,19 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
                   {/* Exercise Header */}
                   <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-100">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200 text-[#FF5722] flex items-center justify-center font-bold text-sm shrink-0">
-                        {exIdx + 1}
-                      </div>
+                      {ex.gifPlaceholderUrl ? (
+                        <img
+                          src={ex.gifPlaceholderUrl}
+                          alt={ex.name}
+                          className="w-12 h-12 rounded-xl object-cover border border-slate-200 bg-slate-100 shrink-0"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200 text-[#FF5722] flex items-center justify-center font-bold text-sm shrink-0">
+                          {exIdx + 1}
+                        </div>
+                      )}
                       <div>
-                        <h4 className="font-bold text-sm sm:text-base text-slate-900">
+                        <h4 className="font-bold text-sm sm:text-base text-slate-900 capitalize">
                           {ex.name}
                         </h4>
                         <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
@@ -796,6 +838,13 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
         exercises={routineExercises}
+      />
+
+      {/* Exercise Drawer */}
+      <ExerciseDrawer
+        isOpen={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+        onAddExercise={handleAddFromDrawer}
       />
     </div>
   );

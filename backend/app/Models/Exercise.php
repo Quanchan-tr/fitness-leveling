@@ -17,14 +17,22 @@ class Exercise extends Model
 
     protected $fillable = [
         'created_by',
+        'external_id',
         'name',
         'description',
         'muscle_group',
+        'category',
+        'body_part',
+        'target_muscle',
+        'secondary_muscles',
         'equipment',
         'difficulty',
         'video_url',
         'thumbnail_url',
+        'gif_url',
+        'instructions',
         'has_pose_check',
+        'has_ai_check',
         'pose_rules_key',
         'verified',
         'avg_rating',
@@ -33,7 +41,10 @@ class Exercise extends Model
     ];
 
     protected $casts = [
+        'secondary_muscles' => 'array',
+        'instructions' => 'array',
         'has_pose_check' => 'boolean',
+        'has_ai_check' => 'boolean',
         'verified' => 'boolean',
         'avg_rating' => 'float',
         'rating_count' => 'integer',

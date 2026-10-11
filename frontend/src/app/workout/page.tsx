@@ -11,6 +11,9 @@ import { WeeklyCalendar } from '@/components/workout/WeeklyCalendar';
 import { RoutineCard } from '@/components/workout/RoutineCard';
 import { RoutineEditor } from '@/components/workout/RoutineEditor';
 import { RoutineDetailView } from '@/components/workout/RoutineDetailView';
+import { ExerciseDrawer } from '@/components/workout/ExerciseDrawer';
+import { ExerciseCatalogView } from '@/components/workout/ExerciseCatalogView';
+import { Exercise } from '@/types/workout.types';
 import {
   Dumbbell,
   Plus,
@@ -63,6 +66,10 @@ export default function WorkoutPage() {
   const [renamingFolder, setRenamingFolder] = useState<{ id: string; name: string } | null>(null);
   const [renameInput, setRenameInput] = useState('');
 
+  // Exercise drawer & collection tab state
+  const [isExerciseDrawerOpen, setIsExerciseDrawerOpen] = useState(false);
+  const [collectionTab, setCollectionTab] = useState<'routines' | 'exercises'>('routines');
+
   const handleStartLive = (routine: RoutineItem) => {
     startWorkout(routine);
     router.push('/workout/live');
@@ -72,6 +79,78 @@ export default function WorkoutPage() {
     setEditingRoutine(routine);
     setTargetFolderId(folderId || routine?.folderId);
     setViewMode('editor');
+  };
+
+  const handleAddExerciseToRoutine = (ex: Exercise) => {
+    handleOpenEditor({
+      id: '',
+      title: `Routine với ${ex.name}`,
+      restTimerSeconds: 60,
+      createdBy: {
+        userId: profile.id,
+        username: profile.name,
+        avatarUrl: profile.avatar,
+      },
+      exercises: [
+        {
+          exercise: {
+            id: ex.id,
+            name: ex.name,
+            nameVi: ex.nameVi,
+            targetMuscles: [ex.target_muscle || ex.body_part || ex.category || 'chest'],
+            equipment: (ex.equipment || 'bodyweight').toLowerCase() as any,
+            type: 'weight_reps',
+            gifPlaceholderUrl: ex.gif_url || ex.thumbnail_url,
+            description:
+              typeof ex.instructions === 'string'
+                ? ex.instructions
+                : ex.description || ex.name,
+          },
+          sets: [
+            { setNumber: 1, weightKg: 20, reps: 10, isCompleted: false },
+            { setNumber: 2, weightKg: 20, reps: 10, isCompleted: false },
+            { setNumber: 3, weightKg: 20, reps: 10, isCompleted: false },
+          ],
+        },
+      ],
+    });
+  };
+
+  const handleStartQuickWorkout = (ex: Exercise) => {
+    const quickRoutine: RoutineItem = {
+      id: `quick-${ex.id}-${Date.now()}`,
+      title: `Tập luyện ${ex.name}`,
+      restTimerSeconds: 60,
+      createdBy: {
+        userId: profile.id,
+        username: profile.name,
+        avatarUrl: profile.avatar,
+      },
+      exercises: [
+        {
+          exercise: {
+            id: ex.id,
+            name: ex.name,
+            nameVi: ex.nameVi,
+            targetMuscles: [ex.target_muscle || ex.body_part || ex.category || 'chest'],
+            equipment: (ex.equipment || 'bodyweight').toLowerCase() as any,
+            type: 'weight_reps',
+            gifPlaceholderUrl: ex.gif_url || ex.thumbnail_url,
+            description:
+              typeof ex.instructions === 'string'
+                ? ex.instructions
+                : ex.description || ex.name,
+          },
+          sets: [
+            { setNumber: 1, weightKg: 20, reps: 10, isCompleted: false },
+            { setNumber: 2, weightKg: 20, reps: 10, isCompleted: false },
+            { setNumber: 3, weightKg: 20, reps: 10, isCompleted: false },
+          ],
+        },
+      ],
+    };
+    startWorkout(quickRoutine);
+    router.push('/workout/live');
   };
 
   const handleOpenDetail = (routine: RoutineItem) => {
@@ -164,14 +243,25 @@ export default function WorkoutPage() {
                 </h1>
               </div>
 
-              {/* Action Buttons: Tạo Routine & Tạo Thư mục */}
+              {/* Action Buttons: Tạo Routine & Tạo Thư mục & Ngân hàng bài tập */}
               <div className="flex items-center gap-2.5 flex-wrap">
                 <button
                   onClick={() => setIsFolderModalOpen(true)}
-                  className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold border border-slate-300 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold border border-slate-300 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
                 >
                   <FolderPlus className="w-4 h-4 text-slate-500" />
                   <span>Tạo Thư mục</span>
+                </button>
+                <button
+                  onClick={() => setCollectionTab((prev) => (prev === 'exercises' ? 'routines' : 'exercises'))}
+                  className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs ${
+                    collectionTab === 'exercises'
+                      ? 'bg-slate-900 text-white border-slate-900'
+                      : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300'
+                  }`}
+                >
+                  <Dumbbell className={`w-4 h-4 ${collectionTab === 'exercises' ? 'text-white' : 'text-[#FF5722]'}`} />
+                  <span>Danh sách bài tập (1.324 bài)</span>
                 </button>
                 <button
                   onClick={() => handleOpenEditor()}
@@ -192,19 +282,62 @@ export default function WorkoutPage() {
               }}
             />
 
-            {/* 2. Folders & Routines Collection */}
+            {/* 2. Folders, Routines & Exercises Collection Section */}
             <div className="space-y-6 pt-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Layers className="w-5 h-5 text-slate-700" />
-                  <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
-                    Bộ sưu tập Routine &amp; Thư mục
-                  </h2>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
+                {/* Segmented Tab Switcher */}
+                <div className="flex items-center p-1 bg-slate-200/80 rounded-xl gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setCollectionTab('routines')}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+                      collectionTab === 'routines'
+                        ? 'bg-white text-slate-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Layers className="w-4 h-4" />
+                    <span>Bộ sưu tập Routine &amp; Thư mục</span>
+                    <span className="text-[11px] font-bold px-1.5 py-0.2 rounded-md bg-slate-100 text-slate-700">
+                      {routines.length}
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setCollectionTab('exercises')}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
+                      collectionTab === 'exercises'
+                        ? 'bg-white text-slate-900 shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Dumbbell className="w-4 h-4 text-[#FF5722]" />
+                    <span>Danh sách bài tập</span>
+                    <span className="text-[11px] font-bold px-1.5 py-0.2 rounded-md bg-orange-100 text-[#FF5722]">
+                      1.324 bài
+                    </span>
+                  </button>
                 </div>
-                <span className="text-xs font-semibold text-slate-500 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-                  {routines.length} routines • {folders.length} thư mục
+
+                <span className="text-xs font-semibold text-slate-500">
+                  {collectionTab === 'routines'
+                    ? `${routines.length} routines • ${folders.length} thư mục`
+                    : '1.324 bài tập kèm GIF động & AI Pose Check'}
                 </span>
               </div>
+
+              {/* View 1: Exercise Catalog */}
+              {collectionTab === 'exercises' && (
+                <ExerciseCatalogView
+                  onAddExerciseToRoutine={handleAddExerciseToRoutine}
+                  onStartQuickWorkout={handleStartQuickWorkout}
+                />
+              )}
+
+              {/* View 2: Routines & Folders */}
+              {collectionTab === 'routines' && (
+                <>
 
               {/* Folders List with Routines inside */}
               {folders.map((folder) => {
@@ -376,6 +509,8 @@ export default function WorkoutPage() {
                   </div>
                 </div>
               )}
+                </>
+              )}
             </div>
           </div>
         )}
@@ -494,6 +629,46 @@ export default function WorkoutPage() {
           </div>
         </div>
       )}
+      {/* Exercise Drawer */}
+      <ExerciseDrawer
+        isOpen={isExerciseDrawerOpen}
+        onClose={() => setIsExerciseDrawerOpen(false)}
+        onAddExercise={(ex) => {
+          setIsExerciseDrawerOpen(false);
+          handleOpenEditor({
+            id: '',
+            title: `Routine với ${ex.name}`,
+            restTimerSeconds: 60,
+            createdBy: {
+              userId: profile.id,
+              username: profile.name,
+              avatarUrl: profile.avatar,
+            },
+            exercises: [
+              {
+                exercise: {
+                  id: ex.id,
+                  name: ex.name,
+                  nameVi: ex.nameVi,
+                  targetMuscles: [ex.target_muscle || ex.body_part || ex.category || 'chest'],
+                  equipment: (ex.equipment || 'bodyweight').toLowerCase() as any,
+                  type: 'weight_reps',
+                  gifPlaceholderUrl: ex.gif_url || ex.thumbnail_url,
+                  description:
+                    typeof ex.instructions === 'string'
+                      ? ex.instructions
+                      : ex.description || ex.name,
+                },
+                sets: [
+                  { setNumber: 1, weightKg: 20, reps: 10, isCompleted: false },
+                  { setNumber: 2, weightKg: 20, reps: 10, isCompleted: false },
+                  { setNumber: 3, weightKg: 20, reps: 10, isCompleted: false },
+                ],
+              },
+            ],
+          });
+        }}
+      />
     </main>
   );
 }

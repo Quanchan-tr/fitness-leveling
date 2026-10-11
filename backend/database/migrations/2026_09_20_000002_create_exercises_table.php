@@ -13,14 +13,22 @@ return new class extends Migration
         Schema::create('exercises', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('created_by')->nullable();
-            $table->string('name', 150);
-            $table->text('description');
-            $table->string('muscle_group', 30)->index();
-            $table->string('equipment', 50);
-            $table->string('difficulty', 20);
+            $table->string('external_id', 50)->nullable()->index();
+            $table->string('name', 255)->index();
+            $table->text('description')->nullable();
+            $table->string('muscle_group', 100)->nullable()->index();
+            $table->string('category', 100)->nullable()->index();
+            $table->string('body_part', 100)->nullable()->index();
+            $table->string('target_muscle', 100)->nullable()->index();
+            $table->json('secondary_muscles')->nullable();
+            $table->string('equipment', 100)->nullable()->index();
+            $table->string('difficulty', 50)->default('beginner');
             $table->string('video_url', 500)->nullable();
             $table->string('thumbnail_url', 500)->nullable();
+            $table->string('gif_url', 500)->nullable();
+            $table->json('instructions')->nullable();
             $table->boolean('has_pose_check')->default(false)->index();
+            $table->boolean('has_ai_check')->default(false)->index();
             $table->string('pose_rules_key', 50)->nullable();
             $table->boolean('verified')->default(false)->index();
             $table->decimal('avg_rating', 3, 2)->default(0.00);
