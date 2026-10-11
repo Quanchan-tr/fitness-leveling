@@ -41,6 +41,8 @@ export interface VisibilityWarning {
   message: string;
 }
 
+export type CameraView = 'FRONT_VIEW' | 'SIDE_VIEW' | 'DIAGONAL_VIEW' | 'UNKNOWN';
+
 export interface PoseMetrics {
   repCount: number;         // Tổng số chu kỳ chuyển động hoàn thành
   validRepCount: number;    // Số rep đạt biên độ tối thiểu (GOOD_REP hoặc BAD_FORM)
@@ -49,6 +51,7 @@ export interface PoseMetrics {
   score: number;           // 0-100 overall form score
   isInRep: boolean;        // currently mid-rep
   currentRepScore: number;
+  cameraView: CameraView;   // Detected camera angle
   issues: PoseFeedbackIssue[];
   landmarks: NormalisedLandmark[] | null;
   fps: number;
@@ -66,6 +69,7 @@ function createInitialMetrics(): PoseMetrics {
     score: 100,
     isInRep: false,
     currentRepScore: 100,
+    cameraView: 'UNKNOWN',
     issues: [],
     landmarks: null,
     fps: 0,
@@ -102,16 +106,16 @@ const MODEL_URL =
   'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task';
 
 /** Minimum visibility score for a landmark to be considered reliably seen */
-const VISIBILITY_THRESHOLD = 0.65;
+const VISIBILITY_THRESHOLD = 0.50;
 
 /** EMA smoothing factor. Higher = more responsive but noisier */
-const EMA_ALPHA = 0.4;
+const EMA_ALPHA = 0.40;
 
 /** Minimum milliseconds a rep cycle must take to be counted (prevents flicker) */
-const MIN_REP_DURATION_MS = 800;
+const MIN_REP_DURATION_MS = 600;
 
 /** Cooldown after a rep is counted. Prevents double-counting on jitter at top */
-const REP_COOLDOWN_MS = 500;
+const REP_COOLDOWN_MS = 300;
 
 // ---------------------------------------------------------------------------
 // Landmark Indices
@@ -145,7 +149,7 @@ function isVisible(lms: NormalisedLandmark[], idx: number): boolean {
 /**
  * Returns null if the frame satisfies minimum visibility requirements,
  * or a VisibilityWarning describing what is missing.
- * The state machine MUST NOT run when this returns non-null.
+ * Allows single-side view (left OR right) for side-profile exercise filming.
  */
 function checkVisibility(
   lms: NormalisedLandmark[] | null | undefined,
@@ -154,45 +158,42 @@ function checkVisibility(
   if (!lms || lms.length === 0) {
     return {
       code: 'POSE_NOT_DETECTED',
-      message: 'Khong phat hien duoc tu the. Hay dung vao khung hinh.',
+      message: 'Không phát hiện được tư thế. Hãy đứng vào khung hình.',
     };
   }
 
   if (exercise === 'squat') {
-    const required = [LM.LEFT_HIP, LM.RIGHT_HIP, LM.LEFT_KNEE, LM.RIGHT_KNEE, LM.LEFT_ANKLE, LM.RIGHT_ANKLE];
-    const missing = required.filter((i) => !isVisible(lms, i));
-    if (missing.length > 0) {
+    const leftSide = isVisible(lms, LM.LEFT_HIP) && isVisible(lms, LM.LEFT_KNEE) && isVisible(lms, LM.LEFT_ANKLE);
+    const rightSide = isVisible(lms, LM.RIGHT_HIP) && isVisible(lms, LM.RIGHT_KNEE) && isVisible(lms, LM.RIGHT_ANKLE);
+    if (!leftSide && !rightSide) {
       return {
         code: 'INCOMPLETE_BODY_VISIBLE',
-        message: 'Camera can thay toan bo phan duoi co the (hong, goi, mat ca). Hay lui xa hon.',
+        message: 'Camera cần thấy rõ hông, đầu gối và cổ chân (ít nhất một bên). Hãy lùi xa hơn.',
       };
     }
   } else if (exercise === 'pushup') {
-    // Upper body: all required
-    const upper = [LM.LEFT_SHOULDER, LM.RIGHT_SHOULDER, LM.LEFT_ELBOW, LM.RIGHT_ELBOW, LM.LEFT_WRIST, LM.RIGHT_WRIST];
-    const upperMissing = upper.filter((i) => !isVisible(lms, i));
-    if (upperMissing.length > 0) {
+    const leftArm = isVisible(lms, LM.LEFT_SHOULDER) && isVisible(lms, LM.LEFT_ELBOW) && isVisible(lms, LM.LEFT_WRIST);
+    const rightArm = isVisible(lms, LM.RIGHT_SHOULDER) && isVisible(lms, LM.RIGHT_ELBOW) && isVisible(lms, LM.RIGHT_WRIST);
+    if (!leftArm && !rightArm) {
       return {
         code: 'INCOMPLETE_BODY_VISIBLE',
-        message: 'Camera can thay ro vai, khuyu tay va co tay. Hay dieu chinh goc camera.',
+        message: 'Camera cần thấy rõ vai, khuỷu tay và cổ tay (ít nhất một bên). Điều chỉnh góc camera.',
       };
     }
-    // Lower body: at least one hip AND at least one ankle
     const hasHip = isVisible(lms, LM.LEFT_HIP) || isVisible(lms, LM.RIGHT_HIP);
-    const hasAnkle = isVisible(lms, LM.LEFT_ANKLE) || isVisible(lms, LM.RIGHT_ANKLE);
-    if (!hasHip || !hasAnkle) {
+    if (!hasHip) {
       return {
         code: 'INCOMPLETE_BODY_VISIBLE',
-        message: 'Camera can thay duoc hong va mat ca de kiem tra duong thang co the. Lui camera ra xa.',
+        message: 'Camera cần thấy được hông để kiểm tra tư thế cơ thể.',
       };
     }
   } else if (exercise === 'plank') {
-    const required = [LM.LEFT_SHOULDER, LM.RIGHT_SHOULDER, LM.LEFT_HIP, LM.RIGHT_HIP, LM.LEFT_ANKLE, LM.RIGHT_ANKLE];
-    const missing = required.filter((i) => !isVisible(lms, i));
-    if (missing.length > 0) {
+    const leftSide = isVisible(lms, LM.LEFT_SHOULDER) && isVisible(lms, LM.LEFT_HIP) && isVisible(lms, LM.LEFT_ANKLE);
+    const rightSide = isVisible(lms, LM.RIGHT_SHOULDER) && isVisible(lms, LM.RIGHT_HIP) && isVisible(lms, LM.RIGHT_ANKLE);
+    if (!leftSide && !rightSide) {
       return {
         code: 'INCOMPLETE_BODY_VISIBLE',
-        message: 'Camera can thay toan bo co the (vai, hong, mat ca). Dat camera tu xa va tu ben hong.',
+        message: 'Camera cần thấy toàn bộ cơ thể (vai, hông, mắt cá ít nhất một bên).',
       };
     }
   }
@@ -214,14 +215,63 @@ function angle2D(a: NormalisedLandmark, b: NormalisedLandmark, c: NormalisedLand
   return (Math.acos(cosAngle) * 180) / Math.PI;
 }
 
+function angle3D(
+  a: { x: number; y: number; z: number },
+  b: { x: number; y: number; z: number },
+  c: { x: number; y: number; z: number }
+): number {
+  const ba = { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z };
+  const bc = { x: c.x - b.x, y: c.y - b.y, z: c.z - b.z };
+  const dot = ba.x * bc.x + ba.y * bc.y + ba.z * bc.z;
+  const magBa = Math.sqrt(ba.x ** 2 + ba.y ** 2 + ba.z ** 2) + 1e-7;
+  const magBc = Math.sqrt(bc.x ** 2 + bc.y ** 2 + bc.z ** 2) + 1e-7;
+  if (magBa < 1e-7 || magBc < 1e-7) return 180.0;
+  const cosAngle = Math.max(-1, Math.min(1, dot / (magBa * magBc)));
+  return (Math.acos(cosAngle) * 180) / Math.PI;
+}
+
 function verticalAngle(a: NormalisedLandmark, b: NormalisedLandmark): number {
   const vec = { x: b.x - a.x, y: b.y - a.y };
   const cosAngle = -vec.y / (Math.sqrt(vec.x ** 2 + vec.y ** 2) + 1e-7);
   return (Math.acos(Math.max(-1, Math.min(1, cosAngle))) * 180) / Math.PI;
 }
 
+function verticalAngle3D(a: { x: number; y: number; z: number }, b: { x: number; y: number; z: number }): number {
+  const vec = { x: b.x - a.x, y: b.y - a.y, z: b.z - a.z };
+  const norm = Math.sqrt(vec.x ** 2 + vec.y ** 2 + vec.z ** 2) + 1e-7;
+  const cosAngle = Math.max(-1, Math.min(1, -vec.y / norm));
+  return (Math.acos(cosAngle) * 180) / Math.PI;
+}
+
 function midpoint(a: NormalisedLandmark, b: NormalisedLandmark): NormalisedLandmark {
   return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, z: (a.z + b.z) / 2 };
+}
+
+function detectCameraView(lms: NormalisedLandmark[] | null | undefined): CameraView {
+  if (!lms || lms.length === 0) return 'UNKNOWN';
+  const lSh = lms[LM.LEFT_SHOULDER];
+  const rSh = lms[LM.RIGHT_SHOULDER];
+  const lHip = lms[LM.LEFT_HIP];
+  const rHip = lms[LM.RIGHT_HIP];
+
+  const hasLSh = !!lSh && (lSh.visibility ?? 1) >= 0.5;
+  const hasRSh = !!rSh && (rSh.visibility ?? 1) >= 0.5;
+  const hasLHip = !!lHip && (lHip.visibility ?? 1) >= 0.5;
+  const hasRHip = !!rHip && (rHip.visibility ?? 1) >= 0.5;
+
+  if (hasLSh !== hasRSh || hasLHip !== hasRHip) return 'SIDE_VIEW';
+  if (!hasLSh || !hasRSh || !hasLHip || !hasRHip) return 'UNKNOWN';
+
+  const shoulderDistX = Math.abs(lSh.x - rSh.x);
+  const midSh = { x: (lSh.x + rSh.x) / 2, y: (lSh.y + rSh.y) / 2 };
+  const midHip = { x: (lHip.x + rHip.x) / 2, y: (lHip.y + rHip.y) / 2 };
+  const torsoLen = Math.sqrt((midSh.x - midHip.x) ** 2 + (midSh.y - midHip.y) ** 2);
+
+  if (torsoLen < 1e-5) return 'FRONT_VIEW';
+  const ratio = shoulderDistX / torsoLen;
+  if (ratio < 0.22) return 'SIDE_VIEW';
+  if (ratio > 0.42) return 'FRONT_VIEW';
+  return 'DIAGONAL_VIEW';
 }
 
 // ---------------------------------------------------------------------------
@@ -259,6 +309,8 @@ interface RepEngineState {
   maxLeanAngle: number;
   minElbowAngle: number;
   maxElbowFlare: number;
+  minValgusRatio: number;
+  standingHipY: number;
   badBodyFrames: number;
   totalBodyFrames: number;
   repStartTime: number;   // performance.now() when rep started
@@ -280,6 +332,8 @@ function createRepState(): RepEngineState {
     maxLeanAngle: 0,
     minElbowAngle: 180,
     maxElbowFlare: 0,
+    minValgusRatio: 1.0,
+    standingHipY: 0.5,
     badBodyFrames: 0,
     totalBodyFrames: 0,
     repStartTime: 0,
@@ -299,6 +353,8 @@ function createRepState(): RepEngineState {
 
 function processSquatFrame(
   lms: NormalisedLandmark[],
+  worldLms: NormalisedLandmark[] | null | undefined,
+  cameraView: CameraView,
   state: RepEngineState,
   prevEma: EmaAngles,
   nowMs: number,
@@ -306,13 +362,54 @@ function processSquatFrame(
 ): { state: RepEngineState; ema: EmaAngles } {
   const s = { ...state };
 
-  const hip = midpoint(lms[LM.LEFT_HIP], lms[LM.RIGHT_HIP]);
-  const knee = midpoint(lms[LM.LEFT_KNEE], lms[LM.RIGHT_KNEE]);
-  const ankle = midpoint(lms[LM.LEFT_ANKLE], lms[LM.RIGHT_ANKLE]);
-  const shoulder = midpoint(lms[LM.LEFT_SHOULDER], lms[LM.RIGHT_SHOULDER]);
+  // Select the clearer side for side-profile squats
+  const lSide = isVisible(lms, LM.LEFT_HIP) && isVisible(lms, LM.LEFT_KNEE) && isVisible(lms, LM.LEFT_ANKLE);
+  const rSide = isVisible(lms, LM.RIGHT_HIP) && isVisible(lms, LM.RIGHT_KNEE) && isVisible(lms, LM.RIGHT_ANKLE);
 
-  const rawKnee = angle2D(hip, knee, ankle);
-  const rawLean = verticalAngle(hip, shoulder);
+  // 3D Landmark source (prefer world coordinates if available)
+  const src = worldLms && worldLms.length >= 33 ? worldLms : lms;
+
+  let rawKnee: number;
+  let rawLean = 0;
+
+  if (lSide && !rSide) {
+    rawKnee = angle3D(src[LM.LEFT_HIP], src[LM.LEFT_KNEE], src[LM.LEFT_ANKLE]);
+    if (src[LM.LEFT_SHOULDER]) {
+      rawLean = verticalAngle3D(src[LM.LEFT_HIP], src[LM.LEFT_SHOULDER]);
+    }
+  } else if (!lSide && rSide) {
+    rawKnee = angle3D(src[LM.RIGHT_HIP], src[LM.RIGHT_KNEE], src[LM.RIGHT_ANKLE]);
+    if (src[LM.RIGHT_SHOULDER]) {
+      rawLean = verticalAngle3D(src[LM.RIGHT_HIP], src[LM.RIGHT_SHOULDER]);
+    }
+  } else {
+    const lAngle = angle3D(src[LM.LEFT_HIP], src[LM.LEFT_KNEE], src[LM.LEFT_ANKLE]);
+    const rAngle = angle3D(src[LM.RIGHT_HIP], src[LM.RIGHT_KNEE], src[LM.RIGHT_ANKLE]);
+    rawKnee = (lAngle + rAngle) / 2.0;
+
+    const midHip = midpoint(src[LM.LEFT_HIP], src[LM.RIGHT_HIP]);
+    const midShoulder = midpoint(src[LM.LEFT_SHOULDER], src[LM.RIGHT_SHOULDER]);
+    rawLean = verticalAngle3D(midHip, midShoulder);
+  }
+
+  // 2D Knee Valgus ratio
+  let valgusRatio = 1.0;
+  if (lms[LM.LEFT_KNEE] && lms[LM.RIGHT_KNEE]) {
+    const kneeWidth = Math.abs(lms[LM.LEFT_KNEE].x - lms[LM.RIGHT_KNEE].x);
+    const ankleWidth = lms[LM.LEFT_ANKLE] && lms[LM.RIGHT_ANKLE]
+      ? Math.abs(lms[LM.LEFT_ANKLE].x - lms[LM.RIGHT_ANKLE].x) : 0;
+    const hipWidth = lms[LM.LEFT_HIP] && lms[LM.RIGHT_HIP]
+      ? Math.abs(lms[LM.LEFT_HIP].x - lms[LM.RIGHT_HIP].x) : 0;
+    const refWidth = Math.max(ankleWidth, hipWidth, 1e-5);
+    valgusRatio = kneeWidth / refWidth;
+  }
+
+  // 2D Hip Drop ratio
+  const currentHipY = ((lms[LM.LEFT_HIP]?.y ?? 0) + (lms[LM.RIGHT_HIP]?.y ?? 0)) / 2 || lms[LM.LEFT_HIP]?.y || 0.5;
+  if (s.state === 'READY' || s.state === 'TOP') {
+    s.standingHipY = currentHipY;
+  }
+  const hipDrop = Math.max(0, currentHipY - s.standingHipY);
 
   const newEma: EmaAngles = {
     ...prevEma,
@@ -325,12 +422,14 @@ function processSquatFrame(
 
   switch (s.state) {
     case 'READY':
-      if (ka < 148) {
+    case 'TOP':
+      if (ka < 148 || (cameraView === 'FRONT_VIEW' && hipDrop > 0.08)) {
         s.state = 'DESCENDING';
         s.isInRep = true;
         s.repStartTime = nowMs;
         s.minKneeAngle = ka;
         s.maxLeanAngle = la;
+        s.minValgusRatio = valgusRatio;
         s.currentRepScore = 100;
       }
       break;
@@ -338,10 +437,12 @@ function processSquatFrame(
     case 'DESCENDING':
       s.minKneeAngle = Math.min(s.minKneeAngle, ka);
       s.maxLeanAngle = Math.max(s.maxLeanAngle, la);
-      if (ka <= 90) {
+      s.minValgusRatio = Math.min(s.minValgusRatio, valgusRatio);
+
+      const isBottom = ka <= 95 || (cameraView === 'FRONT_VIEW' && ka <= 105 && hipDrop >= 0.12);
+      if (isBottom) {
         s.state = 'BOTTOM';
-      } else if (ka > s.minKneeAngle + 15 && s.minKneeAngle > 90) {
-        // Rose back up without reaching bottom — partial rep cycle continues to ASCENDING
+      } else if (ka > s.minKneeAngle + 12 && s.minKneeAngle <= 125) {
         s.state = 'ASCENDING';
       }
       break;
@@ -349,12 +450,19 @@ function processSquatFrame(
     case 'BOTTOM':
       s.minKneeAngle = Math.min(s.minKneeAngle, ka);
       s.maxLeanAngle = Math.max(s.maxLeanAngle, la);
-      if (ka > 105) s.state = 'ASCENDING';
+      s.minValgusRatio = Math.min(s.minValgusRatio, valgusRatio);
+      if (ka > s.minKneeAngle + 10 || ka > 105) {
+        s.state = 'ASCENDING';
+      }
       break;
 
     case 'ASCENDING':
       s.maxLeanAngle = Math.max(s.maxLeanAngle, la);
-      if (ka >= 158) {
+      s.minValgusRatio = Math.min(s.minValgusRatio, valgusRatio);
+      const isStanding = ka >= 148 || (ka >= s.minKneeAngle + 35 && ka >= 140) || (cameraView === 'FRONT_VIEW' && hipDrop <= 0.04);
+      const isReSquat = ka < s.minKneeAngle + 8 && nowMs - s.repStartTime > 800;
+
+      if (isStanding || isReSquat) {
         const repDuration = nowMs - s.repStartTime;
         const cooldownOk = nowMs - s.lastRepTime >= REP_COOLDOWN_MS;
 
@@ -362,44 +470,57 @@ function processSquatFrame(
           const issues: PoseFeedbackIssue[] = [];
           let repScore = 100;
 
-          // Rule 1: Range of motion (ROM / Depth)
+          // Core Rule 1: Range of motion (ROM / Depth)
           const isRomSufficient = s.minKneeAngle <= 120;
           if (!isRomSufficient) {
             repScore -= 30;
             issues.push({
               issueCode: 'HALF_SQUAT',
               severity: 'high',
-              message: `Hạ chưa đủ sâu (góc gối ${Math.round(s.minKneeAngle)}°). Chưa đạt biên độ tối thiểu.`,
+              message: `Hạ chưa đủ sâu (góc gối 3D: ${Math.round(s.minKneeAngle)}°). Cần hạ thấp hơn (<= 95°).`,
             });
-          } else if (s.minKneeAngle > 90) {
+          } else if (s.minKneeAngle > 95) {
             repScore -= 15;
             issues.push({
               issueCode: 'INSUFFICIENT_DEPTH',
               severity: 'medium',
-              message: `Chưa hạ đủ sâu (góc gối ${Math.round(s.minKneeAngle)}°). Cần xuống <= 90°.`,
+              message: `Chưa hạ đủ sâu (góc gối ${Math.round(s.minKneeAngle)}°). Cần đùi song song sàn (<= 95°).`,
             });
           }
 
-          // Rule 2: Torso lean
-          if (s.maxLeanAngle > 55) {
-            repScore -= 25;
-            issues.push({
-              issueCode: 'EXCESSIVE_FORWARD_LEAN',
-              severity: 'high',
-              message: `Lưng bị gập quá mức (thân nghiêng ${Math.round(s.maxLeanAngle)}°). Giữ ngực thẳng!`,
-            });
-          } else if (s.maxLeanAngle > 45) {
-            repScore -= 10;
-            issues.push({
-              issueCode: 'FORWARD_LEAN',
-              severity: 'medium',
-              message: `Thân trên hơi ngả về trước (${Math.round(s.maxLeanAngle)}°). Giữ ngực thẳng hơn.`,
-            });
+          // Form Modifier: Torso Lean (Only evaluated for SIDE_VIEW & DIAGONAL_VIEW)
+          if (cameraView === 'SIDE_VIEW' || cameraView === 'DIAGONAL_VIEW') {
+            if (s.maxLeanAngle > 55) {
+              repScore -= 25;
+              issues.push({
+                issueCode: 'EXCESSIVE_FORWARD_LEAN',
+                severity: 'high',
+                message: `Lưng bị gập quá mức (${Math.round(s.maxLeanAngle)}°). Mở ngực và giữ cột sống thẳng!`,
+              });
+            } else if (s.maxLeanAngle > 45) {
+              repScore -= 10;
+              issues.push({
+                issueCode: 'FORWARD_LEAN',
+                severity: 'medium',
+                message: `Thân trên hơi ngả về trước (${Math.round(s.maxLeanAngle)}°). Giữ ngực thẳng hơn.`,
+              });
+            }
+          }
+
+          // Form Modifier: Knee Valgus (Only evaluated for FRONT_VIEW & DIAGONAL_VIEW)
+          if (cameraView === 'FRONT_VIEW' || cameraView === 'DIAGONAL_VIEW') {
+            if (s.minValgusRatio < 0.75) {
+              repScore -= 20;
+              issues.push({
+                issueCode: 'KNEE_VALGUS',
+                severity: s.minValgusRatio < 0.6 ? 'high' : 'medium',
+                message: 'Đầu gối chụm vào trong (Knee Valgus). Đẩy gối ra ngoài theo hướng ngón chân!',
+              });
+            }
           }
 
           repScore = Math.max(0, repScore);
 
-          // Form Quality Analyzer
           const hasHighSeverity = issues.some(
             (i) => i.severity === 'high' && i.issueCode !== 'HALF_SQUAT',
           );
@@ -409,7 +530,7 @@ function processSquatFrame(
           if (!isRomSufficient) {
             repStatus = 'NO_REP';
             isRepValid = false;
-          } else if (hasHighSeverity || repScore < 75) {
+          } else if (hasHighSeverity || repScore < 75 || s.minKneeAngle > 95) {
             repStatus = 'BAD_FORM';
             isRepValid = true;
           } else {
@@ -429,11 +550,13 @@ function processSquatFrame(
           s.lastRepTime = nowMs;
           onRep(s, repStatus, isRepValid);
         }
-        // Reset regardless (valid or timing-rejected)
+
         s.state = 'READY';
         s.isInRep = false;
         s.minKneeAngle = 180;
         s.maxLeanAngle = 0;
+        s.minValgusRatio = 1.0;
+        s.standingHipY = currentHipY;
       }
       break;
   }
@@ -444,15 +567,16 @@ function processSquatFrame(
 // ---------------------------------------------------------------------------
 // Push-up Engine
 //
-// Hysteresis (gap = 65 deg):
-//   Trigger descent:  elbowAngle < 145
-//   Confirm bottom:   elbowAngle <= 90
-//   Start ascent:     elbowAngle >  105
-//   Complete rep:     elbowAngle >= 155
+// Flexible Hysteresis:
+//   Trigger descent:  elbowAngle < 140
+//   Confirm bottom:   elbowAngle <= 100
+//   Start ascent:     elbowAngle > minElbowAngle + 12
+//   Complete rep:     elbowAngle >= 140 (or >= min + 35)
 // ---------------------------------------------------------------------------
 
 function processPushupFrame(
   lms: NormalisedLandmark[],
+  worldLms: NormalisedLandmark[] | null | undefined,
   state: RepEngineState,
   prevEma: EmaAngles,
   nowMs: number,
@@ -460,26 +584,42 @@ function processPushupFrame(
 ): { state: RepEngineState; ema: EmaAngles } {
   const s = { ...state };
 
-  const shoulder = midpoint(lms[LM.LEFT_SHOULDER], lms[LM.RIGHT_SHOULDER]);
-  const elbow = midpoint(lms[LM.LEFT_ELBOW], lms[LM.RIGHT_ELBOW]);
-  const wrist = midpoint(lms[LM.LEFT_WRIST], lms[LM.RIGHT_WRIST]);
+  // Select the clearer arm for side-profile push-ups
+  const lArm = isVisible(lms, LM.LEFT_SHOULDER) && isVisible(lms, LM.LEFT_ELBOW) && isVisible(lms, LM.LEFT_WRIST);
+  const rArm = isVisible(lms, LM.RIGHT_SHOULDER) && isVisible(lms, LM.RIGHT_ELBOW) && isVisible(lms, LM.RIGHT_WRIST);
 
-  // Elbow flare: angle between upper-arm and torso at shoulder joint
-  const lShoulder = lms[LM.LEFT_SHOULDER];
-  const lElbow = lms[LM.LEFT_ELBOW];
-  const lHip = lms[LM.LEFT_HIP] ?? lms[LM.RIGHT_HIP];
-  const rawFlare = lHip ? angle2D(lElbow, lShoulder, lHip) : 45;
+  const src = worldLms && worldLms.length >= 33 ? worldLms : lms;
 
-  // Body alignment — use available hip/ankle
-  const hipLm = lms[LM.LEFT_HIP] && lms[LM.RIGHT_HIP]
-    ? midpoint(lms[LM.LEFT_HIP], lms[LM.RIGHT_HIP])
-    : (lms[LM.LEFT_HIP] ?? lms[LM.RIGHT_HIP]);
-  const ankleLm = lms[LM.LEFT_ANKLE] && lms[LM.RIGHT_ANKLE]
-    ? midpoint(lms[LM.LEFT_ANKLE], lms[LM.RIGHT_ANKLE])
-    : (lms[LM.LEFT_ANKLE] ?? lms[LM.RIGHT_ANKLE]);
+  let shoulder: NormalisedLandmark;
+  let elbow: NormalisedLandmark;
+  let wrist: NormalisedLandmark;
+  let hip: NormalisedLandmark;
+  let ankle: NormalisedLandmark;
 
-  const rawElbow = angle2D(shoulder, elbow, wrist);
-  const rawBody = hipLm && ankleLm ? angle2D(shoulder, hipLm, ankleLm) : 180;
+  if (lArm && !rArm) {
+    shoulder = src[LM.LEFT_SHOULDER];
+    elbow = src[LM.LEFT_ELBOW];
+    wrist = src[LM.LEFT_WRIST];
+    hip = src[LM.LEFT_HIP] ?? src[LM.RIGHT_HIP];
+    ankle = src[LM.LEFT_ANKLE] ?? src[LM.RIGHT_ANKLE];
+  } else if (!lArm && rArm) {
+    shoulder = src[LM.RIGHT_SHOULDER];
+    elbow = src[LM.RIGHT_ELBOW];
+    wrist = src[LM.RIGHT_WRIST];
+    hip = src[LM.RIGHT_HIP] ?? src[LM.LEFT_HIP];
+    ankle = src[LM.RIGHT_ANKLE] ?? src[LM.LEFT_ANKLE];
+  } else {
+    shoulder = midpoint(src[LM.LEFT_SHOULDER] ?? src[LM.RIGHT_SHOULDER], src[LM.RIGHT_SHOULDER] ?? src[LM.LEFT_SHOULDER]);
+    elbow = midpoint(src[LM.LEFT_ELBOW] ?? src[LM.RIGHT_ELBOW], src[LM.RIGHT_ELBOW] ?? src[LM.LEFT_ELBOW]);
+    wrist = midpoint(src[LM.LEFT_WRIST] ?? src[LM.RIGHT_WRIST], src[LM.RIGHT_WRIST] ?? src[LM.LEFT_WRIST]);
+    hip = midpoint(src[LM.LEFT_HIP] ?? src[LM.RIGHT_HIP], src[LM.RIGHT_HIP] ?? src[LM.LEFT_HIP]);
+    ankle = midpoint(src[LM.LEFT_ANKLE] ?? src[LM.RIGHT_ANKLE], src[LM.RIGHT_ANKLE] ?? src[LM.LEFT_ANKLE]);
+  }
+
+  // 3D Angle calculations
+  const rawFlare = hip ? angle3D(elbow, shoulder, hip) : 45;
+  const rawElbow = angle3D(shoulder, elbow, wrist);
+  const rawBody = hip && ankle ? angle3D(shoulder, hip, ankle) : 180;
 
   const newEma: EmaAngles = {
     ...prevEma,
@@ -493,7 +633,7 @@ function processPushupFrame(
   switch (s.state) {
     case 'READY':
     case 'TOP':
-      if (ea < 145) {
+      if (ea < 140) {
         s.state = 'DESCENDING';
         s.isInRep = true;
         s.repStartTime = nowMs;
@@ -506,10 +646,10 @@ function processPushupFrame(
     case 'DESCENDING':
       s.minElbowAngle = Math.min(s.minElbowAngle, ea);
       s.maxElbowFlare = Math.max(s.maxElbowFlare, rawFlare);
-      if (ea <= 90) {
+      if (ea <= 100) {
         s.state = 'BOTTOM';
-      } else if (ea > s.minElbowAngle + 15 && s.minElbowAngle > 90) {
-        // Rose back up without reaching bottom — partial rep cycle continues to ASCENDING
+      } else if (ea > s.minElbowAngle + 12 && s.minElbowAngle <= 125) {
+        // Switched to pushing up without reaching full bottom
         s.state = 'ASCENDING';
       }
       break;
@@ -517,12 +657,17 @@ function processPushupFrame(
     case 'BOTTOM':
       s.minElbowAngle = Math.min(s.minElbowAngle, ea);
       s.maxElbowFlare = Math.max(s.maxElbowFlare, rawFlare);
-      if (ea > 105) s.state = 'ASCENDING';
+      if (ea > s.minElbowAngle + 10 || ea > 105) {
+        s.state = 'ASCENDING';
+      }
       break;
 
     case 'ASCENDING':
       s.maxElbowFlare = Math.max(s.maxElbowFlare, rawFlare);
-      if (ea >= 155) {
+      const isExtended = ea >= 140 || (ea >= s.minElbowAngle + 35 && ea >= 135);
+      const isReDescent = ea < s.minElbowAngle + 8 && nowMs - s.repStartTime > 800;
+
+      if (isExtended || isReDescent) {
         const repDuration = nowMs - s.repStartTime;
         const cooldownOk = nowMs - s.lastRepTime >= REP_COOLDOWN_MS;
 
@@ -537,31 +682,31 @@ function processPushupFrame(
             issues.push({
               issueCode: 'HALF_REP',
               severity: 'high',
-              message: `Hạ chưa đủ sâu (khuỷu tay ${Math.round(s.minElbowAngle)}°). Chưa đạt biên độ tối thiểu.`,
+              message: `Hạ chưa đủ sâu (khuỷu tay ${Math.round(s.minElbowAngle)}°). Cần hạ thấp hơn (<= 90°).`,
             });
-          } else if (s.minElbowAngle > 90) {
+          } else if (s.minElbowAngle > 95) {
             repScore -= 15;
             issues.push({
               issueCode: 'INSUFFICIENT_DEPTH',
               severity: 'medium',
-              message: `Chưa hạ đủ sâu (khuỷu tay ${Math.round(s.minElbowAngle)}°). Hướng đến <= 90°.`,
+              message: `Khuỷu tay đạt ${Math.round(s.minElbowAngle)}°. Cố gắng hạ sâu hơn (<= 90°).`,
             });
           }
 
           // Rule 2: Body alignment
-          if (ba < 160) {
+          if (ba < 155) {
             repScore -= 25;
             issues.push({
               issueCode: 'HIPS_SAGGING',
               severity: 'high',
-              message: 'Lưng bị võng quá mức. Siết core và mông để giữ thẳng người!',
+              message: 'Lưng bị võng. Siết core và mông để giữ thẳng người!',
             });
           } else if (ba > 205) {
-            repScore -= 20;
+            repScore -= 15;
             issues.push({
               issueCode: 'HIPS_PIKING',
               severity: 'medium',
-              message: 'Hông nhô lên quá cao. Hạ hông xuống ngang thân.',
+              message: 'Hông nhô lên cao. Hạ hông xuống ngang thân.',
             });
           }
 
@@ -571,20 +716,20 @@ function processPushupFrame(
             issues.push({
               issueCode: 'ELBOW_FLARE_T_SHAPE',
               severity: 'high',
-              message: `Khuỷu tay xòe ngang ${Math.round(s.maxElbowFlare)}° chữ T nguy hiểm! Khép vào ~45°.`,
+              message: `Khuỷu tay xòe ngang ${Math.round(s.maxElbowFlare)}° chữ T. Khép vào ~45° để bảo vệ vai!`,
             });
           } else if (s.maxElbowFlare > 65) {
             repScore -= 10;
             issues.push({
               issueCode: 'ELBOW_FLARE_WIDE',
               severity: 'medium',
-              message: `Khuỷu tay hơi xòe rộng (${Math.round(s.maxElbowFlare)}°). Khép vào ~45°.`,
+              message: `Khuỷu tay hơi xòe (${Math.round(s.maxElbowFlare)}°). Khép vào khoảng 45°.`,
             });
           }
 
           repScore = Math.max(0, repScore);
 
-          // Form Quality Analyzer: Phân biệt "Form đúng" và "Rep hợp lệ"
+          // Form Quality Analyzer: Phân biệt rõ Form đúng vs Rep hợp lệ
           const hasHighSeverity = issues.some(
             (i) => i.severity === 'high' && i.issueCode !== 'HALF_REP',
           );
@@ -594,7 +739,7 @@ function processPushupFrame(
           if (!isRomSufficient) {
             repStatus = 'NO_REP';
             isRepValid = false;
-          } else if (hasHighSeverity || repScore < 75) {
+          } else if (hasHighSeverity || repScore < 75 || s.minElbowAngle > 95) {
             repStatus = 'BAD_FORM';
             isRepValid = true;
           } else {
@@ -602,6 +747,7 @@ function processPushupFrame(
             isRepValid = true;
           }
 
+          // Total cycle count ALWAYS increments
           s.repCount += 1;
           if (isRepValid) s.validRepCount += 1;
           if (repStatus === 'GOOD_REP') s.goodRepCount += 1;
@@ -614,7 +760,7 @@ function processPushupFrame(
           s.lastRepTime = nowMs;
           onRep(s, repStatus, isRepValid);
         }
-        // Reset regardless
+
         s.state = 'TOP';
         s.isInRep = false;
         s.minElbowAngle = 180;
@@ -848,6 +994,8 @@ export function usePoseDetection({ exercise, onRepCompleted, onVideoEnded }: Use
       ctx.restore();
 
       const lms = (result.landmarks?.[0] ?? null) as NormalisedLandmark[] | null;
+      const worldLms = (result.worldLandmarks?.[0] ?? null) as NormalisedLandmark[] | null;
+      const cameraView = detectCameraView(lms);
 
       // ── Visibility Gatekeeper ─────────────────────────────────────────
       const visWarning = checkVisibility(lms, exercise);
@@ -871,6 +1019,7 @@ export function usePoseDetection({ exercise, onRepCompleted, onVideoEnded }: Use
           ...prev,
           fps: fpsRef.current,
           landmarks: lms,
+          cameraView,
           isFrameValid: false,
           visibilityWarning: visWarning,
         }));
@@ -888,10 +1037,10 @@ export function usePoseDetection({ exercise, onRepCompleted, onVideoEnded }: Use
 
       switch (exercise) {
         case 'squat':
-          engineResult = processSquatFrame(lms, repStateRef.current, emaRef.current, nowMs, onRep);
+          engineResult = processSquatFrame(lms, worldLms, cameraView, repStateRef.current, emaRef.current, nowMs, onRep);
           break;
         case 'pushup':
-          engineResult = processPushupFrame(lms, repStateRef.current, emaRef.current, nowMs, onRep);
+          engineResult = processPushupFrame(lms, worldLms, repStateRef.current, emaRef.current, nowMs, onRep);
           break;
         case 'plank':
           engineResult = processPlankFrame(lms, repStateRef.current, emaRef.current, nowMs, onRep);
@@ -912,6 +1061,7 @@ export function usePoseDetection({ exercise, onRepCompleted, onVideoEnded }: Use
         score: ns.score,
         isInRep: ns.isInRep,
         currentRepScore: ns.currentRepScore,
+        cameraView,
         issues: ns.issues,
         landmarks: lms,
         fps: fpsRef.current,

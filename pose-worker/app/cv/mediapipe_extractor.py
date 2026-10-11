@@ -196,12 +196,18 @@ class MediaPipeExtractor:
                 continue
             if lm.visibility < self.VISIBILITY_THRESHOLD:
                 continue
-            lm_dict[str(idx)] = {
+            item: Dict[str, Any] = {
                 "x": round(lm.x, 6),
                 "y": round(lm.y, 6),
                 "z": round(lm.z, 6),
                 "visibility": round(lm.visibility, 4),
             }
+            if results.pose_world_landmarks:
+                w_lm = results.pose_world_landmarks.landmark[idx]
+                item["world_x"] = round(w_lm.x, 6)
+                item["world_y"] = round(w_lm.y, 6)
+                item["world_z"] = round(w_lm.z, 6)
+            lm_dict[str(idx)] = item
 
         return lm_dict
 

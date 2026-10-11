@@ -60,6 +60,7 @@ class SessionSummary(BaseModel):
     improvement_areas: List[str] = []  # Detailed correction tips with injury risk info
     common_issues: List[PoseIssue] = []  # Most frequent issues across all reps
     visibility_note: Optional[str] = None  # Overall note about camera quality
+    camera_view: Optional[str] = None  # FRONT_VIEW, SIDE_VIEW, DIAGONAL_VIEW
 
 
 class PoseFeedbackResponse(BaseModel):
@@ -67,6 +68,7 @@ class PoseFeedbackResponse(BaseModel):
     valid_rep_count: int = 0
     good_rep_count: int = 0
     score: float = Field(..., ge=0, le=100)
+    camera_view: Optional[str] = "UNKNOWN"  # FRONT_VIEW, SIDE_VIEW, DIAGONAL_VIEW
     rep_feedback: List[RepFeedback] = []
     session_summary: Optional[SessionSummary] = None
     visibility_warnings: List[VisibilityWarning] = []  # Frame-level visibility issues

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Requests\AddWorkoutSetRequest;
+use App\Http\Requests\StoreWorkoutLogRequest;
 use App\Models\WorkoutLog;
 use App\Models\WorkoutLogSet;
 use Illuminate\Http\JsonResponse;
@@ -31,12 +33,9 @@ class WorkoutLogController extends Controller
         ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreWorkoutLogRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'log_date' => 'required|date',
-            'notes' => 'nullable|string|max:1000',
-        ]);
+        $validated = $request->validated();
 
         $log = WorkoutLog::create([
             'user_id' => $request->user()->id,
@@ -61,19 +60,11 @@ class WorkoutLogController extends Controller
         ]);
     }
 
-    public function addSet(Request $request, string $id): JsonResponse
+    public function addSet(AddWorkoutSetRequest $request, string $id): JsonResponse
     {
         $log = WorkoutLog::where('user_id', $request->user()->id)->findOrFail($id);
 
-        $validated = $request->validate([
-            'exercise_id' => 'required|uuid|exists:exercises,id',
-            'set_number' => 'required|integer|min:1',
-            'reps' => 'required|integer|min:0',
-            'weight_kg' => 'required|numeric|min:0',
-            'duration_sec' => 'sometimes|integer|min:0',
-        ]);
-
-        $set = $log->sets()->create($validated);
+        $set = $log->sets()->create($request->validated());
 
         return response()->json([
             'data' => $set,

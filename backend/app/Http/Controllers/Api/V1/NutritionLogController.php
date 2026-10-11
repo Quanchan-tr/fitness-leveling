@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Requests\StoreNutritionLogRequest;
 use App\Models\NutritionLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -29,17 +30,9 @@ class NutritionLogController extends Controller
         ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreNutritionLogRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'log_date' => 'required|date',
-            'meal_type' => 'required|string|in:breakfast,lunch,dinner,snack',
-            'food_name' => 'required|string|max:150',
-            'calories' => 'required|integer|min:0',
-            'protein_g' => 'sometimes|numeric|min:0',
-            'carbs_g' => 'sometimes|numeric|min:0',
-            'fat_g' => 'sometimes|numeric|min:0',
-        ]);
+        $validated = $request->validated();
 
         $log = NutritionLog::create([
             'user_id' => $request->user()->id,

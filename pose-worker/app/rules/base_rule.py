@@ -52,8 +52,8 @@ class EmaState:
 # Temporal constraint helpers
 # ---------------------------------------------------------------------------
 
-DEFAULT_MIN_REP_FRAMES = 24       # at 30fps: 0.8s
-DEFAULT_REP_COOLDOWN_FRAMES = 15  # at 30fps: 0.5s
+DEFAULT_MIN_REP_FRAMES = 18       # at 30fps: 0.6s
+DEFAULT_REP_COOLDOWN_FRAMES = 9   # at 30fps: 0.3s
 
 
 class BasePoseRule(ABC):
@@ -102,6 +102,27 @@ class BasePoseRule(ABC):
         return True, None
 
     # ---------------------------------------------------------------
+    # Landmark point helpers
+    # ---------------------------------------------------------------
+
+    @staticmethod
+    def get_point_3d(lm: Dict[str, Any], idx: str) -> np.ndarray:
+        """
+        Extract 3D coordinates for a landmark. Prefers world coordinates (metric 3D)
+        when available, otherwise falls back to normalized coordinates.
+        """
+        pt = lm[idx]
+        if "world_x" in pt:
+            return np.array([pt["world_x"], pt["world_y"], pt["world_z"]], dtype=np.float32)
+        return np.array([pt["x"], pt["y"], pt["z"]], dtype=np.float32)
+
+    @staticmethod
+    def get_point_2d(lm: Dict[str, Any], idx: str) -> np.ndarray:
+        """Extract 2D screen coordinates for landmark."""
+        pt = lm[idx]
+        return np.array([pt["x"], pt["y"]], dtype=np.float32)
+
+    # ---------------------------------------------------------------
     # Rep evaluation helpers
     # ---------------------------------------------------------------
 
@@ -128,10 +149,11 @@ class BasePoseRule(ABC):
         visibility_warnings: List[VisibilityWarning],
         total_frames: int,
         exercise_name: str = "",
+        camera_view: str = "UNKNOWN",
     ) -> PoseFeedbackResponse:
         """Build PoseFeedbackResponse for rep-based exercises."""
         session_summary = self.build_session_summary(
-            reps, visibility_warnings, total_frames, exercise_name
+            reps, visibility_warnings, total_frames, exercise_name, camera_view=camera_view
         )
         avg_score = float(np.mean([r.score for r in reps])) if reps else 0.0
         return PoseFeedbackResponse(
@@ -139,6 +161,7 @@ class BasePoseRule(ABC):
             valid_rep_count=sum(1 for r in reps if r.is_rep_valid),
             good_rep_count=sum(1 for r in reps if r.status == RepStatus.GOOD_REP),
             score=round(avg_score, 2),
+            camera_view=camera_view,
             rep_feedback=reps,
             session_summary=session_summary,
             visibility_warnings=visibility_warnings,
@@ -155,6 +178,7 @@ class BasePoseRule(ABC):
         visibility_warnings: List[VisibilityWarning],
         total_frames: int,
         exercise_name: str,
+        camera_view: Optional[str] = None,
     ) -> SessionSummary:
         """
         Build a comprehensive post-session summary from collected rep feedback.
@@ -248,6 +272,7 @@ class BasePoseRule(ABC):
             improvement_areas=improvement_areas,
             common_issues=common_issues,
             visibility_note=visibility_note,
+            camera_view=camera_view,
         )
 
     # ---------------------------------------------------------------

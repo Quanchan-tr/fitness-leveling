@@ -78,26 +78,37 @@ class PlankRule(BasePoseRule):
         MAX_CONSECUTIVE_MISSING = 10
 
         for frame_idx, lm in enumerate(frames_landmarks):
-            # --- Visibility gating: ALL 6 body-line joints required ---
-            all_present, vis_warning = self.check_required_landmarks(
-                lm, self.REQUIRED_LANDMARKS, frame_idx, fps
-            )
-            if not all_present:
+            # --- Visibility gating: at least one side required ---
+            ts = round(frame_idx / max(fps, 1.0), 2)
+            has_left = all(k in lm for k in ("11", "23", "27"))
+            has_right = all(k in lm for k in ("12", "24", "28"))
+            if not (has_left or has_right):
                 consecutive_missing += 1
-                if vis_warning and consecutive_missing == MAX_CONSECUTIVE_MISSING:
-                    vis_warning.message = (
-                        "Camera can thay toan bo co the (vai, hong, mat ca). "
-                        "Dat camera tu xa va tu ben hong."
-                    )
-                    visibility_warnings.append(vis_warning)
+                if consecutive_missing == MAX_CONSECUTIVE_MISSING:
+                    visibility_warnings.append(VisibilityWarning(
+                        warning_code="INCOMPLETE_BODY_VISIBLE",
+                        message="Camera can thay toan bo co the (vai, hong, mat ca it nhat mot ben). Dat camera tu xa va tu ben hong.",
+                        affected_landmarks=["11", "23", "27"],
+                        frame_index=frame_idx,
+                        timestamp_sec=ts,
+                    ))
                 continue
 
             consecutive_missing = 0
 
             # --- Extract landmarks ---
-            shoulder = np.array([(lm["11"]["x"] + lm["12"]["x"]) / 2, (lm["11"]["y"] + lm["12"]["y"]) / 2])
-            hip = np.array([(lm["23"]["x"] + lm["24"]["x"]) / 2, (lm["23"]["y"] + lm["24"]["y"]) / 2])
-            ankle = np.array([(lm["27"]["x"] + lm["28"]["x"]) / 2, (lm["27"]["y"] + lm["28"]["y"]) / 2])
+            if has_left and has_right:
+                shoulder = np.array([(lm["11"]["x"] + lm["12"]["x"]) / 2, (lm["11"]["y"] + lm["12"]["y"]) / 2])
+                hip = np.array([(lm["23"]["x"] + lm["24"]["x"]) / 2, (lm["23"]["y"] + lm["24"]["y"]) / 2])
+                ankle = np.array([(lm["27"]["x"] + lm["28"]["x"]) / 2, (lm["27"]["y"] + lm["28"]["y"]) / 2])
+            elif has_left:
+                shoulder = np.array([lm["11"]["x"], lm["11"]["y"]])
+                hip = np.array([lm["23"]["x"], lm["23"]["y"]])
+                ankle = np.array([lm["27"]["x"], lm["27"]["y"]])
+            else:
+                shoulder = np.array([lm["12"]["x"], lm["12"]["y"]])
+                hip = np.array([lm["24"]["x"], lm["24"]["y"]])
+                ankle = np.array([lm["28"]["x"], lm["28"]["y"]])
 
             nose = np.array([lm["0"]["x"], lm["0"]["y"]]) if "0" in lm else None
 

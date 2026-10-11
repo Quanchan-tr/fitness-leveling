@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Requests\RealtimePoseResultRequest;
+use App\Http\Requests\UploadPoseCheckRequest;
 use App\Jobs\ProcessPoseCheckJob;
 use App\Models\PoseCheckSession;
 use App\Services\Pose\PrivateVideoStorageService;
@@ -45,14 +47,9 @@ class PoseCheckController extends Controller
     // POST /api/v1/pose-check/realtime/result
     // -------------------------------------------------------------------------
 
-    public function realtimeResult(Request $request): JsonResponse
+    public function realtimeResult(RealtimePoseResultRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'exercise_id'   => 'required|uuid|exists:exercises,id',
-            'rep_count'     => 'required|integer|min:0',
-            'score'         => 'required|numeric|min:0|max:100',
-            'feedback_json' => 'required|array',
-        ]);
+        $validated = $request->validated();
 
         $session = PoseCheckSession::create([
             'user_id'       => $request->user()->id,
@@ -74,13 +71,8 @@ class PoseCheckController extends Controller
     // POST /api/v1/pose-check/sessions
     // -------------------------------------------------------------------------
 
-    public function upload(Request $request): JsonResponse
+    public function upload(UploadPoseCheckRequest $request): JsonResponse
     {
-        $request->validate([
-            'exercise_id' => 'required|uuid|exists:exercises,id',
-            'video'       => 'required|file|mimes:mp4,mov,quicktime|max:102400', // 100 MB
-        ]);
-
         $file      = $request->file('video');
         $userId    = $request->user()->id;
         $sessionId = (string) Str::uuid();

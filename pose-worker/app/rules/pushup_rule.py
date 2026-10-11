@@ -15,23 +15,34 @@ Robustness features:
 - Temporal constraints: min rep duration (0.8s) and cooldown (0.5s)
 """
 
+from collections import Counter
+from typing import Any, Dict, List
 import numpy as np
-from typing import List, Dict, Any
 
-from app.rules.base_rule import BasePoseRule, EmaState, DEFAULT_MIN_REP_FRAMES, DEFAULT_REP_COOLDOWN_FRAMES
-from app.cv.angle_math import calculate_angle_2d, calculate_vertical_angle
+from app.cv.angle_math import (
+    calculate_angle_2d,
+    calculate_angle_3d,
+    calculate_vertical_angle,
+    detect_camera_view,
+)
+from app.rules.base_rule import (
+    DEFAULT_MIN_REP_FRAMES,
+    DEFAULT_REP_COOLDOWN_FRAMES,
+    BasePoseRule,
+    EmaState,
+)
 from app.schemas.response import (
-    PoseFeedbackResponse,
-    RepFeedback,
-    PoseIssue,
-    VisibilityWarning,
     BreathingCue,
+    PoseFeedbackResponse,
+    PoseIssue,
+    RepFeedback,
+    VisibilityWarning,
 )
 
 
 class PushupRule(BasePoseRule):
     """
-    Multi-rule push-up evaluator with EMA smoothing and temporal constraints.
+    Multi-rule push-up evaluator with 3D angles, EMA smoothing and temporal constraints.
 
     MediaPipe landmark indices used:
       0  = NOSE
@@ -42,11 +53,11 @@ class PushupRule(BasePoseRule):
       27 = LEFT_ANKLE        28 = RIGHT_ANKLE
     """
 
-    # --- State machine thresholds with hysteresis (65 deg gap) ---
-    ELBOW_ENTER_DESCENT = 145.0   # arms start bending (enter DESCENDING)
-    ELBOW_CONFIRM_BOTTOM = 90.0   # full depth confirmed (enter BOTTOM)
-    ELBOW_START_ASCENT = 105.0    # rising from bottom (enter ASCENDING)
-    ELBOW_REP_COMPLETE = 155.0    # arms extended again (rep done)
+    # --- State machine thresholds with hysteresis ---
+    ELBOW_ENTER_DESCENT = 140.0   # arms start bending (enter DESCENDING)
+    ELBOW_CONFIRM_BOTTOM = 100.0  # depth confirmed (enter BOTTOM)
+    ELBOW_START_ASCENT = 110.0    # rising from bottom (enter ASCENDING)
+    ELBOW_REP_COMPLETE = 140.0    # arms extended again (rep done)
 
     # --- Form thresholds ---
     BODY_SAG_THRESHOLD = 160.0
@@ -62,7 +73,7 @@ class PushupRule(BasePoseRule):
         frame_idx: int,
         fps: float,
     ):
-        """Upper body required, lower body at least one hip + one ankle."""
+        """Upper body required (left OR right side), lower body at least one hip + one ankle."""
         ts = round(frame_idx / max(fps, 1.0), 2)
         if not lm:
             return False, VisibilityWarning(
@@ -72,12 +83,13 @@ class PushupRule(BasePoseRule):
                 timestamp_sec=ts,
             )
 
-        missing_upper = [k for k in ("11", "13", "15") if k not in lm]
-        if missing_upper:
+        has_left_arm = all(k in lm for k in ("11", "13", "15"))
+        has_right_arm = all(k in lm for k in ("12", "14", "16"))
+        if not (has_left_arm or has_right_arm):
             return False, VisibilityWarning(
                 warning_code="INCOMPLETE_BODY_VISIBLE",
-                message="Camera can thay ro vai, khuyu tay va co tay. Dieu chinh goc camera.",
-                affected_landmarks=missing_upper,
+                message="Camera can thay ro vai, khuyu tay va co tay (it nhat mot ben). Dieu chinh goc camera.",
+                affected_landmarks=["11", "13", "15"],
                 frame_index=frame_idx,
                 timestamp_sec=ts,
             )
@@ -99,6 +111,7 @@ class PushupRule(BasePoseRule):
 
         reps: List[RepFeedback] = []
         visibility_warnings: List[VisibilityWarning] = []
+        detected_views: List[str] = []
 
         # EMA state
         ema = EmaState()
@@ -111,52 +124,59 @@ class PushupRule(BasePoseRule):
         rep_head_drops: List[float] = []
 
         # Temporal constraints (frame-based)
-        min_rep_frames = max(DEFAULT_MIN_REP_FRAMES, int(fps * 0.8))
-        cooldown_frames = max(DEFAULT_REP_COOLDOWN_FRAMES, int(fps * 0.5))
+        min_rep_frames = max(DEFAULT_MIN_REP_FRAMES, int(fps * 0.6))
+        cooldown_frames = max(DEFAULT_REP_COOLDOWN_FRAMES, int(fps * 0.3))
         rep_start_frame = 0
-        last_rep_end_frame = -cooldown_frames  # allow first rep immediately
+        last_rep_end_frame = -cooldown_frames
 
         consecutive_missing = 0
         MAX_CONSECUTIVE_MISSING = 10
 
         for frame_idx, lm in enumerate(frames_landmarks):
-            # --- Visibility gating (push-up specific) ---
             all_present, vis_warning = self._check_pushup_visibility(lm, frame_idx, fps)
             if not all_present:
                 consecutive_missing += 1
                 if vis_warning and consecutive_missing == MAX_CONSECUTIVE_MISSING:
                     visibility_warnings.append(vis_warning)
-                # Freeze state — do NOT advance FSM
                 continue
 
             consecutive_missing = 0
 
-            # --- Extract landmarks ---
-            shoulder = np.array([lm["11"]["x"], lm["11"]["y"]])
-            elbow = np.array([lm["13"]["x"], lm["13"]["y"]])
-            wrist = np.array([lm["15"]["x"], lm["15"]["y"]])
+            frame_view = detect_camera_view(lm)
+            detected_views.append(frame_view)
 
-            # Use left hip/ankle, fall back to right
-            hip_lm = lm.get("23") or lm.get("24")
-            ankle_lm = lm.get("27") or lm.get("28")
-            hip = np.array([hip_lm["x"], hip_lm["y"]])
-            ankle = np.array([ankle_lm["x"], ankle_lm["y"]])
+            # --- 3D World Landmarks extraction ---
+            use_left = all(k in lm for k in ("11", "13", "15"))
+            if use_left:
+                shoulder_3d = self.get_point_3d(lm, "11")
+                elbow_3d = self.get_point_3d(lm, "13")
+                wrist_3d = self.get_point_3d(lm, "15")
+                hip_idx = "23" if "23" in lm else "24"
+                ankle_idx = "27" if "27" in lm else "28"
+            else:
+                shoulder_3d = self.get_point_3d(lm, "12")
+                elbow_3d = self.get_point_3d(lm, "14")
+                wrist_3d = self.get_point_3d(lm, "16")
+                hip_idx = "24" if "24" in lm else "23"
+                ankle_idx = "28" if "28" in lm else "27"
 
-            nose = np.array([lm["0"]["x"], lm["0"]["y"]]) if "0" in lm else None
+            hip_3d = self.get_point_3d(lm, hip_idx)
+            ankle_3d = self.get_point_3d(lm, ankle_idx)
 
-            # --- Raw angles ---
-            raw_elbow = calculate_angle_2d(shoulder, elbow, wrist)
-            raw_body = calculate_angle_2d(shoulder, hip, ankle)
-            raw_flare = calculate_angle_2d(elbow, shoulder, hip)
+            # 3D Angles
+            raw_elbow = calculate_angle_3d(shoulder_3d, elbow_3d, wrist_3d)
+            raw_body = calculate_angle_3d(shoulder_3d, hip_3d, ankle_3d)
+            raw_flare = calculate_angle_3d(elbow_3d, shoulder_3d, hip_3d)
 
             head_drop = 0.0
-            if nose is not None:
-                head_drop = calculate_vertical_angle(nose, shoulder)
+            if "0" in lm:
+                nose_2d = self.get_point_2d(lm, "0")
+                shoulder_2d = self.get_point_2d(lm, "11" if use_left else "12")
+                head_drop = calculate_vertical_angle(nose_2d, shoulder_2d)
 
             # --- EMA smoothing ---
             ea = ema.update_elbow(raw_elbow)
             ba = ema.update_body(raw_body)
-            # Note: flare and head drop use raw (no EMA) — they're accumulators
 
             # --- FSM with hysteresis ---
             if state == "TOP":
@@ -176,8 +196,7 @@ class PushupRule(BasePoseRule):
 
                 if ea <= self.ELBOW_CONFIRM_BOTTOM:
                     state = "BOTTOM"
-                elif ea > current_min_elbow + 15.0 and current_min_elbow > self.ELBOW_CONFIRM_BOTTOM:
-                    # Rose without reaching bottom — movement cycle continues to ASCENDING to evaluate ROM/form
+                elif ea > current_min_elbow + 12.0 and current_min_elbow > self.ELBOW_CONFIRM_BOTTOM:
                     state = "ASCENDING"
 
             elif state == "BOTTOM":
@@ -194,8 +213,7 @@ class PushupRule(BasePoseRule):
                 rep_elbow_flares.append(raw_flare)
                 rep_head_drops.append(head_drop)
 
-                if ea >= self.ELBOW_REP_COMPLETE:
-                    # Temporal constraint check
+                if ea >= self.ELBOW_REP_COMPLETE or (ea > current_min_elbow + 35.0 and ea >= 130.0):
                     rep_duration = frame_idx - rep_start_frame
                     cooldown_ok = frame_idx - last_rep_end_frame >= cooldown_frames
 
@@ -206,17 +224,20 @@ class PushupRule(BasePoseRule):
                             rep_elbow_flares, rep_head_drops,
                         )
                         last_rep_end_frame = frame_idx
-                    # else: timing-rejected — silently discard this cycle
 
-                    # Reset state regardless
                     state = "TOP"
                     current_min_elbow = 180.0
                     rep_body_alignments = []
                     rep_elbow_flares = []
                     rep_head_drops = []
 
+        session_view = (
+            Counter(detected_views).most_common(1)[0][0]
+            if detected_views else "SIDE_VIEW"
+        )
+
         return self.build_rep_response(
-            reps, visibility_warnings, len(frames_landmarks), "Push-up"
+            reps, visibility_warnings, len(frames_landmarks), "Push-up", camera_view=session_view
         )
 
     def _finalize_rep(

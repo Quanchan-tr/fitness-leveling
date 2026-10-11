@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Requests\StoreBodyMetricRequest;
 use App\Models\BodyMetric;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -29,14 +30,9 @@ class BodyMetricController extends Controller
         ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreBodyMetricRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'log_date' => 'required|date',
-            'weight_kg' => 'required|numeric|min:20|max:300',
-            'body_fat_pct' => 'nullable|numeric|min:0|max:100',
-            'height_cm' => 'nullable|numeric|min:80|max:250',
-        ]);
+        $validated = $request->validated();
 
         $metric = BodyMetric::updateOrCreate(
             [

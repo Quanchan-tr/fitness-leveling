@@ -42,9 +42,18 @@ class IdempotencyMiddleware
     {
         $idempotencyKey = $request->header('Idempotency-Key');
 
-        // Only apply to mutating requests that supply the header.
-        if (!$idempotencyKey || !in_array($request->method(), ['POST', 'PUT', 'PATCH'])) {
+        if (!in_array($request->method(), ['POST', 'PUT', 'PATCH'])) {
             return $next($request);
+        }
+
+        // Routes using this middleware must send a UUID key.
+        if (!Str::isUuid((string) $idempotencyKey)) {
+            return response()->json([
+                'error' => [
+                    'code'    => 'IDEMPOTENCY_KEY_INVALID',
+                    'message' => 'A valid UUID Idempotency-Key header is required.',
+                ],
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
         $userId = $request->user()?->id ?? 'anon';
