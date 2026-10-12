@@ -1,0 +1,12 @@
+{
+  "name": "fitness-leveling",
+  "private": true,
+  "workspaces": [
+    "mobile",
+    "packages/*"
+  ],
+  "scripts": {
+    "mobile": "npm run start -w mobile",
+    "test:shared": "npm test -w @fitness/shared"
+  }
+}
