@@ -103,6 +103,9 @@ export default function WorkoutSessionScreen() {
           </Text>
           <Text style={s.stopwatch}>⏱ {formatDuration(elapsedSeconds)}</Text>
         </View>
+        <Pressable style={s.aiCamBtn} onPress={() => router.push('/pose-camera')} accessibilityRole="button">
+          <Text style={s.aiCamText}>📷 AI</Text>
+        </Pressable>
         <Pressable style={s.cancelBtn} onPress={handleCancel} accessibilityRole="button">
           <Text style={s.cancelText}>Huỷ</Text>
         </Pressable>
@@ -212,6 +215,13 @@ const s = StyleSheet.create({
   },
   routineTitle: { fontSize: 16, fontWeight: '800', color: colors.text },
   stopwatch: { fontSize: 13, fontWeight: '600', color: colors.muted, marginTop: 2 },
+  aiCamBtn: {
+    backgroundColor: '#0F172A',
+    paddingVertical: 7,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+  },
+  aiCamText: { color: '#38BDF8', fontWeight: '800', fontSize: 12 },
   cancelBtn: { paddingVertical: 8, paddingHorizontal: 10 },
   cancelText: { color: colors.danger, fontWeight: '600', fontSize: 13 },
   finishBtn: {

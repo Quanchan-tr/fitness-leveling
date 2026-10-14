@@ -2,9 +2,11 @@ import base64
 import logging
 import os
 
+import json
+
 import cv2
 import numpy as np
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import config
@@ -212,3 +214,53 @@ async def analyze_frame(payload: AnalyzeFrameRequest):
         pose_detected=bool(lm_dict),
         exercise_type=payload.exercise_type,
     )
+
+
+from app.rules.realtime_evaluator import RealtimePoseEvaluator
+
+
+@app.websocket("/ws/pose-stream/{exercise_type}")
+async def pose_stream_endpoint(websocket: WebSocket, exercise_type: str):
+    """
+    Real-time bidirectional WebSocket stream for mobile camera frames.
+    Accepts raw binary JPEG/PNG or JSON with base64 frame,
+    returns real-time rep count, current angle, state, and visual skeleton keypoints.
+    """
+    await websocket.accept()
+    evaluator = RealtimePoseEvaluator(exercise_type=exercise_type)
+    extractor = get_extractor(model_complexity=0, frame_skip=1)
+    logger.info(f"WebSocket client connected for live stream: {exercise_type}")
+
+    try:
+        while True:
+            message = await websocket.receive()
+            frame_bytes = None
+
+            if "bytes" in message and message["bytes"]:
+                frame_bytes = message["bytes"]
+            elif "text" in message and message["text"]:
+                try:
+                    payload = json.loads(message["text"])
+                    b64_str = payload.get("frame", "")
+                    if b64_str:
+                        frame_bytes = base64.b64decode(b64_str)
+                except Exception:
+                    pass
+
+            if not frame_bytes:
+                continue
+
+            img_array = np.frombuffer(frame_bytes, dtype=np.uint8)
+            bgr_frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+            if bgr_frame is None:
+                continue
+
+            lm_dict = extractor.extract_frame(bgr_frame)
+            result = evaluator.evaluate_frame(lm_dict)
+            await websocket.send_json(result)
+
+    except WebSocketDisconnect:
+        logger.info(f"WebSocket client disconnected | reps={evaluator.rep_count}")
+    except Exception as exc:
+        logger.warning(f"WebSocket session closed unexpectedly: {exc}")
+

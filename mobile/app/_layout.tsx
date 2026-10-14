@@ -21,8 +21,10 @@ function RootStack() {
     <Stack screenOptions={{ headerTintColor: colors.text, headerShadowVisible: false }}>
       <Stack.Protected guard={!!user}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="routine/[id]" options={{ title: 'Routine' }} />
+        <Stack.Screen name="profile" options={{ headerShown: false }} />
+        <Stack.Screen name="routine/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="workout" options={{ title: 'Đang tập', gestureEnabled: false }} />
+        <Stack.Screen name="pose-camera" options={{ headerShown: false }} />
       </Stack.Protected>
       <Stack.Protected guard={!user}>
         <Stack.Screen name="login" options={{ headerShown: false }} />
