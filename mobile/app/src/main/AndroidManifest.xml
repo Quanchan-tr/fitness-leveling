@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@android:drawable/sym_def_app_icon"
+        android:label="@string/app_name"
+        android:roundIcon="@android:drawable/sym_def_app_icon"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.FitTrack">
+
+        <activity
+            android:name=".ui.auth.LoginActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.auth.SignUpActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.auth.VerifyEmailActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.auth.ForgotPasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.auth.VerifyForgotPasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ui.auth.CreateNewPasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <!-- Onboarding Flow Activities -->
+        <activity android:name=".ui.onboarding.OnboardingGenderActivity" android:exported="false" />
+        <activity android:name=".ui.onboarding.OnboardingBirthdayActivity" android:exported="false" />
+        <activity android:name=".ui.onboarding.OnboardingWeightActivity" android:exported="false" />
+        <activity android:name=".ui.onboarding.OnboardingHeightActivity" android:exported="false" />
+        <activity android:name=".ui.onboarding.OnboardingGoalActivity" android:exported="false" />
+        <activity android:name=".ui.onboarding.OnboardingExperienceActivity" android:exported="false" />
+        <activity android:name=".ui.onboarding.OnboardingGuideActivity" android:exported="false" />
+        <activity android:name=".ui.onboarding.OnboardingFrequencyActivity" android:exported="false" />
+        <activity android:name=".ui.onboarding.OnboardingWorkoutTimeActivity" android:exported="false" />
+        <activity android:name=".ui.onboarding.OnboardingFocusMuscleActivity" android:exported="false" />
+        <activity android:name=".ui.onboarding.OnboardingDestinationActivity" android:exported="false" />
+        <activity android:name=".ui.onboarding.OnboardingEquipmentActivity" android:exported="false" />
+        <activity android:name=".ui.onboarding.OnboardingLoadingActivity" android:exported="false" />
+
+        <!-- Core App Activities -->
+        <activity android:name=".ui.dashboard.DashboardActivity" android:exported="false" />
+        <activity android:name=".ui.workout.WorkoutsActivity" android:exported="false" />
+        <activity android:name=".ui.aipose.AiPoseCoachActivity" android:exported="false" />
+        <activity android:name=".ui.metrics.BodyMetricsActivity" android:exported="false" />
+        <activity android:name=".ui.nutrition.NutritionTrackerActivity" android:exported="false" />
+        <activity android:name=".ui.community.CommunityActivity" android:exported="false" />
+        <activity android:name=".ui.profile.UserProfileActivity" android:exported="false" />
+        <activity android:name=".ui.routine.RoutineDetailActivity" android:exported="false" />
+        <activity android:name=".ui.aipose.AiPoseActiveSessionActivity" android:exported="false" />
+        <activity android:name=".ui.workout.ActiveWorkoutActivity" android:exported="false" />
+        <activity android:name=".ui.routine.CreateRoutineActivity" android:exported="false" />
+        <activity android:name=".ui.profile.BadgesAchievementsActivity" android:exported="false" />
+        <activity android:name=".ui.settings.SettingsActivity" android:exported="false" />
+        <activity android:name=".ui.profile.EditProfileActivity" android:exported="false" />
+
+        <!-- Modals & Popups -->
+        <activity
+            android:name=".ui.modal.DailyQuestsModalActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FitTrack.Modal" />
+        <activity
+            android:name=".ui.modal.ExercisePickerModalActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FitTrack.Modal" />
+        <activity
+            android:name=".ui.modal.WorkoutSummaryModalActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FitTrack.Modal" />
+        <activity
+            android:name=".ui.modal.AiCalibrationModalActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FitTrack.Modal" />
+        <activity
+            android:name=".ui.modal.LogMealModalActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FitTrack.Modal" />
+
+    </application>
+
+</manifest>

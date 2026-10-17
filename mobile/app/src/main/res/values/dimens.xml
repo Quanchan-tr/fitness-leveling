@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Screen Paddings -->
+    <dimen name="screen_padding_horizontal">20dp</dimen>
+    <dimen name="screen_padding_top">48dp</dimen>
+    <dimen name="screen_padding_bottom">24dp</dimen>
+
+    <!-- Component Dimensions -->
+    <dimen name="button_height">50dp</dimen>
+    <dimen name="button_corner_radius">25dp</dimen>
+    <dimen name="input_height">48dp</dimen>
+    <dimen name="input_corner_radius">6dp</dimen>
+    <dimen name="back_button_size">40dp</dimen>
+    <dimen name="otp_box_size">48dp</dimen>
+
+    <!-- Spacings -->
+    <dimen name="spacing_tiny">4dp</dimen>
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_medium">16dp</dimen>
+    <dimen name="spacing_large">24dp</dimen>
+    <dimen name="spacing_xlarge">32dp</dimen>
+</resources>

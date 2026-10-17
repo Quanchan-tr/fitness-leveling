@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Primary Colors (Extracted from Figma FitTrack) -->
+    <color name="primary">#FF5722</color>
+    <color name="primary_variant">#E64A19</color>
+    <color name="primary_light">#FFEBE5</color>
+    <color name="primary_blue">#2563EB</color>
+    <color name="border_gray">#CBD5E1</color>
+    <color name="on_primary">#FFFFFF</color>
+
+    <!-- Backgrounds -->
+    <color name="background">#FFFFFF</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="circle_button_bg">#F4F7FF</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#191D23</color>
+    <color name="text_secondary">#6C6F72</color>
+    <color name="text_muted">#717D96</color>
+    <color name="text_placeholder">#BABABA</color>
+    <color name="text_link">#1443C3</color>
+
+    <!-- Borders & Dividers -->
+    <color name="border_default">#CBD2E0</color>
+    <color name="border_focused">#FF5722</color>
+    <color name="divider">#DADADA</color>
+
+    <!-- State & Functional Colors -->
+    <color name="success">#2CB629</color>
+    <color name="error">#EA2A2A</color>
+    <color name="checkbox_checked">#59CDBE</color>
+
+    <!-- Onboarding & Cards -->
+    <color name="card_selected_bg">#FFF5F2</color>
+    <color name="border_card">#E2E8F0</color>
+    <color name="segment_bg">#F1F5F9</color>
+    <color name="segment_selected_bg">#FFFFFF</color>
+    <color name="indicator_bg">#E2E8F0</color>
+    <color name="indicator_active">#FF5722</color>
+
+    <!-- Core App Dashboard & Features -->
+    <color name="bg_screen_gray">#F8FAFC</color>
+    <color name="text_dark">#0F172A</color>
+    <color name="text_slate">#475569</color>
+    <color name="text_slate_light">#94A3B8</color>
+    <color name="badge_bg">#0F172A</color>
+    <color name="badge_streak_bg">#FFF7ED</color>
+    <color name="badge_streak_text">#EA580C</color>
+    <color name="live_dark">#0F172A</color>
+    <color name="live_green">#16A34A</color>
+
+    <!-- Modal & Popup Color Tokens (Figma FitTrack) -->
+    <color name="modal_overlay">#8A000000</color>
+    <color name="modal_quest_green_bg">#F0FDF4</color>
+    <color name="modal_quest_badge_bg">#DCFCE7</color>
+    <color name="modal_quest_badge_text">#15803D</color>
+    <color name="modal_level_up_bg">#FEF3C7</color>
+    <color name="modal_level_up_title">#B45309</color>
+    <color name="modal_level_up_text">#D97706</color>
+    <color name="modal_stats_bg">#EFF6FF</color>
+    <color name="modal_dark_card">#1E2330</color>
+    <color name="modal_dark_item">#242938</color>
+    <color name="modal_dark_button">#333847</color>
+    <color name="modal_dark_text_muted">#99A1B2</color>
+    <color name="modal_chip_orange_light">#FFF1E5</color>
+    <color name="modal_chip_gray_text">#64748B</color>
+
+    <!-- Common -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="icon_tint">#292D32</color>
+    <color name="transparent">#00000000</color>
+</resources>
