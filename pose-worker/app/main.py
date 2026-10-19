@@ -11,10 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import config
 from app.cv.mediapipe_extractor import get_extractor
-from app.rules.bodyweight_rules import REP_RULES, WALL_SIT
-from app.rules.plank_rule import PlankRule
-from app.rules.pushup_rule import PushupRule
-from app.rules.squat_rule import SquatRule
+from app.rules import EXERCISE_RULES
 from app.schemas.request import AnalyzeFrameRequest, ProcessVideoRequest
 from app.schemas.response import (
     AnalyzeFrameResponse,
@@ -40,19 +37,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-_squat, _pushup, _plank = SquatRule(), PushupRule(), PlankRule()
-RULES_REGISTRY = {
-    "squat_v1": _squat,
-    "squat": _squat,
-    "pushup_v1": _pushup,
-    "pushup": _pushup,
-    "plank_v1": _plank,
-    "plank": _plank,
-    "wall_sit_v1": WALL_SIT,
-    "wall_sit": WALL_SIT,
-}
-for _name, _rule in REP_RULES.items():
-    RULES_REGISTRY[_name] = RULES_REGISTRY[f"{_name}_v1"] = _rule
+_default_rule = EXERCISE_RULES["squat"]
+RULES_REGISTRY = {}
+for _name, _rule in EXERCISE_RULES.items():
+    RULES_REGISTRY[_name] = _rule
+    RULES_REGISTRY[f"{_name}_v1"] = _rule
 
 
 
@@ -113,7 +102,7 @@ async def process_video_task(payload: ProcessVideoRequest):
 
     # --- Select rule engine ---
     rule_key = payload.exercise_type.lower()
-    rule_engine = RULES_REGISTRY.get(rule_key, _squat)
+    rule_engine = RULES_REGISTRY.get(rule_key, _default_rule)
 
     # --- Process video from local filesystem via MediaPipe ---
     logger.info(

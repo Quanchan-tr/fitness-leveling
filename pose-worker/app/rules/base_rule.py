@@ -5,6 +5,7 @@ from typing import List, Dict, Any, Optional, Set, Tuple
 
 import numpy as np
 
+from app.cv.angle_math import detect_camera_view
 from app.schemas.response import (
     PoseFeedbackResponse,
     PoseIssue,
@@ -14,6 +15,12 @@ from app.schemas.response import (
     SessionSummary,
     BreathingCue,
 )
+
+SEVERITY_PENALTIES: Dict[str, float] = {
+    "high": 25.0,
+    "medium": 15.0,
+    "low": 8.0,
+}
 
 # ---------------------------------------------------------------------------
 # EMA state — passed in and out each frame so rule classes stay stateless
@@ -121,6 +128,46 @@ class BasePoseRule(ABC):
         """Extract 2D screen coordinates for landmark."""
         pt = lm[idx]
         return np.array([pt["x"], pt["y"]], dtype=np.float32)
+
+    @staticmethod
+    def has_landmarks(lm: Dict[str, Any], *indices: str) -> bool:
+        """Verify that all given landmark indices are present."""
+        return all(idx in lm for idx in indices)
+
+    @staticmethod
+    def get_midpoint_2d(lm: Dict[str, Any], *indices: str) -> Optional[np.ndarray]:
+        """Calculate mean 2D point of specified landmark indices if present."""
+        pts = [BasePoseRule.get_point_2d(lm, idx) for idx in indices if idx in lm]
+        return np.mean(pts, axis=0) if pts else None
+
+    @staticmethod
+    def get_side_landmarks_2d(
+        lm: Dict[str, Any], *left_indices: int
+    ) -> Optional[List[np.ndarray]]:
+        """
+        Extract 2D points for left side (left_indices) if all present,
+        otherwise right side (left_indices + 1), otherwise None.
+        """
+        for offset in (0, 1):
+            indices = [str(idx + offset) for idx in left_indices]
+            if all(k in lm for k in indices):
+                return [BasePoseRule.get_point_2d(lm, k) for k in indices]
+        return None
+
+    @staticmethod
+    def create_issue(
+        issue_code: str,
+        severity: str,
+        message: str,
+        detail: Optional[str] = None,
+    ) -> PoseIssue:
+        """Helper to construct PoseIssue with default detail matching message."""
+        return PoseIssue(
+            issue_code=issue_code,
+            severity=severity,
+            message=message,
+            detail=detail or message,
+        )
 
     # ---------------------------------------------------------------
     # Rep evaluation helpers
@@ -288,3 +335,146 @@ class BasePoseRule(ABC):
         and return evaluated reps & issues.
         """
         pass
+
+
+class RepBasedRule(BasePoseRule):
+    """
+    Standard biomechanical rule engine for rep-based exercises.
+
+    Subclasses implement:
+      - measure(lm) -> Dict[str, float]: extracts normalized effort (0=rest, 1=ROM) and joint angles.
+      - judge(peak, series, fps, ctx) -> List[PoseIssue]: biomechanical form checks for completed rep.
+    """
+
+    NAME: str = ""
+    REQUIRED_LANDMARKS: List[str] = []
+    VIS_MSG: str = "Camera cần thấy rõ toàn bộ cơ thể."
+    HALF_MSG: str = "Chưa đủ biên độ vận động."
+    BREATH: Tuple[str, str] = ("REP", "Thở đều, thở ra khi dùng sức.")
+
+    START: float = 0.3
+    END: float = 0.15
+    PEAK_OK: float = 0.85
+    ALPHA: float = 0.4
+    MIN_REP_SEC: float = 0.6
+    COOLDOWN_SEC: float = 0.2
+    RHYTHM: bool = False
+
+    def measure(self, lm: Dict[str, Any]) -> Optional[Dict[str, float]]:
+        """Extract frame metrics. Must contain 'effort' and 'angle'."""
+        raise NotImplementedError
+
+    def judge(
+        self, peak: float, s: Dict[str, List[float]], fps: float, ctx: Dict[str, Any]
+    ) -> List[PoseIssue]:
+        """Biomechanical checks for a completed rep."""
+        raise NotImplementedError
+
+    def grade_rep(
+        self, peak: float, s: Dict[str, List[float]], fps: float, ctx: Dict[str, Any]
+    ) -> Tuple[List[PoseIssue], float, RepStatus, bool]:
+        """Grade a single rep for both video and WebSocket realtime stream."""
+        rom_ok = peak >= self.PEAK_OK
+        issues: List[PoseIssue] = [] if rom_ok else [
+            self.create_issue("HALF_REP", "high", self.HALF_MSG)
+        ]
+        if rom_ok:
+            issues.extend(self.judge(peak, s, fps, ctx))
+
+        durs = ctx.setdefault("durs", [])
+        dur = len(s["effort"]) / max(fps, 1.0)
+        if self.RHYTHM and rom_ok and len(durs) >= 3 and dur > 1.6 * float(np.median(durs)):
+            issues.append(self.create_issue(
+                "RHYTHM_SLOWING",
+                "low",
+                "Nhịp tập đang chậm lại rõ rệt.",
+                "Nhịp rep chậm dần so với đầu bài — dấu hiệu mệt. Nghỉ ngắn rồi tiếp tục để giữ form.",
+            ))
+        durs.append(dur)
+
+        penalty = 0.0 if rom_ok else 30.0
+        penalty += sum(
+            SEVERITY_PENALTIES.get(i.severity, 15.0)
+            for i in issues
+            if i.issue_code != "HALF_REP"
+        )
+        score = max(0.0, 100.0 - penalty)
+        status, valid = self.classify_rep(rom_ok, score, issues, rom_issue_codes={"HALF_REP"})
+        return issues, score, status, valid
+
+    def process_landmarks_sequence(
+        self, frames_landmarks: List[Dict[str, Any]], fps: float
+    ) -> PoseFeedbackResponse:
+        fps = max(fps, 1.0)
+        min_frames = max(3, int(fps * self.MIN_REP_SEC))
+        cooldown = int(fps * self.COOLDOWN_SEC)
+
+        reps: List[RepFeedback] = []
+        warnings: List[VisibilityWarning] = []
+        detected_views: List[str] = []
+        ctx: Dict[str, Any] = {}
+        series: Dict[str, List[float]] = {}
+        active, e, peak, start, last_end, missing = False, 0.0, 0.0, 0, -cooldown, 0
+        MAX_CONSECUTIVE_MISSING = 10
+
+        for i, lm in enumerate(frames_landmarks):
+            ts = round(i / fps, 2)
+            if not lm:
+                missing += 1
+                if missing == MAX_CONSECUTIVE_MISSING:
+                    warnings.append(VisibilityWarning(
+                        warning_code="POSE_NOT_DETECTED",
+                        message="Không phát hiện được tư thế. Hãy đảm bảo toàn bộ cơ thể nằm trong khung hình camera.",
+                        affected_landmarks=self.REQUIRED_LANDMARKS,
+                        frame_index=i,
+                        timestamp_sec=ts,
+                    ))
+                continue
+
+            m = self.measure(lm)
+            if m is None:
+                missing += 1
+                if missing == MAX_CONSECUTIVE_MISSING:
+                    warnings.append(VisibilityWarning(
+                        warning_code="INCOMPLETE_BODY_VISIBLE",
+                        message=self.VIS_MSG,
+                        affected_landmarks=self.REQUIRED_LANDMARKS,
+                        frame_index=i,
+                        timestamp_sec=ts,
+                    ))
+                continue
+            missing = 0
+
+            detected_views.append(detect_camera_view(lm))
+
+            e = self.ALPHA * m["effort"] + (1.0 - self.ALPHA) * e
+            m["effort"] = e
+
+            if not active and e >= self.START and i - last_end >= cooldown:
+                active, start, peak, series = True, i, e, {}
+            if active:
+                peak = max(peak, e)
+                for k, v in m.items():
+                    series.setdefault(k, []).append(v)
+                if e <= self.END:
+                    active = False
+                    if i - start >= min_frames:
+                        issues, score, status, valid = self.grade_rep(peak, series, fps, ctx)
+                        reps.append(RepFeedback(
+                            rep_number=len(reps) + 1,
+                            score=score,
+                            status=status,
+                            is_rep_valid=valid,
+                            timestamp_sec=round(i / fps, 2),
+                            issues=issues,
+                            breathing_cue=BreathingCue(phase=self.BREATH[0], instruction=self.BREATH[1]),
+                        ))
+                        last_end = i
+
+        dominant_view = (
+            Counter(detected_views).most_common(1)[0][0]
+            if detected_views else "UNKNOWN"
+        )
+        return self.build_rep_response(
+            reps, warnings, len(frames_landmarks), self.NAME, camera_view=dominant_view
+        )

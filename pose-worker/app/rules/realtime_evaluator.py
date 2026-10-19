@@ -8,8 +8,10 @@ Maintains state per active socket connection (reps, phases, angles, feedback).
 import time
 from typing import Any, Dict, List, Optional
 import numpy as np
-from app.cv.angle_math import calculate_angle_3d, calculate_angle_2d
-from app.rules.bodyweight_rules import REP_RULES, WALL_SIT
+from app.cv.angle_math import calculate_angle_3d
+from app.rules import EXERCISE_RULES
+from app.rules.base_rule import RepBasedRule
+from app.rules.bodyweight_rules import WALL_SIT
 from app.schemas.response import RepStatus
 
 
@@ -61,12 +63,13 @@ class RealtimePoseEvaluator:
             return self._evaluate_plank(lm)
         elif "wall_sit" in self.exercise_type:
             return self._evaluate_wall_sit(lm)
-        for name, rule in REP_RULES.items():
-            if name in self.exercise_type:
+        for name, rule in EXERCISE_RULES.items():
+            if isinstance(rule, RepBasedRule) and name in self.exercise_type:
                 return self._evaluate_rep_rule(lm, rule)
         return self._evaluate_squat(lm)
 
-    def _evaluate_rep_rule(self, lm: Dict[str, Any], rule) -> Dict[str, Any]:
+    def _evaluate_rep_rule(self, lm: Dict[str, Any], rule: RepBasedRule) -> Dict[str, Any]:
+        keypoint_ids = getattr(rule, "REQUIRED_LANDMARKS", getattr(rule, "KEYPOINTS", []))
         m = rule.measure(lm)
         if m is None:
             return {
@@ -77,7 +80,7 @@ class RealtimePoseEvaluator:
                 "state": self.state,
                 "status": None,
                 "feedback": rule.VIS_MSG,
-                "keypoints": self._extract_keypoints(lm, list(rule.KEYPOINTS)),
+                "keypoints": self._extract_keypoints(lm, list(keypoint_ids)),
             }
 
         now = time.monotonic()
@@ -115,12 +118,13 @@ class RealtimePoseEvaluator:
             "state": self.state,
             "status": status_event,
             "feedback": self.feedback,
-            "keypoints": self._extract_keypoints(lm, list(rule.KEYPOINTS)),
+            "keypoints": self._extract_keypoints(lm, list(keypoint_ids)),
         }
 
     def _evaluate_wall_sit(self, lm: Dict[str, Any]) -> Dict[str, Any]:
+        keypoint_ids = getattr(WALL_SIT, "REQUIRED_LANDMARKS", getattr(WALL_SIT, "KEYPOINTS", []))
         m = WALL_SIT.measure(lm)
-        keypoints = self._extract_keypoints(lm, list(WALL_SIT.KEYPOINTS))
+        keypoints = self._extract_keypoints(lm, list(keypoint_ids))
         if m is None:
             return {
                 "pose_detected": True, "rep_count": self.rep_count, "angle": 0.0, "state": "HOLD",
