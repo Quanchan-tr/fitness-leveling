@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.fittrack.app.databinding.ActivitySettingsBinding
-import com.fittrack.app.ui.auth.LoginActivity
+import com.fittrack.app.MainActivity
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -20,7 +20,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.btnLogout.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
             finish()
