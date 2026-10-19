@@ -17,6 +17,17 @@
 
         <!-- Background -->
         <item name="android:windowBackground">@color/background</item>
+
+        <!-- CheckBox Component Style -->
+        <item name="checkboxStyle">@style/Widget.FitTrack.CheckBox</item>
+    </style>
+
+    <!-- Custom CheckBox Widget Style -->
+    <style name="Widget.FitTrack.CheckBox" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/bg_checkbox_state</item>
+        <item name="buttonCompat">@drawable/bg_checkbox_state</item>
+        <item name="android:buttonTint">@null</item>
+        <item name="buttonTint">@null</item>
     </style>
 
     <!-- Typography Styles (Extracted from Figma FitTrack) -->

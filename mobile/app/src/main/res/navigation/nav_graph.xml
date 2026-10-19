@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <!-- Login Destination -->
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.fittrack.app.ui.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/activity_login">
+        <action
+            android:id="@+id/action_loginFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
+            app:destination="@id/forgotPasswordFragment" />
+    </fragment>
+
+    <!-- Sign Up Destination -->
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="com.fittrack.app.ui.auth.SignUpFragment"
+        android:label="SignUp"
+        tools:layout="@layout/activity_sign_up">
+        <action
+            android:id="@+id/action_signUpFragment_to_verifyEmailFragment"
+            app:destination="@id/verifyEmailFragment" />
+        <action
+            android:id="@+id/action_signUpFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Verify Email Destination -->
+    <fragment
+        android:id="@+id/verifyEmailFragment"
+        android:name="com.fittrack.app.ui.auth.VerifyEmailFragment"
+        android:label="VerifyEmail"
+        tools:layout="@layout/activity_verify_email">
+        <action
+            android:id="@+id/action_verifyEmailFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+    </fragment>
+
+    <!-- Forgot Password Destination -->
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.fittrack.app.ui.auth.ForgotPasswordFragment"
+        android:label="ForgotPassword"
+        tools:layout="@layout/activity_forgot_password">
+        <action
+            android:id="@+id/action_forgotPasswordFragment_to_verifyForgotPasswordFragment"
+            app:destination="@id/verifyForgotPasswordFragment" />
+        <action
+            android:id="@+id/action_forgotPasswordFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Verify Forgot Password Destination -->
+    <fragment
+        android:id="@+id/verifyForgotPasswordFragment"
+        android:name="com.fittrack.app.ui.auth.VerifyForgotPasswordFragment"
+        android:label="VerifyForgotPassword"
+        tools:layout="@layout/activity_verify_forgot_password">
+        <action
+            android:id="@+id/action_verifyForgotPasswordFragment_to_createNewPasswordFragment"
+            app:destination="@id/createNewPasswordFragment" />
+    </fragment>
+
+    <!-- Create New Password Destination -->
+    <fragment
+        android:id="@+id/createNewPasswordFragment"
+        android:name="com.fittrack.app.ui.auth.CreateNewPasswordFragment"
+        android:label="CreateNewPassword"
+        tools:layout="@layout/activity_create_new_password">
+        <action
+            android:id="@+id/action_createNewPasswordFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+</navigation>

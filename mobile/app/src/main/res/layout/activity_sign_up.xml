@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/screen_padding_top"
     android:paddingEnd="@dimen/screen_padding_horizontal"
     android:paddingBottom="@dimen/screen_padding_bottom"
-    tools:context=".ui.auth.SignUpActivity">
+    tools:context=".ui.auth.SignUpFragment">
 
     <!-- Circle Back Button -->
     <ImageButton
@@ -178,10 +178,10 @@
             <!-- Terms Checkbox -->
             <CheckBox
                 android:id="@+id/cb_terms"
+                style="@style/Widget.FitTrack.CheckBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_large"
-                android:button="@drawable/bg_checkbox_state"
                 android:paddingStart="@dimen/spacing_small"
                 android:text="@string/terms_agreement"
                 android:textColor="@color/text_secondary"

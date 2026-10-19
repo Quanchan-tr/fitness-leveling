@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import config
 from app.cv.mediapipe_extractor import get_extractor
+from app.rules.bodyweight_rules import REP_RULES, WALL_SIT
 from app.rules.plank_rule import PlankRule
 from app.rules.pushup_rule import PushupRule
 from app.rules.squat_rule import SquatRule
@@ -47,7 +48,11 @@ RULES_REGISTRY = {
     "pushup": _pushup,
     "plank_v1": _plank,
     "plank": _plank,
+    "wall_sit_v1": WALL_SIT,
+    "wall_sit": WALL_SIT,
 }
+for _name, _rule in REP_RULES.items():
+    RULES_REGISTRY[_name] = RULES_REGISTRY[f"{_name}_v1"] = _rule
 
 
 

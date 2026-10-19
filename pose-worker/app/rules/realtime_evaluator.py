@@ -5,9 +5,12 @@ Lightweight real-time pose state evaluator for live WebSocket camera stream.
 Maintains state per active socket connection (reps, phases, angles, feedback).
 """
 
+import time
 from typing import Any, Dict, List, Optional
 import numpy as np
 from app.cv.angle_math import calculate_angle_3d, calculate_angle_2d
+from app.rules.bodyweight_rules import REP_RULES, WALL_SIT
+from app.schemas.response import RepStatus
 
 
 def _pt3d(lm: Dict[str, Any], idx: str) -> np.ndarray:
@@ -28,6 +31,12 @@ class RealtimePoseEvaluator:
         self.feedback = "Đứng vào khung hình"
         self.last_rep_status: Optional[str] = None
         self.alpha = 0.4  # EMA smoothing factor
+        # Generic rep rules (lunge, glute_bridge, ...) state
+        self._effort = 0.0
+        self._peak = 0.0
+        self._series: Dict[str, List[float]] = {}
+        self._t0 = 0.0
+        self._ctx: Dict[str, Any] = {}
 
     def _update_ema(self, raw_angle: float) -> float:
         self.smoothed_angle = self.alpha * raw_angle + (1.0 - self.alpha) * self.smoothed_angle
@@ -50,8 +59,86 @@ class RealtimePoseEvaluator:
             return self._evaluate_pushup(lm)
         elif "plank" in self.exercise_type:
             return self._evaluate_plank(lm)
-        else:
-            return self._evaluate_squat(lm)
+        elif "wall_sit" in self.exercise_type:
+            return self._evaluate_wall_sit(lm)
+        for name, rule in REP_RULES.items():
+            if name in self.exercise_type:
+                return self._evaluate_rep_rule(lm, rule)
+        return self._evaluate_squat(lm)
+
+    def _evaluate_rep_rule(self, lm: Dict[str, Any], rule) -> Dict[str, Any]:
+        m = rule.measure(lm)
+        if m is None:
+            return {
+                "pose_detected": True,
+                "rep_count": self.rep_count,
+                "good_rep_count": self.good_rep_count,
+                "angle": 0.0,
+                "state": self.state,
+                "status": None,
+                "feedback": rule.VIS_MSG,
+                "keypoints": self._extract_keypoints(lm, list(rule.KEYPOINTS)),
+            }
+
+        now = time.monotonic()
+        self._effort = rule.ALPHA * m["effort"] + (1.0 - rule.ALPHA) * self._effort
+        m["effort"] = self._effort
+        status_event = None
+
+        if self.state != "ACTIVE":
+            self.feedback = "Bắt đầu động tác"
+            if self._effort >= rule.START:
+                self.state, self._series, self._peak, self._t0 = "ACTIVE", {}, self._effort, now
+        if self.state == "ACTIVE":
+            self._peak = max(self._peak, self._effort)
+            for k, v in m.items():
+                self._series.setdefault(k, []).append(v)
+            if self._effort <= rule.END:
+                self.state = "READY"
+                dur = now - self._t0
+                if dur >= rule.MIN_REP_SEC:
+                    fps = len(self._series["effort"]) / max(dur, 1e-3)
+                    issues, _, st, _ = rule.grade_rep(self._peak, self._series, fps, self._ctx)
+                    self.rep_count += 1
+                    if st == RepStatus.GOOD_REP:
+                        self.good_rep_count += 1
+                        status_event, self.feedback = "GOOD_REP", "Rep chuẩn! Tiếp tục"
+                    else:
+                        status_event = "BAD_FORM"
+                        self.feedback = issues[0].message if issues else "Chưa đạt form"
+
+        return {
+            "pose_detected": True,
+            "rep_count": self.rep_count,
+            "good_rep_count": self.good_rep_count,
+            "angle": round(m["angle"], 1),
+            "state": self.state,
+            "status": status_event,
+            "feedback": self.feedback,
+            "keypoints": self._extract_keypoints(lm, list(rule.KEYPOINTS)),
+        }
+
+    def _evaluate_wall_sit(self, lm: Dict[str, Any]) -> Dict[str, Any]:
+        m = WALL_SIT.measure(lm)
+        keypoints = self._extract_keypoints(lm, list(WALL_SIT.KEYPOINTS))
+        if m is None:
+            return {
+                "pose_detected": True, "rep_count": self.rep_count, "angle": 0.0, "state": "HOLD",
+                "status": None, "feedback": "Cần thấy rõ hông, gối và cổ chân", "keypoints": keypoints,
+            }
+        knee = self._update_ema(m["knee"])
+        flags = WALL_SIT.flags(m)
+        self.feedback = WALL_SIT.FLAGS[flags[0]][1] if flags else "Tư thế wall sit chuẩn! Giữ vững"
+        return {
+            "pose_detected": True,
+            "rep_count": self.rep_count,
+            "good_rep_count": self.good_rep_count,
+            "angle": round(knee, 1),
+            "state": "HOLD",
+            "status": "BAD_FORM" if flags else "GOOD_REP",
+            "feedback": self.feedback,
+            "keypoints": keypoints,
+        }
 
     def _evaluate_squat(self, lm: Dict[str, Any]) -> Dict[str, Any]:
         # Knee angle from left or right side

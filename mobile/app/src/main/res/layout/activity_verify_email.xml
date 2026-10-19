@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/screen_padding_top"
     android:paddingEnd="@dimen/screen_padding_horizontal"
     android:paddingBottom="@dimen/screen_padding_bottom"
-    tools:context=".ui.auth.VerifyEmailActivity">
+    tools:context=".ui.auth.VerifyEmailFragment">
 
     <!-- Circle Back Button -->
     <ImageButton

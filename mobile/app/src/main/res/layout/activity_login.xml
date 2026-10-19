@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/screen_padding_top"
     android:paddingEnd="@dimen/screen_padding_horizontal"
     android:paddingBottom="@dimen/screen_padding_bottom"
-    tools:context=".ui.auth.LoginActivity">
+    tools:context=".ui.auth.LoginFragment">
 
     <!-- Header / Title -->
     <TextView
@@ -117,10 +117,10 @@
         <!-- Keep me signed in Checkbox -->
         <CheckBox
             android:id="@+id/cb_keep_signed_in"
+            style="@style/Widget.FitTrack.CheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_large"
-            android:button="@drawable/bg_checkbox_state"
             android:paddingStart="@dimen/spacing_small"
             android:text="@string/keep_me_signed_in"
             android:textColor="@color/text_primary"
