@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\UpdateProfileRequest;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,10 +25,10 @@ class AuthController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'goal' => $validated['goal'] ?? 'maintain',
-            'weight_kg' => $validated['weight_kg'],
-            'height_cm' => $validated['height_cm'],
-            'birth_date' => $validated['birth_date'],
-            'gender' => $validated['gender'],
+            'weight_kg' => $validated['weight_kg'] ?? 70.0,
+            'height_cm' => $validated['height_cm'] ?? 170.0,
+            'birth_date' => $validated['birth_date'] ?? '2000-01-01',
+            'gender' => $validated['gender'] ?? 'other',
             'activity_level' => $validated['activity_level'] ?? 'moderate',
             'role' => 'user',
         ]);
@@ -81,6 +82,19 @@ class AuthController extends Controller
         return response()->json([
             'data' => [
                 'message' => 'Logged out successfully.',
+            ],
+        ]);
+    }
+
+    public function updateProfile(UpdateProfileRequest $request): JsonResponse
+    {
+        $user = $request->user();
+        $user->update($request->validated());
+
+        return response()->json([
+            'data' => [
+                'user' => $user->fresh(),
+                'message' => 'Profile updated successfully.',
             ],
         ]);
     }

@@ -34,6 +34,8 @@ import {
   initialWorkoutHistory,
 } from '@/data/fitnesslevelingMockData';
 import { playRestTimerBeep } from '@/lib/soundUtils';
+import { apiRequest, fetchExercises } from '@/lib/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface UserFitnessProfile {
   id: string;
@@ -152,8 +154,27 @@ function getSavedStorage(key: string, fallbackKey: string): string | null {
 }
 
 export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
+
   // 1. Exercises
   const [exercises, setExercises] = useState<Exercise[]>(initialExercises);
+
+  // Sync exercises from backend API
+  useEffect(() => {
+    let mounted = true;
+    fetchExercises({ per_page: 100 })
+      .then((res) => {
+        if (mounted && res?.data && res.data.length > 0) {
+          setExercises(res.data);
+        }
+      })
+      .catch((err) => {
+        console.warn('Could not fetch exercises from backend API, using fallback data', err);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // 2. Folders & Routines
   const [folders, setFolders] = useState<RoutineFolder[]>(() => {
@@ -328,6 +349,73 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
     }
   }, [vitals]);
+
+  // Sync profile & vitals with authenticated user and backend endpoints
+  useEffect(() => {
+    if (user) {
+      setProfile((prev) => ({
+        ...prev,
+        id: user.id,
+        name: user.displayName,
+        avatar: user.avatarUrl || prev.avatar,
+        goal: (user.goal as any) || prev.goal,
+      }));
+
+      // 1. Sync recent body metrics for weight history
+      apiRequest<{ data: Array<{ log_date: string; weight_kg: number }> }>('/body-metrics?per_page=7')
+        .then((res) => {
+          if (res?.data && res.data.length > 0) {
+            const history = res.data
+              .map((m) => ({ date: m.log_date, weightKg: Number(m.weight_kg) }))
+              .reverse();
+            setVitals((prev) => ({ ...prev, weightHistory: history }));
+          }
+        })
+        .catch(() => {});
+
+      // 2. Sync workout count from workout-logs
+      apiRequest<{ data: Array<{ id: string; log_date: string }> }>('/workout-logs?per_page=50')
+        .then((res) => {
+          if (res?.data) {
+            setProfile((prev) => ({
+              ...prev,
+              totalWorkouts: res.data.length,
+            }));
+          }
+        })
+        .catch(() => {});
+
+      // 3. Sync today's nutrition logs
+      const todayStr = new Date().toISOString().split('T')[0];
+      apiRequest<{ data: Array<{ calories: number; protein_g: number; carbs_g: number; fat_g: number; log_date: string }> }>(
+        '/nutrition-logs?per_page=50'
+      )
+        .then((res) => {
+          if (res?.data) {
+            const todayLogs = res.data.filter((l) => l.log_date === todayStr);
+            if (todayLogs.length > 0) {
+              const totalCalories = todayLogs.reduce((acc, cur) => acc + (cur.calories || 0), 0);
+              const totalProtein = todayLogs.reduce((acc, cur) => acc + Number(cur.protein_g || 0), 0);
+              const totalCarbs = todayLogs.reduce((acc, cur) => acc + Number(cur.carbs_g || 0), 0);
+              const totalFat = todayLogs.reduce((acc, cur) => acc + Number(cur.fat_g || 0), 0);
+
+              setVitals((prev) => ({
+                ...prev,
+                nutrition: {
+                  calories: { current: totalCalories, target: prev.nutrition.calories.target },
+                  macros: {
+                    protein: { current: totalProtein, target: prev.nutrition.macros.protein.target },
+                    carbs: { current: totalCarbs, target: prev.nutrition.macros.carbs.target },
+                    fat: { current: totalFat, target: prev.nutrition.macros.fat.target },
+                  },
+                },
+              }));
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  }, [user]);
 
   // 6. Active Live Workout Session (with localStorage persistence)
   const [activeWorkout, setActiveWorkout] = useState<ActiveWorkoutSession | null>(() => {
@@ -851,7 +939,47 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       };
     });
 
-    // 4. Clear active workout session
+    // 4. Synchronize with backend API (POST /api/v1/workout-logs)
+    const todayStr = new Date().toISOString().split('T')[0];
+    apiRequest<{ data: { id: string } }>('/workout-logs', {
+      method: 'POST',
+      useIdempotency: true,
+      body: JSON.stringify({
+        log_date: todayStr,
+        notes: activeWorkout.routineTitle,
+      }),
+    })
+      .then(async (res) => {
+        const logId = res?.data?.id;
+        if (!logId) return;
+
+        let setNum = 1;
+        for (const item of activeWorkout.exercises) {
+          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.exercise.id);
+          if (!isUuid) continue;
+
+          for (const s of item.sets) {
+            if (s.isCompleted) {
+              await apiRequest(`/workout-logs/${logId}/sets`, {
+                method: 'POST',
+                useIdempotency: true,
+                body: JSON.stringify({
+                  exercise_id: item.exercise.id,
+                  set_number: setNum++,
+                  reps: s.reps || 10,
+                  weight_kg: s.weightKg || 0,
+                  duration_sec: s.durationSeconds || 0,
+                }),
+              }).catch(() => {});
+            }
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn('Could not sync workout session to backend', err);
+      });
+
+    // 5. Clear active workout session
     setActiveWorkout(null);
 
     return record;
@@ -881,6 +1009,17 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const updateWeight = useCallback((weightKg: number) => {
     const todayStr = new Date().toISOString().split('T')[0];
+
+    apiRequest('/body-metrics', {
+      method: 'POST',
+      body: JSON.stringify({
+        log_date: todayStr,
+        weight_kg: weightKg,
+      }),
+    }).catch((err) => {
+      console.warn('Failed to sync weight to backend', err);
+    });
+
     setVitals((prev) => {
       const history = [...prev.weightHistory];
       const existingTodayIndex = history.findIndex((h) => h.date === todayStr);

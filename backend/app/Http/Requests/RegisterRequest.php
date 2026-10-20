@@ -22,10 +22,10 @@ class RegisterRequest extends FormRequest
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
             'goal' => ['sometimes', Rule::enum(FitnessGoal::class)],
-            'weight_kg' => 'required|numeric|min:20|max:300',
-            'height_cm' => 'required|numeric|min:80|max:250',
-            'birth_date' => 'required|date|before:today',
-            'gender' => 'required|string|in:male,female,other',
+            'weight_kg' => 'sometimes|numeric|min:20|max:300',
+            'height_cm' => 'sometimes|numeric|min:80|max:250',
+            'birth_date' => 'sometimes|date|before:today',
+            'gender' => 'sometimes|string|in:male,female,other',
             'activity_level' => 'sometimes|string|in:sedentary,light,moderate,active',
         ];
     }

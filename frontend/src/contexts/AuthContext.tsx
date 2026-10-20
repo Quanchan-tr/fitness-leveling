@@ -45,12 +45,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [fitnessProfile, setFitnessProfile] = useState<FitnessProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Restore session from localStorage on first mount
+  // Restore session from localStorage on first mount, then verify with backend if token exists
   useEffect(() => {
     const { user: savedUser, fitnessProfile: savedProfile } = authService.loadSession();
     setUser(savedUser);
     setFitnessProfile(savedProfile);
     setIsLoading(false);
+
+    authService.verifySession().then((verifiedUser) => {
+      if (verifiedUser) {
+        setUser(verifiedUser);
+      } else if (savedUser) {
+        setUser(null);
+      }
+    });
   }, []);
 
   const login = useCallback(async (payload: LoginPayload): Promise<AuthUser> => {
