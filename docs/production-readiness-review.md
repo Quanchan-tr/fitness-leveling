@@ -97,9 +97,9 @@ Các thành phần thiết yếu bắt buộc phải có của một hệ thốn
 ### 📋 Checklist 5 việc ƯU TIÊN BẮT BUỘC phải xử lý trước khi Deploy
 
 ```markdown
-- [ ] 1. Chuẩn hóa Dockerfile Production (Loại bỏ toàn bộ Dev Server)
-      - Backend: Đổi sang mô hình PHP-FPM 8.2/8.3 kết hợp Nginx (hoặc FrankenPHP / Octane) thay vì `php artisan serve` / `php -S`.
-      - Frontend: Đổi sang multi-stage build `npm run build` và chạy server tối ưu `next start` (hoặc output: 'standalone').
+- [x] 1. Chuẩn hóa Dockerfile Production (Loại bỏ toàn bộ Dev Server) (ĐÃ HOÀN THÀNH - 20/10/2026)
+      - Backend: Đổi sang mô hình PHP-FPM 8.3 + Nginx kết hợp Supervisord, tối ưu opcache, upload max size 100M, thay thế hoàn toàn `php -S`.
+      - Frontend: Đổi sang multi-stage build (deps -> builder -> runner) với Next.js standalone output và non-root user `nextjs`. Tách riêng `docker-compose.dev.yml` cho môi trường dev.
 
 - [ ] 2. Khóa bảo mật Backend (.env & Secrets)
       - Chạy `php artisan key:generate` để tạo APP_KEY thực.

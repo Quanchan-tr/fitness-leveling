@@ -1,0 +1,23 @@
+# Local development overrides with live hot-reloading
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  frontend:
+    command: ["npm", "run", "dev"]
+    environment:
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+
+  backend:
+    volumes:
+      - ./backend:/var/www/html
+      - private_storage:/var/www/html/storage/app/private
+
+  queue-worker:
+    volumes:
+      - ./backend:/var/www/html
+      - private_storage:/var/www/html/storage/app/private
