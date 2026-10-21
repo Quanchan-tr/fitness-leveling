@@ -138,11 +138,13 @@
                     android:padding="12dp"
                     app:layout_constraintTop_toBottomOf="@id/tv_routine_stats">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🤖 "
-                        android:textSize="14sp" />
+                    <ImageView
+                        android:layout_width="@dimen/icon_size_xs"
+                        android:layout_height="@dimen/icon_size_xs"
+                        android:layout_marginEnd="6dp"
+                        android:contentDescription="AI Coach"
+                        app:srcCompat="@drawable/ic_bot_solid"
+                        app:tint="#166534" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -213,10 +215,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="70 kg ➔"
+                    android:text="70 kg"
                     android:textColor="@color/primary_blue"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:drawablePadding="4dp"
+                    app:drawableEndCompat="@drawable/ic_arrow_forward"
+                    app:drawableTint="@color/primary_blue" />
             </LinearLayout>
 
             <!-- Exercise 2 -->
@@ -267,10 +272,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="24 kg ➔"
+                    android:text="24 kg"
                     android:textColor="@color/primary_blue"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:drawablePadding="4dp"
+                    app:drawableEndCompat="@drawable/ic_arrow_forward"
+                    app:drawableTint="@color/primary_blue" />
             </LinearLayout>
 
             <!-- Exercise 3 -->
@@ -321,10 +329,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="BW ➔"
+                    android:text="BW"
                     android:textColor="@color/primary_blue"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:drawablePadding="4dp"
+                    app:drawableEndCompat="@drawable/ic_arrow_forward"
+                    app:drawableTint="@color/primary_blue" />
             </LinearLayout>
 
             <!-- Exercise 4 -->
@@ -375,10 +386,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="15 kg ➔"
+                    android:text="15 kg"
                     android:textColor="@color/primary_blue"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:drawablePadding="4dp"
+                    app:drawableEndCompat="@drawable/ic_arrow_forward"
+                    app:drawableTint="@color/primary_blue" />
             </LinearLayout>
 
             <!-- Exercise 5 -->
@@ -429,10 +443,13 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="20 kg ➔"
+                    android:text="20 kg"
                     android:textColor="@color/primary_blue"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:drawablePadding="4dp"
+                    app:drawableEndCompat="@drawable/ic_arrow_forward"
+                    app:drawableTint="@color/primary_blue" />
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

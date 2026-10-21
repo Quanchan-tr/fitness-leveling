@@ -33,19 +33,19 @@ class LogMealModalActivity : AppCompatActivity() {
 
         binding.btnAddFood1.setOnClickListener {
             addedItemsCount++
-            binding.btnAddFood1.text = "✓"
+            binding.btnAddFood1.text = "Đã chọn"
             Toast.makeText(this, "Đã chọn: Ức gà áp chảo (100g)", Toast.LENGTH_SHORT).show()
         }
 
         binding.btnAddFood2.setOnClickListener {
             addedItemsCount++
-            binding.btnAddFood2.text = "✓"
+            binding.btnAddFood2.text = "Đã chọn"
             Toast.makeText(this, "Đã chọn: Cơm gạo lứt (150g)", Toast.LENGTH_SHORT).show()
         }
 
         binding.btnAddFood3.setOnClickListener {
             addedItemsCount++
-            binding.btnAddFood3.text = "✓"
+            binding.btnAddFood3.text = "Đã chọn"
             Toast.makeText(this, "Đã chọn: Trứng gà luộc (2 quả)", Toast.LENGTH_SHORT).show()
         }
 

@@ -33,19 +33,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <ImageView
             android:id="@+id/btn_settings"
             android:layout_width="36dp"
             android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center"
-            android:text="⚙️"
-            android:textSize="18sp"
+            android:padding="6dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_settings_solid"
+            app:tint="@color/text_dark" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Scrollable Profile Content -->
@@ -78,14 +78,14 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <TextView
-                    android:id="@+id/tv_avatar"
+                <ImageView
+                    android:id="@+id/iv_avatar"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    android:background="@drawable/bg_tag_chip"
-                    android:gravity="center"
-                    android:text="🧔"
-                    android:textSize="36sp" />
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="16dp"
+                    app:srcCompat="@drawable/ic_user_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:id="@+id/tv_profile_name"

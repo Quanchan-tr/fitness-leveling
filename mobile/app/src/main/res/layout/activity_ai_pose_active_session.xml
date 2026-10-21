@@ -62,14 +62,15 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <ImageView
             android:id="@+id/btn_flip_camera"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:background="#80000000"
-            android:gravity="center"
-            android:text="🔄"
-            android:textSize="16sp"
+            android:background="@drawable/bg_icon_container_white"
+            android:contentDescription="Flip Camera"
+            android:padding="8dp"
+            app:srcCompat="@drawable/ic_rotate_solid"
+            app:tint="@color/text_primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -196,13 +197,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_voice_feedback"
             style="@style/Widget.FitTrack.Button.Secondary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🔊 Giọng nói: BẬT"
-            android:textSize="12sp" />
+            android:text="Giọng nói: BẬT"
+            android:textSize="12sp"
+            app:icon="@drawable/ic_volume_up_solid"
+            app:iconGravity="textStart"
+            app:iconPadding="4dp" />
 
         <Space
             android:layout_width="12dp"

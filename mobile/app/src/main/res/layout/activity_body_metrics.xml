@@ -249,14 +249,29 @@
                     android:layout_marginTop="12dp"
                     android:background="@drawable/bg_tag_chip">
 
-                    <TextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:text="📉 12 WEEKS PROGRESSION CHART"
-                        android:textColor="@color/text_slate_light"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="@dimen/icon_size_xs"
+                            android:layout_height="@dimen/icon_size_xs"
+                            android:layout_marginEnd="6dp"
+                            android:contentDescription="Chart"
+                            app:srcCompat="@drawable/ic_chart_line_solid"
+                            app:tint="@color/text_slate_light" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="12 WEEKS PROGRESSION CHART"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
                 </FrameLayout>
 
                 <TextView

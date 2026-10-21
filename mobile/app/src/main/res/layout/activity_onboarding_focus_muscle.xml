@@ -76,11 +76,14 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="⚡"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="6dp"
+                    android:contentDescription="Balanced"
+                    app:srcCompat="@drawable/ic_bolt_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -106,11 +109,14 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🧘"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="6dp"
+                    android:contentDescription="Core"
+                    app:srcCompat="@drawable/ic_lotus_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -136,11 +142,14 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💪"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="6dp"
+                    android:contentDescription="Chest"
+                    app:srcCompat="@drawable/ic_arm_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -166,11 +175,14 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🦾"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="6dp"
+                    android:contentDescription="Arms"
+                    app:srcCompat="@drawable/ic_bicep_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -196,11 +208,14 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🦵"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="6dp"
+                    android:contentDescription="Legs"
+                    app:srcCompat="@drawable/ic_leg_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -226,11 +241,14 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏋️"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="6dp"
+                    android:contentDescription="Shoulders"
+                    app:srcCompat="@drawable/ic_dumbbell_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="wrap_content"

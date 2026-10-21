@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottom_nav_container"
     android:layout_width="match_parent"
     android:layout_height="72dp"
@@ -22,22 +23,24 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_nav_icon_dashboard"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🏠"
-            android:textSize="20sp" />
+        <ImageView
+            android:id="@+id/iv_nav_icon_dashboard"
+            android:layout_width="@dimen/nav_icon_size"
+            android:layout_height="@dimen/nav_icon_size"
+            android:contentDescription="@string/nav_dashboard"
+            app:srcCompat="@drawable/ic_nav_dashboard"
+            app:tint="@color/nav_inactive" />
 
         <TextView
             android:id="@+id/tv_nav_label_dashboard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
+            android:includeFontPadding="false"
+            android:singleLine="true"
             android:text="@string/nav_dashboard"
-            android:textColor="@color/primary"
-            android:textSize="11sp"
-            android:textStyle="bold" />
+            android:textColor="@color/nav_inactive"
+            android:textSize="11sp" />
     </LinearLayout>
 
     <!-- Tab 2: Workouts -->
@@ -52,20 +55,23 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_nav_icon_workouts"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🏋️"
-            android:textSize="20sp" />
+        <ImageView
+            android:id="@+id/iv_nav_icon_workouts"
+            android:layout_width="@dimen/nav_icon_size"
+            android:layout_height="@dimen/nav_icon_size"
+            android:contentDescription="@string/nav_workouts"
+            app:srcCompat="@drawable/ic_nav_workouts"
+            app:tint="@color/nav_inactive" />
 
         <TextView
             android:id="@+id/tv_nav_label_workouts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
+            android:includeFontPadding="false"
+            android:singleLine="true"
             android:text="@string/nav_workouts"
-            android:textColor="@color/text_slate"
+            android:textColor="@color/nav_inactive"
             android:textSize="11sp" />
     </LinearLayout>
 
@@ -81,20 +87,23 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_nav_icon_metrics"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="📊"
-            android:textSize="20sp" />
+        <ImageView
+            android:id="@+id/iv_nav_icon_metrics"
+            android:layout_width="@dimen/nav_icon_size"
+            android:layout_height="@dimen/nav_icon_size"
+            android:contentDescription="@string/nav_metrics"
+            app:srcCompat="@drawable/ic_nav_metrics"
+            app:tint="@color/nav_inactive" />
 
         <TextView
             android:id="@+id/tv_nav_label_metrics"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
+            android:includeFontPadding="false"
+            android:singleLine="true"
             android:text="@string/nav_metrics"
-            android:textColor="@color/text_slate"
+            android:textColor="@color/nav_inactive"
             android:textSize="11sp" />
     </LinearLayout>
 
@@ -110,20 +119,23 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_nav_icon_community"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="👥"
-            android:textSize="20sp" />
+        <ImageView
+            android:id="@+id/iv_nav_icon_community"
+            android:layout_width="@dimen/nav_icon_size"
+            android:layout_height="@dimen/nav_icon_size"
+            android:contentDescription="@string/nav_community"
+            app:srcCompat="@drawable/ic_nav_community"
+            app:tint="@color/nav_inactive" />
 
         <TextView
             android:id="@+id/tv_nav_label_community"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
+            android:includeFontPadding="false"
+            android:singleLine="true"
             android:text="@string/nav_community"
-            android:textColor="@color/text_slate"
+            android:textColor="@color/nav_inactive"
             android:textSize="11sp" />
     </LinearLayout>
 
@@ -139,20 +151,23 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_nav_icon_profile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="👤"
-            android:textSize="20sp" />
+        <ImageView
+            android:id="@+id/iv_nav_icon_profile"
+            android:layout_width="@dimen/nav_icon_size"
+            android:layout_height="@dimen/nav_icon_size"
+            android:contentDescription="@string/nav_profile"
+            app:srcCompat="@drawable/ic_nav_profile"
+            app:tint="@color/nav_inactive" />
 
         <TextView
             android:id="@+id/tv_nav_label_profile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
+            android:layout_marginTop="4dp"
+            android:includeFontPadding="false"
+            android:singleLine="true"
             android:text="@string/nav_profile"
-            android:textColor="@color/text_slate"
+            android:textColor="@color/nav_inactive"
             android:textSize="11sp" />
     </LinearLayout>
 

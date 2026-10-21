@@ -5,6 +5,8 @@
     <color name="primary_variant">#E64A19</color>
     <color name="primary_light">#FFEBE5</color>
     <color name="primary_blue">#2563EB</color>
+    <color name="nav_active">#FF7A00</color>
+    <color name="nav_inactive">#8E8E93</color>
     <color name="border_gray">#CBD5E1</color>
     <color name="on_primary">#FFFFFF</color>
 

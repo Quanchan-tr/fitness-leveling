@@ -31,11 +31,12 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🔥"
-                android:textSize="20sp" />
+            <ImageView
+                android:layout_width="@dimen/icon_size_medium"
+                android:layout_height="@dimen/icon_size_medium"
+                android:contentDescription="@string/dashboard_app_title"
+                app:srcCompat="@drawable/ic_flame_solid"
+                app:tint="@color/primary" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -86,17 +87,18 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/btn_notification"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_marginStart="8dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
+                android:background="@drawable/bg_icon_container_white"
                 android:clickable="true"
                 android:focusable="true"
-                android:gravity="center"
-                android:text="🔔"
-                android:textSize="18sp" />
+                android:padding="8dp"
+                android:contentDescription="@string/dashboard_command_center"
+                app:srcCompat="@drawable/ic_bell_solid"
+                app:tint="@color/text_dark" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -211,13 +213,14 @@
                     android:layout_marginTop="12dp"
                     android:background="@drawable/bg_tag_chip">
 
-                    <TextView
+                    <ImageView
                         android:id="@+id/tv_avatar_placeholder"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
                         android:layout_gravity="center"
-                        android:text="🧍‍♂️"
-                        android:textSize="48sp" />
+                        android:contentDescription="@string/dashboard_avatar_subtitle"
+                        app:srcCompat="@drawable/ic_user_solid"
+                        app:tint="@color/primary" />
 
                     <TextView
                         android:layout_width="wrap_content"

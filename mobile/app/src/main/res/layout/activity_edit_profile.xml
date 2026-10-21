@@ -86,23 +86,25 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal">
 
-                <TextView
+                <ImageView
                     android:id="@+id/iv_avatar"
                     android:layout_width="88dp"
                     android:layout_height="88dp"
-                    android:background="#DBEAFE"
-                    android:gravity="center"
-                    android:text="🏋️"
-                    android:textSize="44sp" />
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="20dp"
+                    android:contentDescription="Avatar"
+                    app:srcCompat="@drawable/ic_user_solid"
+                    app:tint="@color/primary" />
 
-                <TextView
+                <ImageView
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:layout_gravity="bottom|end"
                     android:background="@drawable/bg_primary_button"
-                    android:gravity="center"
-                    android:text="📷"
-                    android:textSize="14sp" />
+                    android:padding="6dp"
+                    android:contentDescription="Edit photo"
+                    app:srcCompat="@drawable/ic_camera_solid"
+                    app:tint="@color/white" />
             </FrameLayout>
 
             <!-- Full Name -->

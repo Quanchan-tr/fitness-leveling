@@ -66,11 +66,12 @@
                 android:orientation="horizontal"
                 android:padding="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="✍️"
-                    android:textSize="18sp" />
+                <ImageView
+                    android:layout_width="@dimen/icon_size_small"
+                    android:layout_height="@dimen/icon_size_small"
+                    android:contentDescription="Write post"
+                    app:srcCompat="@drawable/ic_edit_solid"
+                    app:tint="@color/text_slate_light" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -97,11 +98,14 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🧔"
-                        android:textSize="22sp" />
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/bg_icon_container_white"
+                        android:padding="4dp"
+                        android:contentDescription="Avatar"
+                        app:srcCompat="@drawable/ic_user_solid"
+                        app:tint="@color/primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -117,22 +121,37 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Vừa hoàn thành Push Day! PR Bench Press 90kg thành công nhờ AI Coach canh nhịp thở chuẩn 🔥"
+                    android:text="Vừa hoàn thành Push Day! PR Bench Press 90kg thành công nhờ AI Coach canh nhịp thở chuẩn"
                     android:textColor="@color/text_dark"
                     android:textSize="13sp" />
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:background="@drawable/bg_tag_chip"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:paddingStart="8dp"
                     android:paddingTop="4dp"
                     android:paddingEnd="8dp"
-                    android:paddingBottom="4dp"
-                    android:text="🏋️ 2.680 kg • 45p"
-                    android:textColor="@color/text_slate"
-                    android:textSize="11sp" />
+                    android:paddingBottom="4dp">
+
+                    <ImageView
+                        android:layout_width="@dimen/icon_size_xs"
+                        android:layout_height="@dimen/icon_size_xs"
+                        android:layout_marginEnd="4dp"
+                        android:contentDescription="Workout"
+                        app:srcCompat="@drawable/ic_dumbbell_solid"
+                        app:tint="@color/text_slate" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2.680 kg • 45p"
+                        android:textColor="@color/text_slate"
+                        android:textSize="11sp" />
+                </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
@@ -144,7 +163,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="❤️ 42 Thích   💬 8 Bình luận   🔗 Chia sẻ"
+                    android:text="42 Thích • 8 Bình luận • Chia sẻ"
                     android:textColor="@color/text_slate"
                     android:textSize="11sp" />
             </LinearLayout>

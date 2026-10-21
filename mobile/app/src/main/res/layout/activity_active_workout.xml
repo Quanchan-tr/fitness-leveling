@@ -139,11 +139,12 @@
                     android:orientation="vertical"
                     app:layout_constraintTop_toBottomOf="@id/tv_target_info">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="🏋️"
-                        android:textSize="32sp" />
+                    <ImageView
+                        android:layout_width="@dimen/icon_size_large"
+                        android:layout_height="@dimen/icon_size_large"
+                        android:contentDescription="@string/active_workout_exercise_title"
+                        app:srcCompat="@drawable/ic_dumbbell_solid"
+                        app:tint="@color/primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -291,14 +292,13 @@
                         android:textColor="@color/text_dark"
                         android:textSize="14sp" />
 
-                    <TextView
+                    <ImageView
                         android:layout_width="60dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="✓"
-                        android:textColor="#10B981"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:layout_height="20dp"
+                        android:contentDescription="@string/active_workout_exercise_title"
+                        android:scaleType="centerInside"
+                        app:srcCompat="@drawable/ic_check_solid"
+                        app:tint="#10B981" />
                 </LinearLayout>
 
                 <!-- Set Row 2 -->
@@ -339,14 +339,13 @@
                         android:textColor="@color/text_dark"
                         android:textSize="14sp" />
 
-                    <TextView
+                    <ImageView
                         android:layout_width="60dp"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="✓"
-                        android:textColor="#10B981"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:layout_height="20dp"
+                        android:contentDescription="@string/active_workout_exercise_title"
+                        android:scaleType="centerInside"
+                        app:srcCompat="@drawable/ic_check_solid"
+                        app:tint="#10B981" />
                 </LinearLayout>
 
                 <!-- Set Row 3 (Active) -->

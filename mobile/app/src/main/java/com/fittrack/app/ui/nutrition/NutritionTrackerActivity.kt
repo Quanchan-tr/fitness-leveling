@@ -4,7 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.fittrack.app.databinding.ActivityNutritionTrackerBinding
+import com.fittrack.app.ui.BottomNavTab
 import com.fittrack.app.ui.modal.LogMealModalActivity
+import com.fittrack.app.ui.setupBottomNav
 
 class NutritionTrackerActivity : AppCompatActivity() {
 
@@ -22,5 +24,7 @@ class NutritionTrackerActivity : AppCompatActivity() {
         binding.btnAddMeal.setOnClickListener {
             startActivity(Intent(this, LogMealModalActivity::class.java))
         }
+
+        binding.bottomNavigation.setupBottomNav(this, BottomNavTab.METRICS)
     }
 }

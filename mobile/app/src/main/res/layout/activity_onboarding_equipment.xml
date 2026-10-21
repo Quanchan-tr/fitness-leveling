@@ -117,11 +117,14 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏋️"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="4dp"
+                    android:contentDescription="Dumbbell"
+                    app:srcCompat="@drawable/ic_dumbbell_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -152,11 +155,14 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏋️"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="4dp"
+                    android:contentDescription="Barbell"
+                    app:srcCompat="@drawable/ic_dumbbell_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -187,11 +193,14 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🫖"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="4dp"
+                    android:contentDescription="Kettlebell"
+                    app:srcCompat="@drawable/ic_kettlebell_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -231,11 +240,14 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🧗"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="4dp"
+                    android:contentDescription="Pull Up Bar"
+                    app:srcCompat="@drawable/ic_pullup_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -266,11 +278,14 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="⛩️"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="4dp"
+                    android:contentDescription="Squat Rack"
+                    app:srcCompat="@drawable/ic_rack_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="0dp"
@@ -300,11 +315,14 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🛋️"
-                    android:textSize="20sp" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="4dp"
+                    android:contentDescription="Flat Bench"
+                    app:srcCompat="@drawable/ic_bench_solid"
+                    app:tint="@color/primary" />
 
                 <TextView
                     android:layout_width="0dp"

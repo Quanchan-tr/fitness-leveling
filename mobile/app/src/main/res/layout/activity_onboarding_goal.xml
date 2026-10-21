@@ -56,11 +56,14 @@
             android:paddingStart="24dp"
             android:paddingEnd="24dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="💪"
-                android:textSize="24sp" />
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_icon_container_white"
+                android:padding="8dp"
+                android:contentDescription="Build Muscle"
+                app:srcCompat="@drawable/ic_arm_solid"
+                app:tint="@color/primary" />
 
             <TextView
                 android:id="@+id/tv_goal_build_muscle"
@@ -87,11 +90,14 @@
             android:paddingStart="24dp"
             android:paddingEnd="24dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🏋️"
-                android:textSize="24sp" />
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_icon_container_white"
+                android:padding="8dp"
+                android:contentDescription="Gain Strength"
+                app:srcCompat="@drawable/ic_dumbbell_solid"
+                app:tint="@color/primary" />
 
             <TextView
                 android:id="@+id/tv_goal_gain_strength"
@@ -118,11 +124,14 @@
             android:paddingStart="24dp"
             android:paddingEnd="24dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🔥"
-                android:textSize="24sp" />
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_icon_container_white"
+                android:padding="8dp"
+                android:contentDescription="Fat Loss"
+                app:srcCompat="@drawable/ic_flame_solid"
+                app:tint="@color/primary" />
 
             <TextView
                 android:id="@+id/tv_goal_fat_loss"

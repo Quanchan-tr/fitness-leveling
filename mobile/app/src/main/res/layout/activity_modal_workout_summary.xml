@@ -39,16 +39,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <ImageView
             android:id="@+id/btn_close"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:gravity="center"
-            android:text="✕"
-            android:textColor="@color/primary"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            android:contentDescription="Close"
+            app:srcCompat="@drawable/ic_close"
+            app:tint="@color/primary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

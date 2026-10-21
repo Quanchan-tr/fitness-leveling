@@ -182,12 +182,12 @@
                 android:orientation="horizontal"
                 android:padding="14dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="☰"
-                    android:textColor="@color/text_muted"
-                    android:textSize="18sp" />
+                <ImageView
+                    android:layout_width="@dimen/icon_size_small"
+                    android:layout_height="@dimen/icon_size_small"
+                    android:contentDescription="Reorder"
+                    app:srcCompat="@drawable/ic_drag_handle"
+                    app:tint="@color/text_muted" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -213,11 +213,12 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🗑"
-                    android:textSize="16sp" />
+                <ImageView
+                    android:layout_width="@dimen/icon_size_small"
+                    android:layout_height="@dimen/icon_size_small"
+                    android:contentDescription="Delete"
+                    app:srcCompat="@drawable/ic_trash_solid"
+                    app:tint="@color/text_muted" />
             </LinearLayout>
 
             <!-- Exercise item 2 -->
@@ -230,12 +231,12 @@
                 android:orientation="horizontal"
                 android:padding="14dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="☰"
-                    android:textColor="@color/text_muted"
-                    android:textSize="18sp" />
+                <ImageView
+                    android:layout_width="@dimen/icon_size_small"
+                    android:layout_height="@dimen/icon_size_small"
+                    android:contentDescription="Reorder"
+                    app:srcCompat="@drawable/ic_drag_handle"
+                    app:tint="@color/text_muted" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -261,11 +262,12 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🗑"
-                    android:textSize="16sp" />
+                <ImageView
+                    android:layout_width="@dimen/icon_size_small"
+                    android:layout_height="@dimen/icon_size_small"
+                    android:contentDescription="Delete"
+                    app:srcCompat="@drawable/ic_trash_solid"
+                    app:tint="@color/text_muted" />
             </LinearLayout>
 
             <!-- Exercise item 3 -->
@@ -278,12 +280,12 @@
                 android:orientation="horizontal"
                 android:padding="14dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="☰"
-                    android:textColor="@color/text_muted"
-                    android:textSize="18sp" />
+                <ImageView
+                    android:layout_width="@dimen/icon_size_small"
+                    android:layout_height="@dimen/icon_size_small"
+                    android:contentDescription="Reorder"
+                    app:srcCompat="@drawable/ic_drag_handle"
+                    app:tint="@color/text_muted" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -309,11 +311,12 @@
                         android:textSize="12sp" />
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🗑"
-                    android:textSize="16sp" />
+                <ImageView
+                    android:layout_width="@dimen/icon_size_small"
+                    android:layout_height="@dimen/icon_size_small"
+                    android:contentDescription="Delete"
+                    app:srcCompat="@drawable/ic_trash_solid"
+                    app:tint="@color/text_muted" />
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

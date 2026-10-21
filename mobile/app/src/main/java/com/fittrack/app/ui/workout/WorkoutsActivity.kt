@@ -8,8 +8,10 @@ import com.fittrack.app.ui.aipose.AiPoseCoachActivity
 import com.fittrack.app.ui.dashboard.DashboardActivity
 import com.fittrack.app.ui.metrics.BodyMetricsActivity
 import com.fittrack.app.ui.profile.UserProfileActivity
+import com.fittrack.app.ui.BottomNavTab
 import com.fittrack.app.ui.routine.CreateRoutineActivity
 import com.fittrack.app.ui.routine.RoutineDetailActivity
+import com.fittrack.app.ui.setupBottomNav
 
 class WorkoutsActivity : AppCompatActivity() {
 
@@ -39,17 +41,6 @@ class WorkoutsActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNav() {
-        binding.bottomNavigation.navItemDashboard.setOnClickListener {
-            startActivity(Intent(this, DashboardActivity::class.java))
-            finish()
-        }
-        binding.bottomNavigation.navItemMetrics.setOnClickListener {
-            startActivity(Intent(this, BodyMetricsActivity::class.java))
-            finish()
-        }
-        binding.bottomNavigation.navItemProfile.setOnClickListener {
-            startActivity(Intent(this, UserProfileActivity::class.java))
-            finish()
-        }
+        binding.bottomNavigation.setupBottomNav(this, BottomNavTab.WORKOUTS)
     }
 }

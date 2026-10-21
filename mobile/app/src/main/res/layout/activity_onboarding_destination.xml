@@ -74,11 +74,14 @@
                 android:orientation="horizontal"
                 android:padding="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏢"
-                    android:textSize="22sp" />
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="6dp"
+                    android:contentDescription="Large Gym"
+                    app:srcCompat="@drawable/ic_building_solid"
+                    app:tint="@color/primary" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -116,11 +119,14 @@
                 android:orientation="horizontal"
                 android:padding="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏪"
-                    android:textSize="22sp" />
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="6dp"
+                    android:contentDescription="Commercial Gym"
+                    app:srcCompat="@drawable/ic_store_solid"
+                    app:tint="@color/primary" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -158,11 +164,14 @@
                 android:orientation="horizontal"
                 android:padding="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏋️"
-                    android:textSize="22sp" />
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="6dp"
+                    android:contentDescription="Garage Gym"
+                    app:srcCompat="@drawable/ic_dumbbell_solid"
+                    app:tint="@color/primary" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -200,11 +209,14 @@
                 android:orientation="horizontal"
                 android:padding="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏠"
-                    android:textSize="22sp" />
+                <ImageView
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:background="@drawable/bg_icon_container_white"
+                    android:padding="6dp"
+                    android:contentDescription="At Home"
+                    app:srcCompat="@drawable/ic_home_solid"
+                    app:tint="@color/primary" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

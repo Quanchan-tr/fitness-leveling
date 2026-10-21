@@ -59,9 +59,9 @@
     <string name="gender_male">Male</string>
     <string name="gender_female">Female</string>
     <string name="gender_other">Other</string>
-    <string name="gender_male_symbol">♂</string>
-    <string name="gender_female_symbol">♀</string>
-    <string name="gender_other_symbol">⚥</string>
+    <string name="gender_male_symbol"></string>
+    <string name="gender_female_symbol"></string>
+    <string name="gender_other_symbol"></string>
 
     <!-- 002. Select Birthday -->
     <string name="onboarding_birthday_title">When is your birthday?</string>
@@ -169,20 +169,20 @@
     <!-- 001. Dashboard -->
     <string name="dashboard_app_title">FitTrack AI</string>
     <string name="dashboard_command_center">COMMAND CENTER</string>
-    <string name="dashboard_streak">🔥 17 ngày</string>
-    <string name="dashboard_enter_workout_cta">Vào buổi tập ngay  ➔</string>
+    <string name="dashboard_streak">17 ngày</string>
+    <string name="dashboard_enter_workout_cta">Vào buổi tập ngay</string>
     <string name="dashboard_user_name">Quan Tran</string>
     <string name="dashboard_user_level">Lv. 12</string>
-    <string name="dashboard_rotate_avatar">🔄 Xoay</string>
-    <string name="dashboard_outfit_avatar">👕 Trang phục</string>
+    <string name="dashboard_rotate_avatar">Xoay</string>
+    <string name="dashboard_outfit_avatar">Trang phục</string>
     <string name="dashboard_avatar_subtitle">Hero 3D Avatar • Mục tiêu Tăng cơ</string>
     <string name="dashboard_level_progress_title">Tiến trình cấp độ</string>
     <string name="dashboard_level_xp_value">640 / 1.000 XP (64%)</string>
     <string name="dashboard_today_focus_title">TIÊU ĐIỂM BUỔI TẬP HÔM NAY</string>
     <string name="dashboard_workout_name">Ngực &amp; Tay Sau Cắt Nét</string>
-    <string name="dashboard_status_ready">🟢 Sẵn sàng</string>
-    <string name="dashboard_workout_exercises_count">⚡ 3 bài tập</string>
-    <string name="dashboard_workout_duration">⏱ ~45 phút</string>
+    <string name="dashboard_status_ready">Sẵn sàng</string>
+    <string name="dashboard_workout_exercises_count">3 bài tập</string>
+    <string name="dashboard_workout_duration">~45 phút</string>
     <string name="ex_1_title">Barbell Bench Press</string>
     <string name="ex_1_desc">4 sets • 8 reps (80kg)</string>
     <string name="ex_2_title">Incline DB Press</string>
@@ -193,27 +193,27 @@
     <!-- 002. Workouts -->
     <string name="workouts_title">Kế hoạch &amp; Lịch tập</string>
     <string name="btn_create_routine">+ Tạo Routine</string>
-    <string name="workouts_weekly_schedule_title">📅 Lịch biểu luyện tập tuần này</string>
-    <string name="workouts_status_legend">🟢 Đã tập  🟡 Hôm nay  ⚪ Nghỉ</string>
+    <string name="workouts_weekly_schedule_title">Lịch biểu luyện tập tuần này</string>
+    <string name="workouts_status_legend">Đã tập  •  Hôm nay  •  Nghỉ</string>
     <string name="workouts_drag_hint">⠿ Kéo thả Routine từ thư viện vào ngày tập để xếp lịch</string>
 
     <!-- 003. AI Pose Coach -->
     <string name="pose_coach_title">AI Pose Coach</string>
-    <string name="pose_camera_badge">📹 CAMERA SỬA FORM TỰ ĐỘNG 60FPS</string>
+    <string name="pose_camera_badge">CAMERA SỬA FORM TỰ ĐỘNG 60FPS</string>
     <string name="pose_detect_sub">Phát hiện 33 khớp xương thời gian thực</string>
-    <string name="pose_tracking_status">🦴 Skeleton Tracking Active • Góc gối 92° • Lưng 178°</string>
+    <string name="pose_tracking_status">Skeleton Tracking Active • Góc gối 92° • Lưng 178°</string>
     <string name="pose_supported_exercises_title">Bài tập AI hỗ trợ phân tích:</string>
-    <string name="pose_exercise_squat">🏋️ Squat (Gánh đùi)</string>
-    <string name="pose_exercise_deadlift">🏋️ Deadlift (Kéo lưng)</string>
-    <string name="pose_exercise_bench">🏋️ Barbell Bench Press</string>
-    <string name="pose_exercise_ohp">🏋️ Overhead Press</string>
-    <string name="btn_start_ai_pose">📹 Bắt đầu phiên AI Pose Coach ngay ➔</string>
+    <string name="pose_exercise_squat">Squat (Gánh đùi)</string>
+    <string name="pose_exercise_deadlift">Deadlift (Kéo lưng)</string>
+    <string name="pose_exercise_bench">Barbell Bench Press</string>
+    <string name="pose_exercise_ohp">Overhead Press</string>
+    <string name="btn_start_ai_pose">Bắt đầu phiên AI Pose Coach ngay</string>
 
     <!-- 004. Body Metrics -->
     <string name="metrics_title">Số đo &amp; Tiến trình vóc dáng</string>
     <string name="btn_log_metrics">＋ Ghi số đo</string>
-    <string name="tab_body_metrics">📊 Chỉ số cơ thể</string>
-    <string name="tab_nutrition_shortcut">🍱 Dinh dưỡng ➔</string>
+    <string name="tab_body_metrics">Chỉ số cơ thể</string>
+    <string name="tab_nutrition_shortcut">Dinh dưỡng</string>
     <string name="metric_weight_label">CÂN NẶNG</string>
     <string name="metric_weight_val">68.4 kg</string>
     <string name="metric_weight_diff">↓ -1.2 kg</string>
@@ -224,7 +224,7 @@
     <string name="metric_fat_val">15.2%</string>
     <string name="metric_fat_diff">↓ -0.8%</string>
     <string name="metric_trend_chart_title">Biểu đồ xu hướng cân nặng &amp; mỡ (12 tuần)</string>
-    <string name="metric_trend_chart_desc">📈 Giảm đều từ 69.8kg xuống 68.4kg • Tỷ lệ mỡ giảm 1.8%</string>
+    <string name="metric_trend_chart_desc">Giảm đều từ 69.8kg xuống 68.4kg • Tỷ lệ mỡ giảm 1.8%</string>
 
     <!-- 005. Nutrition Tracker -->
     <string name="nutrition_title">Nhật ký dinh dưỡng &amp; Calo</string>
@@ -234,44 +234,44 @@
     <string name="nutrition_macro_carb">Tinh bột (Carb): 180 / 240g</string>
     <string name="nutrition_macro_fat">Chất béo (Fat): 48 / 65g</string>
     <string name="btn_add_meal">＋ Thêm món ăn</string>
-    <string name="btn_create_combo">🍱 Tạo combo món</string>
+    <string name="btn_create_combo">Tạo combo món</string>
 
     <!-- 006. Community -->
     <string name="community_title">Cộng đồng FitTrack AI</string>
-    <string name="community_input_placeholder">Chia sẻ trải nghiệm buổi tập và giáo án... ✍️</string>
+    <string name="community_input_placeholder">Chia sẻ trải nghiệm buổi tập và giáo án...</string>
 
     <!-- 007. User Profile -->
     <string name="profile_title">Hồ sơ cá nhân</string>
     <string name="profile_level_title">Lv. 12 Chiến binh</string>
     <string name="profile_stats">42 BUỔI TẬP    154 FOLLOWERS    88 FOLLOWING</string>
-    <string name="btn_edit_profile">✏️ Chỉnh sửa hồ sơ cá nhân</string>
+    <string name="btn_edit_profile">Chỉnh sửa hồ sơ cá nhân</string>
     <string name="profile_progress_title">Thống kê tiến trình tập (12 tuần gần nhất)</string>
-    <string name="profile_progress_desc">📊 Hoàn thành 42/48 buổi tập dự kiến • Đạt 87.5% mục tiêu</string>
+    <string name="profile_progress_desc">Hoàn thành 42/48 buổi tập dự kiến • Đạt 87.5% mục tiêu</string>
 
     <!-- 008. Routine Detail -->
     <string name="routine_detail_title">Chi tiết giáo án</string>
-    <string name="routine_today_tag">🔥 GIÁO ÁN HÔM NAY</string>
+    <string name="routine_today_tag">GIÁO ÁN HÔM NAY</string>
     <string name="routine_push_day_title">Push Day - Ngực &amp; Tay Sau Cắt Nét</string>
-    <string name="routine_push_day_stats">⏱ 60 Phút • 5 Bài tập • Khối lượng ~2.800 kg</string>
-    <string name="btn_start_workout_now">🚀 Bắt đầu buổi tập ngay ➔</string>
+    <string name="routine_push_day_stats">60 Phút • 5 Bài tập • Khối lượng ~2.800 kg</string>
+    <string name="btn_start_workout_now">Bắt đầu buổi tập ngay</string>
 
     <!-- 009. AI Pose Active Session -->
-    <string name="live_squat_check_tag">🔴 LIVE AI CAMERA SQUAT CHECK</string>
+    <string name="live_squat_check_tag">LIVE AI CAMERA SQUAT CHECK</string>
     <string name="live_rep_count">REP 8 / 10</string>
-    <string name="live_form_status">🟢 FORM CHUẨN 98% - LƯNG THẲNG</string>
+    <string name="live_form_status">FORM CHUẨN 98% - LƯNG THẲNG</string>
     <string name="live_angle_guidance">Góc gối 92° • Hạ thấp thêm 3cm ở điểm sâu nhất</string>
-    <string name="btn_finish_ai_pose">Hoàn thành phiên AI Pose ➔</string>
+    <string name="btn_finish_ai_pose">Hoàn thành phiên AI Pose</string>
 
     <!-- 010 & 011. Active Workout -->
     <string name="active_workout_exercise_title">Chi tiết tập luyện</string>
     <string name="active_workout_status_1">● Đang tập Bài 1/2</string>
     <string name="active_workout_status_2">● Đang tập Bài 2/2 (Cuối)</string>
-    <string name="active_workout_rest_label">⏱ Đồng hồ nghỉ chuẩn:</string>
+    <string name="active_workout_rest_label">Đồng hồ nghỉ chuẩn:</string>
     <string name="active_workout_rest_time">01:30</string>
     <string name="btn_start_rest">Bắt đầu nghỉ</string>
-    <string name="btn_ai_check_form">📹 AI Check Form</string>
-    <string name="btn_next_exercise">▶ Hoàn thành Bài 1 • Sang Bài 2 ➔</string>
-    <string name="btn_finish_workout_xp">🎉 Hoàn thành buổi tập &amp; Lưu kỷ lục (+350 XP)</string>
+    <string name="btn_ai_check_form">AI Check Form</string>
+    <string name="btn_next_exercise">Hoàn thành Bài 1 • Sang Bài 2</string>
+    <string name="btn_finish_workout_xp">Hoàn thành buổi tập &amp; Lưu kỷ lục (+350 XP)</string>
 
     <!-- 012. Create Routine -->
     <string name="create_routine_screen_title">Tạo giáo án mới</string>
@@ -282,7 +282,7 @@
 
     <!-- 013. Badges & Achievements -->
     <string name="badges_screen_title">Huy hiệu &amp; Thành tích</string>
-    <string name="badges_current_rank">🏆 CẤP ĐỘ HIỆN TẠI: CHIẾN BINH LV. 12</string>
+    <string name="badges_current_rank">CẤP ĐỘ HIỆN TẠI: CHIẾN BINH LV. 12</string>
     <string name="badges_xp_to_next">2.450 / 3.000 XP (Cần thêm 550 XP lên Lv. 13)</string>
 
     <!-- 014. Settings -->
@@ -297,10 +297,10 @@
     <!-- 015. Edit Profile -->
     <string name="edit_profile_title">Chỉnh sửa hồ sơ</string>
     <string name="btn_save">Lưu</string>
-    <string name="btn_save_profile_changes">💾 Lưu thay đổi hồ sơ</string>
+    <string name="btn_save_profile_changes">Lưu thay đổi hồ sơ</string>
 
     <!-- 016. Daily Quests Modal -->
-    <string name="modal_quests_title">🎯 Nhiệm vụ hôm nay</string>
+    <string name="modal_quests_title">Nhiệm vụ hôm nay</string>
     <string name="modal_quests_q1_title">Hoàn thành 1 bài tập Push Day</string>
     <string name="modal_quests_q1_progress">1/1</string>
     <string name="modal_quests_q1_xp">+100 XP</string>
@@ -317,7 +317,7 @@
 
     <!-- 018. Exercise Picker Modal -->
     <string name="modal_picker_title">Thư viện bài tập</string>
-    <string name="modal_picker_search_hint">🔍 Tìm kiếm bài tập (Bench, Squat...)...</string>
+    <string name="modal_picker_search_hint">Tìm kiếm bài tập (Bench, Squat...)...</string>
     <string name="modal_picker_chip_all">Tất cả</string>
     <string name="modal_picker_chip_chest">Ngực</string>
     <string name="modal_picker_chip_back">Lưng</string>
@@ -334,8 +334,8 @@
     <string name="modal_picker_btn_add">+ Thêm vào bài tập</string>
 
     <!-- 019. Workout Summary Modal -->
-    <string name="modal_summary_title">🎉 BUỔI TẬP HOÀN THÀNH!</string>
-    <string name="modal_summary_level_up">👑 THĂNG CẤP! BẠN ĐÃ ĐẠT CẤP 18</string>
+    <string name="modal_summary_title">BUỔI TẬP HOÀN THÀNH!</string>
+    <string name="modal_summary_level_up">THĂNG CẤP! BẠN ĐÃ ĐẠT CẤP 18</string>
     <string name="modal_summary_level_xp">+350 Điểm Kinh Nghiệm (XP)</string>
     <string name="modal_summary_time_label">Thời gian</string>
     <string name="modal_summary_time_val">42 phút</string>
@@ -344,25 +344,25 @@
     <string name="modal_summary_form_label">AI Pose Form</string>
     <string name="modal_summary_form_val">98% Chuẩn</string>
     <string name="modal_summary_rpg_title">TĂNG CHỈ SỐ NHÂN VẬT THỢ SĂN</string>
-    <string name="modal_summary_stat_str">⚔️ Sức mạnh (STR): +3 (84 → 87)</string>
-    <string name="modal_summary_stat_sta">🛡️ Thể lực (STA): +2 (79 → 81)</string>
-    <string name="modal_summary_stat_agi">⚡ Khéo léo (AGI): +1 (75 → 76)</string>
+    <string name="modal_summary_stat_str">Sức mạnh (STR): +3 (84 → 87)</string>
+    <string name="modal_summary_stat_sta">Thể lực (STA): +2 (79 → 81)</string>
+    <string name="modal_summary_stat_agi">Khéo léo (AGI): +1 (75 → 76)</string>
     <string name="modal_summary_btn_share">Chia sẻ thành tích lên Cộng đồng</string>
     <string name="modal_summary_btn_close">Đóng lại</string>
 
     <!-- 020. AI Calibration Modal -->
-    <string name="modal_calib_title">🤖 Hiệu chỉnh Góc Camera AI</string>
-    <string name="modal_calib_status">🟢 17 Điểm Khớp Xương Nhận Diện Chuẩn</string>
+    <string name="modal_calib_title">Hiệu chỉnh Góc Camera AI</string>
+    <string name="modal_calib_status">17 Điểm Khớp Xương Nhận Diện Chuẩn</string>
     <string name="modal_calib_distance">Khoảng cách lý tưởng: 2.0m - 2.5m</string>
     <string name="modal_calib_tip1">• Đặt máy ngang tầm hông, góc nghiêng 45 độ</string>
     <string name="modal_calib_tip2">• Đảm bảo đủ ánh sáng và thấy rõ từ đầu đến chân</string>
     <string name="modal_calib_btn_start">Bắt đầu buổi tập với AI Coach</string>
 
     <!-- 021. Log Meal Modal -->
-    <string name="modal_meal_title">🍽️ Thêm món ăn vào nhật ký</string>
-    <string name="modal_meal_tab_search">🔍 Tìm trong thư viện</string>
-    <string name="modal_meal_tab_combo">🍱 Chọn Combo có sẵn</string>
-    <string name="modal_meal_search_hint">🔍 Nhập tên món: Ức gà, Trứng, Bò, Cơm...</string>
+    <string name="modal_meal_title">Thêm món ăn vào nhật ký</string>
+    <string name="modal_meal_tab_search">Tìm trong thư viện</string>
+    <string name="modal_meal_tab_combo">Chọn Combo có sẵn</string>
+    <string name="modal_meal_search_hint">Nhập tên món: Ức gà, Trứng, Bò, Cơm...</string>
     <string name="modal_meal_chip_all">Tất cả</string>
     <string name="modal_meal_chip_protein">Đạm/Protein</string>
     <string name="modal_meal_chip_carb">Tinh bột</string>
@@ -375,5 +375,5 @@
     <string name="modal_meal_food3_name">Trứng gà luộc (2 quả)</string>
     <string name="modal_meal_food3_macro">156 kcal • P: 13g • C: 1.1g • F: 10g</string>
     <string name="modal_meal_btn_add_item">+ Thêm</string>
-    <string name="modal_meal_btn_confirm">✓ Lưu món vào thực đơn (+ Calo &amp; Macro) ➔</string>
+    <string name="modal_meal_btn_confirm">Lưu món vào thực đơn (+ Calo &amp; Macro)</string>
 </resources>

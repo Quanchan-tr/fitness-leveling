@@ -8,6 +8,9 @@ import com.fittrack.app.ui.dashboard.DashboardActivity
 import com.fittrack.app.ui.profile.UserProfileActivity
 import com.fittrack.app.ui.workout.WorkoutsActivity
 
+import com.fittrack.app.ui.BottomNavTab
+import com.fittrack.app.ui.setupBottomNav
+
 class BodyMetricsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityBodyMetricsBinding
@@ -21,17 +24,6 @@ class BodyMetricsActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNav() {
-        binding.bottomNavigation.navItemDashboard.setOnClickListener {
-            startActivity(Intent(this, DashboardActivity::class.java))
-            finish()
-        }
-        binding.bottomNavigation.navItemWorkouts.setOnClickListener {
-            startActivity(Intent(this, WorkoutsActivity::class.java))
-            finish()
-        }
-        binding.bottomNavigation.navItemProfile.setOnClickListener {
-            startActivity(Intent(this, UserProfileActivity::class.java))
-            finish()
-        }
+        binding.bottomNavigation.setupBottomNav(this, BottomNavTab.METRICS)
     }
 }

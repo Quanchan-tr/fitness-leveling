@@ -39,16 +39,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
+        <ImageView
             android:id="@+id/btn_close"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:gravity="center"
-            android:text="✕"
-            android:textColor="@color/primary"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            android:contentDescription="Close"
+            app:srcCompat="@drawable/ic_close"
+            app:tint="@color/primary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -65,12 +66,13 @@
             app:layout_constraintTop_toBottomOf="@+id/btn_close">
 
             <!-- Human Silhouette Icon -->
-            <TextView
+            <ImageView
                 android:id="@+id/tv_skeleton_avatar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🧍‍♂️"
-                android:textSize="48sp"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:contentDescription="Human Skeleton"
+                app:srcCompat="@drawable/ic_user_solid"
+                app:tint="@color/white"
                 app:layout_constraintBottom_toTopOf="@+id/tv_calib_status"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

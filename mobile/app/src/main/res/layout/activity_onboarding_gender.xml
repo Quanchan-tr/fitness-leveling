@@ -56,13 +56,15 @@
             android:paddingStart="24dp"
             android:paddingEnd="24dp">
 
-            <TextView
+            <ImageView
                 android:id="@+id/tv_symbol_male"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/gender_male_symbol"
-                android:textColor="@color/text_primary"
-                android:textSize="22sp" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_icon_container_white"
+                android:padding="8dp"
+                android:contentDescription="Male"
+                app:srcCompat="@drawable/ic_male_solid"
+                app:tint="@color/primary" />
 
             <TextView
                 android:id="@+id/tv_label_male"
@@ -89,13 +91,15 @@
             android:paddingStart="24dp"
             android:paddingEnd="24dp">
 
-            <TextView
+            <ImageView
                 android:id="@+id/tv_symbol_female"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/gender_female_symbol"
-                android:textColor="@color/text_primary"
-                android:textSize="22sp" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_icon_container_white"
+                android:padding="8dp"
+                android:contentDescription="Female"
+                app:srcCompat="@drawable/ic_female_solid"
+                app:tint="@color/primary" />
 
             <TextView
                 android:id="@+id/tv_label_female"
@@ -122,13 +126,15 @@
             android:paddingStart="24dp"
             android:paddingEnd="24dp">
 
-            <TextView
+            <ImageView
                 android:id="@+id/tv_symbol_other"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/gender_other_symbol"
-                android:textColor="@color/text_primary"
-                android:textSize="22sp" />
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_icon_container_white"
+                android:padding="8dp"
+                android:contentDescription="Other"
+                app:srcCompat="@drawable/ic_gender_other_solid"
+                app:tint="@color/primary" />
 
             <TextView
                 android:id="@+id/tv_label_other"

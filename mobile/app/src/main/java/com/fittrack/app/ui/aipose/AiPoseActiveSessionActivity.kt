@@ -2,6 +2,7 @@ package com.fittrack.app.ui.aipose
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.fittrack.app.R
 import com.fittrack.app.databinding.ActivityAiPoseActiveSessionBinding
 
 class AiPoseActiveSessionActivity : AppCompatActivity() {
@@ -24,7 +25,10 @@ class AiPoseActiveSessionActivity : AppCompatActivity() {
 
         binding.btnVoiceFeedback.setOnClickListener {
             isVoiceEnabled = !isVoiceEnabled
-            binding.btnVoiceFeedback.text = if (isVoiceEnabled) "🔊 Giọng nói: BẬT" else "🔇 Giọng nói: TẮT"
+            binding.btnVoiceFeedback.text = if (isVoiceEnabled) "Giọng nói: BẬT" else "Giọng nói: TẮT"
+            binding.btnVoiceFeedback.setIconResource(
+                if (isVoiceEnabled) R.drawable.ic_volume_up_solid else R.drawable.ic_volume_off_solid
+            )
         }
     }
 }

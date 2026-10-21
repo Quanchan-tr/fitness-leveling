@@ -62,12 +62,10 @@ class ExercisePickerModalActivity : AppCompatActivity() {
 
         if (selectedExercises.contains(id)) {
             selectedExercises.remove(id)
-            btn.text = "+"
-            btn.setBackgroundResource(R.drawable.bg_modal_circle_primary)
+            btn.setImageResource(R.drawable.ic_plus_solid)
         } else {
             selectedExercises.add(id)
-            btn.text = "✓"
-            btn.setBackgroundResource(R.drawable.bg_modal_circle_primary)
+            btn.setImageResource(R.drawable.ic_check_solid)
         }
     }
 }

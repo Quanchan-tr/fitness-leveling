@@ -13,6 +13,14 @@
     <dimen name="back_button_size">40dp</dimen>
     <dimen name="otp_box_size">48dp</dimen>
 
+    <!-- Global Icon Sizing Tokens -->
+    <dimen name="icon_size_xs">14dp</dimen>
+    <dimen name="icon_size_small">18dp</dimen>
+    <dimen name="icon_size_medium">24dp</dimen>
+    <dimen name="icon_size_large">32dp</dimen>
+    <dimen name="icon_size_xlarge">48dp</dimen>
+    <dimen name="nav_icon_size">24dp</dimen>
+
     <!-- Spacings -->
     <dimen name="spacing_tiny">4dp</dimen>
     <dimen name="spacing_small">8dp</dimen>
