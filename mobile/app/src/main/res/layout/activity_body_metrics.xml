@@ -260,14 +260,14 @@
                             android:layout_width="@dimen/icon_size_xs"
                             android:layout_height="@dimen/icon_size_xs"
                             android:layout_marginEnd="6dp"
-                            android:contentDescription="Chart"
+                            android:contentDescription="@string/cd_chart"
                             app:srcCompat="@drawable/ic_chart_line_solid"
                             app:tint="@color/text_slate_light" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="12 WEEKS PROGRESSION CHART"
+                            android:text="@string/metric_chart_placeholder"
                             android:textColor="@color/text_slate_light"
                             android:textSize="11sp"
                             android:textStyle="bold" />

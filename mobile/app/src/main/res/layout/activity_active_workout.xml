@@ -26,7 +26,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Quay lại"
+            android:contentDescription="@string/cd_back_button"
             android:padding="6dp"
             android:src="@drawable/ic_back"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -68,7 +68,7 @@
             android:id="@+id/btn_quit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Kết thúc"
+            android:text="@string/btn_quit_workout"
             android:textColor="#EF4444"
             android:textSize="13sp"
             android:textStyle="bold"
@@ -108,7 +108,7 @@
                     android:id="@+id/tv_current_exercise_name"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Barbell Bench Press"
+                    android:text="@string/active_workout_ex1_name"
                     android:textColor="@color/text_dark"
                     android:textSize="18sp"
                     android:textStyle="bold"
@@ -121,7 +121,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Cơ ngực giữa &amp; Tay sau • Khởi động kỹ khớp vai"
+                    android:text="@string/active_workout_ex1_target"
                     android:textColor="@color/text_muted"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -150,7 +150,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="Hướng dẫn chuyển động chuẩn"
+                        android:text="@string/active_workout_demo_guide"
                         android:textColor="@color/text_muted"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -220,7 +220,7 @@
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="HIỆP"
+                        android:text="@string/active_workout_th_set"
                         android:textColor="@color/text_muted"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -230,7 +230,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="KG"
+                        android:text="@string/active_workout_th_kg"
                         android:textColor="@color/text_muted"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -240,7 +240,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="REPS"
+                        android:text="@string/active_workout_th_reps"
                         android:textColor="@color/text_muted"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -249,7 +249,7 @@
                         android:layout_width="60dp"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="XONG"
+                        android:text="@string/active_workout_th_done"
                         android:textColor="@color/text_muted"
                         android:textSize="11sp"
                         android:textStyle="bold" />
@@ -450,7 +450,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:layout_marginTop="12dp"
-                    android:text="＋ Thêm hiệp (Add Set)"
+                    android:text="@string/btn_add_set"
                     android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>

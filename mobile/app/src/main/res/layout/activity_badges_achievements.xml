@@ -26,7 +26,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Quay lại"
+            android:contentDescription="@string/cd_back_button"
             android:padding="6dp"
             android:src="@drawable/ic_back"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -119,7 +119,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="HUY HIỆU DANH DỰ (4/6 ĐÃ MỞ)"
+                android:text="@string/badges_section_title"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -139,7 +139,7 @@
                     android:layout_height="44dp"
                     android:background="@drawable/bg_icon_container_white"
                     android:padding="10dp"
-                    android:contentDescription="Medal"
+                    android:contentDescription="@string/cd_medal"
                     app:srcCompat="@drawable/ic_medal_solid"
                     app:tint="#F59E0B" />
 
@@ -153,7 +153,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Người Tiên Phong"
+                        android:text="@string/badge_1_title"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -162,7 +162,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Hoàn thành buổi tập đầu tiên • +100 XP"
+                        android:text="@string/badge_1_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -175,7 +175,7 @@
                     android:paddingTop="4dp"
                     android:paddingEnd="8dp"
                     android:paddingBottom="4dp"
-                    android:text="ĐÃ ĐẠT"
+                    android:text="@string/badge_status_unlocked"
                     android:textColor="#16A34A"
                     android:textSize="11sp"
                     android:textStyle="bold" />
@@ -196,7 +196,7 @@
                     android:layout_height="44dp"
                     android:background="@drawable/bg_icon_container_white"
                     android:padding="10dp"
-                    android:contentDescription="Workout"
+                    android:contentDescription="@string/cd_workout"
                     app:srcCompat="@drawable/ic_dumbbell_solid"
                     app:tint="#2563EB" />
 
@@ -210,7 +210,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chiến Thần Đẩy Ngực"
+                        android:text="@string/badge_2_title"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -219,7 +219,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Chinh phục mốc 100kg Bench Press • +250 XP"
+                        android:text="@string/badge_2_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -232,7 +232,7 @@
                     android:paddingTop="4dp"
                     android:paddingEnd="8dp"
                     android:paddingBottom="4dp"
-                    android:text="ĐÃ ĐẠT"
+                    android:text="@string/badge_status_unlocked"
                     android:textColor="#16A34A"
                     android:textSize="11sp"
                     android:textStyle="bold" />
@@ -253,7 +253,7 @@
                     android:layout_height="44dp"
                     android:background="@drawable/bg_icon_container_white"
                     android:padding="10dp"
-                    android:contentDescription="Yoga"
+                    android:contentDescription="@string/cd_yoga"
                     app:srcCompat="@drawable/ic_lotus_solid"
                     app:tint="#16A34A" />
 
@@ -267,7 +267,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="AI Pose Master"
+                        android:text="@string/badge_3_title"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -276,7 +276,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Độ chuẩn form 98% trong 10 hiệp • +200 XP"
+                        android:text="@string/badge_3_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -289,7 +289,7 @@
                     android:paddingTop="4dp"
                     android:paddingEnd="8dp"
                     android:paddingBottom="4dp"
-                    android:text="ĐÃ ĐẠT"
+                    android:text="@string/badge_status_unlocked"
                     android:textColor="#16A34A"
                     android:textSize="11sp"
                     android:textStyle="bold" />
@@ -310,7 +310,7 @@
                     android:layout_height="44dp"
                     android:background="@drawable/bg_icon_container_white"
                     android:padding="10dp"
-                    android:contentDescription="Streak"
+                    android:contentDescription="@string/cd_streak"
                     app:srcCompat="@drawable/ic_flame_solid"
                     app:tint="#EA580C" />
 
@@ -324,7 +324,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chuỗi Kỷ Luật 30 Ngày"
+                        android:text="@string/badge_4_title"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -333,7 +333,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Tập luyện liên tục không ngắt quãng • +500 XP"
+                        android:text="@string/badge_4_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -346,7 +346,7 @@
                     android:paddingTop="4dp"
                     android:paddingEnd="8dp"
                     android:paddingBottom="4dp"
-                    android:text="ĐÃ ĐẠT"
+                    android:text="@string/badge_status_unlocked"
                     android:textColor="#16A34A"
                     android:textSize="11sp"
                     android:textStyle="bold" />
@@ -367,7 +367,7 @@
                     android:layout_height="44dp"
                     android:background="@drawable/bg_icon_container_white"
                     android:padding="11dp"
-                    android:contentDescription="Locked"
+                    android:contentDescription="@string/cd_locked"
                     app:srcCompat="@drawable/ic_lock_solid"
                     app:tint="@color/text_muted" />
 
@@ -381,7 +381,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Chuyên Gia Dinh Dưỡng"
+                        android:text="@string/badge_5_title"
                         android:textColor="@color/text_muted"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -390,7 +390,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="Ghi chép bữa ăn 14 ngày trọn vẹn • +150 XP"
+                        android:text="@string/badge_5_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -403,7 +403,7 @@
                     android:paddingTop="4dp"
                     android:paddingEnd="8dp"
                     android:paddingBottom="4dp"
-                    android:text="TIẾN ĐỘ 7/14"
+                    android:text="@string/badge_status_progress"
                     android:textColor="@color/text_muted"
                     android:textSize="11sp"
                     android:textStyle="bold" />

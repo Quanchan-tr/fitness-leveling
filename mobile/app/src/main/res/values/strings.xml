@@ -2,162 +2,165 @@
 <resources>
     <string name="app_name">FitTrack</string>
 
-    <!-- Common -->
-    <string name="label_optional">Optional</string>
-    <string name="cd_back_button">Back</string>
-    <string name="cd_toggle_password">Toggle password visibility</string>
+    <!-- Common Controls & Navigation -->
+    <string name="label_optional">Không bắt buộc</string>
+    <string name="cd_back_button">Quay lại</string>
+    <string name="cd_toggle_password">Ẩn/hiện mật khẩu</string>
+    <string name="cd_close">Đóng</string>
+    <string name="btn_continue">Tiếp tục</string>
+    <string name="btn_skip">Bỏ qua</string>
+    <string name="btn_save">Lưu</string>
+    <string name="btn_cancel">Hủy</string>
 
     <!-- 1. Login Screen -->
-    <string name="login_title">Login</string>
-    <string name="label_email">Email Address</string>
+    <string name="login_title">Đăng nhập</string>
+    <string name="label_email">Địa chỉ email</string>
     <string name="hint_email">name@example.com</string>
-    <string name="label_password">Password</string>
+    <string name="label_password">Mật khẩu</string>
     <string name="hint_password">••••••••</string>
-    <string name="forgot_password_link">Forgot Password</string>
-    <string name="keep_me_signed_in">Keep me signed in</string>
-    <string name="btn_login">Login</string>
-    <string name="dont_have_account_full"><![CDATA[Don’t have an Account? <font color="#1443C3"><b>Sign up here</b></font>]]></string>
+    <string name="forgot_password_link">Quên mật khẩu?</string>
+    <string name="keep_me_signed_in">Duy trì đăng nhập</string>
+    <string name="btn_login">Đăng nhập</string>
+    <string name="dont_have_account_full"><![CDATA[Chưa có tài khoản? <font color="#1443C3"><b>Đăng ký ngay</b></font>]]></string>
 
     <!-- 2. Signup Screen -->
-    <string name="signup_title">Signup</string>
-    <string name="label_full_name">Full Name</string>
-    <string name="hint_full_name">Becca Ade</string>
-    <string name="label_confirm_password">Confirm Password</string>
-    <string name="terms_agreement">By Creating an Account, I accept Terms of Use and Privacy Policy</string>
-    <string name="btn_signup">Signup</string>
-    <string name="have_account_full"><![CDATA[Have an Account? <font color="#1443C3"><b>Sign in here</b></font>]]></string>
+    <string name="signup_title">Đăng ký</string>
+    <string name="label_full_name">Họ và tên</string>
+    <string name="hint_full_name">Nguyễn Văn Tuấn</string>
+    <string name="label_confirm_password">Xác nhận mật khẩu</string>
+    <string name="terms_agreement">Bằng việc tạo tài khoản, bạn đồng ý với Điều khoản sử dụng và Chính sách quyền riêng tư</string>
+    <string name="btn_signup">Đăng ký</string>
+    <string name="have_account_full"><![CDATA[Đã có tài khoản? <font color="#1443C3"><b>Đăng nhập tại đây</b></font>]]></string>
 
     <!-- 3. Verify Email Screen -->
-    <string name="verify_email_title">Please verify your email address</string>
-    <string name="verify_email_description">We’ve sent an email to becca@gmail.com, please enter the code below.</string>
-    <string name="label_enter_code">Enter Code</string>
-    <string name="btn_verify">Verify</string>
-    <string name="resend_code_full"><![CDATA[Didn’t see your email? <font color="#1443C3"><b>Resend</b></font>]]></string>
+    <string name="verify_email_title">Xác thực địa chỉ email</string>
+    <string name="verify_email_description">Mã xác thực 6 số đã được gửi tới email của bạn. Vui lòng nhập mã bên dưới để tiếp tục.</string>
+    <string name="label_enter_code">Nhập mã xác thực</string>
+    <string name="btn_verify">Xác thực</string>
+    <string name="resend_code_full"><![CDATA[Chưa nhận được email? <font color="#1443C3"><b>Gửi lại mã</b></font>]]></string>
 
     <!-- 4. Forgot Password Screen -->
-    <string name="forgot_password_title">Forgot Password</string>
-    <string name="forgot_password_description">Enter the email address registered with your account. We\'ll send you a link to reset your password.</string>
-    <string name="btn_submit">Submit</string>
-    <string name="remember_password_full"><![CDATA[Remembered password? <font color="#1443C3"><b>Login to your account</b></font>]]></string>
+    <string name="forgot_password_title">Quên mật khẩu</string>
+    <string name="forgot_password_description">Nhập địa chỉ email đã đăng ký. FitTrack sẽ gửi liên kết khôi phục mật khẩu vào hòm thư của bạn.</string>
+    <string name="btn_submit">Gửi yêu cầu</string>
+    <string name="remember_password_full"><![CDATA[Đã nhớ lại mật khẩu? <font color="#1443C3"><b>Đăng nhập ngay</b></font>]]></string>
 
     <!-- 5. Verify Forgot Password Screen -->
-    <string name="email_sent_title">Email sent!</string>
-    <string name="email_sent_description">We’ve sent an email to becca@gmail.com, please enter the code below.</string>
+    <string name="email_sent_title">Đã gửi email!</string>
+    <string name="email_sent_description">Mã xác thực khôi phục mật khẩu đã được gửi đến email của bạn. Vui lòng nhập mã bên dưới.</string>
 
     <!-- 6. Create New Password Screen -->
-    <string name="create_new_password_title">Create a New Password</string>
-    <string name="label_new_password">Password</string>
-    <string name="btn_update">Update</string>
+    <string name="create_new_password_title">Tạo mật khẩu mới</string>
+    <string name="label_new_password">Mật khẩu mới</string>
+    <string name="btn_update">Cập nhật mật khẩu</string>
 
     <!-- Onboarding Flow Common -->
-    <string name="btn_continue">Continue</string>
-    <string name="btn_skip">Skip</string>
-    <string name="onboarding_privacy_notice">Your data is private and secure.</string>
+    <string name="onboarding_privacy_notice">Dữ liệu thể chất của bạn được bảo mật tuyệt đối.</string>
 
     <!-- 001. Select Gender -->
-    <string name="onboarding_gender_title">What is your gender?</string>
-    <string name="gender_male">Male</string>
-    <string name="gender_female">Female</string>
-    <string name="gender_other">Other</string>
+    <string name="onboarding_gender_title">Giới tính sinh học của bạn là gì?</string>
+    <string name="gender_male">Nam</string>
+    <string name="gender_female">Nữ</string>
+    <string name="gender_other">Khác</string>
     <string name="gender_male_symbol"></string>
     <string name="gender_female_symbol"></string>
     <string name="gender_other_symbol"></string>
 
     <!-- 002. Select Birthday -->
-    <string name="onboarding_birthday_title">When is your birthday?</string>
+    <string name="onboarding_birthday_title">Ngày sinh của bạn là khi nào?</string>
 
     <!-- 003. Select Weight -->
-    <string name="onboarding_weight_title">What is your weight?</string>
-    <string name="unit_kilograms">Kilograms</string>
-    <string name="unit_pounds">Pounds</string>
+    <string name="onboarding_weight_title">Cân nặng hiện tại của bạn?</string>
+    <string name="unit_kilograms">Kilogram (kg)</string>
+    <string name="unit_pounds">Pound (lbs)</string>
     <string name="unit_kg">kg</string>
     <string name="unit_lbs">lbs</string>
     <string name="default_weight_kg">72.0</string>
 
     <!-- 004. Select Height -->
-    <string name="onboarding_height_title">What is your height?</string>
-    <string name="unit_centimeters">Centimeters</string>
-    <string name="unit_feet_inches">Feet and Inches</string>
+    <string name="onboarding_height_title">Chiều cao hiện tại của bạn?</string>
+    <string name="unit_centimeters">Centimet (cm)</string>
+    <string name="unit_feet_inches">Feet &amp; Inches (ft/in)</string>
     <string name="default_height_cm">170 cm</string>
 
     <!-- 005. Select Goal -->
-    <string name="onboarding_goal_title">What is your top goal?</string>
-    <string name="goal_build_muscle">Build Muscle</string>
-    <string name="goal_gain_strength">Gain Strength</string>
-    <string name="goal_fat_loss">Fat Loss</string>
+    <string name="onboarding_goal_title">Mục tiêu tập luyện hàng đầu của bạn?</string>
+    <string name="goal_build_muscle">Tăng cơ (Hypertrophy)</string>
+    <string name="goal_gain_strength">Tăng sức mạnh (Strength)</string>
+    <string name="goal_fat_loss">Giảm mỡ (Fat Loss)</string>
 
     <!-- 006. Select Experience -->
-    <string name="onboarding_experience_title">How much training experience do you have?</string>
-    <string name="exp_beginner_title">Beginner</string>
-    <string name="exp_beginner_desc">0-1 year</string>
-    <string name="exp_intermediate_title">Intermediate</string>
-    <string name="exp_intermediate_desc">1-3 years</string>
-    <string name="exp_advanced_title">Advanced</string>
-    <string name="exp_advanced_desc">3+ years</string>
+    <string name="onboarding_experience_title">Kinh nghiệm tập luyện thể hình của bạn?</string>
+    <string name="exp_beginner_title">Mới bắt đầu (Beginner)</string>
+    <string name="exp_beginner_desc">Dưới 1 năm tập luyện</string>
+    <string name="exp_intermediate_title">Đã có kinh nghiệm (Intermediate)</string>
+    <string name="exp_intermediate_desc">1 - 3 năm tập luyện</string>
+    <string name="exp_advanced_title">Nâng cao (Advanced)</string>
+    <string name="exp_advanced_desc">Trên 3 năm tập luyện</string>
 
     <!-- 007. Guide Or Not -->
-    <string name="onboarding_guide_title">Would you like to build your own workouts or be guided?</string>
-    <string name="guide_option_self">I want to build my own workouts</string>
-    <string name="guide_option_guided">I want to be guided</string>
+    <string name="onboarding_guide_title">Bạn muốn tự lập lịch tập hay được AI hướng dẫn?</string>
+    <string name="guide_option_self">Tôi muốn tự thiết kế giáo án tập</string>
+    <string name="guide_option_guided">Tôi muốn có AI hướng dẫn chi tiết</string>
 
     <!-- 008. Select Frequency -->
-    <string name="onboarding_frequency_title">How often do you want to work out?</string>
-    <string name="freq_1">1 per week</string>
-    <string name="freq_2">2 per week</string>
-    <string name="freq_3">3 per week</string>
-    <string name="freq_4">4 per week</string>
-    <string name="freq_5">5 per week</string>
-    <string name="freq_6">6 per week</string>
+    <string name="onboarding_frequency_title">Bạn muốn tập luyện bao nhiêu buổi mỗi tuần?</string>
+    <string name="freq_1">1 buổi / tuần</string>
+    <string name="freq_2">2 buổi / tuần</string>
+    <string name="freq_3">3 buổi / tuần</string>
+    <string name="freq_4">4 buổi / tuần</string>
+    <string name="freq_5">5 buổi / tuần</string>
+    <string name="freq_6">6 buổi / tuần</string>
 
     <!-- 009. Workout Time -->
-    <string name="onboarding_time_title">How long would you like your workouts to be?</string>
-    <string name="time_40m">40min</string>
-    <string name="time_60m">1h 0min</string>
-    <string name="time_80m">1h 20min</string>
+    <string name="onboarding_time_title">Thời lượng mỗi buổi tập bạn mong muốn?</string>
+    <string name="time_40m">40 phút</string>
+    <string name="time_60m">1 giờ</string>
+    <string name="time_80m">1 giờ 20 phút</string>
 
     <!-- 010. Focus Muscle -->
-    <string name="onboarding_muscle_title">Which muscle group do you want to focus on?</string>
-    <string name="onboarding_muscle_subtitle">Your program will be well-rounded, but you can highlight one muscle group for extra attention.</string>
-    <string name="muscle_balanced">Balanced</string>
+    <string name="onboarding_muscle_title">Nhóm cơ bạn muốn tập trung phát triển?</string>
+    <string name="onboarding_muscle_subtitle">Giáo án vẫn đảm bảo cân đối toàn diện, nhưng bạn có thể ưu tiên thêm cho một nhóm cơ.</string>
+    <string name="muscle_balanced">Toàn diện (Full Body)</string>
     <string name="muscle_core">Core</string>
-    <string name="muscle_chest">Chest</string>
-    <string name="muscle_arms">Arms</string>
-    <string name="muscle_legs">Legs</string>
-    <string name="muscle_shoulders">Shoulders</string>
+    <string name="muscle_chest">Cơ Ngực (Chest)</string>
+    <string name="muscle_arms">Cơ Tay (Arms)</string>
+    <string name="muscle_legs">Cơ Chân (Legs)</string>
+    <string name="muscle_shoulders">Cơ Vai (Shoulders)</string>
 
     <!-- 011. Destination -->
-    <string name="onboarding_destination_title">Where do you work out?</string>
-    <string name="onboarding_destination_subtitle">Choose where you usually train</string>
-    <string name="dest_large_gym_title">Large Gym</string>
-    <string name="dest_large_gym_desc">Full fitness clubs</string>
-    <string name="dest_commercial_gym_title">Commercial Gym</string>
-    <string name="dest_commercial_gym_desc">Compact public gym with basic machines and equipment</string>
-    <string name="dest_garage_gym_title">Garage Gym</string>
-    <string name="dest_garage_gym_desc">Barbells, squat rack, dumbbells, bench</string>
-    <string name="dest_home_title">At Home</string>
-    <string name="dest_home_desc">Limited equipment such as dumbbells, pull-up bar and bench.</string>
+    <string name="onboarding_destination_title">Địa điểm tập luyện thường xuyên của bạn?</string>
+    <string name="onboarding_destination_subtitle">Chọn nơi bạn thường xuyên rèn luyện để AI tùy biến bài tập phù hợp</string>
+    <string name="dest_large_gym_title">Phòng Gym lớn (Fitness Club)</string>
+    <string name="dest_large_gym_desc">Trung tâm thể hình quy mô đầy đủ máy khối, tạ rời và phụ kiện chuyên sâu</string>
+    <string name="dest_commercial_gym_title">Phòng Gym thương mại</string>
+    <string name="dest_commercial_gym_desc">Phòng tập tiêu chuẩn với đầy đủ thanh đòn, tạ đơn và máy tập cơ bản</string>
+    <string name="dest_garage_gym_title">Phòng tập tại gia (Garage Gym)</string>
+    <string name="dest_garage_gym_desc">Trang bị thanh đòn, giá Squat rack, tạ đơn, ghế tập đa năng</string>
+    <string name="dest_home_title">Tập tại nhà (Home Workout)</string>
+    <string name="dest_home_desc">Dụng cụ tối giản: tạ đơn, xà đơn hoặc bài tập Bodyweight</string>
 
     <!-- 012 & 013. Equipment -->
-    <string name="onboarding_equipment_title">Optionally personalize equipment selections</string>
-    <string name="onboarding_equipment_subtitle">You can customize the selection later</string>
-    <string name="hint_search_equipment">Search equipment</string>
-    <string name="equip_cat_weights">Weights and Bars</string>
-    <string name="equip_dumbbell">Dumbbell</string>
-    <string name="equip_barbell">Barbell</string>
-    <string name="equip_plate">Plate</string>
-    <string name="equip_kettlebell">Kettlebell</string>
-    <string name="equip_ez_bar">EZ Bar</string>
-    <string name="equip_cat_benches">Benches and Racks</string>
-    <string name="equip_pull_up_bar">Pull Up Bar</string>
-    <string name="equip_squat_rack">Squat Rack</string>
-    <string name="equip_flat_bench">Flat Bench</string>
-    <string name="equip_adj_bench">Adjustable Bench</string>
-    <string name="equip_dip_bar">Dip Bar</string>
+    <string name="onboarding_equipment_title">Chọn các dụng cụ tập luyện bạn có sẵn</string>
+    <string name="onboarding_equipment_subtitle">Bạn có thể tùy chỉnh lại danh sách thiết bị bất cứ lúc nào trong Cài đặt</string>
+    <string name="hint_search_equipment">Tìm kiếm dụng cụ, thiết bị...</string>
+    <string name="equip_cat_weights">Tạ rời &amp; Thanh đòn</string>
+    <string name="equip_dumbbell">Dumbbell (Tạ đơn)</string>
+    <string name="equip_barbell">Barbell (Thanh đòn)</string>
+    <string name="equip_plate">Weight Plate (Bánh tạ)</string>
+    <string name="equip_kettlebell">Kettlebell (Tạ bình)</string>
+    <string name="equip_ez_bar">EZ Bar (Đòn cong)</string>
+    <string name="equip_cat_benches">Ghế tập &amp; Giá đỡ</string>
+    <string name="equip_pull_up_bar">Pull-up Bar (Xà đơn)</string>
+    <string name="equip_squat_rack">Squat Rack (Giá gánh tạ)</string>
+    <string name="equip_flat_bench">Flat Bench (Ghế phẳng)</string>
+    <string name="equip_adj_bench">Adjustable Bench (Ghế dốc điều chỉnh)</string>
+    <string name="equip_dip_bar">Dip Bar (Xà kép)</string>
 
     <!-- 014. Loading Screen -->
-    <string name="onboarding_loading_title">We\'re preparing your\npersonalized program</string>
+    <string name="onboarding_loading_title">Hệ thống đang chuẩn bị\ngiáo án cá nhân hóa cho bạn</string>
     <string name="onboarding_loading_progress">99%</string>
-    <string name="onboarding_loading_status">Analyzing your fitness profile...</string>
+    <string name="onboarding_loading_status">Đang phân tích hồ sơ thể chất và mục tiêu...</string>
 
     <!-- Core App Bottom Navigation -->
     <string name="nav_dashboard">Tổng quan</string>
@@ -168,7 +171,7 @@
 
     <!-- 001. Dashboard -->
     <string name="dashboard_app_title">FitTrack AI</string>
-    <string name="dashboard_command_center">COMMAND CENTER</string>
+    <string name="dashboard_command_center">TRUNG TÂM ĐIỀU KHIỂN</string>
     <string name="dashboard_streak">17 ngày</string>
     <string name="dashboard_enter_workout_cta">Vào buổi tập ngay</string>
     <string name="dashboard_user_name">Quan Tran</string>
@@ -183,9 +186,12 @@
     <string name="dashboard_status_ready">Sẵn sàng</string>
     <string name="dashboard_workout_exercises_count">3 bài tập</string>
     <string name="dashboard_workout_duration">~45 phút</string>
+    <string name="dashboard_exercise_1_tag">BÀI 1</string>
+    <string name="dashboard_exercise_2_tag">BÀI 2</string>
+    <string name="dashboard_exercise_3_tag">BÀI 3</string>
     <string name="ex_1_title">Barbell Bench Press</string>
     <string name="ex_1_desc">4 sets • 8 reps (80kg)</string>
-    <string name="ex_2_title">Incline DB Press</string>
+    <string name="ex_2_title">Incline Dumbbell Press</string>
     <string name="ex_2_desc">3 sets • 10 reps (26kg)</string>
     <string name="ex_3_title">Cable Triceps Pushdown</string>
     <string name="ex_3_desc">3 sets • 12 reps</string>
@@ -196,15 +202,27 @@
     <string name="workouts_weekly_schedule_title">Lịch biểu luyện tập tuần này</string>
     <string name="workouts_status_legend">Đã tập  •  Hôm nay  •  Nghỉ</string>
     <string name="workouts_drag_hint">⠿ Kéo thả Routine từ thư viện vào ngày tập để xếp lịch</string>
+    <string name="day_mon">T2</string>
+    <string name="day_tue">T3</string>
+    <string name="day_wed">T4</string>
+    <string name="day_thu">T5</string>
+    <string name="day_fri">T6</string>
+    <string name="day_sat">T7</string>
+    <string name="day_sun">CN</string>
+    <string name="status_rest">Nghỉ</string>
+    <string name="muscle_chest_short">Ngực</string>
+    <string name="muscle_back_short">Lưng</string>
+    <string name="muscle_legs_short">Chân</string>
+    <string name="muscle_shoulders_short">Vai</string>
 
     <!-- 003. AI Pose Coach -->
     <string name="pose_coach_title">AI Pose Coach</string>
     <string name="pose_camera_badge">CAMERA SỬA FORM TỰ ĐỘNG 60FPS</string>
     <string name="pose_detect_sub">Phát hiện 33 khớp xương thời gian thực</string>
     <string name="pose_tracking_status">Skeleton Tracking Active • Góc gối 92° • Lưng 178°</string>
-    <string name="pose_supported_exercises_title">Bài tập AI hỗ trợ phân tích:</string>
-    <string name="pose_exercise_squat">Squat (Gánh đùi)</string>
-    <string name="pose_exercise_deadlift">Deadlift (Kéo lưng)</string>
+    <string name="pose_supported_exercises_title">Bài tập AI hỗ trợ phân tích form:</string>
+    <string name="pose_exercise_squat">Squat</string>
+    <string name="pose_exercise_deadlift">Deadlift</string>
     <string name="pose_exercise_bench">Barbell Bench Press</string>
     <string name="pose_exercise_ohp">Overhead Press</string>
     <string name="btn_start_ai_pose">Bắt đầu phiên AI Pose Coach ngay</string>
@@ -225,10 +243,12 @@
     <string name="metric_fat_diff">↓ -0.8%</string>
     <string name="metric_trend_chart_title">Biểu đồ xu hướng cân nặng &amp; mỡ (12 tuần)</string>
     <string name="metric_trend_chart_desc">Giảm đều từ 69.8kg xuống 68.4kg • Tỷ lệ mỡ giảm 1.8%</string>
+    <string name="metric_chart_placeholder">BIỂU ĐỒ TIẾN TRÌNH 12 TUẦN</string>
+    <string name="cd_chart">Biểu đồ</string>
 
     <!-- 005. Nutrition Tracker -->
     <string name="nutrition_title">Nhật ký dinh dưỡng &amp; Calo</string>
-    <string name="nutrition_target_calories_title">Mục tiêu calo hôm nay:</string>
+    <string name="nutrition_target_calories_title">Mục tiêu Calo hôm nay:</string>
     <string name="nutrition_target_calories_val">1.850 kcal</string>
     <string name="nutrition_macro_protein">Đạm (Protein): 135 / 160g</string>
     <string name="nutrition_macro_carb">Tinh bột (Carb): 180 / 240g</string>
@@ -239,11 +259,17 @@
     <!-- 006. Community -->
     <string name="community_title">Cộng đồng FitTrack AI</string>
     <string name="community_input_placeholder">Chia sẻ trải nghiệm buổi tập và giáo án...</string>
+    <string name="community_post_user">Quan Tran [Lv. 12] • 10 phút trước</string>
+    <string name="community_post_content">Vừa hoàn thành Push Day! PR Bench Press 90kg thành công nhờ AI Coach canh nhịp thở chuẩn</string>
+    <string name="community_post_stats">2.680 kg • 45 phút</string>
+    <string name="community_post_reactions">42 Thích • 8 Bình luận • Chia sẻ</string>
+    <string name="cd_avatar">Ảnh đại diện</string>
+    <string name="cd_workout">Buổi tập</string>
 
     <!-- 007. User Profile -->
     <string name="profile_title">Hồ sơ cá nhân</string>
     <string name="profile_level_title">Lv. 12 Chiến binh</string>
-    <string name="profile_stats">42 BUỔI TẬP    154 FOLLOWERS    88 FOLLOWING</string>
+    <string name="profile_stats">42 BUỔI TẬP    154 NGƯỜI THEO DÕI    88 ĐANG THEO DÕI</string>
     <string name="btn_edit_profile">Chỉnh sửa hồ sơ cá nhân</string>
     <string name="profile_progress_title">Thống kê tiến trình tập (12 tuần gần nhất)</string>
     <string name="profile_progress_desc">Hoàn thành 42/48 buổi tập dự kiến • Đạt 87.5% mục tiêu</string>
@@ -254,6 +280,18 @@
     <string name="routine_push_day_title">Push Day - Ngực &amp; Tay Sau Cắt Nét</string>
     <string name="routine_push_day_stats">60 Phút • 5 Bài tập • Khối lượng ~2.800 kg</string>
     <string name="btn_start_workout_now">Bắt đầu buổi tập ngay</string>
+    <string name="routine_ai_coach_tip">Gợi ý từ AI Coach: Hôm nay hãy tập trung vào bài Barbell Bench Press đầu tiên để tối ưu sức mạnh bộc phát. Nghỉ đủ 90 giây giữa các hiệp nặng.</string>
+    <string name="routine_exercise_list_header">DANH SÁCH BÀI TẬP (5 BÀI)</string>
+    <string name="routine_ex1_name">Barbell Bench Press</string>
+    <string name="routine_ex1_desc">4 sets • 8-10 reps • Rest 90s</string>
+    <string name="routine_ex2_name">Incline Dumbbell Press</string>
+    <string name="routine_ex2_desc">3 sets • 10-12 reps • Rest 75s</string>
+    <string name="routine_ex3_name">Dips</string>
+    <string name="routine_ex3_desc">3 sets • Bodyweight (10-12 reps)</string>
+    <string name="routine_ex4_name">Cable Fly</string>
+    <string name="routine_ex4_desc">3 sets • 12-15 reps • Rest 60s</string>
+    <string name="routine_ex5_name">Triceps Rope Pushdown</string>
+    <string name="routine_ex5_desc">4 sets • 12-15 reps • Rest 45s</string>
 
     <!-- 009. AI Pose Active Session -->
     <string name="live_squat_check_tag">LIVE AI CAMERA SQUAT CHECK</string>
@@ -261,17 +299,34 @@
     <string name="live_form_status">FORM CHUẨN 98% - LƯNG THẲNG</string>
     <string name="live_angle_guidance">Góc gối 92° • Hạ thấp thêm 3cm ở điểm sâu nhất</string>
     <string name="btn_finish_ai_pose">Hoàn thành phiên AI Pose</string>
+    <string name="cd_close_session">Đóng phiên tập</string>
+    <string name="cd_flip_camera">Đổi camera</string>
+    <string name="live_knee_angle">Gối: 92°</string>
+    <string name="live_hip_angle">Hông: 84°</string>
+    <string name="voice_feedback_on">Giọng nói: BẬT</string>
+    <string name="voice_feedback_off">Giọng nói: TẮT</string>
 
     <!-- 010 & 011. Active Workout -->
     <string name="active_workout_exercise_title">Chi tiết tập luyện</string>
     <string name="active_workout_status_1">● Đang tập Bài 1/2</string>
     <string name="active_workout_status_2">● Đang tập Bài 2/2 (Cuối)</string>
-    <string name="active_workout_rest_label">Đồng hồ nghỉ chuẩn:</string>
+    <string name="btn_quit_workout">Kết thúc</string>
+    <string name="active_workout_rest_label">Thời gian nghỉ (Rest):</string>
     <string name="active_workout_rest_time">01:30</string>
-    <string name="btn_start_rest">Bắt đầu nghỉ</string>
+    <string name="btn_start_rest">Bắt đầu nghỉ (Rest)</string>
     <string name="btn_ai_check_form">AI Check Form</string>
     <string name="btn_next_exercise">Hoàn thành Bài 1 • Sang Bài 2</string>
     <string name="btn_finish_workout_xp">Hoàn thành buổi tập &amp; Lưu kỷ lục (+350 XP)</string>
+    <string name="active_workout_demo_guide">Hướng dẫn chuyển động chuẩn</string>
+    <string name="active_workout_th_set">SET</string>
+    <string name="active_workout_th_kg">KG</string>
+    <string name="active_workout_th_reps">REPS</string>
+    <string name="active_workout_th_done">XONG</string>
+    <string name="btn_add_set">＋ Thêm Set (Add Set)</string>
+    <string name="active_workout_ex1_name">Barbell Bench Press</string>
+    <string name="active_workout_ex1_target">Cơ ngực giữa &amp; Tay sau • Khởi động kỹ khớp vai</string>
+    <string name="active_workout_ex2_name">Incline Dumbbell Press</string>
+    <string name="active_workout_ex2_target">Cơ ngực trên &amp; Vai trước • Khối lượng đề xuất 24kg</string>
 
     <!-- 012. Create Routine -->
     <string name="create_routine_screen_title">Tạo giáo án mới</string>
@@ -279,25 +334,67 @@
     <string name="hint_routine_name">Push Hypertrophy - Tăng cơ Ngực &amp; Vai</string>
     <string name="label_target_muscle">NHÓM CƠ MỤC TIÊU</string>
     <string name="btn_save_routine">Lưu vào Danh sách Luyện tập</string>
+    <string name="chip_muscle_chest">Ngực (Chest)</string>
+    <string name="chip_muscle_back">Lưng xô (Back)</string>
+    <string name="chip_muscle_triceps">Tay sau (Triceps)</string>
+    <string name="chip_muscle_shoulders">Vai (Shoulders)</string>
+    <string name="chip_muscle_legs">Đùi &amp; Mông (Legs)</string>
+    <string name="label_exercises_in_routine">BÀI TẬP TRONG GIÁO ÁN</string>
+    <string name="btn_add_exercise_to_routine">＋ Thêm bài tập</string>
+    <string name="cd_reorder">Thay đổi thứ tự</string>
+    <string name="cd_delete">Xóa</string>
 
     <!-- 013. Badges & Achievements -->
     <string name="badges_screen_title">Huy hiệu &amp; Thành tích</string>
     <string name="badges_current_rank">CẤP ĐỘ HIỆN TẠI: CHIẾN BINH LV. 12</string>
     <string name="badges_xp_to_next">2.450 / 3.000 XP (Cần thêm 550 XP lên Lv. 13)</string>
+    <string name="badges_section_title">HUY HIỆU DANH DỰ (4/6 ĐÃ MỞ)</string>
+    <string name="badge_status_unlocked">ĐÃ ĐẠT</string>
+    <string name="badge_status_progress">TIẾN ĐỘ 7/14</string>
+    <string name="badge_1_title">Người Tiên Phong</string>
+    <string name="badge_1_desc">Hoàn thành buổi tập đầu tiên • +100 XP</string>
+    <string name="badge_2_title">Chiến Thần Bench Press</string>
+    <string name="badge_2_desc">Chinh phục mốc 100kg Bench Press • +250 XP</string>
+    <string name="badge_3_title">Bậc Thầy AI Pose</string>
+    <string name="badge_3_desc">Độ chuẩn form 98% trong 10 sets • +200 XP</string>
+    <string name="badge_4_title">Kỷ Luật Thép 30 Ngày</string>
+    <string name="badge_4_desc">Tập luyện liên tục không ngắt quãng • +500 XP</string>
+    <string name="badge_5_title">Chuyên Gia Dinh Dưỡng</string>
+    <string name="badge_5_desc">Ghi chép bữa ăn 14 ngày trọn vẹn • +150 XP</string>
+    <string name="cd_medal">Huy chương</string>
+    <string name="cd_yoga">Tập luyện</string>
+    <string name="cd_streak">Chuỗi ngày tập</string>
+    <string name="cd_locked">Chưa mở khóa</string>
 
     <!-- 014. Settings -->
     <string name="settings_screen_title">Cài đặt ứng dụng</string>
     <string name="settings_section_training">TẬP LUYỆN &amp; HUẤN LUYỆN VIÊN AI</string>
     <string name="settings_voice_coach">Huấn luyện viên giọng nói AI</string>
     <string name="settings_weight_unit">Đơn vị khối lượng</string>
-    <string name="settings_rest_time">Thời gian nghỉ mặc định</string>
+    <string name="settings_weight_unit_val">Kilogram (kg) ›</string>
+    <string name="settings_rest_time">Thời gian nghỉ mặc định (Rest)</string>
+    <string name="settings_rest_time_val">90 giây ›</string>
     <string name="settings_general">Cài đặt chung</string>
+    <string name="settings_notifications">Thông báo nhắc nhở luyện tập</string>
+    <string name="settings_health_sync">Đồng bộ Google Fit / Sức khỏe</string>
+    <string name="settings_health_connected">Đã kết nối</string>
+    <string name="settings_language">Ngôn ngữ ứng dụng</string>
+    <string name="settings_language_val">Tiếng Việt (VN) ›</string>
     <string name="btn_logout">Đăng xuất tài khoản</string>
 
     <!-- 015. Edit Profile -->
     <string name="edit_profile_title">Chỉnh sửa hồ sơ</string>
-    <string name="btn_save">Lưu</string>
     <string name="btn_save_profile_changes">Lưu thay đổi hồ sơ</string>
+    <string name="label_profile_fullname">HỌ VÀ TÊN</string>
+    <string name="hint_profile_fullname">Nhập họ và tên</string>
+    <string name="label_profile_goal">MỤC TIÊU LUYỆN TẬP</string>
+    <string name="hint_profile_goal">Mục tiêu tập luyện</string>
+    <string name="default_profile_goal">Tăng cơ giảm mỡ (Body Recomposition)</string>
+    <string name="label_profile_height">CHIỀU CAO (CM)</string>
+    <string name="label_profile_weight">CÂN NẶNG (KG)</string>
+    <string name="label_profile_birthday">NGÀY SINH</string>
+    <string name="hint_profile_birthday">DD/MM/YYYY</string>
+    <string name="cd_edit_photo">Đổi ảnh đại diện</string>
 
     <!-- 016. Daily Quests Modal -->
     <string name="modal_quests_title">Nhiệm vụ hôm nay</string>
@@ -314,24 +411,27 @@
     <string name="modal_quests_q4_progress">1/1</string>
     <string name="modal_quests_q4_xp">+40 XP</string>
     <string name="modal_quests_claim_all">Nhận tất cả phần thưởng (+190 XP)</string>
+    <string name="toast_quests_claimed">Đã nhận +190 XP và hoàn thành nhiệm vụ ngày!</string>
 
     <!-- 018. Exercise Picker Modal -->
     <string name="modal_picker_title">Thư viện bài tập</string>
-    <string name="modal_picker_search_hint">Tìm kiếm bài tập (Bench, Squat...)...</string>
+    <string name="modal_picker_search_hint">Tìm kiếm bài tập (Bench Press, Squat...)...</string>
     <string name="modal_picker_chip_all">Tất cả</string>
     <string name="modal_picker_chip_chest">Ngực</string>
     <string name="modal_picker_chip_back">Lưng</string>
     <string name="modal_picker_chip_legs">Chân</string>
     <string name="modal_picker_chip_shoulders">Vai</string>
-    <string name="modal_picker_ex1_name">Đẩy ngực đòn tạ (Bench Press)</string>
+    <string name="modal_picker_ex1_name">Barbell Bench Press</string>
     <string name="modal_picker_ex1_desc">Cơ Ngực • PR: 85 kg</string>
-    <string name="modal_picker_ex2_name">Đẩy ngực dốc tạ đơn (Incline Press)</string>
+    <string name="modal_picker_ex2_name">Incline Dumbbell Press</string>
     <string name="modal_picker_ex2_desc">Ngực trên • PR: 28 kg</string>
-    <string name="modal_picker_ex3_name">Kéo xô tạ đòn (Bent-Over Row)</string>
+    <string name="modal_picker_ex3_name">Bent-Over Row</string>
     <string name="modal_picker_ex3_desc">Cơ Lưng • PR: 75 kg</string>
-    <string name="modal_picker_ex4_name">Gánh đùi tạ đòn (Barbell Squat)</string>
+    <string name="modal_picker_ex4_name">Barbell Squat</string>
     <string name="modal_picker_ex4_desc">Cơ Đùi &amp; Mông • PR: 110 kg</string>
-    <string name="modal_picker_btn_add">+ Thêm vào bài tập</string>
+    <string name="modal_picker_btn_add">+ Thêm vào buổi tập</string>
+    <string name="toast_exercises_added">Đã thêm %1$d bài tập vào buổi tập thành công!</string>
+    <string name="cd_select_exercise">Chọn bài tập</string>
 
     <!-- 019. Workout Summary Modal -->
     <string name="modal_summary_title">BUỔI TẬP HOÀN THÀNH!</string>
@@ -340,7 +440,7 @@
     <string name="modal_summary_time_label">Thời gian</string>
     <string name="modal_summary_time_val">42 phút</string>
     <string name="modal_summary_volume_label">Khối lượng</string>
-    <string name="modal_summary_volume_val">3,840 kg</string>
+    <string name="modal_summary_volume_val">3.840 kg</string>
     <string name="modal_summary_form_label">AI Pose Form</string>
     <string name="modal_summary_form_val">98% Chuẩn</string>
     <string name="modal_summary_rpg_title">TĂNG CHỈ SỐ NHÂN VẬT THỢ SĂN</string>
@@ -349,6 +449,7 @@
     <string name="modal_summary_stat_agi">Khéo léo (AGI): +1 (75 → 76)</string>
     <string name="modal_summary_btn_share">Chia sẻ thành tích lên Cộng đồng</string>
     <string name="modal_summary_btn_close">Đóng lại</string>
+    <string name="toast_open_community">Đang mở trang Cộng đồng để chia sẻ kỷ lục...</string>
 
     <!-- 020. AI Calibration Modal -->
     <string name="modal_calib_title">Hiệu chỉnh Góc Camera AI</string>
@@ -357,6 +458,7 @@
     <string name="modal_calib_tip1">• Đặt máy ngang tầm hông, góc nghiêng 45 độ</string>
     <string name="modal_calib_tip2">• Đảm bảo đủ ánh sáng và thấy rõ từ đầu đến chân</string>
     <string name="modal_calib_btn_start">Bắt đầu buổi tập với AI Coach</string>
+    <string name="cd_human_skeleton">Khung xương cơ thể</string>
 
     <!-- 021. Log Meal Modal -->
     <string name="modal_meal_title">Thêm món ăn vào nhật ký</string>
@@ -364,10 +466,10 @@
     <string name="modal_meal_tab_combo">Chọn Combo có sẵn</string>
     <string name="modal_meal_search_hint">Nhập tên món: Ức gà, Trứng, Bò, Cơm...</string>
     <string name="modal_meal_chip_all">Tất cả</string>
-    <string name="modal_meal_chip_protein">Đạm/Protein</string>
-    <string name="modal_meal_chip_carb">Tinh bột</string>
+    <string name="modal_meal_chip_protein">Đạm (Protein)</string>
+    <string name="modal_meal_chip_carb">Tinh bột (Carb)</string>
     <string name="modal_meal_chip_veggie">Rau củ</string>
-    <string name="modal_meal_chip_whey">Sữa/Whey</string>
+    <string name="modal_meal_chip_whey">Whey &amp; Thực phẩm bổ sung</string>
     <string name="modal_meal_food1_name">Ức gà áp chảo (100g)</string>
     <string name="modal_meal_food1_macro">165 kcal • P: 31g • C: 0g • F: 3.6g</string>
     <string name="modal_meal_food2_name">Cơm gạo lứt nấu chín (150g)</string>
@@ -375,5 +477,8 @@
     <string name="modal_meal_food3_name">Trứng gà luộc (2 quả)</string>
     <string name="modal_meal_food3_macro">156 kcal • P: 13g • C: 1.1g • F: 10g</string>
     <string name="modal_meal_btn_add_item">+ Thêm</string>
+    <string name="modal_meal_btn_added">Đã chọn</string>
     <string name="modal_meal_btn_confirm">Lưu món vào thực đơn (+ Calo &amp; Macro)</string>
+    <string name="toast_meal_selected">Đã chọn: %1$s</string>
+    <string name="toast_meals_saved">Đã lưu %1$d món vào thực đơn hôm nay thành công!</string>
 </resources>

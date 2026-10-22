@@ -117,7 +117,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="T2"
+                            android:text="@string/day_mon"
                             android:textColor="@color/text_dark"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -125,7 +125,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Ngực"
+                            android:text="@string/muscle_chest_short"
                             android:textColor="@color/primary"
                             android:textSize="9sp" />
                     </LinearLayout>
@@ -144,7 +144,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="T3"
+                            android:text="@string/day_tue"
                             android:textColor="@color/text_dark"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -152,7 +152,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Lưng"
+                            android:text="@string/muscle_back_short"
                             android:textColor="@color/primary"
                             android:textSize="9sp" />
                     </LinearLayout>
@@ -171,14 +171,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="T4"
+                            android:text="@string/day_wed"
                             android:textColor="@color/text_slate_light"
                             android:textSize="11sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Nghỉ"
+                            android:text="@string/status_rest"
                             android:textColor="@color/text_slate_light"
                             android:textSize="9sp" />
                     </LinearLayout>
@@ -197,7 +197,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="T5"
+                            android:text="@string/day_thu"
                             android:textColor="@color/text_dark"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -205,7 +205,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Chân"
+                            android:text="@string/muscle_legs_short"
                             android:textColor="@color/primary"
                             android:textSize="9sp" />
                     </LinearLayout>
@@ -224,7 +224,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="T6"
+                            android:text="@string/day_fri"
                             android:textColor="@color/text_dark"
                             android:textSize="11sp"
                             android:textStyle="bold" />
@@ -232,7 +232,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Vai"
+                            android:text="@string/muscle_shoulders_short"
                             android:textColor="@color/primary"
                             android:textSize="9sp" />
                     </LinearLayout>
@@ -251,14 +251,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="T7"
+                            android:text="@string/day_sat"
                             android:textColor="@color/text_slate_light"
                             android:textSize="11sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Nghỉ"
+                            android:text="@string/status_rest"
                             android:textColor="@color/text_slate_light"
                             android:textSize="9sp" />
                     </LinearLayout>
@@ -277,14 +277,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="CN"
+                            android:text="@string/day_sun"
                             android:textColor="@color/text_slate_light"
                             android:textSize="11sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Nghỉ"
+                            android:text="@string/status_rest"
                             android:textColor="@color/text_slate_light"
                             android:textSize="9sp" />
                     </LinearLayout>

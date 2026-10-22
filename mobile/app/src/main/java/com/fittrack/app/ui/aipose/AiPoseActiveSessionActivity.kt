@@ -25,7 +25,9 @@ class AiPoseActiveSessionActivity : AppCompatActivity() {
 
         binding.btnVoiceFeedback.setOnClickListener {
             isVoiceEnabled = !isVoiceEnabled
-            binding.btnVoiceFeedback.text = if (isVoiceEnabled) "Giọng nói: BẬT" else "Giọng nói: TẮT"
+            binding.btnVoiceFeedback.text = getString(
+                if (isVoiceEnabled) R.string.voice_feedback_on else R.string.voice_feedback_off
+            )
             binding.btnVoiceFeedback.setIconResource(
                 if (isVoiceEnabled) R.drawable.ic_volume_up_solid else R.drawable.ic_volume_off_solid
             )

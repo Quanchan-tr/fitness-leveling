@@ -26,7 +26,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Quay lại"
+            android:contentDescription="@string/cd_back_button"
             android:padding="6dp"
             android:src="@drawable/ic_back"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -132,7 +132,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Kilogram (kg) ›"
+                        android:text="@string/settings_weight_unit_val"
                         android:textColor="@color/text_muted"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -162,7 +162,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="90 giây ›"
+                        android:text="@string/settings_rest_time_val"
                         android:textColor="@color/text_muted"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -196,7 +196,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Thông báo nhắc nhở luyện tập"
+                        android:text="@string/settings_notifications"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp" />
 
@@ -224,7 +224,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Đồng bộ Google Fit / Sức khỏe"
+                        android:text="@string/settings_health_sync"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp" />
 
@@ -244,7 +244,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Đã kết nối"
+                            android:text="@string/settings_health_connected"
                             android:textColor="#10B981"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -267,14 +267,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Ngôn ngữ ứng dụng"
+                        android:text="@string/settings_language"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Tiếng Việt (VN) ›"
+                        android:text="@string/settings_language_val"
                         android:textColor="@color/text_muted"
                         android:textSize="14sp" />
                 </LinearLayout>

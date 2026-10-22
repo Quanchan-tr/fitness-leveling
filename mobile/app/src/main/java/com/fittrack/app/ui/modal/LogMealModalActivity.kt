@@ -3,6 +3,7 @@ package com.fittrack.app.ui.modal
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.fittrack.app.R
 import com.fittrack.app.databinding.ActivityModalLogMealBinding
 
 class LogMealModalActivity : AppCompatActivity() {
@@ -33,25 +34,25 @@ class LogMealModalActivity : AppCompatActivity() {
 
         binding.btnAddFood1.setOnClickListener {
             addedItemsCount++
-            binding.btnAddFood1.text = "Đã chọn"
-            Toast.makeText(this, "Đã chọn: Ức gà áp chảo (100g)", Toast.LENGTH_SHORT).show()
+            binding.btnAddFood1.text = getString(R.string.modal_meal_btn_added)
+            Toast.makeText(this, getString(R.string.toast_meal_selected, getString(R.string.modal_meal_food1_name)), Toast.LENGTH_SHORT).show()
         }
 
         binding.btnAddFood2.setOnClickListener {
             addedItemsCount++
-            binding.btnAddFood2.text = "Đã chọn"
-            Toast.makeText(this, "Đã chọn: Cơm gạo lứt (150g)", Toast.LENGTH_SHORT).show()
+            binding.btnAddFood2.text = getString(R.string.modal_meal_btn_added)
+            Toast.makeText(this, getString(R.string.toast_meal_selected, getString(R.string.modal_meal_food2_name)), Toast.LENGTH_SHORT).show()
         }
 
         binding.btnAddFood3.setOnClickListener {
             addedItemsCount++
-            binding.btnAddFood3.text = "Đã chọn"
-            Toast.makeText(this, "Đã chọn: Trứng gà luộc (2 quả)", Toast.LENGTH_SHORT).show()
+            binding.btnAddFood3.text = getString(R.string.modal_meal_btn_added)
+            Toast.makeText(this, getString(R.string.toast_meal_selected, getString(R.string.modal_meal_food3_name)), Toast.LENGTH_SHORT).show()
         }
 
         binding.btnConfirmAddMeal.setOnClickListener {
             val total = if (addedItemsCount == 0) 1 else addedItemsCount
-            Toast.makeText(this, "Đã lưu $total món vào thực đơn hôm nay thành công!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_meals_saved, total), Toast.LENGTH_SHORT).show()
             finish()
         }
     }

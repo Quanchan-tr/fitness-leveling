@@ -35,8 +35,8 @@ class ActiveWorkoutActivity : AppCompatActivity() {
             if (currentExerciseIndex == 1) {
                 currentExerciseIndex = 2
                 binding.tvExerciseStatus.text = getString(R.string.active_workout_status_2)
-                binding.tvCurrentExerciseName.text = "Incline Dumbbell Press"
-                binding.tvTargetInfo.text = "Cơ ngực trên & Vai trước • Khối lượng đề xuất 24kg"
+                binding.tvCurrentExerciseName.text = getString(R.string.active_workout_ex2_name)
+                binding.tvTargetInfo.text = getString(R.string.active_workout_ex2_target)
                 binding.btnNextExercise.text = getString(R.string.btn_finish_workout_xp)
             } else {
                 startActivity(Intent(this, WorkoutSummaryModalActivity::class.java))

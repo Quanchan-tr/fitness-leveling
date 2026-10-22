@@ -69,7 +69,7 @@
                 <ImageView
                     android:layout_width="@dimen/icon_size_small"
                     android:layout_height="@dimen/icon_size_small"
-                    android:contentDescription="Write post"
+                    android:contentDescription="@string/community_input_placeholder"
                     app:srcCompat="@drawable/ic_edit_solid"
                     app:tint="@color/text_slate_light" />
 
@@ -103,7 +103,7 @@
                         android:layout_height="32dp"
                         android:background="@drawable/bg_icon_container_white"
                         android:padding="4dp"
-                        android:contentDescription="Avatar"
+                        android:contentDescription="@string/cd_avatar"
                         app:srcCompat="@drawable/ic_user_solid"
                         app:tint="@color/primary" />
 
@@ -111,7 +111,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="Quan Tran [Lv. 12] • 10 phút trước"
+                        android:text="@string/community_post_user"
                         android:textColor="@color/text_dark"
                         android:textSize="12sp"
                         android:textStyle="bold" />
@@ -121,7 +121,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Vừa hoàn thành Push Day! PR Bench Press 90kg thành công nhờ AI Coach canh nhịp thở chuẩn"
+                    android:text="@string/community_post_content"
                     android:textColor="@color/text_dark"
                     android:textSize="13sp" />
 
@@ -141,14 +141,14 @@
                         android:layout_width="@dimen/icon_size_xs"
                         android:layout_height="@dimen/icon_size_xs"
                         android:layout_marginEnd="4dp"
-                        android:contentDescription="Workout"
+                        android:contentDescription="@string/cd_workout"
                         app:srcCompat="@drawable/ic_dumbbell_solid"
                         app:tint="@color/text_slate" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2.680 kg • 45p"
+                        android:text="@string/community_post_stats"
                         android:textColor="@color/text_slate"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -163,7 +163,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="42 Thích • 8 Bình luận • Chia sẻ"
+                    android:text="@string/community_post_reactions"
                     android:textColor="@color/text_slate"
                     android:textSize="11sp" />
             </LinearLayout>

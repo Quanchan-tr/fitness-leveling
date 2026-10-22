@@ -26,7 +26,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Quay lại"
+            android:contentDescription="@string/cd_back_button"
             android:padding="6dp"
             android:src="@drawable/ic_back"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -150,7 +150,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Gợi ý từ AI Coach: Hôm nay hãy tập trung vào bài Barbell Bench Press đầu tiên để tối ưu sức mạnh bộc phát. Nghỉ đủ 90 giây giữa các hiệp nặng."
+                        android:text="@string/routine_ai_coach_tip"
                         android:textColor="#166534"
                         android:textSize="12sp"
                         android:lineSpacingExtra="2dp" />
@@ -162,7 +162,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="DANH SÁCH BÀI TẬP (5 BÀI)"
+                android:text="@string/routine_exercise_list_header"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -198,7 +198,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Barbell Bench Press"
+                        android:text="@string/routine_ex1_name"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -207,7 +207,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="4 Hiệp • 8-10 reps • Nghỉ 90s"
+                        android:text="@string/routine_ex1_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -255,7 +255,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Incline Dumbbell Press"
+                        android:text="@string/routine_ex2_name"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -264,7 +264,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="3 Hiệp • 10-12 reps • Nghỉ 75s"
+                        android:text="@string/routine_ex2_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -312,7 +312,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Dips (Xà kép ngực &amp; tay sau)"
+                        android:text="@string/routine_ex3_name"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -321,7 +321,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="3 Hiệp • Bodyweight (10-12 reps)"
+                        android:text="@string/routine_ex3_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -369,7 +369,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Cable Fly (Ép ngực dây cáp)"
+                        android:text="@string/routine_ex4_name"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -378,7 +378,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="3 Hiệp • 12-15 reps • Nghỉ 60s"
+                        android:text="@string/routine_ex4_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -426,7 +426,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Triceps Rope Pushdown"
+                        android:text="@string/routine_ex5_name"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -435,7 +435,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="4 Hiệp • 12-15 reps • Nghỉ 45s"
+                        android:text="@string/routine_ex5_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>

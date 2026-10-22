@@ -46,7 +46,7 @@ class ExercisePickerModalActivity : AppCompatActivity() {
 
         binding.btnAddToWorkout.setOnClickListener {
             val count = if (selectedExercises.isEmpty()) 1 else selectedExercises.size
-            Toast.makeText(this, "Đã thêm $count bài tập vào buổi tập thành công!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_exercises_added, count), Toast.LENGTH_SHORT).show()
             finish()
         }
     }

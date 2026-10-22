@@ -26,7 +26,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Quay lại"
+            android:contentDescription="@string/cd_back_button"
             android:padding="6dp"
             android:src="@drawable/ic_back"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -117,32 +117,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="Ngực (Chest)" />
+                    android:text="@string/chip_muscle_chest" />
 
                 <com.google.android.material.chip.Chip
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Lưng xô (Back)" />
+                    android:text="@string/chip_muscle_back" />
 
                 <com.google.android.material.chip.Chip
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="Tay sau (Triceps)" />
+                    android:text="@string/chip_muscle_triceps" />
 
                 <com.google.android.material.chip.Chip
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Vai (Shoulders)" />
+                    android:text="@string/chip_muscle_shoulders" />
 
                 <com.google.android.material.chip.Chip
                     style="@style/Widget.MaterialComponents.Chip.Choice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Đùi &amp; Mông (Legs)" />
+                    android:text="@string/chip_muscle_legs" />
             </com.google.android.material.chip.ChipGroup>
 
             <!-- Added Exercises List -->
@@ -157,7 +157,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="BÀI TẬP TRONG GIÁO ÁN"
+                    android:text="@string/label_exercises_in_routine"
                     android:textColor="@color/text_muted"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -166,7 +166,7 @@
                     android:id="@+id/btn_add_exercise"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="＋ Thêm bài"
+                    android:text="@string/btn_add_exercise_to_routine"
                     android:textColor="@color/primary_blue"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -185,7 +185,7 @@
                 <ImageView
                     android:layout_width="@dimen/icon_size_small"
                     android:layout_height="@dimen/icon_size_small"
-                    android:contentDescription="Reorder"
+                    android:contentDescription="@string/cd_reorder"
                     app:srcCompat="@drawable/ic_drag_handle"
                     app:tint="@color/text_muted" />
 
@@ -199,7 +199,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Barbell Bench Press"
+                        android:text="@string/routine_ex1_name"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -208,7 +208,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="4 Hiệp • 8-10 reps • Nghỉ 90s"
+                        android:text="@string/routine_ex1_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -216,7 +216,7 @@
                 <ImageView
                     android:layout_width="@dimen/icon_size_small"
                     android:layout_height="@dimen/icon_size_small"
-                    android:contentDescription="Delete"
+                    android:contentDescription="@string/cd_delete"
                     app:srcCompat="@drawable/ic_trash_solid"
                     app:tint="@color/text_muted" />
             </LinearLayout>
@@ -234,7 +234,7 @@
                 <ImageView
                     android:layout_width="@dimen/icon_size_small"
                     android:layout_height="@dimen/icon_size_small"
-                    android:contentDescription="Reorder"
+                    android:contentDescription="@string/cd_reorder"
                     app:srcCompat="@drawable/ic_drag_handle"
                     app:tint="@color/text_muted" />
 
@@ -248,7 +248,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Incline Dumbbell Press"
+                        android:text="@string/routine_ex2_name"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -257,7 +257,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="3 Hiệp • 10-12 reps • Nghỉ 75s"
+                        android:text="@string/routine_ex2_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -265,7 +265,7 @@
                 <ImageView
                     android:layout_width="@dimen/icon_size_small"
                     android:layout_height="@dimen/icon_size_small"
-                    android:contentDescription="Delete"
+                    android:contentDescription="@string/cd_delete"
                     app:srcCompat="@drawable/ic_trash_solid"
                     app:tint="@color/text_muted" />
             </LinearLayout>
@@ -283,7 +283,7 @@
                 <ImageView
                     android:layout_width="@dimen/icon_size_small"
                     android:layout_height="@dimen/icon_size_small"
-                    android:contentDescription="Reorder"
+                    android:contentDescription="@string/cd_reorder"
                     app:srcCompat="@drawable/ic_drag_handle"
                     app:tint="@color/text_muted" />
 
@@ -297,7 +297,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Triceps Rope Pushdown"
+                        android:text="@string/routine_ex5_name"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp"
                         android:textStyle="bold" />
@@ -306,7 +306,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="4 Hiệp • 12-15 reps • Nghỉ 45s"
+                        android:text="@string/routine_ex5_desc"
                         android:textColor="@color/text_muted"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -314,7 +314,7 @@
                 <ImageView
                     android:layout_width="@dimen/icon_size_small"
                     android:layout_height="@dimen/icon_size_small"
-                    android:contentDescription="Delete"
+                    android:contentDescription="@string/cd_delete"
                     app:srcCompat="@drawable/ic_trash_solid"
                     app:tint="@color/text_muted" />
             </LinearLayout>

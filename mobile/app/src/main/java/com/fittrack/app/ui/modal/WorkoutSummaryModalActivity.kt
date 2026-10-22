@@ -37,7 +37,7 @@ class WorkoutSummaryModalActivity : AppCompatActivity() {
         }
 
         binding.btnShareCommunity.setOnClickListener {
-            Toast.makeText(this, "Đang mở trang Cộng đồng để chia sẻ kỷ lục...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(com.fittrack.app.R.string.toast_open_community), Toast.LENGTH_SHORT).show()
             startActivity(Intent(this, CommunityActivity::class.java))
             finish()
         }

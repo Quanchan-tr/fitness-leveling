@@ -47,7 +47,7 @@
             android:clickable="true"
             android:focusable="true"
             android:padding="6dp"
-            android:contentDescription="Close"
+            android:contentDescription="@string/cd_close"
             app:srcCompat="@drawable/ic_close"
             app:tint="@color/modal_chip_gray_text"
             app:layout_constraintEnd_toEndOf="parent"

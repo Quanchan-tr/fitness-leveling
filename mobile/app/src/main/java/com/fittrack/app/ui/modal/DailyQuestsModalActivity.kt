@@ -31,7 +31,7 @@ class DailyQuestsModalActivity : AppCompatActivity() {
         }
 
         binding.btnClaimAll.setOnClickListener {
-            Toast.makeText(this, "Đã nhận +190 XP và hoàn thành nhiệm vụ ngày!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(com.fittrack.app.R.string.toast_quests_claimed), Toast.LENGTH_SHORT).show()
             finish()
         }
     }

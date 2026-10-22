@@ -368,7 +368,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="BÀI 1"
+                        android:text="@string/dashboard_exercise_1_tag"
                         android:textColor="@color/primary"
                         android:textSize="9sp"
                         android:textStyle="bold" />
@@ -405,7 +405,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="BÀI 2"
+                        android:text="@string/dashboard_exercise_2_tag"
                         android:textColor="@color/primary"
                         android:textSize="9sp"
                         android:textStyle="bold" />
@@ -442,7 +442,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="BÀI 3"
+                        android:text="@string/dashboard_exercise_3_tag"
                         android:textColor="@color/primary"
                         android:textSize="9sp"
                         android:textStyle="bold" />
