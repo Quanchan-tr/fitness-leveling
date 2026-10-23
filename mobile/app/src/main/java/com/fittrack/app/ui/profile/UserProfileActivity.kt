@@ -33,6 +33,12 @@ class UserProfileActivity : AppCompatActivity() {
         binding.btnEditProfile.setOnClickListener {
             startActivity(Intent(this, EditProfileActivity::class.java))
         }
+
+        val openBadges = {
+            startActivity(Intent(this, BadgesAchievementsActivity::class.java))
+        }
+        binding.btnBadgesLinkLv.setOnClickListener { openBadges() }
+        binding.btnBadgesLinkStreak.setOnClickListener { openBadges() }
     }
 
     private fun setupBottomNav() {

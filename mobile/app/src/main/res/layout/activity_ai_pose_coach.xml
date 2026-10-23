@@ -21,11 +21,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageButton
+        <TextView
             android:id="@+id/btn_back"
-            style="@style/Widget.FitTrack.CircleBackButton"
-            android:contentDescription="@string/cd_back_button"
-            android:src="@drawable/ic_arrow_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="‹ Luyện tập"
+            android:textColor="@color/primary"
+            android:textSize="14sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -91,13 +95,23 @@
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/pose_tracking_status"
-                    android:textColor="@color/live_green"
-                    android:textSize="11sp" />
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_border_gray"
+                    android:backgroundTint="#331E293B"
+                    android:padding="10dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🦴 Skeleton Tracking Active • Góc gối 92° • Lưng 178°"
+                        android:textColor="@color/live_green"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Supported Exercises Card -->
@@ -164,7 +178,7 @@
                 android:id="@+id/btn_start_ai_pose_session"
                 style="@style/Widget.FitTrack.PrimaryButton"
                 android:layout_marginTop="20dp"
-                android:text="@string/btn_start_ai_pose" />
+                android:text="📹 Bắt đầu phiên AI Pose Coach ngay ➔" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

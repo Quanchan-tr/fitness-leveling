@@ -81,33 +81,56 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/workouts_weekly_schedule_title"
-                    android:textColor="@color/text_dark"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
+                    <TextView
+                        android:id="@+id/tv_schedule_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/workouts_weekly_schedule_title"
+                        android:textColor="@color/text_dark"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/workouts_status_legend"
+                        android:textColor="@color/text_slate_light"
+                        android:textSize="9sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Drag & drop banner -->
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/workouts_status_legend"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:paddingStart="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="4dp"
+                    android:text="@string/workouts_drag_routine_hint"
                     android:textColor="@color/text_slate"
-                    android:textSize="10sp" />
+                    android:textSize="9sp" />
 
                 <!-- Week Days Row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
                     <!-- T2 -->
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="72dp"
+                        android:layout_height="84dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_card_selectable"
                         android:gravity="center"
@@ -119,22 +142,39 @@
                             android:layout_height="wrap_content"
                             android:text="@string/day_mon"
                             android:textColor="@color/text_dark"
-                            android:textSize="11sp"
+                            android:textSize="10sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="28/09"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="8sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="@string/muscle_chest_short"
-                            android:textColor="@color/primary"
-                            android:textSize="9sp" />
+                            android:textColor="@color/live_green"
+                            android:textSize="9sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Bench • Dips"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="7sp" />
                     </LinearLayout>
 
                     <!-- T3 -->
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="72dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_height="84dp"
+                        android:layout_marginStart="3dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_card_selectable"
                         android:gravity="center"
@@ -146,22 +186,39 @@
                             android:layout_height="wrap_content"
                             android:text="@string/day_tue"
                             android:textColor="@color/text_dark"
-                            android:textSize="11sp"
+                            android:textSize="10sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="29/09"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="8sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="@string/muscle_back_short"
-                            android:textColor="@color/primary"
-                            android:textSize="9sp" />
+                            android:textColor="@color/live_green"
+                            android:textSize="9sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Deadlift • Pull"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="7sp" />
                     </LinearLayout>
 
                     <!-- T4 -->
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="72dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_height="84dp"
+                        android:layout_marginStart="3dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_card_selectable"
                         android:gravity="center"
@@ -173,21 +230,37 @@
                             android:layout_height="wrap_content"
                             android:text="@string/day_wed"
                             android:textColor="@color/text_slate_light"
-                            android:textSize="11sp" />
+                            android:textSize="10sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="30/09"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="8sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="@string/status_rest"
                             android:textColor="@color/text_slate_light"
                             android:textSize="9sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Cardio • Stretch"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="7sp" />
                     </LinearLayout>
 
                     <!-- T5 -->
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="72dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_height="84dp"
+                        android:layout_marginStart="3dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_card_selectable"
                         android:gravity="center"
@@ -199,22 +272,39 @@
                             android:layout_height="wrap_content"
                             android:text="@string/day_thu"
                             android:textColor="@color/text_dark"
-                            android:textSize="11sp"
+                            android:textSize="10sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="01/10"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="8sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="@string/muscle_legs_short"
                             android:textColor="@color/primary"
-                            android:textSize="9sp" />
+                            android:textSize="9sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Squat • Leg Press"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="7sp" />
                     </LinearLayout>
 
                     <!-- T6 -->
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="72dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_height="84dp"
+                        android:layout_marginStart="3dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_card_selectable"
                         android:gravity="center"
@@ -226,22 +316,39 @@
                             android:layout_height="wrap_content"
                             android:text="@string/day_fri"
                             android:textColor="@color/text_dark"
-                            android:textSize="11sp"
+                            android:textSize="10sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="02/10"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="8sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="@string/muscle_shoulders_short"
                             android:textColor="@color/primary"
-                            android:textSize="9sp" />
+                            android:textSize="9sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Shoulder Press"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="7sp" />
                     </LinearLayout>
 
                     <!-- T7 -->
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="72dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_height="84dp"
+                        android:layout_marginStart="3dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_card_selectable"
                         android:gravity="center"
@@ -253,21 +360,37 @@
                             android:layout_height="wrap_content"
                             android:text="@string/day_sat"
                             android:textColor="@color/text_slate_light"
-                            android:textSize="11sp" />
+                            android:textSize="10sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:text="03/10"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="8sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
                             android:text="@string/status_rest"
                             android:textColor="@color/text_slate_light"
                             android:textSize="9sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Đi bộ 10k"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="7sp" />
                     </LinearLayout>
 
                     <!-- CN -->
                     <LinearLayout
                         android:layout_width="0dp"
-                        android:layout_height="72dp"
-                        android:layout_marginStart="4dp"
+                        android:layout_height="84dp"
+                        android:layout_marginStart="3dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_card_selectable"
                         android:gravity="center"
@@ -279,68 +402,376 @@
                             android:layout_height="wrap_content"
                             android:text="@string/day_sun"
                             android:textColor="@color/text_slate_light"
-                            android:textSize="11sp" />
+                            android:textSize="10sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/status_rest"
+                            android:text="04/10"
                             android:textColor="@color/text_slate_light"
-                            android:textSize="9sp" />
+                            android:textSize="8sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Ngực Cắt"
+                            android:textColor="@color/badge_streak_text"
+                            android:textSize="8sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Bench • Fly"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="7sp" />
                     </LinearLayout>
                 </LinearLayout>
+
+                <!-- Today Scheduled Routine Card within Calendar -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/card_today_scheduled_routine"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_badge_streak"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:id="@+id/tv_yellow_dot"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🟡"
+                        android:textSize="12sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <LinearLayout
+                        android:id="@+id/layout_today_routine_info"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/btn_calendar_routine_detail"
+                        app:layout_constraintStart_toEndOf="@id/tv_yellow_dot"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/workouts_today_scheduled_routine"
+                            android:textColor="@color/badge_streak_text"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="@string/workouts_today_scheduled_ex"
+                            android:textColor="@color/text_slate"
+                            android:textSize="10sp" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/btn_calendar_routine_detail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_primary_button"
+                        android:paddingStart="10dp"
+                        android:paddingTop="4dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="4dp"
+                        android:text="@string/workouts_btn_detail"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+            <!-- Section 2: Routines & Folders Collection -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp">
+
+                <TextView
+                    android:id="@+id/tv_routines_header"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/workouts_collection_title"
+                    android:textColor="@color/text_dark"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="@string/workouts_drag_hint"
+                    android:text="@string/workouts_collection_sub"
                     android:textColor="@color/text_slate_light"
-                    android:textSize="10sp" />
-            </LinearLayout>
+                    android:textSize="10sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- Routine Card (Push Day) -->
+            <!-- Card 1: Routine Push Day -->
             <LinearLayout
                 android:id="@+id/card_routine_push"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/bg_card_white"
                 android:elevation="2dp"
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/routine_today_tag"
-                    android:textColor="@color/primary"
-                    android:textSize="10sp"
-                    android:textStyle="bold" />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tv_routine_push_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/routine_push_day_title"
+                        android:textColor="@color/text_dark"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_tag_chip"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp"
+                        android:text="@string/workouts_drag_to_cal"
+                        android:textColor="@color/text_slate"
+                        android:textSize="10sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="@string/routine_push_day_title"
-                    android:textColor="@color/text_dark"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="@string/routine_push_day_stats"
+                    android:text="⚡ 3 bài tập  •  10 sets  •  ⏱ 45 phút  •  ⏳ Nghỉ 90s"
                     android:textColor="@color/text_slate"
                     android:textSize="11sp" />
 
-                <com.google.android.material.button.MaterialButton
+                <!-- Exercises Preview Box -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="1. Barbell Bench Press (Đẩy ngực đòn)  —  4 sets × 8 reps"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="2. Incline Dumbbell Press (Ngực trên)  —  3 sets × 10 reps"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="3. Dips xà kép (Tay sau &amp; Ngực dưới)  —  3 sets × 12 reps"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
                     android:id="@+id/btn_start_push_routine"
-                    style="@style/Widget.FitTrack.PrimaryButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:text="@string/btn_start_workout_now" />
+                    android:text="@string/workouts_view_routine_detail_action"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
+
+            <!-- Card 2: Routine Pull Day -->
+            <LinearLayout
+                android:id="@+id/card_routine_pull"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_card_white"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/tv_routine_pull_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/workouts_routine_pull_title"
+                        android:textColor="@color/text_dark"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_tag_chip"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp"
+                        android:text="@string/workouts_drag_to_cal"
+                        android:textColor="@color/text_slate"
+                        android:textSize="10sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/workouts_routine_pull_stats"
+                    android:textColor="@color/text_slate"
+                    android:textSize="11sp" />
+
+                <!-- Exercises Preview Box -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="1. Conventional Deadlift (Kéo đòn)  —  3 sets × 6 reps"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="2. Lat Pulldown (Kéo xô máy cáp)  —  3 sets × 10 reps"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="3. Barbell Biceps Curl (Cuốn tay trước)  —  2 sets × 12 reps"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/btn_start_pull_routine"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/workouts_view_routine_detail_action"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Card 3: AI Pose Coach Entry Banner -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/card_ai_pose_coach_entry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_card_dark"
+                android:clickable="true"
+                android:elevation="3dp"
+                android:focusable="true"
+                android:padding="14dp">
+
+                <TextView
+                    android:id="@+id/tv_ai_bot_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🤖"
+                    android:textSize="22sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/tv_ai_pose_open"
+                    app:layout_constraintStart_toEndOf="@id/tv_ai_bot_icon"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/workouts_ai_pose_banner_title"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/workouts_ai_pose_banner_desc"
+                        android:textColor="@color/text_slate_light"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_ai_pose_open"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/workouts_ai_pose_banner_cta"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

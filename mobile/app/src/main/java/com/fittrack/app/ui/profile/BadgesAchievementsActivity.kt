@@ -3,6 +3,8 @@ package com.fittrack.app.ui.profile
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.fittrack.app.databinding.ActivityBadgesAchievementsBinding
+import com.fittrack.app.ui.BottomNavTab
+import com.fittrack.app.ui.setupBottomNav
 
 class BadgesAchievementsActivity : AppCompatActivity() {
 
@@ -16,5 +18,7 @@ class BadgesAchievementsActivity : AppCompatActivity() {
         binding.btnBack.setOnClickListener {
             finish()
         }
+
+        binding.bottomNavigation.setupBottomNav(this, BottomNavTab.PROFILE)
     }
 }

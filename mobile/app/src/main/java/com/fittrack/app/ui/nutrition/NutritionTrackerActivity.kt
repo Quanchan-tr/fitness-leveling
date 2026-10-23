@@ -25,6 +25,15 @@ class NutritionTrackerActivity : AppCompatActivity() {
             startActivity(Intent(this, LogMealModalActivity::class.java))
         }
 
+        binding.btnToMetrics.setOnClickListener {
+            startActivity(Intent(this, com.fittrack.app.ui.metrics.BodyMetricsActivity::class.java))
+            finish()
+        }
+
+        binding.btnCreateCombo.setOnClickListener {
+            startActivity(Intent(this, LogMealModalActivity::class.java))
+        }
+
         binding.bottomNavigation.setupBottomNav(this, BottomNavTab.METRICS)
     }
 }

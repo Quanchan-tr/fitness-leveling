@@ -20,7 +20,14 @@ class BodyMetricsActivity : AppCompatActivity() {
         binding = ActivityBodyMetricsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupInteractions()
         setupBottomNav()
+    }
+
+    private fun setupInteractions() {
+        binding.btnToNutrition.setOnClickListener {
+            startActivity(Intent(this, com.fittrack.app.ui.nutrition.NutritionTrackerActivity::class.java))
+        }
     }
 
     private fun setupBottomNav() {

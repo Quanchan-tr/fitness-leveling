@@ -21,18 +21,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <LinearLayout
             android:id="@+id/btn_back"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/cd_back_button"
-            android:padding="6dp"
-            android:src="@drawable/ic_back"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/text_dark" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_back_to_workouts"
+                android:textColor="@color/primary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_title"
@@ -40,7 +49,7 @@
             android:layout_height="wrap_content"
             android:text="@string/routine_detail_title"
             android:textColor="@color/text_dark"
-            android:textSize="18sp"
+            android:textSize="17sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -162,7 +171,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
-                android:text="@string/routine_exercise_list_header"
+                android:text="@string/routine_ex_list_figma"
                 android:textColor="@color/text_muted"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -198,28 +207,28 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/routine_ex1_name"
+                        android:text="@string/routine_ex1_f_title"
                         android:textColor="@color/text_dark"
-                        android:textSize="14sp"
+                        android:textSize="13sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="@string/routine_ex1_desc"
+                        android:text="@string/routine_ex1_f_desc"
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp" />
+                        android:textSize="11sp" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="70 kg"
-                    android:textColor="@color/primary_blue"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
                     android:drawablePadding="4dp"
+                    android:text="70-80 kg"
+                    android:textColor="@color/primary_blue"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
                     app:drawableEndCompat="@drawable/ic_arrow_forward"
                     app:drawableTint="@color/primary_blue" />
             </LinearLayout>
@@ -255,28 +264,28 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/routine_ex2_name"
+                        android:text="@string/routine_ex2_f_title"
                         android:textColor="@color/text_dark"
-                        android:textSize="14sp"
+                        android:textSize="13sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="@string/routine_ex2_desc"
+                        android:text="@string/routine_ex2_f_desc"
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp" />
+                        android:textSize="11sp" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:drawablePadding="4dp"
                     android:text="24 kg"
                     android:textColor="@color/primary_blue"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
-                    android:drawablePadding="4dp"
                     app:drawableEndCompat="@drawable/ic_arrow_forward"
                     app:drawableTint="@color/primary_blue" />
             </LinearLayout>
@@ -312,28 +321,28 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/routine_ex3_name"
+                        android:text="@string/routine_ex3_f_title"
                         android:textColor="@color/text_dark"
-                        android:textSize="14sp"
+                        android:textSize="13sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="@string/routine_ex3_desc"
+                        android:text="@string/routine_ex3_f_desc"
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp" />
+                        android:textSize="11sp" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="BW"
-                    android:textColor="@color/primary_blue"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
                     android:drawablePadding="4dp"
+                    android:text="15 kg"
+                    android:textColor="@color/primary_blue"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
                     app:drawableEndCompat="@drawable/ic_arrow_forward"
                     app:drawableTint="@color/primary_blue" />
             </LinearLayout>
@@ -369,28 +378,28 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/routine_ex4_name"
+                        android:text="@string/routine_ex4_f_title"
                         android:textColor="@color/text_dark"
-                        android:textSize="14sp"
+                        android:textSize="13sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="@string/routine_ex4_desc"
+                        android:text="@string/routine_ex4_f_desc"
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp" />
+                        android:textSize="11sp" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="15 kg"
-                    android:textColor="@color/primary_blue"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
                     android:drawablePadding="4dp"
+                    android:text="25 kg"
+                    android:textColor="@color/primary_blue"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
                     app:drawableEndCompat="@drawable/ic_arrow_forward"
                     app:drawableTint="@color/primary_blue" />
             </LinearLayout>
@@ -426,28 +435,28 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/routine_ex5_name"
+                        android:text="@string/routine_ex5_f_title"
                         android:textColor="@color/text_dark"
-                        android:textSize="14sp"
+                        android:textSize="13sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="@string/routine_ex5_desc"
+                        android:text="@string/routine_ex5_f_desc"
                         android:textColor="@color/text_muted"
-                        android:textSize="12sp" />
+                        android:textSize="11sp" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="20 kg"
-                    android:textColor="@color/primary_blue"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
                     android:drawablePadding="4dp"
+                    android:text="BW"
+                    android:textColor="@color/primary_blue"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
                     app:drawableEndCompat="@drawable/ic_arrow_forward"
                     app:drawableTint="@color/primary_blue" />
             </LinearLayout>
@@ -473,7 +482,7 @@
             style="@style/Widget.FitTrack.Button.Primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/btn_start_workout_now" />
+            android:text="@string/btn_start_workout_figma" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,8 @@ package com.fittrack.app.ui.profile
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.fittrack.app.databinding.ActivityEditProfileBinding
+import com.fittrack.app.ui.BottomNavTab
+import com.fittrack.app.ui.setupBottomNav
 
 class EditProfileActivity : AppCompatActivity() {
 
@@ -24,5 +26,7 @@ class EditProfileActivity : AppCompatActivity() {
         binding.btnSaveProfileChanges.setOnClickListener {
             finish()
         }
+
+        binding.bottomNavigation.setupBottomNav(this, BottomNavTab.PROFILE)
     }
 }

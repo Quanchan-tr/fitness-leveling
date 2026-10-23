@@ -38,6 +38,26 @@ class WorkoutsActivity : AppCompatActivity() {
         binding.btnStartPushRoutine.setOnClickListener {
             startActivity(Intent(this, RoutineDetailActivity::class.java))
         }
+
+        binding.cardRoutinePull.setOnClickListener {
+            startActivity(Intent(this, RoutineDetailActivity::class.java))
+        }
+
+        binding.btnStartPullRoutine.setOnClickListener {
+            startActivity(Intent(this, RoutineDetailActivity::class.java))
+        }
+
+        binding.btnCalendarRoutineDetail.setOnClickListener {
+            startActivity(Intent(this, RoutineDetailActivity::class.java))
+        }
+
+        binding.cardTodayScheduledRoutine.setOnClickListener {
+            startActivity(Intent(this, RoutineDetailActivity::class.java))
+        }
+
+        binding.cardAiPoseCoachEntry.setOnClickListener {
+            startActivity(Intent(this, AiPoseCoachActivity::class.java))
+        }
     }
 
     private fun setupBottomNav() {

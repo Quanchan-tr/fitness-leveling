@@ -481,4 +481,129 @@
     <string name="modal_meal_btn_confirm">Lưu món vào thực đơn (+ Calo &amp; Macro)</string>
     <string name="toast_meal_selected">Đã chọn: %1$s</string>
     <string name="toast_meals_saved">Đã lưu %1$d món vào thực đơn hôm nay thành công!</string>
+
+    <!-- Figma Mobile Redesign Additional Strings -->
+    <!-- Dashboard -->
+    <string name="dashboard_enter_workout_banner">Vào buổi tập ngay  ➔</string>
+    <string name="dashboard_hint_rest">💡 Gợi ý: Nghỉ 90s giữa các hiệp nặng</string>
+    <string name="dashboard_energy_title">🔥 Năng lượng &amp; Calo</string>
+    <string name="dashboard_energy_val">1,800 kcal</string>
+    <string name="dashboard_energy_target">Mục tiêu 2,400 (Còn 600)</string>
+    <string name="dashboard_water_title">💧 Nước uống &amp; Vận động</string>
+    <string name="dashboard_water_val">1.8L / 2.0L (90%)</string>
+    <string name="dashboard_water_add_250">+250ml</string>
+    <string name="dashboard_water_add_500">+500ml</string>
+    <string name="dashboard_daily_quest_banner">Nhiệm vụ hôm nay: 2/3 hoàn thành (+150 XP)</string>
+    <string name="dashboard_daily_quest_action">Xem ➔</string>
+
+    <!-- Workouts -->
+    <string name="workouts_drag_routine_hint">⠿ Kéo thả Routine từ thư viện vào ngày tập để xếp lịch</string>
+    <string name="workouts_today_scheduled_routine">Lịch hôm nay: Ngực &amp; Tay Sau Cắt Nét (3 bài)</string>
+    <string name="workouts_today_scheduled_ex">• Barbell Bench Press  • Incline DB  • Dips Triceps</string>
+    <string name="workouts_btn_detail">Chi tiết</string>
+    <string name="workouts_collection_title">Bộ sưu tập Routine &amp; Thư mục</string>
+    <string name="workouts_collection_sub">4 routines • 3 thư mục</string>
+    <string name="workouts_drag_to_cal">⠿ Kéo vào lịch</string>
+    <string name="workouts_view_routine_detail_action">🔍 Xem chi tiết giáo án &amp; kỹ thuật tập ➔</string>
+    <string name="workouts_routine_pull_title">Lưng Xô &amp; Bắp Tay Trước</string>
+    <string name="workouts_routine_pull_stats">⚡ 3 bài tập  •  8 sets  •  ⏱ 40 phút  •  ⏳ Nghỉ 90s</string>
+    <string name="workouts_routine_pull_ex1">1. Conventional Deadlift (Kéo đòn)\n3 sets × 6 reps</string>
+    <string name="workouts_routine_pull_ex2">2. Lat Pulldown (Kéo xô máy cáp)\n3 sets × 10 reps</string>
+    <string name="workouts_routine_pull_ex3">3. Barbell Biceps Curl (Cuốn tay trước)\n2 sets × 12 reps</string>
+    <string name="workouts_ai_pose_banner_title">AI Pose Coach • Sửa form &amp; Đếm rep Camera</string>
+    <string name="workouts_ai_pose_banner_desc">Kiểm tra kỹ thuật tự động 99% chuẩn trước buổi tập</string>
+    <string name="workouts_ai_pose_banner_cta">Mở ➔</string>
+
+    <!-- Body Metrics -->
+    <string name="metrics_circumference_title">Số đo vòng cơ thể chi tiết:</string>
+    <string name="metrics_chest_val">Ngực: 98 cm</string>
+    <string name="metrics_chest_diff">+2 cm</string>
+    <string name="metrics_waist_val">Eo: 78 cm</string>
+    <string name="metrics_waist_diff">-3 cm</string>
+    <string name="metrics_arm_val">Bắp tay: 36 cm</string>
+    <string name="metrics_arm_diff">+1.5 cm</string>
+    <string name="metrics_thigh_val">Đùi: 56 cm</string>
+    <string name="metrics_thigh_diff">+1 cm</string>
+    <string name="metrics_history_title">Lịch sử đo gần nhất:</string>
+    <string name="metrics_history_1_date">Thứ Sáu, 02/10</string>
+    <string name="metrics_history_1_val">68.4 kg • 15.2% mỡ • BMI 22.3</string>
+    <string name="metrics_history_2_date">Thứ Sáu, 25/09</string>
+    <string name="metrics_history_2_val">68.9 kg • 15.6% mỡ • BMI 22.5</string>
+
+    <!-- Nutrition Tracker -->
+    <string name="nutrition_meals_today_title">Bữa ăn đã nạp hôm nay (3 bữa):</string>
+    <string name="nutrition_meal_1_name">Bữa sáng: Phở bò tái lăn</string>
+    <string name="nutrition_meal_1_macro">480 kcal (32g Protein)</string>
+    <string name="nutrition_meal_2_name">Bữa trưa: Cơm ức gà xào nấm</string>
+    <string name="nutrition_meal_2_macro">620 kcal (48g Protein)</string>
+    <string name="nutrition_meal_3_name">Bữa phụ: Whey Isolate + Chuối</string>
+    <string name="nutrition_meal_3_macro">280 kcal (28g Protein)</string>
+    <string name="nutrition_meal_4_name">Bữa tối: Salad cá hồi áp chảo</string>
+    <string name="nutrition_meal_4_macro">470 kcal (35g Protein)</string>
+    <string name="nutrition_combos_preset_title">Gợi ý combo món chuẩn macro:</string>
+    <string name="nutrition_combo_1">Combo Tăng Cơ Chuẩn: Ức gà 200g + Khoai lang 150g</string>
+    <string name="nutrition_combo_2">Combo Eat Clean: Salad cá ngừ + Bánh mì đen</string>
+
+    <!-- Community -->
+    <string name="community_post_2_user">Minh Anh  [Lv. 8] • 1 giờ trước</string>
+    <string name="community_post_2_content" formatted="false">Đạt chuỗi 17 ngày streak liên tục rồi mọi người ơi! Body fat giảm từ 18% xuống 15.2% cảm giác người nhẹ hẳn.</string>
+    <string name="community_post_2_tag">🔥 Streak 17 ngày</string>
+    <string name="community_post_reactions_figma">❤️ 42 Thích   💬 8 Bình luận   🔗 Chia sẻ</string>
+
+    <!-- User Profile -->
+    <string name="profile_streak_badge">🔥 17</string>
+    <string name="profile_recent_logs_title">Nhật ký hoạt động (4 buổi gần nhất):</string>
+    <string name="profile_log_1_title">Thứ Sáu, 02/10 - Ngực &amp; Tay Sau Cắt Nét</string>
+    <string name="profile_log_1_stats">⏱ 45p • 🏋️ 2.680 kg • ⚡ 10 sets</string>
+    <string name="profile_log_2_title">Thứ Bảy, 03/10 - Cardio &amp; Chạy Bộ Đốt Mỡ</string>
+    <string name="profile_log_2_stats">⏱ 32p • 🏋️ 0 kg • ⚡ 4 sets</string>
+    <string name="profile_log_3_title">Thứ Tư, 30/09 - Lưng Xô &amp; Bắp Tay Trước</string>
+    <string name="profile_log_3_stats">⏱ 52p • 🏋️ 3.450 kg • ⚡ 8 sets</string>
+
+    <!-- Badges & Achievements -->
+    <string name="badge_figma_title">Huy hiệu đã đạt (6/12):</string>
+    <string name="badge_f1_title">Kỷ lục gia</string>
+    <string name="badge_f1_desc">PR Bench 90kg</string>
+    <string name="badge_f2_title">Chuỗi 15 ngày</string>
+    <string name="badge_f2_desc">Streak bền bỉ</string>
+    <string name="badge_f3_title">King of Squat</string>
+    <string name="badge_f3_desc">Gánh tạ 120kg</string>
+    <string name="badge_f4_title">Siêu kỷ luật</string>
+    <string name="badge_f4_desc">100% nhiệm vụ</string>
+    <string name="badge_f5_title">Thép tôi luyện</string>
+    <string name="badge_f5_desc">40 buổi tập</string>
+    <string name="badge_f6_title">Thần tốc</string>
+    <string name="badge_f6_desc">Hoàn thành 30p</string>
+
+    <!-- Edit Profile -->
+    <string name="label_profile_gender">GIỚI TÍNH</string>
+    <string name="hint_profile_gender">Nam</string>
+    <string name="profile_cancel_edit">Hủy</string>
+    <string name="btn_save_profile_figma">💾 Lưu thay đổi hồ sơ</string>
+
+    <!-- Routine Detail Figma Extras -->
+    <string name="btn_back_to_workouts">‹ Luyện tập</string>
+    <string name="btn_start_workout_figma">🚀 Bắt đầu buổi tập ngay ➔</string>
+    <string name="routine_ex_list_figma">Danh sách bài tập (5 bài):</string>
+    <string name="routine_ex1_f_title">1. Barbell Bench Press (Nằm đẩy tạ đòn)</string>
+    <string name="routine_ex1_f_desc">4 sets x 8-10 reps • 70-80 kg</string>
+    <string name="routine_ex2_f_title">2. Incline Dumbbell Press (Đẩy ngực trên)</string>
+    <string name="routine_ex2_f_desc">3 sets x 10-12 reps • 24 kg/tay</string>
+    <string name="routine_ex3_f_title">3. Cable Chest Fly (Ép ngực cáp)</string>
+    <string name="routine_ex3_f_desc">3 sets x 12-15 reps • 15 kg/bên</string>
+    <string name="routine_ex4_f_title">4. Triceps Rope Pushdown (Kéo cáp tay sau)</string>
+    <string name="routine_ex4_f_desc">4 sets x 12 reps • 25 kg</string>
+    <string name="routine_ex5_f_title">5. Dips (Xà kép tay sau &amp; ngực dưới)</string>
+    <string name="routine_ex5_f_desc">3 sets x max reps • Bodyweight</string>
+
+    <!-- AI Pose Active Session Extras -->
+    <string name="btn_back_to_workouts_session">‹ Trở về</string>
+    <string name="btn_finish_ai_session_figma">Hoàn thành phiên AI Pose ➔</string>
+
+    <!-- Settings Extras -->
+    <string name="btn_back_to_profile">‹ Hồ sơ</string>
+    <string name="settings_btn_back">← Quay lại</string>
+    <string name="settings_voice_status">BẬT [✓]</string>
+    <string name="settings_watch_sync">Garmin / Galaxy Watch</string>
+    <string name="settings_country_vn">Việt Nam</string>
 </resources>

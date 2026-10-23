@@ -36,6 +36,10 @@ class DashboardActivity : AppCompatActivity() {
         binding.cardAvatarRpg.setOnClickListener {
             startActivity(Intent(this, com.fittrack.app.ui.modal.DailyQuestsModalActivity::class.java))
         }
+
+        binding.btnOpenDailyQuests.setOnClickListener {
+            startActivity(Intent(this, com.fittrack.app.ui.modal.DailyQuestsModalActivity::class.java))
+        }
     }
 
     private fun setupBottomNav() {

@@ -6,6 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.fittrack.app.databinding.ActivitySettingsBinding
 import com.fittrack.app.MainActivity
 
+import com.fittrack.app.ui.BottomNavTab
+import com.fittrack.app.ui.setupBottomNav
+
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
@@ -25,5 +28,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+
+        binding.bottomNavigation.setupBottomNav(this, BottomNavTab.PROFILE)
     }
 }

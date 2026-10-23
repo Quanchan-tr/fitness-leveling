@@ -31,18 +31,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
+        <LinearLayout
             android:id="@+id/btn_close"
-            android:layout_width="36dp"
+            android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:background="#80000000"
+            android:clickable="true"
             android:contentDescription="@string/cd_close_session"
-            android:padding="8dp"
-            android:src="@drawable/ic_back"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_back_to_workouts_session"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_live_tag"
@@ -218,7 +228,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/btn_finish_ai_pose" />
+            android:text="@string/btn_finish_ai_session_figma" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
