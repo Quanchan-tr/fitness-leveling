@@ -3,7 +3,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { TopBar } from '@/components/layout/TopBar';
 import { MainGrid } from '@/components/layout/MainGrid';
 import { BodyMetricsModal } from '@/components/home/BodyMetricsModal';
 import { ProgressPhotoModal } from '@/components/home/ProgressPhotoModal';
@@ -11,13 +10,11 @@ import { OutfitModal } from '@/components/home/OutfitModal';
 import { CharacterOutfit } from '@/components/home/3d/Character';
 import { mockDashboardData } from '@/data/mockData';
 import { initialFitnessData, MetricHistoryItem, ProgressPhotoItem } from '@/lib/fitnessData';
-import { useShell } from '@/components/layout/ShellLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 export default function DashboardPage() {
-  const { user, isLoading, signOut, loginDemo } = useAuth();
-  const { toggleMobileNav } = useShell();
+  const { user, isLoading, loginDemo } = useAuth();
   const router = useRouter();
 
   const [dashboardData, setDashboardData] = useState(mockDashboardData);
@@ -101,11 +98,6 @@ export default function DashboardPage() {
     }));
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.push('/auth/login');
-  };
-
   // Automatically activate demo session if user is not logged in so dashboard is immediately accessible
   useEffect(() => {
     if (!isLoading && !user) {
@@ -117,21 +109,6 @@ export default function DashboardPage() {
   if (isLoading || !user) {
     return (
       <main className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen animate-in fade-in duration-150">
-        {/* TopBar Skeleton */}
-        <div className="h-16 bg-white border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Skeleton className="w-9 h-9 rounded-full" />
-            <div className="space-y-1">
-              <Skeleton className="w-28 h-4 rounded" />
-              <Skeleton className="w-16 h-3 rounded" />
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Skeleton className="w-20 h-7 rounded-lg" />
-            <Skeleton className="w-24 h-7 rounded-lg" />
-          </div>
-        </div>
-
         {/* Dashboard Grid Skeleton */}
         <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -177,28 +154,8 @@ export default function DashboardPage() {
     return null;
   }
 
-  // ── Full dashboard for authenticated users ──────────────────────────────────
-  const topBarUser = {
-    name: user.displayName || dashboardData.user.name,
-    level: dashboardData.user.level,
-    xp: dashboardData.user.exp.current,
-    nextLevelXp: dashboardData.user.exp.max,
-    str: dashboardData.user.stats.STR,
-    end: dashboardData.user.stats.END,
-    mob: dashboardData.user.stats.AGI,
-    goal: 'gain_muscle',
-  };
-
   return (
     <main className="dashboard-shell flex-1 flex flex-col min-w-0 min-h-screen bg-slate-50">
-      <TopBar
-        user={topBarUser}
-        streak={17}
-        photoCount={extraData.progressPhotos.length}
-        onToggleMobileMenu={toggleMobileNav}
-        onSignOut={handleSignOut}
-      />
-
       <MainGrid
         outfit={outfit}
         photoCount={extraData.progressPhotos.length}

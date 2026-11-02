@@ -2,9 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TopBar } from '@/components/layout/TopBar';
 import { useFitness } from '@/contexts/FitnessContext';
-import { useShell } from '@/components/layout/ShellLayout';
 import { CommunityPostComposer } from '@/components/community/CommunityPostComposer';
 import { FeedPostCard } from '@/components/community/FeedPostCard';
 import { CommunitySidebar } from '@/components/community/CommunitySidebar';
@@ -21,7 +19,6 @@ import {
 } from 'lucide-react';
 
 export default function CommunityPage() {
-  const { toggleMobileNav } = useShell();
   const { posts, profile } = useFitness();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -55,22 +52,6 @@ export default function CommunityPage() {
 
   return (
     <main className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen">
-      {/* Top Navigation Bar */}
-      <TopBar
-        user={{
-          name: profile.name,
-          level: profile.level,
-          xp: profile.xp,
-          nextLevelXp: profile.maxXp,
-          str: 24,
-          end: 18,
-          mob: 15,
-          goal: profile.goal,
-        }}
-        streak={profile.streak}
-        onToggleMobileMenu={toggleMobileNav}
-      />
-
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">

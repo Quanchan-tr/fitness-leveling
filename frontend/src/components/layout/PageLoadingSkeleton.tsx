@@ -5,22 +5,11 @@ import { Skeleton } from '@/components/ui/Skeleton';
 
 export const PageLoadingSkeleton: React.FC = () => {
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen animate-in fade-in duration-100">
+    <div className="flex-1 flex flex-col min-w-0 bg-slate-50 animate-in fade-in duration-100">
       {/* Top progress bar with animated brand shimmer */}
       <div className="h-0.5 w-full bg-slate-100 overflow-hidden relative">
         <div className="absolute inset-y-0 left-0 bg-[#FF5722] w-1/3 animate-[shimmer_1.2s_infinite]" />
       </div>
-
-      {/* TopBar Skeleton */}
-      <header className="h-16 px-4 sm:px-6 lg:px-8 bg-white border-b border-slate-200 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Skeleton className="w-36 h-6 rounded-md" />
-        </div>
-        <div className="flex items-center gap-3">
-          <Skeleton className="w-24 h-8 rounded-full" />
-          <Skeleton className="w-9 h-9 rounded-full" />
-        </div>
-      </header>
 
       {/* Main Page Body Skeleton */}
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto w-full">
@@ -60,4 +49,3 @@ export const PageLoadingSkeleton: React.FC = () => {
     </div>
   );
 };
-

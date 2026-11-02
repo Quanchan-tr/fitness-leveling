@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { TopBar } from '@/components/layout/TopBar';
 import { initialFitnessData } from '@/lib/fitnessData';
 import { apiRequest, generateUUID } from '@/lib/api';
 import {
@@ -29,7 +28,6 @@ import {
   Camera,
   CameraOff,
 } from 'lucide-react';
-import { useShell } from '@/components/layout/ShellLayout';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { AiWorkoutPlannerWizard } from '@/components/ai/AiWorkoutPlannerWizard';
 
@@ -63,7 +61,6 @@ function scoreBgColour(score: number): string {
 // ─── Page Component ───────────────────────────────────────────────────────────
 
 export default function AiCoachPage() {
-  const { toggleMobileNav } = useShell();
   const [activeTab, setActiveTab] = useState<TabType>('pose');
   const [poseExercise, setPoseExercise] = useState<ExerciseType>('squat');
   const [sessionActive, setSessionActive] = useState(false);
@@ -260,12 +257,6 @@ export default function AiCoachPage() {
 
   return (
     <main className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen">
-      <TopBar
-        user={initialFitnessData.user}
-        streak={initialFitnessData.today.streak}
-        onToggleMobileMenu={toggleMobileNav}
-      />
-
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-6xl mx-auto w-full">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200">

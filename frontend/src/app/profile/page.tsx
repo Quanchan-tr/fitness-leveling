@@ -2,9 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TopBar } from '@/components/layout/TopBar';
 import { useFitness } from '@/contexts/FitnessContext';
-import { useShell } from '@/components/layout/ShellLayout';
 import {
   User,
   Calendar,
@@ -26,7 +24,6 @@ import {
 import Link from 'next/link';
 
 export default function ProfilePage() {
-  const { toggleMobileNav } = useShell();
   const { profile, updateProfile, workoutHistory } = useFitness();
 
   // Statistics state: Tab & Time filter
@@ -141,22 +138,6 @@ export default function ProfilePage() {
 
   return (
     <main className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen">
-      {/* Top Navigation Bar */}
-      <TopBar
-        user={{
-          name: profile.name,
-          level: profile.level,
-          xp: profile.xp,
-          nextLevelXp: profile.maxXp,
-          str: 24,
-          end: 18,
-          mob: 15,
-          goal: profile.goal,
-        }}
-        streak={profile.streak}
-        onToggleMobileMenu={toggleMobileNav}
-      />
-
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
         {/* Section 19: Profile Header Card */}
         <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-8 space-y-6">

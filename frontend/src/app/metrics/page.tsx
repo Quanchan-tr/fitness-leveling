@@ -4,7 +4,6 @@
 import { apiRequest } from '@/lib/api';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { TopBar } from '@/components/layout/TopBar';
 import { initialFitnessData, MetricHistoryItem, ProgressPhotoItem } from '@/lib/fitnessData';
 import {
   Scale,
@@ -23,7 +22,6 @@ import {
 } from 'lucide-react';
 import { BodyMetricsModal } from '@/components/home/BodyMetricsModal';
 import { ProgressPhotoModal } from '@/components/home/ProgressPhotoModal';
-import { useShell } from '@/components/layout/ShellLayout';
 import {
   calculateBmi,
   calculateBodyFat,
@@ -32,7 +30,6 @@ import {
 } from '@/lib/bodyMetrics';
 
 export default function MetricsPage() {
-  const { toggleMobileNav } = useShell();
   const [data, setData] = useState<typeof initialFitnessData>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -430,15 +427,6 @@ export default function MetricsPage() {
 
   return (
     <main className="flex-1 flex flex-col min-w-0 bg-[#F8FAFC] min-h-screen">
-      <TopBar
-        user={data.user}
-        streak={data.today.streak}
-        photoCount={data.progressPhotos.length}
-        onOpenBodyMetrics={() => setIsMetricsModalOpen(true)}
-        onOpenProgressPhotos={() => setIsPhotosModalOpen(true)}
-        onToggleMobileMenu={toggleMobileNav}
-      />
-
       <div className="p-4 sm:p-6 lg:p-8 space-y-6 max-w-5xl mx-auto w-full">
         {/* Header (Clean, Minimal) */}
         <div className="pb-3 border-b border-slate-200/90">

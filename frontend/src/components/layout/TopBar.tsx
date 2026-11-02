@@ -25,6 +25,7 @@ import {
 import { EmptyState } from '@/components/ui/EmptyState';
 import { FitnessUser } from '@/lib/fitnessData';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFitness } from '@/contexts/FitnessContext';
 
 export interface NotificationItem {
   id: string;
@@ -38,7 +39,7 @@ export interface NotificationItem {
 }
 
 interface TopBarProps {
-  user: FitnessUser;
+  user?: FitnessUser;
   streak?: number;
   photoCount?: number;
   onOpenBodyMetrics?: () => void;
@@ -49,12 +50,26 @@ interface TopBarProps {
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
-  user,
-  streak = 17,
+  user: propUser,
+  streak: propStreak,
   onToggleMobileMenu,
   onSignOut,
 }) => {
-  const { signOut } = useAuth();
+  const { user: authUser, signOut } = useAuth();
+  const { profile } = useFitness();
+
+  const user: FitnessUser = propUser || {
+    name: authUser?.displayName || profile?.name || 'Chiến binh',
+    level: profile?.level || 1,
+    xp: profile?.xp || 0,
+    nextLevelXp: profile?.maxXp || 1000,
+    str: 24,
+    end: 18,
+    mob: 15,
+    goal: (profile?.goal as 'gain_muscle' | 'lose_fat') || 'gain_muscle',
+  };
+
+  const streak = propStreak !== undefined ? propStreak : (profile?.streak || 17);
   const [currentDateTime, setCurrentDateTime] = useState<string>('');
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);

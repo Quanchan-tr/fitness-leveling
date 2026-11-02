@@ -85,7 +85,7 @@ export const initialFitnessData: FitnessDataState = {
     steps: 8421,
     water: 1.8,
     waterGoal: 2.5,
-    streak: 12,
+    streak: 17,
   },
   recentMetrics: [
     { date: "2026-09-01", weight: 70.2, bodyFat: 16.5, muscle: 53.2 },

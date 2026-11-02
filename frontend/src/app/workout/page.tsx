@@ -3,9 +3,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { TopBar } from '@/components/layout/TopBar';
 import { useFitness } from '@/contexts/FitnessContext';
-import { useShell } from '@/components/layout/ShellLayout';
 import { RoutineItem } from '@/types/fitnessleveling.types';
 import { WeeklyCalendar } from '@/components/workout/WeeklyCalendar';
 import { RoutineCard } from '@/components/workout/RoutineCard';
@@ -34,7 +32,6 @@ import {
 
 export default function WorkoutPage() {
   const router = useRouter();
-  const { toggleMobileNav } = useShell();
   const {
     routines,
     folders,
@@ -194,22 +191,6 @@ export default function WorkoutPage() {
 
   return (
     <main className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen">
-      {/* Top Navigation Bar */}
-      <TopBar
-        user={{
-          name: profile.name,
-          level: profile.level,
-          xp: profile.xp,
-          nextLevelXp: profile.maxXp,
-          str: 24,
-          end: 18,
-          mob: 15,
-          goal: profile.goal,
-        }}
-        streak={profile.streak}
-        onToggleMobileMenu={toggleMobileNav}
-      />
-
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
         {/* Editor View */}
         {viewMode === 'editor' && (

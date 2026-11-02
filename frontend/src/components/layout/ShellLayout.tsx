@@ -4,6 +4,7 @@
 import React, { useState, createContext, useContext, useEffect, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { Sidebar } from './Sidebar';
+import { TopBar } from './TopBar';
 import { useAuth } from '@/contexts/AuthContext';
 import { FloatingActiveWorkoutBar } from '@/components/workout/FloatingActiveWorkoutBar';
 import { OfflineBanner } from '@/components/ui/OfflineBanner';
@@ -148,13 +149,16 @@ export const ShellLayout: React.FC<{ children: React.ReactNode }> = ({
           onCloseMobile={closeMobileNav}
         />
         <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-x-hidden">
+          <TopBar onToggleMobileMenu={toggleMobileNav} />
           <OfflineBanner />
           <SessionExpiredModal />
-          {isNavigating ? (
-            <PageLoadingSkeleton />
-          ) : (
-            children
-          )}
+          <div className="flex-1 flex flex-col min-w-0">
+            {isNavigating ? (
+              <PageLoadingSkeleton />
+            ) : (
+              children
+            )}
+          </div>
         </div>
         <FloatingActiveWorkoutBar />
       </div>

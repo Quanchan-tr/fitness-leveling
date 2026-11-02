@@ -2,10 +2,7 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { TopBar } from '@/components/layout/TopBar';
 import { initialFitnessData } from '@/lib/fitnessData';
-import { useShell } from '@/components/layout/ShellLayout';
-import { useAuth } from '@/contexts/AuthContext';
 import { useFitness } from '@/contexts/FitnessContext';
 import { Utensils } from 'lucide-react';
 
@@ -23,14 +20,7 @@ import { ComboCreatorModal } from '@/components/nutrition/ComboCreatorModal';
 import { ComboEditorModal } from '@/components/nutrition/ComboEditorModal';
 
 export default function NutritionPage() {
-  const { toggleMobileNav } = useShell();
-  const { user, signOut } = useAuth();
   const { updateNutrition } = useFitness();
-
-  const topBarUser = {
-    ...initialFitnessData.user,
-    name: user?.displayName || initialFitnessData.user.name,
-  };
 
   // 1. Food Search Hook
   const {
@@ -172,14 +162,6 @@ export default function NutritionPage() {
 
   return (
     <main className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen">
-      {/* TopBar */}
-      <TopBar
-        user={topBarUser}
-        streak={initialFitnessData.today.streak}
-        onToggleMobileMenu={toggleMobileNav}
-        onSignOut={signOut}
-      />
-
       {/* Main Content Area */}
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
         {/* Page Header (Clean, no AI subtitle) */}
