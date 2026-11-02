@@ -288,28 +288,34 @@ export const authService = {
     return { user: updatedUser, fitnessProfile: profile };
   },
 
-  /** One-click demo login */
+  /** One-click demo login: authenticates against real seeded database account */
   async loginDemo(): Promise<AuthUser> {
     try {
       return await this.login({
-        email: 'test@example.com',
-        password: 'password',
+        email: 'demo@fitnessleveling.test',
+        password: 'password123',
       });
     } catch {
-      // Offline fallback for previewing
-      const demoUser: AuthUser = {
-        id: 'demo-user-quan',
-        email: 'test@example.com',
-        displayName: 'Quân Trần',
-        isEmailVerified: true,
-        hasCompletedOnboarding: true,
-        createdAt: new Date().toISOString(),
-      };
-      _saveToStorage(STORAGE_KEYS.user, demoUser);
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(STORAGE_KEYS.token, 'mock_token_demo_user');
+      try {
+        return await this.login({
+          email: 'test@example.com',
+          password: 'password',
+        });
+      } catch {
+        const demoUser: AuthUser = {
+          id: 'demo-user-quan',
+          email: 'demo@fitnessleveling.test',
+          displayName: 'Demo Athlete',
+          isEmailVerified: true,
+          hasCompletedOnboarding: true,
+          createdAt: new Date().toISOString(),
+        };
+        _saveToStorage(STORAGE_KEYS.user, demoUser);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(STORAGE_KEYS.token, 'mock_token_demo_user');
+        }
+        return demoUser;
       }
-      return demoUser;
     }
   },
 

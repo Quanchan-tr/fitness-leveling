@@ -24,15 +24,84 @@ import {
   CommunityComment,
   SuggestedAthlete,
 } from '@/types/fitnessleveling.types';
+import exerciseDataset from '@/data/exerciseDataset.json';
 import {
-  initialExercises,
-  initialFolders,
-  initialRoutines,
-  initialSchedule,
+  starterFolders,
+  starterRoutines,
+  starterSchedule,
+} from '@/data/starterRoutines';
+import {
   initialCommunityPosts,
   initialSuggestedAthletes,
-  initialWorkoutHistory,
 } from '@/data/fitnesslevelingMockData';
+
+const defaultDatasetExercises: Exercise[] = (exerciseDataset as any[]).map((item) => ({
+  id: item.id,
+  name: item.name,
+  targetMuscles: Array.isArray(item.targetMuscles) && item.targetMuscles.length > 0
+    ? item.targetMuscles
+    : [item.target_muscle || item.body_part || item.category || 'chest'],
+  equipment: (item.equipment || 'bodyweight').toLowerCase() as any,
+  type: item.type || (item.category === 'cardio' ? 'duration' : 'weight_reps'),
+  gifPlaceholderUrl: item.gif_url || item.thumbnail_url,
+  gif_url: item.gif_url,
+  thumbnail_url: item.thumbnail_url,
+  description: item.description || item.instructions || item.name,
+  has_ai_check: Boolean(item.has_ai_check),
+  body_part: item.body_part,
+  category: item.category,
+  target_muscle: item.target_muscle,
+}));
+
+function calculateRealStreak(history: WorkoutHistoryRecord[]): number {
+  if (!history || history.length === 0) return 0;
+  const uniqueDates = Array.from(
+    new Set(
+      history
+        .map((h) => {
+          try {
+            return new Date(h.completedAt).toISOString().split('T')[0];
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean) as string[]
+    )
+  ).sort().reverse();
+
+  if (uniqueDates.length === 0) return 0;
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+  const latest = uniqueDates[0];
+  if (latest !== todayStr && latest !== yesterdayStr) {
+    return 0;
+  }
+
+  let streak = 0;
+  let checkDate = new Date(latest);
+  for (const dStr of uniqueDates) {
+    const currentExpected = checkDate.toISOString().split('T')[0];
+    if (dStr === currentExpected) {
+      streak++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+function calculateLevelFromWorkouts(totalWorkouts: number): { level: number; xp: number; maxXp: number } {
+  const totalXp = totalWorkouts * 120;
+  const maxXp = 1000;
+  const level = Math.floor(totalXp / maxXp) + 1;
+  const xp = totalXp % maxXp;
+  return { level, xp, maxXp };
+}
 import { playRestTimerBeep } from '@/lib/soundUtils';
 import { apiRequest, fetchExercises } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
@@ -226,7 +295,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         console.error('Failed reading custom exercises', e);
       }
     }
-    return [...customList, ...initialExercises];
+    return [...customList, ...defaultDatasetExercises];
   });
 
   // Sync exercises from backend API or local clean dataset
@@ -276,7 +345,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         console.error('Failed reading folders from localStorage', e);
       }
     }
-    return initialFolders;
+    return starterFolders;
   });
 
   // Save folders to localStorage
@@ -299,7 +368,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         console.error('Failed reading routines from localStorage', e);
       }
     }
-    return initialRoutines;
+    return starterRoutines;
   });
 
   // Save routines to localStorage
@@ -334,7 +403,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         console.error('Failed reading schedule from localStorage', e);
       }
     }
-    return initialSchedule.map((day) => ({
+    return starterSchedule.map((day) => ({
       ...day,
       assignedRoutines:
         day.assignedRoutines && day.assignedRoutines.length > 0
@@ -359,21 +428,6 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const todaySchedule = schedule.find((s) => s.dayOfWeek === 'Chủ nhật') || schedule[6];
 
   // 4. User Profile & Workout History
-  const [profile, setProfile] = useState<UserFitnessProfile>({
-    id: 'user-me',
-    name: 'Quan Tran',
-    level: 12,
-    xp: 640,
-    maxXp: 1000,
-    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
-    bio: 'Chiến binh thể hình tự nhiên • Tập trung hypertrophy & calisthenics',
-    goal: 'gain_muscle',
-    streak: 17,
-    totalWorkouts: 42,
-    followersCount: 154,
-    followingCount: 88,
-  });
-
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistoryRecord[]>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -383,8 +437,39 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         console.error('Failed reading history from localStorage', e);
       }
     }
-    return initialWorkoutHistory;
+    return [];
   });
+
+  const [profile, setProfile] = useState<UserFitnessProfile>(() => {
+    const stats = calculateLevelFromWorkouts(0);
+    return {
+      id: user?.id || 'user-me',
+      name: user?.displayName || 'Vận động viên',
+      level: stats.level,
+      xp: stats.xp,
+      maxXp: stats.maxXp,
+      avatar: user?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+      bio: 'Chiến binh thể hình FitLevel • Bắt đầu hành trình bứt phá',
+      goal: (user?.goal as any) || 'gain_muscle',
+      streak: 0,
+      totalWorkouts: 0,
+      followersCount: 0,
+      followingCount: 0,
+    };
+  });
+
+  useEffect(() => {
+    const streak = calculateRealStreak(workoutHistory);
+    const { level, xp, maxXp } = calculateLevelFromWorkouts(workoutHistory.length);
+    setProfile((prev) => ({
+      ...prev,
+      streak,
+      totalWorkouts: workoutHistory.length,
+      level,
+      xp,
+      maxXp,
+    }));
+  }, [workoutHistory]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

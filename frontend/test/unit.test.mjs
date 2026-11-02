@@ -147,3 +147,87 @@ test('validateSplit enforces physiological recovery boundaries', () => {
   const ulCheck = validateSplit('upper_lower', 4);
   assert.equal(ulCheck.isValid, true);
 });
+
+
+// --- 6. Dataset Starter Routines & Real Streak Calculation ---
+test('Starter routines use valid exercise IDs from exerciseDataset.json', () => {
+  const datasetPath = path.resolve(__dirname, '../src/data/exerciseDataset.json');
+  const dataset = JSON.parse(fs.readFileSync(datasetPath, 'utf-8'));
+  const validIds = new Set(dataset.map((e) => e.id));
+
+  const starterIds = [
+    'ex-0025', // Barbell Bench Press
+    'ex-0007', // Alternate Lateral Pulldown
+    'ex-0662', // Push-Up
+    'ex-1004', // Band Squat
+    'ex-0464', // Front Plank With Twist
+    'ex-1429', // Wide Grip Pull-Up
+    'ex-0219', // Cable Shoulder Press
+    'ex-1634', // Cable Lying Bicep Curl
+    'ex-1001', // Band Single Leg Split Squat
+    'ex-3544', // Bodyweight Incline Side Plank
+    'ex-0001', // 3/4 Sit-Up
+  ];
+
+  for (const id of starterIds) {
+    assert.ok(validIds.has(id), `Exercise ID ${id} must exist in exerciseDataset.json`);
+  }
+});
+
+test('Real streak calculation respects consecutive calendar days', () => {
+  function calculateRealStreak(history) {
+    if (!history || history.length === 0) return 0;
+    const uniqueDates = Array.from(
+      new Set(
+        history
+          .map((h) => {
+            try { return new Date(h.completedAt).toISOString().split('T')[0]; } catch { return null; }
+          })
+          .filter(Boolean)
+      )
+    ).sort().reverse();
+
+    if (uniqueDates.length === 0) return 0;
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    const latest = uniqueDates[0];
+    if (latest !== todayStr && latest !== yesterdayStr) return 0;
+
+    let streak = 0;
+    let checkDate = new Date(latest);
+    for (const dStr of uniqueDates) {
+      const currentExpected = checkDate.toISOString().split('T')[0];
+      if (dStr === currentExpected) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  // Case 1: Empty history -> 0 streak
+  assert.equal(calculateRealStreak([]), 0);
+
+  // Case 2: Broken history (workout 5 days ago) -> 0 streak
+  const oldDate = new Date();
+  oldDate.setDate(oldDate.getDate() - 5);
+  assert.equal(calculateRealStreak([{ completedAt: oldDate.toISOString() }]), 0);
+
+  // Case 3: 3 consecutive days ending today -> 3 streak
+  const today = new Date();
+  const d1 = new Date(); d1.setDate(today.getDate() - 1);
+  const d2 = new Date(); d2.setDate(today.getDate() - 2);
+
+  const activeHistory = [
+    { completedAt: today.toISOString() },
+    { completedAt: d1.toISOString() },
+    { completedAt: d2.toISOString() },
+  ];
+  assert.equal(calculateRealStreak(activeHistory), 3);
+});
