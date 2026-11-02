@@ -127,3 +127,22 @@ Tất cả các thay đổi, bổ sung và nâng cấp đáng chú ý của dự
   - Đồng bộ số đo thể chất và lịch sử cân nặng từ API `/api/v1/body-metrics`.
 - **Mở rộng Unit Test Suite (10/10 tests passed)**:
   - Bổ sung kiểm thử tự động xác minh tính toàn vẹn của 11 ID bài tập mẫu trong dataset 1,324 bài và kiểm thử thuật toán tính chuỗi Streak liên tục theo ngày lịch.
+
+
+---
+
+### 12. Bổ Sung Tab "Bài Tập" Riêng Biệt ([`/exercises`](file:///d:/Code/FitApp/fitness-leveling/frontend/src/app/exercises/page.tsx))
+- **Navigation Placement ([`Sidebar.tsx`](file:///d:/Code/FitApp/fitness-leveling/frontend/src/components/layout/Sidebar.tsx))**:
+  - Tích hợp mục menu **"Bài tập"** tại vị trí thứ 3 trên thanh Sidebar (ngay sau *"Luyện tập"*), sử dụng icon `BookOpen` liên kết đến đường dẫn `/exercises`.
+- **Thư Viện Bài Tập Đầy Đủ (1,324+ Bài Tập)**:
+  - Cho phép tra cứu toàn bộ kho bài tập từ dataset chuẩn quốc tế với hiệu năng cao trên client.
+  - Thanh công cụ phía trên gồm: Ô tìm kiếm từ khóa thông minh (debounce 250ms), bộ lọc **Nhóm cơ** (*Ngực, Lưng, Đùi, Bắp chân, Vai, Tay, Bụng & Eo, Cardio*), bộ lọc **Dụng cụ** (*Bodyweight, Barbell, Dumbbell, Cable, Machine...*), và nút chuyển đổi nhanh **Chỉ bài tập có AI Pose Check**.
+- **Lưới Ô Thẻ Bài Tập Trực Quan & Phân Trang Số Truyền Thống**:
+  - Giao diện lưới thẻ responsive kèm ảnh minh họa thumbnail sắc nét, thẻ nhóm cơ, dụng cụ và huy hiệu AI.
+  - Thanh phân trang số truyền thống `[Trước] [1] [2] [3] ... [56] [Sau]` với 24 bài tập/trang, tự động cuộn mượt mà lên đầu trang khi chuyển trang.
+- **Cửa Sổ Chi Tiết Bài Tập Nổi ([`ExerciseDetailModal.tsx`](file:///d:/Code/FitApp/fitness-leveling/frontend/src/components/exercises/ExerciseDetailModal.tsx))**:
+  - Hiển thị Popup Glassmorphism khi nhấp vào bất kỳ bài tập nào mà không làm mất vị trí cuộn trang.
+  - Chiếu **ảnh GIF chuyển động cỡ lớn** thị phạm form chuẩn của động tác.
+  - Thông tin chi tiết: Cơ chính, cơ phụ, dụng cụ, phân loại, trạng thái AI Pose Check.
+  - **Hướng dẫn kỹ thuật từng bước (Step-by-step)** được định dạng rõ ràng từ mô tả tiếng Anh chuẩn.
+  - Tích hợp 2 nút hành động: *"Tập bài này ngay"* (chuyển thẳng sang Live Workout session) và *"Thêm vào Routine"* (đưa vào routine tập luyện cá nhân).

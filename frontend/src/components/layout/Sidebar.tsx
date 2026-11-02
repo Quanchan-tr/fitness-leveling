@@ -8,6 +8,7 @@ import {
   LucideIcon,
   LayoutDashboard,
   Dumbbell,
+  BookOpen,
   Activity,
   Utensils,
   Video,
@@ -29,6 +30,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Luyện tập', href: '/workout', icon: Dumbbell },
+  { name: 'Bài tập', href: '/exercises', icon: BookOpen },
   { name: 'Chỉ số cơ thể', href: '/metrics', icon: Activity },
   { name: 'Dinh dưỡng', href: '/nutrition', icon: Utensils },
   { name: 'Huấn luyện viên AI', href: '/ai-coach', icon: Video, badge: 'AI' },
