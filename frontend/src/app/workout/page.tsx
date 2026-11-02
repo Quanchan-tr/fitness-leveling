@@ -14,6 +14,7 @@ import { RoutineDetailView } from '@/components/workout/RoutineDetailView';
 import { ExerciseDrawer } from '@/components/workout/ExerciseDrawer';
 import { ExerciseCatalogView } from '@/components/workout/ExerciseCatalogView';
 import { Exercise } from '@/types/workout.types';
+import { EmptyState } from '@/components/ui/EmptyState';
 import {
   Dumbbell,
   Plus,
@@ -65,6 +66,8 @@ export default function WorkoutPage() {
   const [openFolderMenuId, setOpenFolderMenuId] = useState<string | null>(null);
   const [renamingFolder, setRenamingFolder] = useState<{ id: string; name: string } | null>(null);
   const [renameInput, setRenameInput] = useState('');
+  const [folderError, setFolderError] = useState<string | null>(null);
+  const [renameError, setRenameError] = useState<string | null>(null);
 
   // Exercise drawer & collection tab state
   const [isExerciseDrawerOpen, setIsExerciseDrawerOpen] = useState(false);
@@ -177,6 +180,11 @@ export default function WorkoutPage() {
 
   const handleCreateFolderSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!newFolderName.trim()) {
+      setFolderError('Vui lòng nhập tên thư mục hợp lệ.');
+      return;
+    }
+    setFolderError(null);
     if (newFolderName.trim()) {
       createFolder(newFolderName.trim());
       setNewFolderName('');
@@ -254,11 +262,10 @@ export default function WorkoutPage() {
                 </button>
                 <button
                   onClick={() => setCollectionTab((prev) => (prev === 'exercises' ? 'routines' : 'exercises'))}
-                  className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs ${
-                    collectionTab === 'exercises'
+                  className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold border transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs ${collectionTab === 'exercises'
                       ? 'bg-slate-900 text-white border-slate-900'
                       : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300'
-                  }`}
+                    }`}
                 >
                   <Dumbbell className={`w-4 h-4 ${collectionTab === 'exercises' ? 'text-white' : 'text-[#FF5722]'}`} />
                   <span>Danh sách bài tập (1.324 bài)</span>
@@ -290,11 +297,10 @@ export default function WorkoutPage() {
                   <button
                     type="button"
                     onClick={() => setCollectionTab('routines')}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
-                      collectionTab === 'routines'
+                    className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${collectionTab === 'routines'
                         ? 'bg-white text-slate-900 shadow-xs'
                         : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                      }`}
                   >
                     <Layers className="w-4 h-4" />
                     <span>Bộ sưu tập Routine &amp; Thư mục</span>
@@ -306,11 +312,10 @@ export default function WorkoutPage() {
                   <button
                     type="button"
                     onClick={() => setCollectionTab('exercises')}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${
-                      collectionTab === 'exercises'
+                    className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer ${collectionTab === 'exercises'
                         ? 'bg-white text-slate-900 shadow-xs'
                         : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                      }`}
                   >
                     <Dumbbell className="w-4 h-4 text-[#FF5722]" />
                     <span>Danh sách bài tập</span>
@@ -339,176 +344,187 @@ export default function WorkoutPage() {
               {collectionTab === 'routines' && (
                 <>
 
-              {/* Folders List with Routines inside */}
-              {folders.map((folder) => {
-                const folderRoutines = routines.filter((r) => r.folderId === folder.id);
+                  {/* Folders List with Routines inside */}
+                  {folders.map((folder) => {
+                    const folderRoutines = routines.filter((r) => r.folderId === folder.id);
 
-                return (
-                  <div
-                    key={folder.id}
-                    className={`bg-white rounded-2xl border border-slate-200/90 shadow-2xs relative ${
-                      openFolderMenuId === folder.id ? 'z-30' : 'z-0'
-                    }`}
-                  >
-                    {/* Collapsible Folder Header */}
-                    <div
-                      onClick={() => toggleFolder(folder.id)}
-                      className={`p-4 sm:p-5 bg-slate-50/70 flex items-center justify-between cursor-pointer select-none hover:bg-slate-100/60 transition-colors ${
-                        folder.isExpanded ? 'rounded-t-2xl border-b border-slate-100' : 'rounded-2xl'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="text-slate-500">
-                          {folder.isExpanded ? (
-                            <ChevronDown className="w-4 h-4 text-slate-600" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4 text-slate-400" />
-                          )}
-                        </div>
-                        <div className="w-8 h-8 rounded-lg bg-orange-50 border border-orange-200/80 text-[#FF5722] flex items-center justify-center">
-                          {folder.isExpanded ? (
-                            <FolderOpen className="w-4 h-4" />
-                          ) : (
-                            <Folder className="w-4 h-4" />
-                          )}
-                        </div>
-                        <div>
-                          <h3 className="font-extrabold text-sm sm:text-base text-slate-900">
-                            {folder.name}
-                          </h3>
-                          <span className="text-[11px] text-slate-400 font-medium">
-                            {folderRoutines.length} routine
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Folder Actions in MoreVertical (...) dropdown */}
+                    return (
                       <div
-                        onClick={(e) => e.stopPropagation()}
-                        className="relative"
+                        key={folder.id}
+                        className={`bg-white rounded-2xl border border-slate-200/90 shadow-2xs relative ${openFolderMenuId === folder.id ? 'z-30' : 'z-0'
+                          }`}
                       >
-                        <button
-                          type="button"
-                          onClick={() => setOpenFolderMenuId(openFolderMenuId === folder.id ? null : folder.id)}
-                          className="p-2 rounded-xl hover:bg-slate-200/80 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
-                          title="Tùy chọn thư mục"
+                        {/* Collapsible Folder Header */}
+                        <div
+                          onClick={() => toggleFolder(folder.id)}
+                          className={`p-4 sm:p-5 bg-slate-50/70 flex items-center justify-between cursor-pointer select-none hover:bg-slate-100/60 transition-colors ${folder.isExpanded ? 'rounded-t-2xl border-b border-slate-100' : 'rounded-2xl'
+                            }`}
                         >
-                          <MoreVertical className="w-4 h-4" />
-                        </button>
-
-                        {openFolderMenuId === folder.id && (
-                          <>
-                            <div
-                              className="fixed inset-0 z-40"
-                              onClick={() => setOpenFolderMenuId(null)}
-                            />
-                            <div className="absolute right-0 top-full mt-1.5 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in zoom-in-95">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setOpenFolderMenuId(null);
-                                  setRenamingFolder(folder);
-                                  setRenameInput(folder.name);
-                                }}
-                                className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer transition-colors"
-                              >
-                                <Edit2 className="w-3.5 h-3.5 text-slate-500" />
-                                <span>Sửa tên thư mục</span>
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setOpenFolderMenuId(null);
-                                  if (!folder.isExpanded) {
-                                    toggleFolder(folder.id);
-                                  }
-                                  handleOpenEditor(undefined, folder.id);
-                                }}
-                                className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer transition-colors"
-                              >
-                                <Plus className="w-3.5 h-3.5 text-slate-500" />
-                                <span>Thêm routine</span>
-                              </button>
-
-                              <div className="my-1 border-t border-slate-100" />
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setOpenFolderMenuId(null);
-                                  if (confirm(`Bạn có chắc muốn xóa thư mục "${folder.name}"? Các routine bên trong sẽ được chuyển về mục Chưa phân loại.`)) {
-                                    deleteFolder(folder.id);
-                                  }
-                                }}
-                                className="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer transition-colors"
-                              >
-                                <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                                <span>Xóa thư mục</span>
-                              </button>
+                          <div className="flex items-center gap-3">
+                            <div className="text-slate-500">
+                              {folder.isExpanded ? (
+                                <ChevronDown className="w-4 h-4 text-slate-600" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4 text-slate-400" />
+                              )}
                             </div>
-                          </>
+                            <div className="w-8 h-8 rounded-lg bg-orange-50 border border-orange-200/80 text-[#FF5722] flex items-center justify-center">
+                              {folder.isExpanded ? (
+                                <FolderOpen className="w-4 h-4" />
+                              ) : (
+                                <Folder className="w-4 h-4" />
+                              )}
+                            </div>
+                            <div>
+                              <h3 className="font-extrabold text-sm sm:text-base text-slate-900">
+                                {folder.name}
+                              </h3>
+                              <span className="text-[11px] text-slate-400 font-medium">
+                                {folderRoutines.length} routine
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Folder Actions in MoreVertical (...) dropdown */}
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="relative"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => setOpenFolderMenuId(openFolderMenuId === folder.id ? null : folder.id)}
+                              className="p-2 rounded-xl hover:bg-slate-200/80 text-slate-500 hover:text-slate-800 transition-colors cursor-pointer"
+                              title="Tùy chọn thư mục"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </button>
+
+                            {openFolderMenuId === folder.id && (
+                              <>
+                                <div
+                                  className="fixed inset-0 z-40"
+                                  onClick={() => setOpenFolderMenuId(null)}
+                                />
+                                <div className="absolute right-0 top-full mt-1.5 w-44 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 animate-in fade-in zoom-in-95">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setOpenFolderMenuId(null);
+                                      setRenamingFolder(folder);
+                                      setRenameInput(folder.name);
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer transition-colors"
+                                  >
+                                    <Edit2 className="w-3.5 h-3.5 text-slate-500" />
+                                    <span>Sửa tên thư mục</span>
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setOpenFolderMenuId(null);
+                                      if (!folder.isExpanded) {
+                                        toggleFolder(folder.id);
+                                      }
+                                      handleOpenEditor(undefined, folder.id);
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer transition-colors"
+                                  >
+                                    <Plus className="w-3.5 h-3.5 text-slate-500" />
+                                    <span>Thêm routine</span>
+                                  </button>
+
+                                  <div className="my-1 border-t border-slate-100" />
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setOpenFolderMenuId(null);
+                                      if (confirm(`Bạn có chắc muốn xóa thư mục "${folder.name}"? Các routine bên trong sẽ được chuyển về mục Chưa phân loại.`)) {
+                                        deleteFolder(folder.id);
+                                      }
+                                    }}
+                                    className="w-full text-left px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer transition-colors"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5 text-rose-500" />
+                                    <span>Xóa thư mục</span>
+                                  </button>
+                                </div>
+
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Folder Routines Grid */}
+                        {folder.isExpanded && (
+                          <div className="p-4 sm:p-5 rounded-b-2xl">
+                            {folderRoutines.length > 0 ? (
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {folderRoutines.map((routine) => (
+                                  <RoutineCard
+                                    key={routine.id}
+                                    routine={routine}
+                                    onSelect={handleOpenDetail}
+                                    onEdit={handleOpenEditor}
+                                    onDelete={deleteRoutine}
+                                    onDuplicate={duplicateRoutine}
+                                    onStartLive={handleStartLive}
+                                  />
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="p-8 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-xl">
+                                Thư mục trống. Bạn có thể kéo hoặc tạo routine mới vào đây.
+                              </div>
+                            )}
+                          </div>
                         )}
                       </div>
-                    </div>
+                    );
+                  })}
 
-                    {/* Folder Routines Grid */}
-                    {folder.isExpanded && (
-                      <div className="p-4 sm:p-5 rounded-b-2xl">
-                        {folderRoutines.length > 0 ? (
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {folderRoutines.map((routine) => (
-                              <RoutineCard
-                                key={routine.id}
-                                routine={routine}
-                                onSelect={handleOpenDetail}
-                                onEdit={handleOpenEditor}
-                                onDelete={deleteRoutine}
-                                onDuplicate={duplicateRoutine}
-                                onStartLive={handleStartLive}
-                              />
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="p-8 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-xl">
-                            Thư mục trống. Bạn có thể kéo hoặc tạo routine mới vào đây.
-                          </div>
-                        )}
+                  {/* Uncategorized Routines */}
+                  {routines.filter((r) => !r.folderId).length > 0 && (
+                    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-5 space-y-4">
+                      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div className="flex items-center gap-2">
+                          <Folder className="w-4 h-4 text-slate-400" />
+                          <h3 className="font-extrabold text-sm sm:text-base text-slate-900">
+                            Routine chưa phân loại
+                          </h3>
+                        </div>
                       </div>
-                    )}
-                  </div>
-                );
-              })}
 
-              {/* Uncategorized Routines */}
-              {routines.filter((r) => !r.folderId).length > 0 && (
-                <div className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs p-5 space-y-4">
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <div className="flex items-center gap-2">
-                      <Folder className="w-4 h-4 text-slate-400" />
-                      <h3 className="font-extrabold text-sm sm:text-base text-slate-900">
-                        Routine chưa phân loại
-                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {routines
+                          .filter((r) => !r.folderId)
+                          .map((routine) => (
+                            <RoutineCard
+                              key={routine.id}
+                              routine={routine}
+                              onSelect={handleOpenDetail}
+                              onEdit={handleOpenEditor}
+                              onDelete={deleteRoutine}
+                              onDuplicate={duplicateRoutine}
+                              onStartLive={handleStartLive}
+                            />
+                          ))}
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {routines
-                      .filter((r) => !r.folderId)
-                      .map((routine) => (
-                        <RoutineCard
-                          key={routine.id}
-                          routine={routine}
-                          onSelect={handleOpenDetail}
-                          onEdit={handleOpenEditor}
-                          onDelete={deleteRoutine}
-                          onDuplicate={duplicateRoutine}
-                          onStartLive={handleStartLive}
-                        />
-                      ))}
-                  </div>
-                </div>
-              )}
+                  )}
+                  {folders.length === 0 && routines.length === 0 && (
+                    <EmptyState
+                      icon={Layers}
+                      title="Chưa có Routine tập luyện nào"
+                      description="Bạn chưa tạo giáo án tập nào. Hãy bắt đầu bằng cách tạo Routine mới hoặc chọn bài tập từ danh sách để thiết lập lịch tập cá nhân."
+                      action={{
+                        label: 'Tạo Routine đầu tiên',
+                        onClick: () => handleOpenEditor(),
+                        icon: Plus,
+                      }}
+                    />
+                  )}
                 </>
               )}
             </div>
@@ -542,9 +558,13 @@ export default function WorkoutPage() {
                   required
                   autoFocus
                   value={newFolderName}
-                  onChange={(e) => setNewFolderName(e.target.value)}
+                  onChange={(e) => {
+                    setNewFolderName(e.target.value);
+                    if (folderError) setFolderError(null);
+                  }}
                   placeholder="Ví dụ: Hạ thể & Bụng..."
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold outline-none focus:border-[#FF5722] bg-slate-50"
+                  className={`w-full px-3 py-2 rounded-xl border font-bold outline-none bg-slate-50 ${folderError ? 'border-rose-400 focus:border-rose-500' : 'border-slate-300 focus:border-[#FF5722]'
+                    }`}
                 />
               </div>
 
@@ -605,7 +625,8 @@ export default function WorkoutPage() {
                   value={renameInput}
                   onChange={(e) => setRenameInput(e.target.value)}
                   placeholder="Nhập tên mới..."
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 font-bold outline-none focus:border-[#FF5722] bg-slate-50"
+                  className={`w-full px-3 py-2 rounded-xl border font-bold outline-none bg-slate-50 ${folderError ? 'border-rose-400 focus:border-rose-500' : 'border-slate-300 focus:border-[#FF5722]'
+                    }`}
                 />
               </div>
 

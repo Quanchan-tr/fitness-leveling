@@ -24,6 +24,34 @@ import {
   Info,
 } from 'lucide-react';
 import Link from 'next/link';
+import exerciseDataset from '@/data/exerciseDataset.json';
+
+function resolveExerciseMedia(exercise: any): string | null {
+  if (!exercise) return null;
+  if (exercise.gif_url && typeof exercise.gif_url === 'string' && exercise.gif_url.endsWith('.gif')) {
+    return exercise.gif_url;
+  }
+  if (exercise.gifPlaceholderUrl && typeof exercise.gifPlaceholderUrl === 'string' && exercise.gifPlaceholderUrl.endsWith('.gif')) {
+    return exercise.gifPlaceholderUrl;
+  }
+  if (exercise.thumbnail_url && typeof exercise.thumbnail_url === 'string') {
+    return exercise.thumbnail_url;
+  }
+  if (exercise.gif_url && typeof exercise.gif_url === 'string') {
+    return exercise.gif_url;
+  }
+
+  // Lookup in dataset by ID or name
+  const searchName = (exercise.name || '').toLowerCase().trim();
+  const searchId = exercise.id;
+  const found = (exerciseDataset as any[]).find(
+    (e) => (searchId && e.id === searchId) || e.name.toLowerCase() === searchName
+  ) || (exerciseDataset as any[]).find(
+    (e) => e.name.toLowerCase().includes(searchName) || searchName.includes(e.name.toLowerCase())
+  );
+
+  return found?.gif_url || found?.thumbnail_url || (typeof exercise.gifPlaceholderUrl === 'string' ? exercise.gifPlaceholderUrl : null);
+}
 
 export default function LiveWorkoutPlayerPage() {
   const router = useRouter();
@@ -477,20 +505,23 @@ export default function LiveWorkoutPlayerPage() {
               </div>
             </div>
 
-            {/* Section 12.2: GIF Animation Placeholder Banner */}
-            <div className="w-full h-48 sm:h-60 rounded-2xl bg-slate-900 text-slate-200 flex flex-col items-center justify-center p-4 relative overflow-hidden shadow-inner group">
-              <div className="text-center space-y-2 z-10">
-                <span className="text-xs sm:text-sm font-extrabold tracking-widest text-[#FF5722] uppercase bg-black/50 px-3.5 py-1 rounded-full border border-orange-500/30">
-                  [Mô phỏng động tác]
-                </span>
-                <p className="text-xs sm:text-sm text-slate-300 font-medium max-w-md mx-auto">
-                  Khung hình động mô phỏng chuyển động kỹ thuật chuẩn của {currentExercise.name}
-                </p>
-              </div>
-
-              {/* Background ambient pattern */}
-              <div className="absolute inset-0 bg-radial from-slate-800 to-slate-950 opacity-80 pointer-events-none" />
-            </div>
+            {/* Section 12.2: Exercise Animation GIF */}
+            {(() => {
+              const mediaUrl = resolveExerciseMedia(currentExercise);
+              if (!mediaUrl) return null;
+              return (
+                <div className="w-full flex justify-center py-2">
+                  <div className="relative bg-slate-950 border border-slate-800/90 rounded-3xl overflow-hidden shadow-xl flex items-center justify-center p-3 sm:p-4 w-full max-w-xl">
+                    <img
+                      src={mediaUrl}
+                      alt={currentExercise.name}
+                      className="w-full max-h-[380px] sm:max-h-[460px] object-contain rounded-2xl"
+                      loading="eager"
+                    />
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Technical Pinned Notes */}
             {(currentItem.pinnedNote || currentExercise.description) && (

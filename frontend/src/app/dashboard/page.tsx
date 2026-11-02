@@ -13,6 +13,7 @@ import { mockDashboardData } from '@/data/mockData';
 import { initialFitnessData, MetricHistoryItem, ProgressPhotoItem } from '@/lib/fitnessData';
 import { useShell } from '@/components/layout/ShellLayout';
 import { useAuth } from '@/contexts/AuthContext';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 export default function DashboardPage() {
   const { user, isLoading, signOut, loginDemo } = useAuth();
@@ -115,12 +116,52 @@ export default function DashboardPage() {
   // Restoring session or initializing demo session
   if (isLoading || !user) {
     return (
-      <div className="flex-1 flex items-center justify-center min-h-screen bg-slate-50">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-slate-200 border-t-[#FF5722] rounded-full animate-spin" />
-          <p className="text-xs text-slate-500 font-bold">Đang tải phòng tập…</p>
+      <main className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen animate-in fade-in duration-150">
+        {/* TopBar Skeleton */}
+        <div className="h-16 bg-white border-b border-slate-200/80 px-4 sm:px-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-9 h-9 rounded-full" />
+            <div className="space-y-1">
+              <Skeleton className="w-28 h-4 rounded" />
+              <Skeleton className="w-16 h-3 rounded" />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Skeleton className="w-20 h-7 rounded-lg" />
+            <Skeleton className="w-24 h-7 rounded-lg" />
+          </div>
         </div>
-      </div>
+
+        {/* Dashboard Grid Skeleton */}
+        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* 3D Canvas Placeholder Skeleton */}
+            <div className="lg:col-span-8 bg-white rounded-3xl border border-slate-200/90 h-[480px] p-6 flex flex-col items-center justify-center space-y-3 shadow-2xs">
+              <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-300">
+                <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-[#FF5722] animate-spin" />
+              </div>
+              <p className="text-xs font-bold text-slate-500">Đang khởi tạo không gian phòng tập 3D...</p>
+            </div>
+
+            {/* Sidebar Widgets Skeleton */}
+            <div className="lg:col-span-4 space-y-4">
+              <div className="bg-white p-5 rounded-2xl border border-slate-200/90 space-y-3">
+                <Skeleton className="w-32 h-4 rounded" />
+                <div className="grid grid-cols-2 gap-2.5">
+                  <Skeleton className="h-24 rounded-xl" />
+                  <Skeleton className="h-24 rounded-xl" />
+                  <Skeleton className="h-24 rounded-xl" />
+                  <Skeleton className="h-24 rounded-xl" />
+                </div>
+              </div>
+              <div className="bg-white p-5 rounded-2xl border border-slate-200/90 space-y-3">
+                <Skeleton className="w-40 h-4 rounded" />
+                <Skeleton className="h-28 rounded-xl" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     );
   }
 

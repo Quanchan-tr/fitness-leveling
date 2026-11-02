@@ -30,6 +30,8 @@ import {
   CameraOff,
 } from 'lucide-react';
 import { useShell } from '@/components/layout/ShellLayout';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { AiWorkoutPlannerWizard } from '@/components/ai/AiWorkoutPlannerWizard';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -246,41 +248,7 @@ export default function AiCoachPage() {
   };
 
 
-  // ─── AI Workout Planner state ─────────────────────────────────────────────
 
-  const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
-  const [generatedPlan, setGeneratedPlan] = useState<any>(null);
-
-  const handleGeneratePlan = async () => {
-    setIsGeneratingPlan(true);
-    try {
-      const result = await apiRequest<{ data: any }>('/ai/exercise-plan', {
-        method: 'POST',
-        useIdempotency: true,
-      });
-      setGeneratedPlan(result.data);
-    } catch (err) {
-      console.warn('[AiCoachPage] Exercise plan generation failed:', err);
-      // Fallback plan
-      setGeneratedPlan({
-        plan_name: 'Kế hoạch tập luyện cơ bản',
-        duration_weeks: 4,
-        sessions: [
-          {
-            day_label: 'Buổi 1',
-            focus_area: 'Toàn thân',
-            exercises: [
-              { exercise_name: 'Squat', sets: 3, reps: '12 reps', rest_seconds: 60 },
-              { exercise_name: 'Push-up', sets: 3, reps: '10 reps', rest_seconds: 60 },
-              { exercise_name: 'Plank', sets: 3, reps: '45s', rest_seconds: 30 },
-            ],
-          },
-        ],
-      });
-    } finally {
-      setIsGeneratingPlan(false);
-    }
-  };
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
@@ -417,6 +385,46 @@ export default function AiCoachPage() {
                           Đang tải mô hình MediaPipe...
                         </p>
                       </div>
+                    ) : poseError && (poseError.toLowerCase().includes('permission') || poseError.toLowerCase().includes('notallowed') || poseError.toLowerCase().includes('từ chối') || poseError.toLowerCase().includes('quyền')) ? (
+                      <div className="bg-slate-900/90 border border-amber-500/50 rounded-2xl p-6 text-center max-w-md mx-4 space-y-3.5 backdrop-blur-md shadow-2xl">
+                        <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 mx-auto">
+                          <CameraOff className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-extrabold text-white">
+                            Quyền truy cập Camera bị từ chối
+                          </h4>
+                          <p className="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                            MediaPipe AI cần quyền truy cập webcam để phân tích 33 điểm khớp và đếm rep theo thời gian thực. Hình ảnh chỉ được xử lý cục bộ trên trình duyệt.
+                          </p>
+                        </div>
+                        <div className="p-3 bg-slate-800/80 rounded-xl text-[11px] text-slate-300 text-left border border-slate-700/80 space-y-1">
+                          <p className="font-bold text-amber-300">Cách cấp quyền lại:</p>
+                          <ol className="list-decimal list-inside space-y-0.5 text-slate-400">
+                            <li>Nhấp vào biểu tượng Ổ khóa / Camera ở thanh địa chỉ URL.</li>
+                            <li>Bật quyền &ldquo;Camera&rdquo; sang trạng thái Cho phép (Allow).</li>
+                            <li>Tải lại trang hoặc bấm &ldquo;Thử lại&rdquo; bên dưới.</li>
+                          </ol>
+                        </div>
+                        <div className="flex items-center gap-2 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => uploadInputRef.current?.click()}
+                            className="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-slate-600"
+                          >
+                            <Upload className="w-3.5 h-3.5" />
+                            <span>Tải video lên</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleToggleSession}
+                            className="py-2 px-4 rounded-xl bg-[#FF5722] hover:bg-[#E64A19] text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                          >
+                            <RefreshCw className="w-3.5 h-3.5" />
+                            <span>Thử lại</span>
+                          </button>
+                        </div>
+                      </div>
                     ) : (
                       <div className="flex flex-col items-center gap-4 text-center">
                         <div className="w-20 h-20 rounded-full bg-slate-900/80 border-2 border-[#FF5722] flex items-center justify-center shadow-lg shadow-orange-500/20">
@@ -431,8 +439,19 @@ export default function AiCoachPage() {
                           </p>
                         </div>
                         {poseError && (
-                          <div className="bg-rose-900/50 border border-rose-700 rounded-lg px-4 py-2 text-xs text-rose-300 max-w-xs">
-                            {poseError}
+                          <div className="bg-rose-900/70 border border-rose-700 rounded-xl p-3 text-xs text-rose-200 max-w-xs space-y-2">
+                            <div className="flex items-center gap-1.5 font-bold text-rose-300">
+                              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                              <span>Lỗi kết nối camera</span>
+                            </div>
+                            <p className="text-[11px] leading-tight text-rose-300/80">{poseError}</p>
+                            <button
+                              type="button"
+                              onClick={() => uploadInputRef.current?.click()}
+                              className="w-full py-1 rounded bg-rose-950 hover:bg-rose-900 text-white text-[11px] font-semibold border border-rose-700"
+                            >
+                              Tải video lên thay thế
+                            </button>
                           </div>
                         )}
                       </div>
@@ -754,87 +773,7 @@ export default function AiCoachPage() {
         )}
 
         {/* ── Tab 2: AI Workout Planner ────────────────────────────────────── */}
-        {activeTab === 'workout' && (
-          <div className="bg-white p-6 rounded-xl border border-slate-200 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
-              <div>
-                <h3 className="font-bold text-base sm:text-lg text-slate-900 tracking-tight">
-                  Kế hoạch tập luyện cá nhân hóa (AI Workout Plan)
-                </h3>
-                <p className="text-xs text-slate-500 font-normal mt-0.5">
-                  Dựa trên hồ sơ cá nhân: tuổi, BMI, mục tiêu, tần suất tập luyện.
-                </p>
-              </div>
-              <button
-                id="btn-generate-plan"
-                onClick={handleGeneratePlan}
-                disabled={isGeneratingPlan}
-                className="bg-[#FF5722] hover:bg-[#E64A19] text-white px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-colors flex items-center gap-2 cursor-pointer self-start sm:self-center disabled:opacity-60"
-              >
-                <RefreshCw className={`w-4 h-4 ${isGeneratingPlan ? 'animate-spin' : ''}`} />
-                <span>{isGeneratingPlan ? 'Đang phân tích dữ liệu...' : 'Sinh lịch tập mới'}</span>
-              </button>
-            </div>
-
-            {generatedPlan ? (
-              <div className="space-y-4">
-                <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 flex items-center justify-between">
-                  <div>
-                    <h4 className="font-bold text-sm text-slate-900">{generatedPlan.plan_name}</h4>
-                    <span className="text-xs text-slate-500 font-medium">
-                      Thời lượng: {generatedPlan.duration_weeks} tuần
-                    </span>
-                  </div>
-                  <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    Đã kiểm duyệt cấu trúc
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {generatedPlan.sessions?.map((sess: any, idx: number) => (
-                    <div
-                      key={idx}
-                      className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-2.5"
-                    >
-                      <div>
-                        <h5 className="font-bold text-xs text-slate-900 uppercase tracking-wide">
-                          {sess.day_label || sess.day || `Buổi ${idx + 1}`}
-                        </h5>
-                        {sess.focus_area && (
-                          <p className="text-[11px] text-slate-500 mt-0.5">{sess.focus_area}</p>
-                        )}
-                      </div>
-                      <ul className="text-xs space-y-1.5 text-slate-600">
-                        {(sess.exercises || []).map((ex: any, i: number) => (
-                          <li key={i} className="flex items-start gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#FF5722] mt-1.5 shrink-0" />
-                            <span className="font-medium text-slate-800">
-                              {typeof ex === 'string'
-                                ? ex
-                                : `${ex.exercise_name} — ${ex.sets}x${ex.reps}`}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
-                <Bot className="w-10 h-10 text-slate-300 mx-auto" />
-                <div>
-                  <p className="text-sm font-bold text-slate-700">
-                    Chưa có kế hoạch tập luyện
-                  </p>
-                  <p className="text-xs text-slate-500 mt-1">
-                    Nhấn &quot;Sinh lịch tập mới&quot; để nhận đề xuất cá nhân hóa từ AI.
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+        {activeTab === 'workout' && <AiWorkoutPlannerWizard />}
       </div>
     </main>
   );

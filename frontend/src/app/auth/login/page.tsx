@@ -1,9 +1,9 @@
 'use strict';
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Flame, Eye, EyeOff, ArrowRight, AlertCircle, Zap } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -30,9 +30,12 @@ function validate(form: LoginFormState): FieldErrors {
   return errors;
 }
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isSessionExpired = searchParams.get('reason') === 'session_expired';
   const { login, loginDemo } = useAuth();
+  const [isSlowNetwork, setIsSlowNetwork] = useState(false);
 
   const [form, setForm] = useState<LoginFormState>({
     email: '',
@@ -63,6 +66,9 @@ export default function LoginPage() {
 
     setIsSubmitting(true);
     setServerError(null);
+    setIsSlowNetwork(false);
+
+    const slowTimer = setTimeout(() => setIsSlowNetwork(true), 4000);
 
     try {
       await login({
@@ -73,7 +79,9 @@ export default function LoginPage() {
     } catch (err) {
       setServerError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
     } finally {
+      clearTimeout(slowTimer);
       setIsSubmitting(false);
+      setIsSlowNetwork(false);
     }
   };
 
@@ -115,6 +123,19 @@ export default function LoginPage() {
       {/* Form card */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md px-4">
         <div className="bg-white py-8 px-6 sm:px-10 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100">
+          {/* Session Expired Banner */}
+          {isSessionExpired && !serverError && (
+            <div className="mb-4 p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-start gap-2.5 animate-in fade-in">
+              <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold">Phiên đăng nhập đã hết hạn</p>
+                <p className="text-[11px] text-amber-700 mt-0.5">
+                  Vui lòng đăng nhập lại để tiếp tục đồng bộ dữ liệu bài tập và chỉ số của bạn.
+                </p>
+              </div>
+            </div>
+          )}
+
           {serverError && (
             <div className="mb-6 p-4 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
@@ -197,6 +218,12 @@ export default function LoginPage() {
             </div>
 
             {/* Submit button */}
+            {isSlowNetwork && (
+              <p className="text-[11px] text-amber-600 text-center font-medium animate-in fade-in">
+                Mạng phản hồi chậm hoặc máy chủ đang khởi động, vui lòng chờ trong giây lát...
+              </p>
+            )}
+
             <button
               type="submit"
               disabled={!isValid || isSubmitting || isDemoLoading}
@@ -263,5 +290,19 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+          <div className="w-8 h-8 border-2 border-slate-200 border-t-[#FF5722] rounded-full animate-spin" />
+        </main>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

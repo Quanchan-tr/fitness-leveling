@@ -152,6 +152,11 @@ export const authService = {
         : null;
     if (!token) return null;
 
+    // Fast-path for local demo mode: avoid dead network requests to offline backend
+    if (token.startsWith('mock_token_')) {
+      return _readFromStorage<AuthUser>(STORAGE_KEYS.user);
+    }
+
     try {
       const res = await apiRequest<{ data: BackendUser }>('/auth/me', {
         method: 'GET',

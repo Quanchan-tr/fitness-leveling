@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { apiRequest } from '@/lib/api';
+
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   FoodItem,
   FoodLogItem,
@@ -37,28 +39,20 @@ function isSameCalendarDay(d1: Date, d2: Date): boolean {
   );
 }
 
-const initialSampleFoodLog: FoodLogItem[] = [
-  {
-    id: 'sample-log-1',
-    foodId: 'pho-bo',
-    name: 'Phở bò tái nạm',
-    meal: 'breakfast',
-    multiplier: 1.0,
-    calories: 450,
-    macros: {
-      protein: 28,
-      carbs: 52,
-      fat: 14,
-    },
-    loggedAt: new Date().toISOString(),
-  },
-];
+const initialSampleFoodLog: FoodLogItem[] = [];
 
 export function useFoodLog(availableFoods: FoodItem[] = vietnameseFoods) {
   const [allLogs, setAllLogs] = useLocalStorage<FoodLogItem[]>(
     STORAGE_KEY_FOOD_LOG,
     initialSampleFoodLog
   );
+
+  // Notify global context and other listeners whenever food logs change
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('fitnessleveling:food-log-updated'));
+    }
+  }, [allLogs]);
 
   const [savedCombos, setSavedCombos] = useLocalStorage<SavedCombo[]>(
     STORAGE_KEY_COMBOS,
@@ -77,7 +71,51 @@ export function useFoodLog(availableFoods: FoodItem[] = vietnameseFoods) {
     });
   }, [allLogs]);
 
-  // Add new food log entry
+  // Initial sync with backend API GET /api/v1/nutrition-logs
+  useEffect(() => {
+    apiRequest<{
+      data: Array<{
+        id: string;
+        food_name: string;
+        meal_type: MealType;
+        calories: number;
+        protein_g: number;
+        carbs_g: number;
+        fat_g: number;
+        log_date: string;
+      }>;
+    }>('/nutrition-logs?per_page=50')
+      .then((res) => {
+        if (res?.data && res.data.length > 0) {
+          const todayStr = new Date().toISOString().split('T')[0];
+          const backendTodayLogs: FoodLogItem[] = res.data
+            .filter((item) => item.log_date === todayStr)
+            .map((item) => ({
+              id: item.id,
+              foodId: `backend-${item.id}`,
+              name: item.food_name,
+              meal: item.meal_type || 'lunch',
+              multiplier: 1,
+              calories: Number(item.calories),
+              macros: {
+                protein: Number(item.protein_g || 0),
+                carbs: Number(item.carbs_g || 0),
+                fat: Number(item.fat_g || 0),
+              },
+              loggedAt: `${item.log_date}T12:00:00.000Z`,
+            }));
+
+          setAllLogs((prev) => {
+            const existingNames = new Set(prev.map((p) => `${p.name}-${p.meal}`));
+            const toAdd = backendTodayLogs.filter((b) => !existingNames.has(`${b.name}-${b.meal}`));
+            return toAdd.length > 0 ? [...toAdd, ...prev] : prev;
+          });
+        }
+      })
+      .catch(() => {});
+  }, [setAllLogs]);
+
+  // Add new food log entry with API POST sync
   const addFood = useCallback(
     (item: {
       foodId: string;
@@ -99,6 +137,24 @@ export function useFoodLog(availableFoods: FoodItem[] = vietnameseFoods) {
       };
 
       setAllLogs((prev) => [newEntry, ...prev]);
+
+      // Post to backend API
+      const todayStr = new Date().toISOString().split('T')[0];
+      apiRequest<{ data: { id: string } }>('/nutrition-logs', {
+        method: 'POST',
+        body: JSON.stringify({
+          log_date: todayStr,
+          meal_type: item.meal,
+          food_name: item.name,
+          calories: Math.round(item.calories),
+          protein_g: Number(item.macros.protein.toFixed(1)),
+          carbs_g: Number(item.macros.carbs.toFixed(1)),
+          fat_g: Number(item.macros.fat.toFixed(1)),
+        }),
+      }).catch((err) => {
+        console.warn('Could not sync nutrition log to backend API, saved locally:', err);
+      });
+
       return newEntry;
     },
     [setAllLogs]
@@ -114,11 +170,16 @@ export function useFoodLog(availableFoods: FoodItem[] = vietnameseFoods) {
     [setAllLogs]
   );
 
-  // Remove food log entry
+  // Remove food log entry with API DELETE
   const removeFood = useCallback(
     (id: string) => {
       setAllLogs((prev) => prev.filter((item) => item.id !== id));
       setSelectedLogIds((prev) => prev.filter((selectedId) => selectedId !== id));
+
+      // Attempt remote delete if valid backend UUID
+      if (id && !id.startsWith('food-log-')) {
+        apiRequest(`/nutrition-logs/${id}`, { method: 'DELETE' }).catch(() => {});
+      }
     },
     [setAllLogs]
   );

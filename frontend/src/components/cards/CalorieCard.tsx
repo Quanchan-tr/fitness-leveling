@@ -14,11 +14,11 @@ interface CalorieCardProps {
 
 export const CalorieCard: React.FC<CalorieCardProps> = ({
   nutrition = {
-    calories: { current: 1800, target: 2400 },
+    calories: { current: 0, target: 2400 },
     macros: {
-      protein: { current: 90, target: 150 },
-      carbs: { current: 180, target: 250 },
-      fat: { current: 45, target: 70 },
+      protein: { current: 0, target: 150 },
+      carbs: { current: 0, target: 250 },
+      fat: { current: 0, target: 70 },
     },
   },
 }) => {

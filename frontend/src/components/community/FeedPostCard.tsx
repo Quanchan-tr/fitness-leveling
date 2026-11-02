@@ -176,6 +176,24 @@ export const FeedPostCard: React.FC<FeedPostCardProps> = ({ post }) => {
         </div>
       )}
 
+      {/* Video Player with AI Pose Check Badge */}
+      {post.videoUrl && (
+        <div className="relative w-full rounded-2xl overflow-hidden bg-black aspect-video max-h-96 border border-slate-200">
+          <video
+            src={post.videoUrl}
+            controls
+            preload="metadata"
+            className="w-full h-full object-contain"
+          />
+          {post.hasPoseCheck && (
+            <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-xs text-sky-400 border border-sky-400/40 text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1.5 shadow-xs">
+              <Video className="w-3.5 h-3.5 text-sky-400" />
+              <span>AI Pose Check Certified</span>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* 4. Multiple Images Slider / Carousel per Section 16.5 */}
       {images.length > 0 && (
         <div className="relative w-full rounded-2xl overflow-hidden bg-slate-900 aspect-video max-h-96">

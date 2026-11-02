@@ -90,6 +90,7 @@ interface FitnessContextType {
   assignRoutineToDay: (dayOfWeek: WeekDayVi, routineId: string) => void;
   removeRoutineFromDay: (dayOfWeek: WeekDayVi, routineId?: string) => void;
   updateDayStatus: (dayOfWeek: WeekDayVi, status: ScheduleStatus) => void;
+  applyWeeklySchedule: (newSchedule: DaySchedule[], createdRoutines?: RoutineItem[]) => void;
   todaySchedule: DaySchedule;
 
   // Live Workout Session
@@ -153,19 +154,108 @@ function getSavedStorage(key: string, fallbackKey: string): string | null {
   return localStorage.getItem(key) || localStorage.getItem(fallbackKey);
 }
 
+function calculateTodayNutritionFromStorage(): VitalsState['nutrition'] {
+  if (typeof window !== 'undefined') {
+    try {
+      const raw =
+        localStorage.getItem('fitnessleveling_food_log_v1') ||
+        localStorage.getItem('fittrack_food_log_v1');
+      if (raw) {
+        const items = JSON.parse(raw);
+        if (Array.isArray(items)) {
+          const today = new Date();
+          const todayItems = items.filter((item: any) => {
+            if (!item.loggedAt) return true;
+            const d = new Date(item.loggedAt);
+            return (
+              !isNaN(d.getTime()) &&
+              d.getFullYear() === today.getFullYear() &&
+              d.getMonth() === today.getMonth() &&
+              d.getDate() === today.getDate()
+            );
+          });
+
+          return {
+            calories: {
+              current: todayItems.reduce((acc, cur) => acc + (cur.calories || 0), 0),
+              target: 2400,
+            },
+            macros: {
+              protein: {
+                current: todayItems.reduce((acc, cur) => acc + (cur.macros?.protein || 0), 0),
+                target: 150,
+              },
+              carbs: {
+                current: todayItems.reduce((acc, cur) => acc + (cur.macros?.carbs || 0), 0),
+                target: 250,
+              },
+              fat: {
+                current: todayItems.reduce((acc, cur) => acc + (cur.macros?.fat || 0), 0),
+                target: 70,
+              },
+            },
+          };
+        }
+      }
+    } catch (e) {
+      console.error('Failed reading today nutrition from storage', e);
+    }
+  }
+
+  return {
+    calories: { current: 0, target: 2400 },
+    macros: {
+      protein: { current: 0, target: 150 },
+      carbs: { current: 0, target: 250 },
+      fat: { current: 0, target: 70 },
+    },
+  };
+}
+
 export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
 
-  // 1. Exercises
-  const [exercises, setExercises] = useState<Exercise[]>(initialExercises);
+  // 1. Exercises (with persistent custom exercises & safe normalization)
+  const [exercises, setExercises] = useState<Exercise[]>(() => {
+    let customList: Exercise[] = [];
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('fittrack_custom_exercises');
+        if (saved) customList = JSON.parse(saved);
+      } catch (e) {
+        console.error('Failed reading custom exercises', e);
+      }
+    }
+    return [...customList, ...initialExercises];
+  });
 
-  // Sync exercises from backend API
+  // Sync exercises from backend API or local clean dataset
   useEffect(() => {
     let mounted = true;
-    fetchExercises({ per_page: 100 })
+    fetchExercises({ per_page: 150 })
       .then((res) => {
         if (mounted && res?.data && res.data.length > 0) {
-          setExercises(res.data);
+          const mapped: Exercise[] = res.data.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            nameVi: item.nameVi || undefined,
+            targetMuscles: Array.isArray(item.targetMuscles) && item.targetMuscles.length > 0
+              ? item.targetMuscles
+              : [item.target_muscle || item.body_part || item.category || 'chest'],
+            equipment: (item.equipment || 'bodyweight').toLowerCase() as any,
+            type: item.type || 'weight_reps',
+            gifPlaceholderUrl: item.gif_url || item.thumbnail_url || item.gifPlaceholderUrl,
+            description: item.description || item.instructions || item.name,
+          }));
+
+          let customList: Exercise[] = [];
+          if (typeof window !== 'undefined') {
+            try {
+              const saved = localStorage.getItem('fittrack_custom_exercises');
+              if (saved) customList = JSON.parse(saved);
+            } catch (e) {}
+          }
+          setExercises([...customList, ...mapped]);
         }
       })
       .catch((err) => {
@@ -308,10 +398,36 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // 5. Vitals State (Water, Weight, Sleep, Steps, Nutrition)
   const [vitals, setVitals] = useState<VitalsState>(() => {
+    const todayNutrition = calculateTodayNutritionFromStorage();
     if (typeof window !== 'undefined') {
       try {
         const saved = getSavedStorage(STORAGE_KEY_VITALS, 'fittrack_vitals');
-        if (saved) return JSON.parse(saved);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          return {
+            ...parsed,
+            nutrition: {
+              calories: {
+                current: todayNutrition.calories.current,
+                target: parsed.nutrition?.calories?.target || 2400,
+              },
+              macros: {
+                protein: {
+                  current: todayNutrition.macros.protein.current,
+                  target: parsed.nutrition?.macros?.protein?.target || 150,
+                },
+                carbs: {
+                  current: todayNutrition.macros.carbs.current,
+                  target: parsed.nutrition?.macros?.carbs?.target || 250,
+                },
+                fat: {
+                  current: todayNutrition.macros.fat.current,
+                  target: parsed.nutrition?.macros?.fat?.target || 70,
+                },
+              },
+            },
+          };
+        }
       } catch (e) {
         console.error('Failed reading vitals from localStorage', e);
       }
@@ -329,14 +445,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       ],
       sleep: { hours: 7, minutes: 30 },
       steps: 5421,
-      nutrition: {
-        calories: { current: 1800, target: 2400 },
-        macros: {
-          protein: { current: 90, target: 150 },
-          carbs: { current: 180, target: 250 },
-          fat: { current: 45, target: 70 },
-        },
-      },
+      nutrition: todayNutrition,
     };
   });
 
@@ -350,6 +459,45 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [vitals]);
 
+  // Synchronize vitals.nutrition whenever food log changes in localStorage or another tab
+  useEffect(() => {
+    const handleFoodLogSync = () => {
+      const todayNutrition = calculateTodayNutritionFromStorage();
+      setVitals((prev) => ({
+        ...prev,
+        nutrition: {
+          calories: {
+            current: todayNutrition.calories.current,
+            target: prev.nutrition?.calories?.target || 2400,
+          },
+          macros: {
+            protein: {
+              current: todayNutrition.macros.protein.current,
+              target: prev.nutrition?.macros?.protein?.target || 150,
+            },
+            carbs: {
+              current: todayNutrition.macros.carbs.current,
+              target: prev.nutrition?.macros?.carbs?.target || 250,
+            },
+            fat: {
+              current: todayNutrition.macros.fat.current,
+              target: prev.nutrition?.macros?.fat?.target || 70,
+            },
+          },
+        },
+      }));
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('fitnessleveling:food-log-updated', handleFoodLogSync);
+      window.addEventListener('storage', handleFoodLogSync);
+      return () => {
+        window.removeEventListener('fitnessleveling:food-log-updated', handleFoodLogSync);
+        window.removeEventListener('storage', handleFoodLogSync);
+      };
+    }
+  }, []);
+
   // Sync profile & vitals with authenticated user and backend endpoints
   useEffect(() => {
     if (user) {
@@ -360,6 +508,11 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         avatar: user.avatarUrl || prev.avatar,
         goal: (user.goal as any) || prev.goal,
       }));
+
+      // In demo mode, state is stored locally; avoid spamming offline backend
+      if (user.id.startsWith('demo-')) {
+        return;
+      }
 
       // 1. Sync recent body metrics for weight history
       apiRequest<{ data: Array<{ log_date: string; weight_kg: number }> }>('/body-metrics?per_page=7')
@@ -393,27 +546,39 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         .then((res) => {
           if (res?.data) {
             const todayLogs = res.data.filter((l) => l.log_date === todayStr);
-            if (todayLogs.length > 0) {
-              const totalCalories = todayLogs.reduce((acc, cur) => acc + (cur.calories || 0), 0);
-              const totalProtein = todayLogs.reduce((acc, cur) => acc + Number(cur.protein_g || 0), 0);
-              const totalCarbs = todayLogs.reduce((acc, cur) => acc + Number(cur.carbs_g || 0), 0);
-              const totalFat = todayLogs.reduce((acc, cur) => acc + Number(cur.fat_g || 0), 0);
+            const totalCalories = todayLogs.reduce((acc, cur) => acc + (cur.calories || 0), 0);
+            const totalProtein = todayLogs.reduce((acc, cur) => acc + Number(cur.protein_g || 0), 0);
+            const totalCarbs = todayLogs.reduce((acc, cur) => acc + Number(cur.carbs_g || 0), 0);
+            const totalFat = todayLogs.reduce((acc, cur) => acc + Number(cur.fat_g || 0), 0);
 
-              setVitals((prev) => ({
-                ...prev,
-                nutrition: {
-                  calories: { current: totalCalories, target: prev.nutrition.calories.target },
-                  macros: {
-                    protein: { current: totalProtein, target: prev.nutrition.macros.protein.target },
-                    carbs: { current: totalCarbs, target: prev.nutrition.macros.carbs.target },
-                    fat: { current: totalFat, target: prev.nutrition.macros.fat.target },
-                  },
+            setVitals((prev) => ({
+              ...prev,
+              nutrition: {
+                calories: { current: totalCalories, target: prev.nutrition.calories.target },
+                macros: {
+                  protein: { current: totalProtein, target: prev.nutrition.macros.protein.target },
+                  carbs: { current: totalCarbs, target: prev.nutrition.macros.carbs.target },
+                  fat: { current: totalFat, target: prev.nutrition.macros.fat.target },
                 },
-              }));
-            }
+              },
+            }));
           }
         })
-        .catch(() => {});
+        .catch(() => {
+          // If offline or demo mock token fails, recalculate from local storage
+          const todayNutrition = calculateTodayNutritionFromStorage();
+          setVitals((prev) => ({
+            ...prev,
+            nutrition: {
+              calories: { current: todayNutrition.calories.current, target: prev.nutrition.calories.target },
+              macros: {
+                protein: { current: todayNutrition.macros.protein.current, target: prev.nutrition.macros.protein.target },
+                carbs: { current: todayNutrition.macros.carbs.current, target: prev.nutrition.macros.carbs.target },
+                fat: { current: todayNutrition.macros.fat.current, target: prev.nutrition.macros.fat.target },
+              },
+            },
+          }));
+        });
     }
   }, [user]);
 
@@ -492,9 +657,42 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWorkout?.isPaused]);
 
-  // 7. Community Posts & Athletes
-  const [posts, setPosts] = useState<CommunityPost[]>(initialCommunityPosts);
-  const [athletes, setAthletes] = useState<SuggestedAthlete[]>(initialSuggestedAthletes);
+  // 7. Community Posts & Athletes (with localStorage persistence)
+  const [posts, setPosts] = useState<CommunityPost[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('fittrack_community_posts_v1');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return initialCommunityPosts;
+  });
+
+  const [athletes, setAthletes] = useState<SuggestedAthlete[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('fittrack_athletes_v1');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return initialSuggestedAthletes;
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('fittrack_community_posts_v1', JSON.stringify(posts));
+      } catch (e) {}
+    }
+  }, [posts]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem('fittrack_athletes_v1', JSON.stringify(athletes));
+      } catch (e) {}
+    }
+  }, [athletes]);
 
   // ----------------------------------------------------
   // Exercise Handlers
@@ -503,8 +701,23 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const created: Exercise = {
       ...newEx,
       id: `custom-ex-${Date.now()}`,
+      targetMuscles: Array.isArray(newEx.targetMuscles) && newEx.targetMuscles.length > 0
+        ? newEx.targetMuscles
+        : ['chest'],
+      equipment: newEx.equipment || 'dumbbell',
+      type: newEx.type || 'weight_reps',
     };
-    setExercises((prev) => [created, ...prev]);
+    setExercises((prev) => {
+      const next = [created, ...prev];
+      if (typeof window !== 'undefined') {
+        try {
+          const saved = localStorage.getItem('fittrack_custom_exercises');
+          const existing = saved ? JSON.parse(saved) : [];
+          localStorage.setItem('fittrack_custom_exercises', JSON.stringify([created, ...existing]));
+        } catch (e) {}
+      }
+      return next;
+    });
     return created;
   }, []);
 
@@ -710,6 +923,29 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       prev.map((day) => (day.dayOfWeek === dayOfWeek ? { ...day, status } : day))
     );
   }, []);
+
+  const applyWeeklySchedule = useCallback(
+    (newSchedule: DaySchedule[], createdRoutines?: RoutineItem[]) => {
+      if (createdRoutines && createdRoutines.length > 0) {
+        setRoutines((prev) => {
+          const next = [...createdRoutines, ...prev];
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem(STORAGE_KEY_ROUTINES, JSON.stringify(next));
+            } catch (e) {}
+          }
+          return next;
+        });
+      }
+      setSchedule(newSchedule);
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(STORAGE_KEY_SCHEDULE, JSON.stringify(newSchedule));
+        } catch (e) {}
+      }
+    },
+    []
+  );
 
   // ----------------------------------------------------
   // Live Workout Session Handlers
@@ -1196,6 +1432,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         assignRoutineToDay,
         removeRoutineFromDay,
         updateDayStatus,
+        applyWeeklySchedule,
         todaySchedule,
         activeWorkout,
         startWorkout,

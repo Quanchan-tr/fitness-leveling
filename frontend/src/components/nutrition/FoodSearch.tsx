@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { FoodItem } from '@/types/nutrition.types';
 import { Search, X, Plus, Utensils } from 'lucide-react';
+import { NoSearchResults } from '@/components/ui/NoSearchResults';
 
 interface FoodSearchProps {
   query: string;
@@ -128,12 +129,17 @@ export const FoodSearch: React.FC<FoodSearchProps> = ({
             </div>
           ))
         ) : (
-          <div className="text-center py-8 px-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-1">
-            <Utensils className="w-6 h-6 text-slate-300 mx-auto mb-1" />
-            <p className="text-xs font-semibold text-slate-600">
-              Không tìm thấy món ăn phù hợp
-            </p>
-          </div>
+          <NoSearchResults
+            query={query}
+            filterLabel={activeCategory !== 'Tất cả' ? activeCategory : undefined}
+            onClear={() => {
+              onClearQuery();
+              setActiveCategory('Tất cả');
+            }}
+            title="Không tìm thấy món ăn"
+            description={`Không tìm thấy món nào khớp với "${query || activeCategory}". Bạn có thể chọn danh mục khác hoặc xóa bộ lọc.`}
+            className="py-6 border-dashed"
+          />
         )}
       </div>
     </div>

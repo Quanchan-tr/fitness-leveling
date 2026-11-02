@@ -19,7 +19,7 @@ class AiController extends Controller
     public function exercisePlan(Request $request): JsonResponse
     {
         $idempotencyKey = $request->header('Idempotency-Key');
-        $plan = $this->aiService->generateWorkoutPlan($request->user(), $idempotencyKey);
+        $plan = $this->aiService->generateWorkoutPlan($request->user(), $request->all(), $idempotencyKey);
 
         return response()->json([
             'data' => $plan,

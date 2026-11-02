@@ -1,3 +1,4 @@
+import cleanExerciseDataset from '@/data/exerciseDataset.json';
 import { PaginatedExercisesResponse } from '@/types/workout.types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
@@ -37,7 +38,7 @@ export function generateUUID(): string {
 
 export async function apiRequest<T>(
   endpoint: string,
-  options: RequestInit & { requiresAuth?: boolean; useIdempotency?: boolean } = {}
+  options: RequestInit & { requiresAuth?: boolean; useIdempotency?: boolean; timeoutMs?: number } = {}
 ): Promise<T> {
   const token =
     typeof window !== 'undefined'
@@ -63,15 +64,24 @@ export async function apiRequest<T>(
 
   const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
 
+  const timeoutMs = options.timeoutMs ?? 2500;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
   try {
     const response = await fetch(url, {
       ...options,
+      signal: options.signal || controller.signal,
       headers,
     });
+    clearTimeout(timeoutId);
 
     const data = await response.json().catch(() => null);
 
     if (!response.ok) {
+      if (response.status === 401 && typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('fitnessleveling:session-expired'));
+      }
       const errorPayload: ApiError = data?.error || {
         code: `HTTP_${response.status}`,
         message: data?.message || response.statusText || 'An error occurred during the request.',
@@ -117,8 +127,65 @@ export async function fetchExercises(
   const queryString = searchParams.toString();
   const endpoint = `/exercises${queryString ? `?${queryString}` : ''}`;
 
-  return apiRequest<PaginatedExercisesResponse>(endpoint, {
-    requiresAuth: false,
+  try {
+    const remoteRes = await apiRequest<PaginatedExercisesResponse>(endpoint, {
+      requiresAuth: false,
+    });
+    if (remoteRes && remoteRes.data && remoteRes.data.length > 0) {
+      return remoteRes;
+    }
+  } catch (err) {
+    // If backend is offline or unreachable, fall through to high-performance local dataset
+  }
+
+  // --- LOCAL DATASET FALLBACK (1,324 EXERCISES) ---
+  const q = (params?.q || '').trim().toLowerCase();
+  const category = (params?.category || 'all').toLowerCase();
+  const bodyPart = (params?.body_part || 'all').toLowerCase();
+  const equipment = (params?.equipment || 'all').toLowerCase();
+  const hasAi = Boolean(params?.has_ai);
+  const page = Math.max(1, params?.page || 1);
+  const perPage = Math.max(1, params?.per_page || 24);
+
+  const dataset = (cleanExerciseDataset as any[]) || [];
+  const filtered = dataset.filter((item) => {
+    if (q) {
+      const matchName = item.name?.toLowerCase().includes(q);
+      const matchDesc = item.description?.toLowerCase().includes(q);
+      if (!matchName && !matchDesc) return false;
+    }
+    if (category !== 'all') {
+      const itemCat = (item.category || '').toLowerCase();
+      const itemBody = (item.body_part || '').toLowerCase();
+      if (itemCat !== category && itemBody !== category && !itemBody.includes(category)) return false;
+    }
+    if (bodyPart !== 'all') {
+      const itemBody = (item.body_part || '').toLowerCase();
+      if (itemBody !== bodyPart && !itemBody.includes(bodyPart)) return false;
+    }
+    if (equipment !== 'all') {
+      const itemEq = (item.equipment || '').toLowerCase();
+      if (!itemEq.includes(equipment) && !equipment.includes(itemEq)) return false;
+    }
+    if (hasAi && !item.has_ai_check) {
+      return false;
+    }
+    return true;
   });
+
+  const total = filtered.length;
+  const lastPage = Math.max(1, Math.ceil(total / perPage));
+  const from = (page - 1) * perPage;
+  const to = Math.min(from + perPage, total);
+  const pagedData = filtered.slice(from, to);
+
+  return {
+    data: pagedData,
+    current_page: page,
+    last_page: lastPage,
+    per_page: perPage,
+    total,
+  };
 }
+
 

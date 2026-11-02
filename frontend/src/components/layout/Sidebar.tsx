@@ -17,6 +17,7 @@ import {
   X,
   User,
 } from 'lucide-react';
+import { useShell } from './ShellLayout';
 
 interface NavItem {
   name: string;
@@ -45,6 +46,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onCloseMobile,
 }) => {
   const pathname = usePathname();
+  const { navigatingTo, startNavigation } = useShell();
+
+  const isNavigating = Boolean(navigatingTo && navigatingTo !== pathname);
+  const activeHref = isNavigating && navigatingTo ? navigatingTo : pathname;
+
+  const isRouteMatch = (itemHref: string, targetHref: string) => {
+    return targetHref === itemHref || targetHref.startsWith(itemHref + '/');
+  };
 
   return (
     <>
@@ -99,16 +108,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <nav className="space-y-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href;
+                const isActive = isRouteMatch(item.href, activeHref);
+                const isNavigatingToThis =
+                  isNavigating &&
+                  isRouteMatch(item.href, navigatingTo || '') &&
+                  !isRouteMatch(item.href, pathname);
+
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    prefetch={true}
-                    onClick={onCloseMobile}
-                    className={`flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-colors ${
+                    onClick={() => {
+                      if (pathname !== item.href) {
+                        startNavigation(item.href);
+                      }
+                      onCloseMobile?.();
+                    }}
+                    className={`flex items-center justify-between px-3 py-2 rounded-lg font-semibold text-xs sm:text-sm transition-all ${
                       isActive
-                        ? 'bg-slate-900 text-white'
+                        ? 'bg-slate-900 text-white shadow-xs'
                         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                     }`}
                   >
@@ -123,19 +141,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                      {item.badge && (
-                        <span
-                          className={`text-[9px] px-1.5 py-0.2 rounded font-bold tracking-wider ${
-                            isActive
-                              ? 'bg-white/20 text-white'
-                              : 'bg-sky-50 text-sky-700 border border-sky-200'
-                          }`}
-                        >
-                          {item.badge}
-                        </span>
-                      )}
-                      {isActive && (
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#FF5722]" />
+                      {isNavigatingToThis ? (
+                        <span className="w-3.5 h-3.5 border-2 border-[#FF5722] border-t-transparent rounded-full animate-spin shrink-0" />
+                      ) : (
+                        <>
+                          {item.badge && (
+                            <span
+                              className={`text-[9px] px-1.5 py-0.2 rounded font-bold tracking-wider ${
+                                isActive
+                                  ? 'bg-white/20 text-white'
+                                  : 'bg-sky-50 text-sky-700 border border-sky-200'
+                              }`}
+                            >
+                              {item.badge}
+                            </span>
+                          )}
+                          {isActive && (
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#FF5722]" />
+                          )}
+                        </>
                       )}
                     </div>
                   </Link>

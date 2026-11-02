@@ -3,11 +3,15 @@ import './globals.css';
 import { ShellLayout } from '@/components/layout/ShellLayout';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { FitnessProvider } from '@/contexts/FitnessContext';
+import { PwaRegister } from '@/components/pwa/PwaRegister';
+
 
 export const metadata: Metadata = {
   title: 'Fitness-Leveling — Web Command Center & 3D Avatar',
   description:
     'Comprehensive fitness platform with 3D athletic character leveling, workout tracking, nutrition logging, body metrics, AI recommendations, and AI Pose Check.',
+  manifest: '/manifest.json',
+  themeColor: '#FF5722',
 };
 
 export default function RootLayout({
@@ -23,7 +27,10 @@ export default function RootLayout({
       >
         <AuthProvider>
           <FitnessProvider>
-            <ShellLayout>{children}</ShellLayout>
+            <ShellLayout>
+              <PwaRegister />
+              {children}
+            </ShellLayout>
           </FitnessProvider>
         </AuthProvider>
       </body>

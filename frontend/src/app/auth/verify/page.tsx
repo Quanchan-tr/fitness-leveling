@@ -67,8 +67,8 @@ export default function VerifyPage() {
       await resendVerificationEmail();
       setResendSuccess(true);
       startCooldown();
-    } catch {
-      // Silently ignore resend errors
+    } catch (err) {
+      setVerifyError(err instanceof Error ? err.message : 'Không thể gửi lại mã xác nhận. Vui lòng kiểm tra lại kết nối mạng.');
     } finally {
       setIsResending(false);
     }

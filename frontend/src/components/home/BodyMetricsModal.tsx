@@ -25,6 +25,8 @@ export const BodyMetricsModal: React.FC<BodyMetricsModalProps> = ({
   const [bodyFat, setBodyFat] = useState(metrics.bodyFat.toString());
   const [autoCalculate, setAutoCalculate] = useState(true);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [weightError, setWeightError] = useState<string | null>(null);
+  const [bodyFatError, setBodyFatError] = useState<string | null>(null);
 
   // Sync state whenever modal opens or metrics change
   useEffect(() => {
@@ -33,6 +35,8 @@ export const BodyMetricsModal: React.FC<BodyMetricsModalProps> = ({
       setBodyFat(metrics.bodyFat.toString());
       setAutoCalculate(true);
       setSavedSuccess(false);
+      setWeightError(null);
+      setBodyFatError(null);
     }
   }, [isOpen, metrics]);
 
@@ -64,21 +68,38 @@ export const BodyMetricsModal: React.FC<BodyMetricsModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setWeightError(null);
+    setBodyFatError(null);
+
     const w = parseFloat(weight);
-    const bf = parseFloat(bodyFat);
-    if (!isNaN(w) && w > 0) {
-      const finalBf = !isNaN(bf) && bf > 0 ? bf : metrics.bodyFat;
-      onSaveMetric({
-        date: new Date().toISOString().split('T')[0],
-        weight: w,
-        bodyFat: finalBf,
-      });
-      setSavedSuccess(true);
-      setTimeout(() => {
-        setSavedSuccess(false);
-        onClose();
-      }, 1200);
+    if (isNaN(w) || w < 25 || w > 350) {
+      setWeightError('Cân nặng phải trong khoảng từ 25kg đến 350kg.');
+      return;
     }
+
+    let finalBf = metrics.bodyFat;
+    if (!autoCalculate) {
+      const bf = parseFloat(bodyFat);
+      if (isNaN(bf) || bf < 3 || bf > 65) {
+        setBodyFatError('Tỷ lệ mỡ phải trong khoảng từ 3% đến 65%.');
+        return;
+      }
+      finalBf = bf;
+    } else {
+      const bf = parseFloat(bodyFat);
+      if (!isNaN(bf) && bf > 0) finalBf = bf;
+    }
+
+    onSaveMetric({
+      date: new Date().toISOString().split('T')[0],
+      weight: w,
+      bodyFat: finalBf,
+    });
+    setSavedSuccess(true);
+    setTimeout(() => {
+      setSavedSuccess(false);
+      onClose();
+    }, 1200);
   };
 
   const bmiCat = getBmiCategory(metrics.bmi);
@@ -204,9 +225,14 @@ export const BodyMetricsModal: React.FC<BodyMetricsModalProps> = ({
                     required
                     value={weight}
                     onChange={(e) => handleWeightChange(e.target.value)}
-                    className="w-full bg-white px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#FF5722]/30 focus:border-[#FF5722]"
+                    className={`w-full bg-white px-3.5 py-2.5 rounded-xl border text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 ${
+                      weightError ? 'border-rose-400 focus:ring-rose-500/30' : 'border-slate-300 focus:ring-[#FF5722]/30 focus:border-[#FF5722]'
+                    }`}
                     placeholder="VD: 68.4"
                   />
+                  {weightError && (
+                    <span className="text-[11px] text-rose-500 font-semibold mt-1 block">{weightError}</span>
+                  )}
                   <span className="text-[10px] text-slate-400 mt-1 block">
                     Chiều cao cố định: {metrics.height || 175} cm
                   </span>

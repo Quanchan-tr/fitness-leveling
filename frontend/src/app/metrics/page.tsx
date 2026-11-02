@@ -1,7 +1,9 @@
 'use strict';
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import { apiRequest } from '@/lib/api';
+
+import React, { useState, useMemo, useEffect } from 'react';
 import { TopBar } from '@/components/layout/TopBar';
 import { initialFitnessData, MetricHistoryItem, ProgressPhotoItem } from '@/lib/fitnessData';
 import {
@@ -31,7 +33,23 @@ import {
 
 export default function MetricsPage() {
   const { toggleMobileNav } = useShell();
-  const [data, setData] = useState(initialFitnessData);
+  const [data, setData] = useState<typeof initialFitnessData>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('fittrack_body_metrics_data');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          return {
+            ...initialFitnessData,
+            body: { ...initialFitnessData.body, ...(parsed.body || {}) },
+            recentMetrics: parsed.recentMetrics || initialFitnessData.recentMetrics,
+          };
+        }
+      } catch (e) {}
+    }
+    return initialFitnessData;
+  });
+
   const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
   const [isPhotosModalOpen, setIsPhotosModalOpen] = useState(false);
   const [isManaging, setIsManaging] = useState(false);
@@ -40,38 +58,124 @@ export default function MetricsPage() {
   const [editAutoCalc, setEditAutoCalc] = useState(true);
   const [chartView, setChartView] = useState<'weight' | 'bodyFat'>('weight');
 
+  // Automatically sync metrics changes to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(
+          'fittrack_body_metrics_data',
+          JSON.stringify({ body: data.body, recentMetrics: data.recentMetrics })
+        );
+      } catch (e) {}
+    }
+  }, [data.body, data.recentMetrics]);
+
   const userAge = data.user.age || 22;
   const userGender = data.user.gender || 'male';
   const userHeight = data.body.height || 175;
 
-  // Add new metric
+  // Sync with backend API GET /api/v1/body-metrics on mount
+  useEffect(() => {
+    apiRequest<{ data: Array<{ log_date: string; weight_kg: number; body_fat_pct?: number; height_cm?: number }> }>(
+      '/body-metrics?per_page=50'
+    )
+      .then((res) => {
+        if (res?.data && res.data.length > 0) {
+          const sorted = [...res.data].sort(
+            (a, b) => new Date(b.log_date).getTime() - new Date(a.log_date).getTime()
+          );
+          const latest = sorted[0];
+          const latestBmi = calculateBmi(Number(latest.weight_kg), latest.height_cm || userHeight);
+          const mappedHistory: MetricHistoryItem[] = sorted.map((item) => ({
+            date: item.log_date,
+            weight: Number(item.weight_kg),
+            bodyFat: item.body_fat_pct
+              ? Number(item.body_fat_pct)
+              : calculateBodyFat(calculateBmi(Number(item.weight_kg), item.height_cm || userHeight), userAge, userGender),
+          }));
+
+          setData((prev) => {
+            const updated = {
+              ...prev,
+              body: {
+                ...prev.body,
+                weight: Number(latest.weight_kg),
+                bodyFat: latest.body_fat_pct ? Number(latest.body_fat_pct) : prev.body.bodyFat,
+                bmi: latestBmi,
+                height: latest.height_cm || prev.body.height,
+              },
+              recentMetrics: mappedHistory,
+            };
+            if (typeof window !== 'undefined') {
+              try {
+                localStorage.setItem(
+                  'fittrack_body_metrics_data',
+                  JSON.stringify({ body: updated.body, recentMetrics: updated.recentMetrics })
+                );
+              } catch (e) {}
+            }
+            return updated;
+          });
+        }
+      })
+      .catch(() => {});
+  }, [userHeight]);
+
+  // Add new metric with API POST sync and localStorage persistence
   const handleSaveMetric = (newMetric: MetricHistoryItem) => {
     const computedBmi = calculateBmi(newMetric.weight, userHeight);
     const computedFat =
       newMetric.bodyFat || calculateBodyFat(computedBmi, userAge, userGender);
 
-    setData((prev) => ({
-      ...prev,
-      body: {
-        ...prev.body,
-        weight: newMetric.weight,
-        bodyFat: computedFat,
-        bmi: computedBmi,
-      },
-      recentMetrics: [
+    setData((prev) => {
+      const filteredOld = prev.recentMetrics.filter((m: MetricHistoryItem) => m.date !== newMetric.date);
+      const updatedMetrics = [
         {
           ...newMetric,
           bodyFat: computedFat,
         },
-        ...prev.recentMetrics,
-      ],
-    }));
+        ...filteredOld,
+      ];
+      const updated = {
+        ...prev,
+        body: {
+          ...prev.body,
+          weight: newMetric.weight,
+          bodyFat: computedFat,
+          bmi: computedBmi,
+        },
+        recentMetrics: updatedMetrics,
+      };
+
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem(
+            'fittrack_body_metrics_data',
+            JSON.stringify({ body: updated.body, recentMetrics: updated.recentMetrics })
+          );
+        } catch (e) {}
+      }
+      return updated;
+    });
+
+    // POST /api/v1/body-metrics
+    apiRequest('/body-metrics', {
+      method: 'POST',
+      body: JSON.stringify({
+        log_date: newMetric.date,
+        weight_kg: newMetric.weight,
+        body_fat_pct: computedFat,
+        height_cm: userHeight,
+      }),
+    }).catch((err) => {
+      console.warn('Could not sync body metric to backend API, saved locally:', err);
+    });
   };
 
   // Delete a single metric
   const handleDeleteMetric = (dateToDelete: string) => {
     setData((prev) => {
-      const updatedMetrics = prev.recentMetrics.filter((m) => m.date !== dateToDelete);
+      const updatedMetrics = prev.recentMetrics.filter((m: MetricHistoryItem) => m.date !== dateToDelete);
       const latest = updatedMetrics[0] || {
         date: new Date().toISOString().split('T')[0],
         weight: prev.body.weight,
@@ -99,7 +203,7 @@ export default function MetricsPage() {
   const handleDeleteSelected = () => {
     if (selectedDates.length === 0) return;
     setData((prev) => {
-      const updatedMetrics = prev.recentMetrics.filter((m) => !selectedDates.includes(m.date));
+      const updatedMetrics = prev.recentMetrics.filter((m: MetricHistoryItem) => !selectedDates.includes(m.date));
       const latest = updatedMetrics[0] || {
         date: new Date().toISOString().split('T')[0],
         weight: prev.body.weight,
@@ -820,9 +924,27 @@ export default function MetricsPage() {
                   <tr>
                     <td
                       colSpan={isManaging ? 6 : 5}
-                      className="p-8 text-center text-slate-400 font-medium"
+                      className="p-10 text-center"
                     >
-                      Chưa có dữ liệu số đo nào. Hãy bấm &quot;Ghi số đo mới&quot; để lưu kết quả đầu tiên.
+                      <div className="max-w-sm mx-auto flex flex-col items-center justify-center space-y-3">
+                        <div className="w-12 h-12 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-[#FF5722]">
+                          <Scale className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <p className="font-extrabold text-sm text-slate-900">Chưa có lịch sử số đo</p>
+                          <p className="text-xs text-slate-500 mt-0.5">
+                            Hãy ghi lại cân nặng và chỉ số hôm nay để bắt đầu theo dõi biểu đồ tiến trình cơ thể.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setIsMetricsModalOpen(true)}
+                          className="px-4 py-2 rounded-xl bg-[#FF5722] hover:bg-[#E64A19] text-white text-xs font-bold transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Ghi số đo đầu tiên</span>
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ) : (

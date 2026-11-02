@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { SocialProof } from './SocialProof';
 import { WebStudioMockup } from './WebStudioMockup';
 
 interface HeroProps {
@@ -72,11 +71,6 @@ export const Hero: React.FC<HeroProps> = ({ onDemoClick, isDemoLoading = false }
                   <span>Dùng thử Demo</span>
                 </button>
               )}
-            </div>
-
-            {/* Social Proof Strip */}
-            <div className="pt-5 border-t border-slate-200 w-full max-w-lg">
-              <SocialProof />
             </div>
           </div>
 

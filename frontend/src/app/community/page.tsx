@@ -8,6 +8,8 @@ import { useShell } from '@/components/layout/ShellLayout';
 import { CommunityPostComposer } from '@/components/community/CommunityPostComposer';
 import { FeedPostCard } from '@/components/community/FeedPostCard';
 import { CommunitySidebar } from '@/components/community/CommunitySidebar';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { NoSearchResults } from '@/components/ui/NoSearchResults';
 import {
   Users,
   Search,
@@ -157,30 +159,24 @@ export default function CommunityPage() {
                   <FeedPostCard key={post.id} post={post} />
                 ))}
               </div>
+            ) : posts.length === 0 ? (
+              <EmptyState
+                icon={Users}
+                title="Cộng đồng chưa có bài chia sẻ nào"
+                description="Hãy là người tiên phong chia sẻ kết quả tập luyện, thành tích hoặc kỷ lục cá nhân của bạn với cộng đồng FitTrack!"
+              />
             ) : (
-              <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 space-y-3 shadow-2xs">
-                <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400 mx-auto">
-                  <SearchX className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-slate-900">
-                    Không tìm thấy bài viết nào
-                  </h3>
-                  <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                    Không có bài viết nào phù hợp với bộ lọc hiện tại. Thử xóa tìm kiếm hoặc chọn nhóm cơ khác.
-                  </p>
-                </div>
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setFilterMuscle('all');
-                    setOnlyPoseCheck(false);
-                  }}
-                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
-                >
-                  Đặt lại bộ lọc
-                </button>
-              </div>
+              <NoSearchResults
+                query={searchQuery}
+                filterLabel={filterMuscle !== 'all' ? `Nhóm cơ ${filterMuscle}` : onlyPoseCheck ? 'Chỉ bài có AI' : undefined}
+                onClear={() => {
+                  setSearchQuery('');
+                  setFilterMuscle('all');
+                  setOnlyPoseCheck(false);
+                }}
+                title="Không tìm thấy bài viết"
+                description={`Không có bài viết nào khớp với "${searchQuery || filterMuscle}". Hãy thử điều chỉnh từ khóa hoặc xóa bộ lọc.`}
+              />
             )}
           </div>
 

@@ -13,8 +13,11 @@ import {
   ChevronDown,
   Plus,
   Play,
-  Flame,
 } from 'lucide-react';
+import { ExerciseCardSkeleton } from '@/components/ui/Skeleton';
+import { NoSearchResults } from '@/components/ui/NoSearchResults';
+import { ErrorState } from '@/components/ui/ErrorState';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface ExerciseCatalogViewProps {
   onAddExerciseToRoutine: (exercise: Exercise) => void;
@@ -60,6 +63,7 @@ export const ExerciseCatalogView: React.FC<ExerciseCatalogViewProps> = ({
   const [totalCount, setTotalCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   // Debounce search input (300ms)
   useEffect(() => {
@@ -69,6 +73,15 @@ export const ExerciseCatalogView: React.FC<ExerciseCatalogViewProps> = ({
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  const handleResetFilters = useCallback(() => {
+    setSearchTerm('');
+    setDebouncedSearch('');
+    setSelectedCategory('all');
+    setSelectedEquipment('all');
+    setFilterAiOnly(false);
+    setApiError(null);
+  }, []);
+
   const loadExercises = useCallback(
     async (targetPage: number, append: boolean = false) => {
       if (append) {
@@ -76,6 +89,7 @@ export const ExerciseCatalogView: React.FC<ExerciseCatalogViewProps> = ({
       } else {
         setIsLoading(true);
       }
+      setApiError(null);
 
       try {
         const response = await fetchExercises({
@@ -98,6 +112,11 @@ export const ExerciseCatalogView: React.FC<ExerciseCatalogViewProps> = ({
         setTotalCount(response.total);
       } catch (err) {
         console.error('Failed to load exercises:', err);
+        setApiError(
+          err instanceof Error
+            ? err.message
+            : 'Không thể kết nối đến cơ sở dữ liệu bài tập. Vui lòng kiểm tra lại mạng hoặc thử lại.'
+        );
       } finally {
         setIsLoading(false);
         setIsLoadingMore(false);
@@ -127,6 +146,10 @@ export const ExerciseCatalogView: React.FC<ExerciseCatalogViewProps> = ({
     if (g.includes('cardio')) return 'bg-amber-50 text-amber-700 border-amber-200';
     return 'bg-slate-100 text-slate-700 border-slate-200';
   };
+
+  const isFiltered = Boolean(
+    debouncedSearch || selectedCategory !== 'all' || selectedEquipment !== 'all' || filterAiOnly
+  );
 
   return (
     <div className="space-y-5">
@@ -209,12 +232,22 @@ export const ExerciseCatalogView: React.FC<ExerciseCatalogViewProps> = ({
         </div>
       </div>
 
-      {/* Exercise Cards Grid */}
+      {/* Exercise Cards Grid / States */}
       {isLoading ? (
-        <div className="bg-white rounded-2xl border border-slate-200 p-16 flex flex-col items-center justify-center gap-3 text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin text-[#FF5722]" />
-          <span className="text-sm font-semibold text-slate-600">Đang tải danh sách bài tập từ database...</span>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <ExerciseCardSkeleton key={idx} />
+          ))}
         </div>
+      ) : apiError ? (
+        <ErrorState
+          title="Không thể tải danh sách bài tập"
+          message={apiError}
+          onRetry={() => loadExercises(1, false)}
+          isNetworkError={
+            apiError.toLowerCase().includes('kết nối') || apiError.toLowerCase().includes('network')
+          }
+        />
       ) : exercises.length > 0 ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -331,14 +364,30 @@ export const ExerciseCatalogView: React.FC<ExerciseCatalogViewProps> = ({
             </div>
           )}
         </>
+      ) : isFiltered ? (
+        <NoSearchResults
+          query={debouncedSearch}
+          filterLabel={
+            selectedCategory !== 'all'
+              ? CATEGORIES.find((c) => c.value === selectedCategory)?.label
+              : selectedEquipment !== 'all'
+              ? EQUIPMENTS.find((e) => e.value === selectedEquipment)?.label
+              : filterAiOnly
+              ? 'Chỉ bài có AI'
+              : undefined
+          }
+          onClear={handleResetFilters}
+        />
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 p-16 text-center text-slate-500 space-y-2">
-          <Dumbbell className="w-10 h-10 mx-auto text-slate-300 mb-2" />
-          <h4 className="font-bold text-base text-slate-700">Không tìm thấy bài tập nào</h4>
-          <p className="text-xs text-slate-400">
-            Thử thay đổi từ khóa tìm kiếm hoặc bỏ chọn các bộ lọc nhóm cơ / dụng cụ.
-          </p>
-        </div>
+        <EmptyState
+          icon={Dumbbell}
+          title="Ngân hàng bài tập đang trống"
+          description="Hiện chưa có bài tập nào được đồng bộ từ hệ thống. Hãy thử tải lại danh sách."
+          action={{
+            label: 'Tải lại danh sách',
+            onClick: () => loadExercises(1, false),
+          }}
+        />
       )}
     </div>
   );

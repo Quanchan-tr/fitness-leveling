@@ -915,6 +915,8 @@ export function usePoseDetection({ exercise, onRepCompleted, onVideoEnded }: Use
   const videoUrlRef = useRef<string | null>(null);
   const isVideoFileRef = useRef<boolean>(false);
   const repStateRef = useRef<RepEngineState>(createRepState());
+  const wsRef = useRef<WebSocket | null>(null);
+  const isWsFallbackRef = useRef<boolean>(false);
   const emaRef = useRef<EmaAngles>(createEmaAngles());
   const lastFrameTimeRef = useRef<number>(0);
   const fpsRef = useRef<number>(0);
@@ -931,20 +933,60 @@ export function usePoseDetection({ exercise, onRepCompleted, onVideoEnded }: Use
     try {
       const { PoseLandmarker, FilesetResolver } = await import('@mediapipe/tasks-vision');
       const vision = await FilesetResolver.forVisionTasks(WASM_BUNDLE_URL);
-      landmarkerRef.current = await PoseLandmarker.createFromOptions(vision, {
-        baseOptions: { modelAssetPath: MODEL_URL, delegate: 'GPU' },
-        runningMode: 'VIDEO',
-        numPoses: 1,
-        minPoseDetectionConfidence: 0.5,
-        minPosePresenceConfidence: 0.5,
-        minTrackingConfidence: 0.5,
-      });
+      try {
+        landmarkerRef.current = await PoseLandmarker.createFromOptions(vision, {
+          baseOptions: { modelAssetPath: MODEL_URL, delegate: 'GPU' },
+          runningMode: 'VIDEO',
+          numPoses: 1,
+          minPoseDetectionConfidence: 0.5,
+          minPosePresenceConfidence: 0.5,
+          minTrackingConfidence: 0.5,
+        });
+      } catch (gpuErr) {
+        console.warn('[usePoseDetection] GPU delegate not supported, falling back to CPU:', gpuErr);
+        landmarkerRef.current = await PoseLandmarker.createFromOptions(vision, {
+          baseOptions: { modelAssetPath: MODEL_URL, delegate: 'CPU' },
+          runningMode: 'VIDEO',
+          numPoses: 1,
+          minPoseDetectionConfidence: 0.5,
+          minPosePresenceConfidence: 0.5,
+          minTrackingConfidence: 0.5,
+        });
+      }
     } catch (err) {
-      console.error('[usePoseDetection] Model load failed:', err);
-      setError('Khong the tai mo hinh MediaPipe. Vui long kiem tra ket noi internet.');
+      console.warn('[usePoseDetection] MediaPipe WASM unavailable, enabling WebSocket fallback:', err);
+      isWsFallbackRef.current = true;
+      try {
+        const wsUrl = `ws://localhost:8001/ws/pose-stream/${exercise}`;
+        const ws = new WebSocket(wsUrl);
+        ws.onopen = () => {
+          console.info(`[usePoseDetection] Connected to Pose Worker WebSocket fallback: ${wsUrl}`);
+          wsRef.current = ws;
+        };
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data) {
+              setMetrics((prev) => ({
+                ...prev,
+                repCount: typeof data.rep_count === 'number' ? data.rep_count : (data.reps ?? prev.repCount),
+                validRepCount: typeof data.valid_reps === 'number' ? data.valid_reps : prev.validRepCount,
+                score: typeof data.score === 'number' ? data.score : prev.score,
+              }));
+            }
+          } catch (e) {}
+        };
+        ws.onerror = () => {
+          console.warn('[usePoseDetection] WebSocket fallback server offline at ws://localhost:8001');
+          setError('Không thể tải mô hình MediaPipe và máy chủ WebSocket (cổng 8001) đang offline.');
+        };
+      } catch (wsErr) {
+        setError('Không thể khởi tạo phân tích tư thế (Cả client-side và WebSocket fallback đều không khả dụng).');
+      }
     } finally {
       setIsModelLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const processFrame = useCallback(

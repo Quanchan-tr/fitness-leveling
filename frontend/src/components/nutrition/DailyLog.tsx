@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { FoodLogItem, MealType, SavedCombo } from '@/types/nutrition.types';
 import { MealSection } from './MealSection';
 import { BookmarkPlus, CheckSquare, Utensils } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 interface DailyLogProps {
   foodLog: FoodLogItem[];
@@ -90,13 +91,12 @@ export const DailyLog: React.FC<DailyLogProps> = ({
       {/* Scrollable list container that fixes height and prevents vertical box expanding */}
       <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-4">
         {foodLog.length === 0 ? (
-          <div className="text-center py-12 px-4 bg-slate-50 rounded-xl border border-dashed border-slate-200 space-y-1.5">
-            <Utensils className="w-7 h-7 text-slate-300 mx-auto" />
-            <h3 className="text-xs sm:text-sm font-bold text-slate-700">Chưa có món ăn hôm nay</h3>
-            <p className="text-xs text-slate-400">
-              Kéo thả Combo từ bên dưới hoặc chuyển sang tab Tìm kiếm để thêm món
-            </p>
-          </div>
+          <EmptyState
+            icon={Utensils}
+            title="Chưa có món ăn hôm nay"
+            description="Bạn chưa ghi lại bữa ăn nào trong ngày. Hãy tìm kiếm món ăn hoặc chọn từ Combo mẫu bên dưới để theo dõi lượng Calo & Macro."
+            className="border-dashed bg-slate-50/50 py-8"
+          />
         ) : (
           <div className="space-y-4 pb-2">
             <MealSection
