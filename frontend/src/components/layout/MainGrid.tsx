@@ -12,14 +12,12 @@ import { useFitness } from '@/contexts/FitnessContext';
 import {
   LayoutDashboard,
   Dumbbell,
-  ArrowRight,
   Flame,
   CheckCircle2,
   Clock,
   Play,
   Footprints,
 } from 'lucide-react';
-import Link from 'next/link';
 
 interface MainGridProps {
   outfit: CharacterOutfit;
@@ -78,7 +76,7 @@ export const MainGrid: React.FC<MainGridProps> = ({
   return (
     <div className="flex-1 w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-4">
       {/* 1. Information-First Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-2 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-200">
         <div>
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 flex items-center gap-2.5">
             <LayoutDashboard className="w-6 h-6 sm:w-7 sm:h-7 text-[#FF5722]" />
@@ -93,17 +91,6 @@ export const MainGrid: React.FC<MainGridProps> = ({
               Mục tiêu: <strong className="text-slate-900 font-bold">Tăng cơ</strong>
             </span>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2.5 shrink-0">
-          <button
-            onClick={handleStartTodayWorkout}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FF5722] hover:bg-[#E64A19] text-white font-bold text-xs sm:text-sm transition-colors cursor-pointer shadow-sm"
-          >
-            <Dumbbell className="w-4 h-4" />
-            <span>Vào buổi tập</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
         </div>
       </div>
 
