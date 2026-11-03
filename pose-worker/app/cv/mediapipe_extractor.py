@@ -28,7 +28,10 @@ logger = logging.getLogger("fitnessleveling-pose-worker")
 from dataclasses import dataclass
 
 # MediaPipe initialisation (module-level, reused across requests)
-_mp_pose = mp.solutions.pose
+try:
+    _mp_pose = mp.solutions.pose
+except AttributeError:
+    import mediapipe.python.solutions.pose as _mp_pose
 
 
 @dataclass

@@ -301,7 +301,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Sync exercises from backend API or local clean dataset
   useEffect(() => {
     let mounted = true;
-    fetchExercises({ per_page: 150 })
+    fetchExercises({ per_page: 2000 })
       .then((res) => {
         if (mounted && res?.data && res.data.length > 0) {
           const mapped: Exercise[] = res.data.map((item: any) => ({
@@ -312,9 +312,15 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
               ? item.targetMuscles
               : [item.target_muscle || item.body_part || item.category || 'chest'],
             equipment: (item.equipment || 'bodyweight').toLowerCase() as any,
-            type: item.type || 'weight_reps',
+            type: item.type || (item.category === 'cardio' ? 'duration' : 'weight_reps'),
             gifPlaceholderUrl: item.gif_url || item.thumbnail_url || item.gifPlaceholderUrl,
+            gif_url: item.gif_url,
+            thumbnail_url: item.thumbnail_url,
             description: item.description || item.instructions || item.name,
+            has_ai_check: Boolean(item.has_ai_check),
+            body_part: item.body_part,
+            category: item.category,
+            target_muscle: item.target_muscle,
           }));
 
           let customList: Exercise[] = [];
@@ -324,7 +330,14 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
               if (saved) customList = JSON.parse(saved);
             } catch (e) {}
           }
-          setExercises([...customList, ...mapped]);
+
+          // Robust Merge by ID: never truncate dataset, merge remote & custom additions
+          const exerciseMap = new Map<string, Exercise>();
+          defaultDatasetExercises.forEach((ex) => exerciseMap.set(ex.id, ex));
+          mapped.forEach((ex) => exerciseMap.set(ex.id, ex));
+          customList.forEach((ex) => exerciseMap.set(ex.id, ex));
+
+          setExercises(Array.from(exerciseMap.values()));
         }
       })
       .catch((err) => {

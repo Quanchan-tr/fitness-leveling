@@ -146,3 +146,18 @@ Tất cả các thay đổi, bổ sung và nâng cấp đáng chú ý của dự
   - Thông tin chi tiết: Cơ chính, cơ phụ, dụng cụ, phân loại, trạng thái AI Pose Check.
   - **Hướng dẫn kỹ thuật từng bước (Step-by-step)** được định dạng rõ ràng từ mô tả tiếng Anh chuẩn.
   - Tích hợp 2 nút hành động: *"Tập bài này ngay"* (chuyển thẳng sang Live Workout session) và *"Thêm vào Routine"* (đưa vào routine tập luyện cá nhân).
+
+
+---
+
+### 13. Khắc Phục Lỗi Giới Hạn 100 Bài Tập (Nâng Cấp Toàn Diện 1,324 Bài)
+- **Backend API Limit Fix ([`ExerciseController.php`](file:///d:/Code/FitApp/fitness-leveling/backend/app/Http/Controllers/Api/V1/ExerciseController.php))**:
+  - Nâng giới hạn tối đa của tham số `$perPage` từ `100` lên `2,000` bài/trang. Cho phép API trả về trọn bộ toàn bộ **1,324 bài tập** từ PostgreSQL trong một lượt gọi duy nhất.
+- **Frontend State Merge Fix ([`FitnessContext.tsx`](file:///d:/Code/FitApp/fitness-leveling/frontend/src/contexts/FitnessContext.tsx))**:
+  - Thay đổi tham số query gọi backend thành `per_page: 2000`.
+  - Áp dụng cơ chế **Hợp nhất theo ID (Merge by ID)**: Kết hợp an toàn giữa kho bài tập mặc định (`defaultDatasetExercises` 1,324 bài), bài tập từ API Backend Database, và các bài tập custom do người dùng tự tạo.
+  - Loại bỏ hoàn toàn tình trạng danh sách 1,324 bài bị ghi đè rút gọn còn 100 bài khi API phản hồi.
+- **Docker Production Image Rebuild**:
+  - Đóng gói và tái khởi động container `fitnessleveling-frontend` và `fitnessleveling-backend`.
+  - Kiểm tra kết nối API `http://localhost:8000/api/v1/exercises?per_page=2000` đạt chuẩn: **1,324 bài tập**.
+  - Kiểm tra route Web `http://localhost:3000/exercises` đạt mã phản hồi **200 OK**.

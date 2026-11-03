@@ -14,7 +14,7 @@ class ExerciseController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $perPage = min(max((int) $request->query('per_page', 24), 1), 100);
+        $perPage = min(max((int) $request->query('per_page', 24), 1), 2000);
         $query = Exercise::where('status', 'active');
 
         if ($request->filled('category')) {
