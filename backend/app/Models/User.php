@@ -29,6 +29,10 @@ class User extends Authenticatable
         'birth_date',
         'gender',
         'activity_level',
+        'xp',
+        'level',
+        'current_streak',
+        'last_active_date',
     ];
 
     protected $hidden = [
@@ -42,6 +46,10 @@ class User extends Authenticatable
         'weight_kg' => 'float',
         'height_cm' => 'float',
         'birth_date' => 'date',
+        'xp' => 'integer',
+        'level' => 'integer',
+        'current_streak' => 'integer',
+        'last_active_date' => 'date',
     ];
 
     public function workoutLogs(): HasMany
@@ -69,6 +77,7 @@ class User extends Authenticatable
         return $this->hasMany(PoseCheckSession::class);
     }
 
+<<<<<<< HEAD
     public function avatarConfig(): HasOne
     {
         return $this->hasOne(UserAvatarConfig::class);
@@ -77,5 +86,20 @@ class User extends Authenticatable
     public function userInventories(): HasMany
     {
         return $this->hasMany(UserInventory::class);
+=======
+    public function workoutRoutines(): HasMany
+    {
+        return $this->hasMany(WorkoutRoutine::class);
+    }
+
+    public function communityPosts(): HasMany
+    {
+        return $this->hasMany(CommunityPost::class);
+    }
+
+    public function postComments(): HasMany
+    {
+        return $this->hasMany(PostComment::class);
+>>>>>>> a980157 (CHORE: Dọn sạch mockup data)
     }
 }

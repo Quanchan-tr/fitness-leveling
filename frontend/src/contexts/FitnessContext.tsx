@@ -471,7 +471,23 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
   });
 
+  // Prioritize server-authoritative gamification stats if available
   useEffect(() => {
+    if (user?.gamification) {
+      setProfile((prev) => ({
+        ...prev,
+        id: user.id || prev.id,
+        name: user.displayName || prev.name,
+        level: user.gamification?.level ?? prev.level,
+        xp: user.gamification?.xp ?? prev.xp,
+        maxXp: user.gamification?.next_level_xp ?? prev.maxXp,
+        streak: user.gamification?.current_streak ?? prev.streak,
+      }));
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user?.gamification) return;
     const streak = calculateRealStreak(workoutHistory);
     const { level, xp, maxXp } = calculateLevelFromWorkouts(workoutHistory.length);
     setProfile((prev) => ({
@@ -482,7 +498,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       xp,
       maxXp,
     }));
-  }, [workoutHistory]);
+  }, [workoutHistory, user?.gamification]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -677,6 +693,61 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
             },
           }));
         });
+
+      // 4. Sync custom workout routines from /routines
+      apiRequest<{ data: any[] }>('/routines')
+        .then((res) => {
+          if (res?.data && res.data.length > 0) {
+            const serverRoutines: RoutineItem[] = res.data.map((r: any) => ({
+              id: r.id,
+              title: r.title,
+              notes: r.description || '',
+              restTimerSeconds: 60,
+              exercises: Array.isArray(r.schedule_days) ? r.schedule_days : [],
+              createdBy: {
+                userId: r.user_id,
+                username: user?.displayName || 'Vận động viên',
+                avatarUrl: user?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+              },
+            }));
+            setRoutines((prev) => {
+              const serverIds = new Set(serverRoutines.map((sr) => sr.id));
+              const remaining = prev.filter((p) => !serverIds.has(p.id));
+              return [...serverRoutines, ...remaining];
+            });
+          }
+        })
+        .catch(() => {});
+
+      // 5. Sync community posts from /community/posts
+      apiRequest<{ data: any[] }>('/community/posts')
+        .then((res) => {
+          if (res?.data && res.data.length > 0) {
+            const serverPosts: CommunityPost[] = res.data.map((p: any) => ({
+              id: p.id,
+              title: p.workout_log?.notes || 'Buổi tập cá nhân',
+              content: p.content,
+              author: {
+                id: p.user?.id || 'user',
+                name: p.user?.name || 'Vận động viên',
+                avatar: p.user?.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+                level: p.user?.level || 1,
+                badge: 'Athlete',
+              },
+              createdAt: new Date(p.created_at).toLocaleDateString('vi-VN'),
+              likesCount: p.likes_count || 0,
+              isLiked: Boolean(p.is_liked),
+              comments: [],
+              tags: ['FITNESSLEVELING'],
+            }));
+            setPosts((prev) => {
+              const serverIds = new Set(serverPosts.map((sp) => sp.id));
+              const remaining = prev.filter((pr) => !serverIds.has(pr.id));
+              return [...serverPosts, ...remaining];
+            });
+          }
+        })
+        .catch(() => {});
     }
   }, [user]);
 
@@ -834,6 +905,27 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         },
       };
       setRoutines((prev) => [created, ...prev]);
+
+      // Synchronize with backend API
+      apiRequest<{ data: { id: string } }>('/routines', {
+        method: 'POST',
+        useIdempotency: true,
+        body: JSON.stringify({
+          title: routine.title,
+          description: routine.notes || '',
+          target_split: 'custom',
+          schedule_days: routine.exercises,
+        }),
+      })
+        .then((res) => {
+          if (res?.data?.id) {
+            setRoutines((prev) =>
+              prev.map((r) => (r.id === created.id ? { ...r, id: res.data.id } : r))
+            );
+          }
+        })
+        .catch(() => {});
+
       return created;
     },
     [profile]
@@ -847,6 +939,17 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         day.assignedRoutine?.id === updated.id ? { ...day, assignedRoutine: updated } : day
       )
     );
+
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(updated.id)) {
+      apiRequest(`/routines/${updated.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          title: updated.title,
+          description: updated.notes || '',
+          schedule_days: updated.exercises,
+        }),
+      }).catch(() => {});
+    }
   }, []);
 
   const deleteRoutine = useCallback((routineId: string) => {
@@ -859,6 +962,10 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
           : day
       )
     );
+
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(routineId)) {
+      apiRequest(`/routines/${routineId}`, { method: 'DELETE' }).catch(() => {});
+    }
   }, []);
 
   const duplicateRoutine = useCallback(
@@ -1275,7 +1382,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // 4. Synchronize with backend API (POST /api/v1/workout-logs)
     const todayStr = new Date().toISOString().split('T')[0];
-    apiRequest<{ data: { id: string } }>('/workout-logs', {
+    apiRequest<{ data: { id: string; gamification?: any } }>('/workout-logs', {
       method: 'POST',
       useIdempotency: true,
       body: JSON.stringify({
@@ -1286,6 +1393,17 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       .then(async (res) => {
         const logId = res?.data?.id;
         if (!logId) return;
+
+        if (res.data.gamification) {
+          const g = res.data.gamification;
+          setProfile((prev) => ({
+            ...prev,
+            streak: g.streak ?? prev.streak,
+            level: g.level ?? prev.level,
+            xp: g.total_xp ?? prev.xp,
+            maxXp: g.next_level_xp ?? prev.maxXp,
+          }));
+        }
 
         let setNum = 1;
         for (const item of activeWorkout.exercises) {
@@ -1308,6 +1426,24 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
             }
           }
         }
+
+        // Finalize workout on backend to get final gamification summary
+        apiRequest<{ data: { gamification?: any } }>(`/workout-logs/${logId}/complete`, {
+          method: 'POST',
+        })
+          .then((compRes) => {
+            if (compRes?.data?.gamification) {
+              const g = compRes.data.gamification;
+              setProfile((prev) => ({
+                ...prev,
+                streak: g.current_streak ?? prev.streak,
+                level: g.level ?? prev.level,
+                xp: g.xp ?? prev.xp,
+                maxXp: g.next_level_xp ?? prev.maxXp,
+              }));
+            }
+          })
+          .catch(() => {});
       })
       .catch((err) => {
         console.warn('Could not sync workout session to backend', err);
@@ -1457,6 +1593,23 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       };
 
       setPosts((prev) => [newPost, ...prev]);
+
+      // Synchronize with backend API
+      apiRequest<{ data: { id: string } }>('/community/posts', {
+        method: 'POST',
+        useIdempotency: true,
+        body: JSON.stringify({
+          content: `${postData.title}\n${postData.content}`,
+        }),
+      })
+        .then((res) => {
+          if (res?.data?.id) {
+            setPosts((prev) =>
+              prev.map((p) => (p.id === newPost.id ? { ...p, id: res.data.id } : p))
+            );
+          }
+        })
+        .catch(() => {});
     },
     [profile, routines]
   );
@@ -1473,6 +1626,10 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         };
       })
     );
+
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(postId)) {
+      apiRequest(`/community/posts/${postId}/like`, { method: 'POST' }).catch(() => {});
+    }
   }, []);
 
   const addComment = useCallback(
@@ -1488,6 +1645,13 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setPosts((prev) =>
         prev.map((p) => (p.id === postId ? { ...p, comments: [...p.comments, newComment] } : p))
       );
+
+      if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(postId)) {
+        apiRequest(`/community/posts/${postId}/comments`, {
+          method: 'POST',
+          body: JSON.stringify({ content: text.trim() }),
+        }).catch(() => {});
+      }
     },
     [profile]
   );

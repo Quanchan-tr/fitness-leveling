@@ -6,10 +6,12 @@ use App\Http\Controllers\Api\V1\AiController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AvatarController;
 use App\Http\Controllers\Api\V1\BodyMetricController;
+use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\ExerciseController;
 use App\Http\Controllers\Api\V1\NutritionLogController;
 use App\Http\Controllers\Api\V1\PoseCheckController;
 use App\Http\Controllers\Api\V1\WorkoutLogController;
+use App\Http\Controllers\Api\V1\WorkoutRoutineController;
 use App\Http\Middleware\IdempotencyMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -22,8 +24,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function () {
     // --- AUTHENTICATION ---
     Route::prefix('auth')->group(function () {
-        Route::post('register', [AuthController::class, 'register']);
-        Route::post('login', [AuthController::class, 'login']);
+        Route::post('register', [AuthController::class, 'register'])->middleware('throttle:6,1');
+        Route::post('login', [AuthController::class, 'login'])->middleware('throttle:6,1');
 
         Route::middleware('auth:sanctum')->group(function () {
             Route::get('me', [AuthController::class, 'me']);
@@ -50,7 +52,23 @@ Route::prefix('v1')->group(function () {
         Route::post('workout-logs', [WorkoutLogController::class, 'store'])->middleware(IdempotencyMiddleware::class);
         Route::get('workout-logs/{id}', [WorkoutLogController::class, 'show']);
         Route::post('workout-logs/{id}/sets', [WorkoutLogController::class, 'addSet'])->middleware(IdempotencyMiddleware::class);
+        Route::post('workout-logs/{id}/complete', [WorkoutLogController::class, 'complete']);
         Route::delete('workout-logs/{id}', [WorkoutLogController::class, 'destroy']);
+
+        // Workout Routines (Custom & AI Generated Plans)
+        Route::get('routines', [WorkoutRoutineController::class, 'index']);
+        Route::post('routines', [WorkoutRoutineController::class, 'store'])->middleware(IdempotencyMiddleware::class);
+        Route::get('routines/{id}', [WorkoutRoutineController::class, 'show']);
+        Route::put('routines/{id}', [WorkoutRoutineController::class, 'update']);
+        Route::delete('routines/{id}', [WorkoutRoutineController::class, 'destroy']);
+
+        // Community Feed
+        Route::get('community/posts', [CommunityController::class, 'index']);
+        Route::post('community/posts', [CommunityController::class, 'store'])->middleware(IdempotencyMiddleware::class);
+        Route::post('community/posts/{id}/like', [CommunityController::class, 'toggleLike']);
+        Route::get('community/posts/{id}/comments', [CommunityController::class, 'comments']);
+        Route::post('community/posts/{id}/comments', [CommunityController::class, 'addComment']);
+        Route::delete('community/posts/{id}', [CommunityController::class, 'destroy']);
 
         // Nutrition Logs
         Route::get('nutrition-logs', [NutritionLogController::class, 'index']);
@@ -61,8 +79,8 @@ Route::prefix('v1')->group(function () {
         Route::get('body-metrics', [BodyMetricController::class, 'index']);
         Route::post('body-metrics', [BodyMetricController::class, 'store']);
 
-        // AI Hub
-        Route::prefix('ai')->middleware(IdempotencyMiddleware::class)->group(function () {
+        // AI Hub (Throttled 30 requests / minute)
+        Route::prefix('ai')->middleware(['throttle:30,1', IdempotencyMiddleware::class])->group(function () {
             Route::post('exercise-plan', [AiController::class, 'exercisePlan']);
             Route::post('meal-plan', [AiController::class, 'mealPlan']);
         });

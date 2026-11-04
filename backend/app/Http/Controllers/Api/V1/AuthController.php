@@ -8,14 +8,18 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Models\User;
+use App\Services\Gamification\GamificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    public function __construct(
+        private readonly GamificationService $gamificationService = new GamificationService()
+    ) {}
+
     public function register(RegisterRequest $request): JsonResponse
     {
         $validated = $request->validated();
@@ -31,13 +35,20 @@ class AuthController extends Controller
             'gender' => $validated['gender'] ?? 'other',
             'activity_level' => $validated['activity_level'] ?? 'moderate',
             'role' => 'user',
+            'xp' => 0,
+            'level' => 1,
+            'current_streak' => 0,
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
+        $gamification = $this->gamificationService->getGamificationSummary($user);
 
         return response()->json([
             'data' => [
-                'user' => $user,
+                'user' => [
+                    ...$user->toArray(),
+                    'gamification' => $gamification,
+                ],
                 'token' => $token,
             ],
         ], 201);
@@ -59,10 +70,14 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
+        $gamification = $this->gamificationService->getGamificationSummary($user);
 
         return response()->json([
             'data' => [
-                'user' => $user,
+                'user' => [
+                    ...$user->toArray(),
+                    'gamification' => $gamification,
+                ],
                 'token' => $token,
             ],
         ]);
@@ -70,8 +85,14 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
+        $user = $request->user();
+        $gamification = $this->gamificationService->getGamificationSummary($user);
+
         return response()->json([
-            'data' => $request->user(),
+            'data' => [
+                ...$user->toArray(),
+                'gamification' => $gamification,
+            ],
         ]);
     }
 
@@ -90,10 +111,15 @@ class AuthController extends Controller
     {
         $user = $request->user();
         $user->update($request->validated());
+        $freshUser = $user->fresh();
+        $gamification = $this->gamificationService->getGamificationSummary($freshUser);
 
         return response()->json([
             'data' => [
-                'user' => $user->fresh(),
+                'user' => [
+                    ...$freshUser->toArray(),
+                    'gamification' => $gamification,
+                ],
                 'message' => 'Profile updated successfully.',
             ],
         ]);

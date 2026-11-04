@@ -103,7 +103,8 @@ graphify-out/*
 coverage/
 .nyc_output/
 .phpunit.result.cache
-*/*tests/
+*/*/tests/
+*/tests/
 
 # --- Temporary & Agent Scratch ---
 scratch/

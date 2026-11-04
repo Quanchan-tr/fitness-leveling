@@ -9,6 +9,27 @@ import { apiRequest } from './api';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+export interface DailyQuest {
+  id: string;
+  title: string;
+  description: string;
+  target: number;
+  current: number;
+  completed: boolean;
+  xp_reward: number;
+}
+
+export interface GamificationProfile {
+  level: number;
+  xp: number;
+  current_streak: number;
+  last_active_date: string | null;
+  current_level_base_xp: number;
+  next_level_xp: number;
+  level_progress_percent: number;
+  daily_quests: DailyQuest[];
+}
+
 export interface AuthUser {
   id: string;
   email: string;
@@ -21,6 +42,10 @@ export interface AuthUser {
   heightCm?: number;
   goal?: string;
   gender?: string;
+  xp?: number;
+  level?: number;
+  currentStreak?: number;
+  gamification?: GamificationProfile;
 }
 
 export interface RegisterPayload {
@@ -68,6 +93,10 @@ interface BackendUser {
   activity_level?: string;
   email_verified_at?: string | null;
   created_at?: string;
+  xp?: number;
+  level?: number;
+  current_streak?: number;
+  gamification?: GamificationProfile;
 }
 
 interface AuthResponse {
@@ -131,6 +160,10 @@ function _mapBackendUserToAuthUser(u: BackendUser): AuthUser {
     heightCm: u.height_cm ? Number(u.height_cm) : undefined,
     goal: u.goal,
     gender: u.gender,
+    xp: u.xp ?? u.gamification?.xp ?? 0,
+    level: u.level ?? u.gamification?.level ?? 1,
+    currentStreak: u.current_streak ?? u.gamification?.current_streak ?? 0,
+    gamification: u.gamification,
   };
 }
 
@@ -151,11 +184,6 @@ export const authService = {
         ? localStorage.getItem(STORAGE_KEYS.token) || localStorage.getItem('fittrack_token')
         : null;
     if (!token) return null;
-
-    // Fast-path for local demo mode: avoid dead network requests to offline backend
-    if (token.startsWith('mock_token_')) {
-      return _readFromStorage<AuthUser>(STORAGE_KEYS.user);
-    }
 
     try {
       const res = await apiRequest<{ data: BackendUser }>('/auth/me', {
@@ -224,15 +252,15 @@ export const authService = {
   },
 
   async resendVerificationEmail(): Promise<void> {
-    // Stub for email verification trigger
+    // Reserved for future email SMTP verification trigger
   },
 
   async requestPasswordReset(_email: string): Promise<void> {
-    // Stub for password reset trigger
+    // Reserved for future password reset trigger
   },
 
   async resetPassword(_email: string, _newPassword: string): Promise<void> {
-    // Stub for password reset update
+    // Reserved for future password reset update
   },
 
   /** Save fitness onboarding profile and sync with PUT /api/v1/auth/profile */
@@ -296,64 +324,66 @@ export const authService = {
         password: 'password123',
       });
     } catch {
+      // If demo user is not yet created, register it automatically
       try {
-        return await this.login({
-          email: 'test@example.com',
-          password: 'password',
+        return await this.register({
+          displayName: 'Demo Hunter',
+          email: 'demo@fitnessleveling.test',
+          password: 'password123',
         });
       } catch {
-        const demoUser: AuthUser = {
-          id: 'demo-user-quan',
+        return await this.login({
           email: 'demo@fitnessleveling.test',
-          displayName: 'Demo Athlete',
-          isEmailVerified: true,
-          hasCompletedOnboarding: true,
-          createdAt: new Date().toISOString(),
-        };
-        _saveToStorage(STORAGE_KEYS.user, demoUser);
-        if (typeof window !== 'undefined') {
-          localStorage.setItem(STORAGE_KEYS.token, 'mock_token_demo_user');
-        }
-        return demoUser;
+          password: 'password123',
+        });
       }
     }
   },
 
-  /** Sign out: call backend logout and clear storage */
-  async signOut(): Promise<void> {
+  /** Log out and purge token */
+  async logout(): Promise<void> {
     try {
-      await apiRequest('/auth/logout', { method: 'POST' }).catch(() => {});
+      await apiRequest('/auth/logout', { method: 'POST' });
+    } catch {
+      // Ignore network errors on logout
     } finally {
+      _removeFromStorage(STORAGE_KEYS.token);
       _removeFromStorage(STORAGE_KEYS.user);
       _removeFromStorage(STORAGE_KEYS.fitnessProfile);
-      _removeFromStorage(STORAGE_KEYS.token);
     }
+  },
+
+  /** Alias for logout for backward compatibility */
+  async signOut(): Promise<void> {
+    return this.logout();
+  },
+
+  getToken(): string | null {
+    if (typeof window === 'undefined') return null;
+    return (
+      localStorage.getItem(STORAGE_KEYS.token) ||
+      localStorage.getItem('fittrack_token') ||
+      null
+    );
   },
 };
 
-// ─── TDEE / Calculation helpers ───────────────────────────────────────────────
-
-/** Mifflin-St Jeor BMR formula */
-export function calculateBmr(
-  weightKg: number,
-  heightCm: number,
-  age: number,
-  gender: 'male' | 'female'
-): number {
+/** Mifflin-St Jeor BMR calculation */
+export function calculateBmr(weightKg: number, heightCm: number, age: number, gender: 'male' | 'female'): number {
   if (gender === 'male') {
     return Math.round(10 * weightKg + 6.25 * heightCm - 5 * age + 5);
   }
   return Math.round(10 * weightKg + 6.25 * heightCm - 5 * age - 161);
 }
 
-const ACTIVITY_MULTIPLIERS: Record<FitnessProfile['dailyActivityLevel'], number> = {
-  sedentary: 1.2,
-  lightly_active: 1.375,
-  moderately_active: 1.55,
-  very_active: 1.725,
-  extremely_active: 1.9,
-};
-
+/** TDEE calculation from BMR and daily activity level */
 export function calculateTdee(bmr: number, activityLevel: FitnessProfile['dailyActivityLevel']): number {
-  return Math.round(bmr * ACTIVITY_MULTIPLIERS[activityLevel]);
+  const multipliers: Record<FitnessProfile['dailyActivityLevel'], number> = {
+    sedentary: 1.2,
+    lightly_active: 1.375,
+    moderately_active: 1.55,
+    very_active: 1.725,
+    extremely_active: 1.9,
+  };
+  return Math.round(bmr * (multipliers[activityLevel] || 1.55));
 }
