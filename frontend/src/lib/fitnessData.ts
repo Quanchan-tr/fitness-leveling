@@ -59,12 +59,12 @@ export interface FitnessDataState {
 export const initialFitnessData: FitnessDataState = {
   user: {
     name: "Quan",
-    level: 17,
-    xp: 3240,
-    nextLevelXp: 4000,
-    str: 68,
-    end: 74,
-    mob: 58,
+    level: 50,
+    xp: 8800,
+    nextLevelXp: 10000,
+    str: 95,
+    end: 92,
+    mob: 88,
     goal: "gain_muscle",
     age: 22,
     gender: "male",

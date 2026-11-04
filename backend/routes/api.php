@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\AiController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\AvatarController;
 use App\Http\Controllers\Api\V1\BodyMetricController;
 use App\Http\Controllers\Api\V1\ExerciseController;
 use App\Http\Controllers\Api\V1\NutritionLogController;
@@ -37,6 +38,10 @@ Route::prefix('v1')->group(function () {
 
     // --- PROTECTED DOMAIN ROUTES ---
     Route::middleware(['auth:sanctum'])->group(function () {
+        // 3D Avatar & Wardrobe Customization
+        Route::get('avatar', [AvatarController::class, 'index']);
+        Route::post('avatar/equip', [AvatarController::class, 'equip']);
+
         // Exercise Contributions
         Route::post('exercises', [ExerciseController::class, 'store']);
 

@@ -5,38 +5,35 @@ import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { CharacterOutfit } from './3d/Character';
 import { UserProfile } from '@/types/dashboard.types';
+import { useAvatarStore } from '@/stores/useAvatarStore';
+import {
+  RotateCw,
+  Shirt,
+  Pencil,
+  Check,
+} from 'lucide-react';
 
-// Lazy-load heavy 3D WebGL Canvas to prevent blocking page transitions
+// Lazy-load heavy 3D WebGL Canvas
 const CharacterCanvas = dynamic(
   () => import('./3d/CharacterCanvas').then((mod) => mod.CharacterCanvas),
   {
     ssr: false,
     loading: () => (
       <div className="w-full h-full flex flex-col items-center justify-center select-none animate-pulse">
-        <div className="w-16 h-16 rounded-full bg-orange-100/70 border border-orange-200 flex items-center justify-center shadow-xs">
-          <div className="w-7 h-7 rounded-full border-2 border-[#FF5722] border-t-transparent animate-spin" />
+        <div className="w-12 h-12 rounded-full bg-orange-100/70 border border-orange-200 flex items-center justify-center shadow-xs">
+          <div className="w-6 h-6 rounded-full border-2 border-[#FF5722] border-t-transparent animate-spin" />
         </div>
-        <span className="text-[11px] font-bold text-slate-400 mt-2.5 tracking-wide">
+        <span className="text-[11px] font-bold text-slate-400 mt-2 tracking-wide">
           Đang nạp 3D Avatar...
         </span>
       </div>
     ),
   }
 );
-import {
-  RotateCw,
-  Shirt,
-  Camera,
-  Activity,
-  Zap,
-  Shield,
-  Pencil,
-  Check,
-} from 'lucide-react';
 
 interface AvatarHeroCardProps {
   user: UserProfile;
-  outfit: CharacterOutfit;
+  outfit?: CharacterOutfit;
   photoCount?: number;
   isAutoRotating: boolean;
   onToggleAutoRotate: () => void;
@@ -60,6 +57,8 @@ export const AvatarHeroCard: React.FC<AvatarHeroCardProps> = ({
   const [isEditingName, setIsEditingName] = useState(false);
   const [nameInput, setNameInput] = useState(user.name);
 
+  const { characterGender, equipped } = useAvatarStore();
+
   useEffect(() => {
     setNameInput(user.name);
   }, [user.name]);
@@ -82,7 +81,7 @@ export const AvatarHeroCard: React.FC<AvatarHeroCardProps> = ({
 
   return (
     <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm flex flex-col justify-between overflow-hidden relative">
-      {/* Card Header with Editable Character Name & Level */}
+      {/* Card Header with Name & Level */}
       <div className="p-3.5 sm:p-4 border-b border-slate-100 flex items-center justify-between z-10 bg-white">
         <div className="flex items-center gap-2">
           {isEditingName ? (
@@ -115,7 +114,7 @@ export const AvatarHeroCard: React.FC<AvatarHeroCardProps> = ({
               type="button"
               onClick={() => setIsEditingName(true)}
               className="group flex items-center gap-1.5 font-extrabold text-sm sm:text-base text-slate-900 tracking-tight hover:text-[#FF5722] transition-colors cursor-pointer text-left"
-              title="Nhấn để đổi tên nhân vật"
+              title="Nhấn để đổi tên"
             >
               <span>{user.name}</span>
               <Pencil className="w-3 h-3 text-slate-400 group-hover:text-[#FF5722] transition-colors" />
@@ -123,6 +122,9 @@ export const AvatarHeroCard: React.FC<AvatarHeroCardProps> = ({
           )}
           <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-900 text-white tabular-nums">
             Lv. {user.level}
+          </span>
+          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-orange-100 text-[#FF5722]">
+            {characterGender === 'female' ? 'Nữ' : 'Nam'}
           </span>
         </div>
 
@@ -134,7 +136,7 @@ export const AvatarHeroCard: React.FC<AvatarHeroCardProps> = ({
               ? 'bg-[#FF5722] text-white border-[#FF5722]'
               : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
           }`}
-          title={isAutoRotating ? 'Dừng xoay 360°' : 'Bật tự động xoay 360°'}
+          title={isAutoRotating ? 'Dừng xoay' : 'Tự động xoay 360°'}
         >
           <RotateCw
             className={`w-3.5 h-3.5 ${
@@ -147,28 +149,28 @@ export const AvatarHeroCard: React.FC<AvatarHeroCardProps> = ({
         </button>
       </div>
 
-      {/* 3D Character Viewport Container */}
-      <div className="relative w-full h-[250px] sm:h-[270px] bg-gradient-to-b from-slate-50/60 via-orange-50/15 to-slate-100/40 flex items-center justify-center overflow-hidden">
-        {/* Studio ambient radial glow behind pedestal */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_78%,rgba(255,87,34,0.10),transparent_60%)] pointer-events-none" />
-        {/* Subtle radial base shadow */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-44 h-8 bg-slate-400/20 rounded-full blur-md pointer-events-none" />
+      {/* 3D Character Viewport Container - Extended height to see full body head-to-toe */}
+      <div className="relative w-full h-[360px] sm:h-[400px] bg-gradient-to-b from-slate-50 via-white to-slate-100/70 flex items-center justify-center overflow-hidden">
+        {/* Soft background glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(255,87,34,0.08),transparent_70%)] pointer-events-none" />
 
-        {/* Standalone Three.js Canvas (Clicking/Dragging only rotates, does not open outfit) */}
+        {/* Standalone Three.js Canvas with Full Body Voxel Character */}
         <CharacterCanvas
           level={user.level}
+          gender={characterGender}
+          equipped={equipped}
           outfit={outfit}
           autoRotate={isAutoRotating}
         />
 
-        {/* Quick Action: Đổi Trang Phục (Sole trigger for outfit customizer) */}
-        <div className="absolute bottom-2.5 right-2.5 z-10">
+        {/* Quick Action: Phòng thay đồ */}
+        <div className="absolute bottom-3 right-3 z-10">
           <button
             onClick={onOpenOutfit}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/95 hover:bg-white text-slate-800 text-xs font-semibold border border-slate-200 shadow-xs transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/95 hover:bg-white text-slate-800 text-xs font-bold border border-slate-200 shadow-sm transition-all hover:scale-105 cursor-pointer"
           >
             <Shirt className="w-3.5 h-3.5 text-[#FF5722]" />
-            <span>Trang phục</span>
+            <span>Phòng thay đồ</span>
           </button>
         </div>
       </div>

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { MainGrid } from '@/components/layout/MainGrid';
 import { BodyMetricsModal } from '@/components/home/BodyMetricsModal';
 import { ProgressPhotoModal } from '@/components/home/ProgressPhotoModal';
-import { OutfitModal } from '@/components/home/OutfitModal';
+import { WardrobeModal } from '@/components/home/WardrobeModal';
 import { CharacterOutfit } from '@/components/home/3d/Character';
 import { initialFitnessData, MetricHistoryItem, ProgressPhotoItem } from '@/lib/fitnessData';
 import { useAuth } from '@/contexts/AuthContext';
@@ -202,11 +202,15 @@ export default function DashboardPage() {
         onDeletePhoto={handleDeletePhoto}
       />
 
-      <OutfitModal
+      <WardrobeModal
         isOpen={isOutfitModalOpen}
         onClose={() => setIsOutfitModalOpen(false)}
-        outfit={outfit}
-        onSaveOutfit={setOutfit}
+        userLevel={extraData.user.level}
+        userStats={{
+          str: extraData.user.str,
+          end: extraData.user.end,
+          mob: extraData.user.mob,
+        }}
       />
     </main>
   );

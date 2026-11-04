@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -66,5 +67,15 @@ class User extends Authenticatable
     public function poseCheckSessions(): HasMany
     {
         return $this->hasMany(PoseCheckSession::class);
+    }
+
+    public function avatarConfig(): HasOne
+    {
+        return $this->hasOne(UserAvatarConfig::class);
+    }
+
+    public function userInventories(): HasMany
+    {
+        return $this->hasMany(UserInventory::class);
     }
 }
