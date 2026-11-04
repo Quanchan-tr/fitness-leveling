@@ -1657,10 +1657,12 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   );
 
   const toggleFollowAthlete = useCallback((athleteId: string) => {
+    let delta = 0;
     setAthletes((prev) =>
       prev.map((ath) => {
         if (ath.id !== athleteId) return ath;
         const isFollowing = !ath.isFollowing;
+        delta = isFollowing ? 1 : -1;
         return {
           ...ath,
           isFollowing,
@@ -1668,6 +1670,12 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         };
       })
     );
+    if (delta !== 0) {
+      setProfile((prev) => ({
+        ...prev,
+        followingCount: Math.max(0, prev.followingCount + delta),
+      }));
+    }
   }, []);
 
   const updateProfile = useCallback((updated: Partial<UserFitnessProfile>) => {
