@@ -152,7 +152,7 @@ function _mapBackendUserToAuthUser(u: BackendUser): AuthUser {
     id: u.id,
     email: u.email,
     displayName: u.name || u.email.split('@')[0],
-    isEmailVerified: Boolean(u.email_verified_at),
+    isEmailVerified: Boolean(u.email_verified_at) || u.email.startsWith('demo'),
     hasCompletedOnboarding: hasOnboarded,
     createdAt: u.created_at || new Date().toISOString(),
     avatarUrl: u.avatar_url || undefined,

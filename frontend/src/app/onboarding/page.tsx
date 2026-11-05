@@ -437,7 +437,7 @@ export default function OnboardingPage() {
       return;
     }
     if (user.hasCompletedOnboarding) {
-      router.replace('/');
+      router.replace('/dashboard');
     }
   }, [user, router]);
 

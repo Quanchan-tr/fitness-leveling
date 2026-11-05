@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base Application Theme -->
+    <!-- Base Application Theme (Modern EdTech / Clean SaaS Design) -->
     <style name="Theme.FitTrack" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Brand Colors -->
         <item name="colorPrimary">@color/primary</item>
@@ -16,7 +16,7 @@
         <item name="android:navigationBarColor">@color/background</item>
 
         <!-- Background -->
-        <item name="android:windowBackground">@color/background</item>
+        <item name="android:windowBackground">@color/bg_screen_gray</item>
 
         <!-- CheckBox Component Style -->
         <item name="checkboxStyle">@style/Widget.FitTrack.CheckBox</item>
@@ -30,9 +30,9 @@
         <item name="buttonTint">@null</item>
     </style>
 
-    <!-- Typography Styles (Extracted from Figma FitTrack) -->
+    <!-- Typography Styles (Standardized Hierarchy) -->
     <style name="TextAppearance.FitTrack.ScreenTitle" parent="TextAppearance.MaterialComponents.Headline5">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">22sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="fontFamily">sans-serif-medium</item>
@@ -53,7 +53,7 @@
     </style>
 
     <style name="TextAppearance.FitTrack.InputOptional" parent="TextAppearance.MaterialComponents.Caption">
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">13sp</item>
         <item name="android:textColor">@color/text_muted</item>
         <item name="fontFamily">sans-serif</item>
     </style>
@@ -66,64 +66,64 @@
     </style>
 
     <style name="TextAppearance.FitTrack.Button" parent="TextAppearance.MaterialComponents.Button">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">false</item>
         <item name="fontFamily">sans-serif-medium</item>
     </style>
 
-    <!-- Component Styles -->
+    <!-- Component Styles: Buttons (Standardized 14dp radius) -->
     <style name="Widget.FitTrack.PrimaryButton" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_height">@dimen/button_height</item>
         <item name="android:backgroundTint">@color/primary</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">false</item>
-        <item name="cornerRadius">25dp</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
         <item name="elevation">0dp</item>
         <item name="android:stateListAnimator">@null</item>
     </style>
 
     <style name="Widget.FitTrack.Button.Primary" parent="Widget.MaterialComponents.Button">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_height">@dimen/button_height</item>
         <item name="android:backgroundTint">@color/primary</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textSize">15sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">false</item>
-        <item name="cornerRadius">12dp</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
         <item name="elevation">0dp</item>
         <item name="android:stateListAnimator">@null</item>
     </style>
 
     <style name="Widget.FitTrack.Button.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_height">@dimen/button_height</item>
         <item name="android:textColor">@color/text_dark</item>
         <item name="strokeColor">@color/border_card</item>
-        <item name="strokeWidth">1dp</item>
+        <item name="strokeWidth">@dimen/border_width_standard</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">false</item>
-        <item name="cornerRadius">12dp</item>
+        <item name="cornerRadius">@dimen/radius_button</item>
         <item name="elevation">0dp</item>
         <item name="android:stateListAnimator">@null</item>
     </style>
 
     <style name="Widget.FitTrack.CircleBackButton" parent="">
-        <item name="android:layout_width">40dp</item>
-        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_width">@dimen/back_button_size</item>
+        <item name="android:layout_height">@dimen/back_button_size</item>
         <item name="android:background">@drawable/bg_circle_button</item>
         <item name="android:scaleType">centerInside</item>
     </style>
 
     <style name="Widget.FitTrack.OtpInput" parent="">
-        <item name="android:layout_width">48dp</item>
-        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_width">@dimen/otp_box_size</item>
+        <item name="android:layout_height">@dimen/otp_box_size</item>
         <item name="android:background">@drawable/bg_input_field</item>
         <item name="android:gravity">center</item>
         <item name="android:inputType">number</item>

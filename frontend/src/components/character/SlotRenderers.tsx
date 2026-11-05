@@ -21,6 +21,8 @@ export function createVoxelMat(
       color={color}
       roughness={roughness}
       metalness={metalness}
+      depthTest={true}
+      depthWrite={true}
       polygonOffset={true}
       polygonOffsetFactor={offsetFactor}
       polygonOffsetUnits={offsetFactor}
@@ -46,12 +48,12 @@ export const HeadwearRenderer: React.FC<{ item: AvatarItem | null }> = ({ item }
       <group position={[0, 0.28, 0]}>
         {/* Main Beanie Dome */}
         <mesh position={[0, 0.08, 0]} castShadow>
-          <boxGeometry args={[0.43, 0.24, 0.43]} />
+          <boxGeometry args={[0.44, 0.26, 0.44]} />
           {createVoxelMat(pColor, 0.85, 0.05, -1)}
         </mesh>
         {/* Ribbed Fold-over Brim with 3D texture ridges */}
         <mesh position={[0, -0.02, 0]} castShadow>
-          <boxGeometry args={[0.45, 0.12, 0.45]} />
+          <boxGeometry args={[0.46, 0.12, 0.46]} />
           {createVoxelMat('#991B1B', 0.9, 0.05, -1)}
         </mesh>
         {/* Knitted Rib Ridges */}
@@ -113,7 +115,7 @@ export const HeadwearRenderer: React.FC<{ item: AvatarItem | null }> = ({ item }
           {createVoxelMat(pColor, 0.7, 0.1, -1)}
         </mesh>
         <mesh position={[0, 0.12, 0]} castShadow>
-          <boxGeometry args={[0.42, 0.18, 0.42]} />
+          <boxGeometry args={[0.44, 0.22, 0.44]} />
           {createVoxelMat(pColor, 0.7, 0.1, -1)}
         </mesh>
         <mesh position={[-0.02, 0.26, -0.02]} castShadow>

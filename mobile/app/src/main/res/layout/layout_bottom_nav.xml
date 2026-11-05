@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/bottom_nav_container"
     android:layout_width="match_parent"
-    android:layout_height="72dp"
-    android:background="@color/white"
-    android:elevation="8dp"
+    android:layout_height="68dp"
+    android:background="@drawable/bg_bottom_nav_bar"
+    android:elevation="0dp"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp">
+    android:paddingStart="4dp"
+    android:paddingEnd="4dp">
 
     <!-- Tab 1: Dashboard -->
     <LinearLayout
@@ -23,6 +23,15 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <!-- Active Indicator Dot (4px) -->
+        <View
+            android:id="@+id/dot_indicator_dashboard"
+            android:layout_width="@dimen/nav_dot_size"
+            android:layout_height="@dimen/nav_dot_size"
+            android:layout_marginBottom="3dp"
+            android:background="@drawable/bg_nav_dot_indicator"
+            android:visibility="invisible" />
+
         <ImageView
             android:id="@+id/iv_nav_icon_dashboard"
             android:layout_width="@dimen/nav_icon_size"
@@ -35,7 +44,7 @@
             android:id="@+id/tv_nav_label_dashboard"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="3dp"
             android:includeFontPadding="false"
             android:singleLine="true"
             android:text="@string/nav_dashboard"
@@ -55,6 +64,15 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <!-- Active Indicator Dot (4px) -->
+        <View
+            android:id="@+id/dot_indicator_workouts"
+            android:layout_width="@dimen/nav_dot_size"
+            android:layout_height="@dimen/nav_dot_size"
+            android:layout_marginBottom="3dp"
+            android:background="@drawable/bg_nav_dot_indicator"
+            android:visibility="invisible" />
+
         <ImageView
             android:id="@+id/iv_nav_icon_workouts"
             android:layout_width="@dimen/nav_icon_size"
@@ -67,7 +85,7 @@
             android:id="@+id/tv_nav_label_workouts"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="3dp"
             android:includeFontPadding="false"
             android:singleLine="true"
             android:text="@string/nav_workouts"
@@ -87,6 +105,15 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <!-- Active Indicator Dot (4px) -->
+        <View
+            android:id="@+id/dot_indicator_metrics"
+            android:layout_width="@dimen/nav_dot_size"
+            android:layout_height="@dimen/nav_dot_size"
+            android:layout_marginBottom="3dp"
+            android:background="@drawable/bg_nav_dot_indicator"
+            android:visibility="invisible" />
+
         <ImageView
             android:id="@+id/iv_nav_icon_metrics"
             android:layout_width="@dimen/nav_icon_size"
@@ -99,7 +126,7 @@
             android:id="@+id/tv_nav_label_metrics"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="3dp"
             android:includeFontPadding="false"
             android:singleLine="true"
             android:text="@string/nav_metrics"
@@ -119,6 +146,15 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <!-- Active Indicator Dot (4px) -->
+        <View
+            android:id="@+id/dot_indicator_community"
+            android:layout_width="@dimen/nav_dot_size"
+            android:layout_height="@dimen/nav_dot_size"
+            android:layout_marginBottom="3dp"
+            android:background="@drawable/bg_nav_dot_indicator"
+            android:visibility="invisible" />
+
         <ImageView
             android:id="@+id/iv_nav_icon_community"
             android:layout_width="@dimen/nav_icon_size"
@@ -131,7 +167,7 @@
             android:id="@+id/tv_nav_label_community"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="3dp"
             android:includeFontPadding="false"
             android:singleLine="true"
             android:text="@string/nav_community"
@@ -151,6 +187,15 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <!-- Active Indicator Dot (4px) -->
+        <View
+            android:id="@+id/dot_indicator_profile"
+            android:layout_width="@dimen/nav_dot_size"
+            android:layout_height="@dimen/nav_dot_size"
+            android:layout_marginBottom="3dp"
+            android:background="@drawable/bg_nav_dot_indicator"
+            android:visibility="invisible" />
+
         <ImageView
             android:id="@+id/iv_nav_icon_profile"
             android:layout_width="@dimen/nav_icon_size"
@@ -163,7 +208,7 @@
             android:id="@+id/tv_nav_label_profile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="3dp"
             android:includeFontPadding="false"
             android:singleLine="true"
             android:text="@string/nav_profile"

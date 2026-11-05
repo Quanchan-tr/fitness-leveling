@@ -29,6 +29,7 @@ class User extends Authenticatable
         'birth_date',
         'gender',
         'activity_level',
+        'email_verified_at',
         'xp',
         'level',
         'current_streak',
@@ -77,7 +78,6 @@ class User extends Authenticatable
         return $this->hasMany(PoseCheckSession::class);
     }
 
-<<<<<<< HEAD
     public function avatarConfig(): HasOne
     {
         return $this->hasOne(UserAvatarConfig::class);
@@ -86,7 +86,8 @@ class User extends Authenticatable
     public function userInventories(): HasMany
     {
         return $this->hasMany(UserInventory::class);
-=======
+    }
+
     public function workoutRoutines(): HasMany
     {
         return $this->hasMany(WorkoutRoutine::class);
@@ -100,6 +101,6 @@ class User extends Authenticatable
     public function postComments(): HasMany
     {
         return $this->hasMany(PostComment::class);
->>>>>>> a980157 (CHORE: Dọn sạch mockup data)
+
     }
 }

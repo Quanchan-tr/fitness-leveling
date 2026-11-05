@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_equipment_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:background="@drawable/bg_wardrobe_item_card"
+    android:clickable="true"
+    android:focusable="true"
+    android:padding="10dp">
+
+    <!-- Tier Rarity Badge -->
+    <TextView
+        android:id="@+id/tv_item_tier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_tag_chip"
+        android:paddingStart="6dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="2dp"
+        android:text="EPIC"
+        android:textColor="#9333EA"
+        android:textSize="8.5sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Equipped Check Badge -->
+    <TextView
+        android:id="@+id/tv_equipped_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_tag_chip"
+        android:backgroundTint="#FF5722"
+        android:paddingStart="5dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="5dp"
+        android:paddingBottom="2dp"
+        android:text="✓ Đang mặc"
+        android:textColor="@color/white"
+        android:textSize="8.5sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+    <!-- Item Icon / Preview Emoji -->
+    <TextView
+        android:id="@+id/tv_item_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bg_card_selectable"
+        android:gravity="center"
+        android:text="👕"
+        android:textSize="26sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_item_tier" />
+
+    <!-- Lock Overlay (if not unlocked) -->
+    <ImageView
+        android:id="@+id/iv_lock_status"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/bg_modal_circle_close_dark"
+        android:padding="4dp"
+        android:src="@drawable/ic_lock_solid"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_item_icon"
+        app:layout_constraintEnd_toEndOf="@+id/tv_item_icon"
+        app:tint="@color/white"
+        tools:visibility="visible" />
+
+    <!-- Item Name -->
+    <TextView
+        android:id="@+id/tv_item_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Áo Sơ Mi Caro Cam"
+        android:textColor="@color/text_dark"
+        android:textSize="11.5sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_item_icon" />
+
+    <!-- Set / Theme Name or Lock Requirement -->
+    <TextView
+        android:id="@+id/tv_item_theme"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Urban Casual"
+        android:textColor="@color/text_slate"
+        android:textSize="9.5sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_item_name" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

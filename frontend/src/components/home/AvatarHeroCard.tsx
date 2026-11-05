@@ -150,9 +150,9 @@ export const AvatarHeroCard: React.FC<AvatarHeroCardProps> = ({
       </div>
 
       {/* 3D Character Viewport Container - Extended height to see full body head-to-toe */}
-      <div className="relative w-full h-[360px] sm:h-[400px] bg-gradient-to-b from-slate-50 via-white to-slate-100/70 flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-[360px] sm:h-[400px] bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#0B0F19] border-y border-slate-800/80 flex items-center justify-center overflow-hidden">
         {/* Soft background glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(255,87,34,0.08),transparent_70%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,rgba(255,87,34,0.22),transparent_70%)] pointer-events-none" />
 
         {/* Standalone Three.js Canvas with Full Body Voxel Character */}
         <CharacterCanvas
@@ -167,7 +167,7 @@ export const AvatarHeroCard: React.FC<AvatarHeroCardProps> = ({
         <div className="absolute bottom-3 right-3 z-10">
           <button
             onClick={onOpenOutfit}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/95 hover:bg-white text-slate-800 text-xs font-bold border border-slate-200 shadow-sm transition-all hover:scale-105 cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-white text-xs font-bold border border-orange-500/40 shadow-md backdrop-blur transition-all hover:scale-105 cursor-pointer"
           >
             <Shirt className="w-3.5 h-3.5 text-[#FF5722]" />
             <span>Phòng thay đồ</span>

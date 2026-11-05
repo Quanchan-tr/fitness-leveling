@@ -3,37 +3,17 @@ package com.fittrack.app.ui.nutrition
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.fittrack.app.databinding.ActivityNutritionTrackerBinding
-import com.fittrack.app.ui.BottomNavTab
-import com.fittrack.app.ui.modal.LogMealModalActivity
-import com.fittrack.app.ui.setupBottomNav
+import com.fittrack.app.ui.metrics.BodyMetricsActivity
 
 class NutritionTrackerActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityNutritionTrackerBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityNutritionTrackerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.btnBack.setOnClickListener {
-            finish()
+        val intent = Intent(this, BodyMetricsActivity::class.java).apply {
+            putExtra("INITIAL_TAB", "NUTRITION")
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
-
-        binding.btnAddMeal.setOnClickListener {
-            startActivity(Intent(this, LogMealModalActivity::class.java))
-        }
-
-        binding.btnToMetrics.setOnClickListener {
-            startActivity(Intent(this, com.fittrack.app.ui.metrics.BodyMetricsActivity::class.java))
-            finish()
-        }
-
-        binding.btnCreateCombo.setOnClickListener {
-            startActivity(Intent(this, LogMealModalActivity::class.java))
-        }
-
-        binding.bottomNavigation.setupBottomNav(this, BottomNavTab.METRICS)
+        startActivity(intent)
+        finish()
     }
 }

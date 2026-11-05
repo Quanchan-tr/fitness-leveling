@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      /* High-Contrast Athletic Stage Background */
+      background: radial-gradient(circle at 50% 38%, #1E293B 0%, #0F172A 60%, #020617 100%);
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+    }
+    canvas {
+      display: block;
+      width: 100%; height: 100%;
+    }
+  </style>
+  <script src="three.min.js"></script>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<script>
+(function() {
+  const canvas = document.getElementById('c');
+
+  // Colors
+  let shirtColorHex = '#FF5722';
+  let shortsColorHex = '#1E293B';
+  let headbandColorHex = '#FF5722';
+  let shoeColorHex = '#FF5722';
+  let hairColorHex = '#2D1E18';
+  const skinToneHex = '#F5C8A8';
+
+  // Scene setup
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 25);
+  camera.position.set(0, -0.04, 2.75);
+
+  let targetCamY = -0.04;
+  let targetCamZ = 2.75;
+  let targetLookY = 0.0;
+  let currentLookY = 0.0;
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: true,
+    alpha: true,
+    powerPreference: 'high-performance'
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  function resize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+  window.addEventListener('resize', resize);
+
+  // High-Contrast Studio Lighting with Rim Shimmer
+  const ambientLight = new THREE.AmbientLight(0xFFFFFF, 1.30);
+  scene.add(ambientLight);
+
+  const keyLight = new THREE.DirectionalLight(0xFFFAF0, 1.65);
+  keyLight.position.set(2.5, 4.0, 3.2);
+  scene.add(keyLight);
+
+  const fillLight = new THREE.DirectionalLight(0xE0F2FE, 0.85);
+  fillLight.position.set(-2.5, 2.5, 2.0);
+  scene.add(fillLight);
+
+  const rimLight = new THREE.DirectionalLight(0xFFA07A, 2.0);
+  rimLight.position.set(0, 3.2, -2.8);
+  scene.add(rimLight);
+
+  // High-Tech Glowing Leveling Podium Under Feet
+  const podiumGroup = new THREE.Group();
+  podiumGroup.position.y = -0.78;
+  scene.add(podiumGroup);
+
+  // 1. Dark circular platform base
+  const floorMat = new THREE.MeshBasicMaterial({ color: 0x0B0F19 });
+  const floorMesh = new THREE.Mesh(new THREE.CircleGeometry(0.56, 32), floorMat);
+  floorMesh.rotation.x = -Math.PI / 2;
+  podiumGroup.add(floorMesh);
+
+  // 2. Glowing Neon Orange Energy Ring
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0xFF5722, side: THREE.DoubleSide });
+  const ringMesh = new THREE.Mesh(new THREE.RingGeometry(0.53, 0.57, 32), ringMat);
+  ringMesh.rotation.x = -Math.PI / 2;
+  ringMesh.position.y = 0.002;
+  podiumGroup.add(ringMesh);
+
+  // 3. Inner accent ring
+  const innerRingMat = new THREE.MeshBasicMaterial({ color: 0xF97316, transparent: true, opacity: 0.5, side: THREE.DoubleSide });
+  const innerRingMesh = new THREE.Mesh(new THREE.RingGeometry(0.38, 0.40, 32), innerRingMat);
+  innerRingMesh.rotation.x = -Math.PI / 2;
+  innerRingMesh.position.y = 0.003;
+  podiumGroup.add(innerRingMesh);
+
+  // Helper to create voxel material with strict depth and polygonOffset
+  function createMat(color, roughness, metalness, offset) {
+    return new THREE.MeshStandardMaterial({
+      color: color,
+      roughness: roughness !== undefined ? roughness : 0.65,
+      metalness: metalness !== undefined ? metalness : 0.1,
+      depthTest: true,
+      depthWrite: true,
+      polygonOffset: offset ? true : false,
+      polygonOffsetFactor: offset || 0,
+      polygonOffsetUnits: offset || 0
+    });
+  }
+
+  // Dynamic Materials
+  const skinMat = createMat(skinToneHex, 0.7);
+  const shirtMat = createMat(shirtColorHex, 0.6);
+  const shortsMat = createMat(shortsColorHex, 0.7);
+  const headbandMat = createMat(headbandColorHex, 0.6);
+  const shoeMat = createMat(shoeColorHex, 0.6);
+  const hairMat = createMat(hairColorHex, 0.85);
+  const whiteMat = createMat('#FFFFFF', 0.5);
+  const darkMat = createMat('#0F172A', 0.8);
+
+  // Ultra-crisp 256x256 Pixel Art Face Texture
+  function generateFaceTexture() {
+    const fCanvas = document.createElement('canvas');
+    fCanvas.width = 256;
+    fCanvas.height = 256;
+    const ctx = fCanvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+
+    // Base skin
+    ctx.fillStyle = '#F5C8A8';
+    ctx.fillRect(0, 0, 256, 256);
+
+    // Contours
+    ctx.fillStyle = '#EBB590';
+    ctx.fillRect(0, 212, 256, 44);
+    ctx.fillRect(0, 0, 16, 256);
+    ctx.fillRect(240, 0, 16, 256);
+
+    // Confident Eyebrows
+    ctx.fillStyle = '#3F1F08';
+    ctx.fillRect(32, 64, 76, 16);
+    ctx.fillRect(24, 70, 14, 12);
+    ctx.fillRect(96, 60, 14, 12);
+    ctx.fillRect(148, 64, 76, 16);
+    ctx.fillRect(218, 70, 14, 12);
+    ctx.fillRect(146, 60, 14, 12);
+
+    // Eyes Upper Lash
+    ctx.fillStyle = '#09090B';
+    ctx.fillRect(34, 88, 72, 10);
+    ctx.fillRect(150, 88, 72, 10);
+
+    // Sclera
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(36, 96, 68, 54);
+    ctx.fillRect(152, 96, 68, 54);
+
+    // Sky Blue / Cyan Anime Irises
+    ctx.fillStyle = '#0284C7';
+    ctx.fillRect(52, 102, 44, 46);
+    ctx.fillRect(160, 102, 44, 46);
+
+    ctx.fillStyle = '#38BDF8';
+    ctx.fillRect(58, 106, 32, 36);
+    ctx.fillRect(166, 106, 32, 36);
+
+    // Pupils
+    ctx.fillStyle = '#0C4A6E';
+    ctx.fillRect(66, 114, 16, 22);
+    ctx.fillRect(174, 114, 16, 22);
+
+    // Catchlight Glints
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(54, 102, 12, 14);
+    ctx.fillRect(162, 102, 12, 14);
+    ctx.fillRect(78, 126, 8, 8);
+    ctx.fillRect(186, 126, 8, 8);
+
+    // Cheek Blush Pixels
+    ctx.fillStyle = '#F472B6';
+    ctx.fillRect(24, 154, 28, 10);
+    ctx.fillRect(204, 154, 28, 10);
+
+    // Friendly Smile Line
+    ctx.fillStyle = '#9A3412';
+    ctx.fillRect(104, 186, 48, 6);
+    ctx.fillRect(98, 182, 8, 6);
+    ctx.fillRect(150, 182, 8, 6);
+
+    const tex = new THREE.CanvasTexture(fCanvas);
+    tex.magFilter = THREE.NearestFilter;
+    tex.minFilter = THREE.NearestFilter;
+    return tex;
+  }
+
+  // Character Root Group
+  const characterGroup = new THREE.Group();
+  characterGroup.position.set(0, -0.16, 0);
+  scene.add(characterGroup);
+
+  // =========================================================================
+  // ATHLETIC VOXEL NECK & TRAPEZIUS (PROMINENT, NO MISSING NECK)
+  // =========================================================================
+  // Main muscular neck bridging torso collar (y=0.33) into skull chin (y=0.47)
+  const neckMesh = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.16, 0.16), skinMat);
+  neckMesh.position.set(0, 0.40, -0.005);
+  characterGroup.add(neckMesh);
+
+  // Trapezius slope voxels
+  const trapMesh = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.14), skinMat);
+  trapMesh.position.set(0, 0.35, -0.02);
+  characterGroup.add(trapMesh);
+
+  // Head Group
+  const headGroup = new THREE.Group();
+  headGroup.position.set(0, 0.44, 0);
+  characterGroup.add(headGroup);
+
+  // 1. Head Base Box
+  const headBox = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.38, 0.38), skinMat);
+  headBox.position.set(0, 0.22, 0);
+  headGroup.add(headBox);
+
+  // 2. Face Decal Plane (With Depth Protection)
+  const facePlaneGeo = new THREE.PlaneGeometry(0.38, 0.38);
+  const facePlaneMat = new THREE.MeshStandardMaterial({
+    map: generateFaceTexture(),
+    transparent: false,
+    roughness: 0.65,
+    depthTest: true,
+    depthWrite: true,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -2
+  });
+  const facePlane = new THREE.Mesh(facePlaneGeo, facePlaneMat);
+  facePlane.position.set(0, 0.22, 0.192);
+  headGroup.add(facePlane);
+
+  // 3. 3D Voxel Nose & Ears
+  const noseMesh = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.05, 0.025), skinMat);
+  noseMesh.position.set(0, 0.205, 0.198);
+  headGroup.add(noseMesh);
+
+  const earL = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.08, 0.06), skinMat);
+  earL.position.set(-0.193, 0.22, -0.01);
+  const earR = earL.clone();
+  earR.position.x = 0.193;
+  headGroup.add(earL);
+  headGroup.add(earR);
+
+  // 4. Layered Anime Voxel Hair
+  const hairGroup = new THREE.Group();
+  // Hair Top Cap
+  const hairCap = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.12, 0.40), hairMat);
+  hairCap.position.set(0, 0.38, -0.01);
+  hairGroup.add(hairCap);
+  // Hair Back
+  const hairBack = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.32, 0.10), hairMat);
+  hairBack.position.set(0, 0.25, -0.16);
+  hairGroup.add(hairBack);
+  // Hair Sides
+  const hairSideL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.24, 0.36), hairMat);
+  hairSideL.position.set(-0.19, 0.28, 0.01);
+  const hairSideR = hairSideL.clone();
+  hairSideR.position.x = 0.19;
+  hairGroup.add(hairSideL);
+  hairGroup.add(hairSideR);
+  // Hair Front Bangs
+  const hairBangs = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.08, 0.06), hairMat);
+  hairBangs.position.set(0, 0.37, 0.18);
+  hairGroup.add(hairBangs);
+  headGroup.add(hairGroup);
+
+  // 5. Full Voxel Headwear (Mũ bao trùm cả đầu: Beanie, Cap, Helmet, Bucket)
+  const headwearGroup = new THREE.Group();
+  headGroup.add(headwearGroup);
+
+  // Main dome wrapping the entire head (top, back, and sides down to brow)
+  const hatDome = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.25, 0.44), headbandMat);
+  hatDome.position.set(0, 0.33, 0);
+  headwearGroup.add(hatDome);
+
+  // Bold fold-over ribbed brim wrapping around forehead & temples
+  const hatBrimMat = createMat(headbandColorHex, 0.7, 0.1, -1);
+  const hatBrim = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.10, 0.46), hatBrimMat);
+  hatBrim.position.set(0, 0.23, 0);
+  headwearGroup.add(hatBrim);
+
+  // Front Cap Visor / Bill
+  const hatVisor = new THREE.Mesh(new THREE.BoxGeometry(0.40, 0.025, 0.18), headbandMat);
+  hatVisor.position.set(0, 0.20, 0.28);
+  headwearGroup.add(hatVisor);
+
+  // Top Pom-pom / Metal Badge / Emblem
+  const hatPomMat = createMat('#F59E0B', 0.4, 0.6, -2);
+  const hatPom = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.08), hatPomMat);
+  hatPom.position.set(0, 0.47, 0);
+  headwearGroup.add(hatPom);
+
+  // By default, headwear is hidden until equipped
+  headwearGroup.visible = false;
+
+  // Chest / Torso Group
+  const chestGroup = new THREE.Group();
+  chestGroup.position.set(0, 0.20, 0);
+  characterGroup.add(chestGroup);
+
+  // Torso / Shirt
+  const torsoMesh = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.40, 0.22), shirtMat);
+  torsoMesh.position.set(0, -0.04, 0);
+  chestGroup.add(torsoMesh);
+
+  // Collar Accent
+  const collarMesh = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.04, 0.06), whiteMat);
+  collarMesh.position.set(0, 0.13, 0.10);
+  chestGroup.add(collarMesh);
+
+  // Arms Group
+  const leftArmGroup = new THREE.Group();
+  leftArmGroup.position.set(-0.25, 0.11, 0);
+  chestGroup.add(leftArmGroup);
+
+  const rightArmGroup = new THREE.Group();
+  rightArmGroup.position.set(0.25, 0.11, 0);
+  chestGroup.add(rightArmGroup);
+
+  // Shoulder Sleeve
+  const sleeveL = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.16, 0.15), shirtMat);
+  sleeveL.position.set(0, -0.06, 0);
+  leftArmGroup.add(sleeveL);
+  const sleeveR = sleeveL.clone();
+  rightArmGroup.add(sleeveR);
+
+  // Forearm (Skin)
+  const forearmL = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.26, 0.11), skinMat);
+  forearmL.position.set(0, -0.22, 0);
+  leftArmGroup.add(forearmL);
+  const forearmR = forearmL.clone();
+  rightArmGroup.add(forearmR);
+
+  // Wristband
+  const wristbandL = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.05, 0.12), darkMat);
+  wristbandL.position.set(0, -0.31, 0);
+  leftArmGroup.add(wristbandL);
+  const wristbandR = wristbandL.clone();
+  rightArmGroup.add(wristbandR);
+
+  // Hips & Shorts
+  const hipsMesh = new THREE.Mesh(new THREE.BoxGeometry(0.33, 0.18, 0.23), shortsMat);
+  hipsMesh.position.set(0, -0.04, 0);
+  characterGroup.add(hipsMesh);
+
+  // Legs & Shoes Group
+  const legL = new THREE.Group();
+  legL.position.set(-0.09, -0.13, 0);
+  characterGroup.add(legL);
+
+  const legR = new THREE.Group();
+  legR.position.set(0.09, -0.13, 0);
+  characterGroup.add(legR);
+
+  // Shorts Hem
+  const shortsHemL = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.12, 0.18), shortsMat);
+  shortsHemL.position.set(0, -0.02, 0);
+  legL.add(shortsHemL);
+  const shortsHemR = shortsHemL.clone();
+  legR.add(shortsHemR);
+
+  // Thigh & Calf
+  const calfL = new THREE.Mesh(new THREE.BoxGeometry(0.115, 0.34, 0.13), skinMat);
+  calfL.position.set(0, -0.22, 0);
+  legL.add(calfL);
+  const calfR = calfL.clone();
+  legR.add(calfR);
+
+  // Sneakers
+  function createSneakerMesh() {
+    const sGroup = new THREE.Group();
+    // White Sole
+    const sole = new THREE.Mesh(new THREE.BoxGeometry(0.135, 0.05, 0.23), whiteMat);
+    sole.position.set(0, -0.025, 0.025);
+    sGroup.add(sole);
+    // Upper Body
+    const upper = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.10, 0.20), shoeMat);
+    upper.position.set(0, 0.045, 0.015);
+    sGroup.add(upper);
+    // Toe Cap
+    const toe = new THREE.Mesh(new THREE.BoxGeometry(0.125, 0.06, 0.07), whiteMat);
+    toe.position.set(0, 0.02, 0.09);
+    sGroup.add(toe);
+    return sGroup;
+  }
+  const shoeMeshL = createSneakerMesh();
+  shoeMeshL.position.set(0, -0.42, 0);
+  legL.add(shoeMeshL);
+
+  const shoeMeshR = createSneakerMesh();
+  shoeMeshR.position.set(0, -0.42, 0);
+  legR.add(shoeMeshR);
+
+  // =========================================================================
+  // SPECIAL EFFECTS (CHỈ HIỂN THỊ KHI TRANG BỊ: CÁNH, BLINK SPARKLES, AURA)
+  // =========================================================================
+  const specialEffectsGroup = new THREE.Group();
+  characterGroup.add(specialEffectsGroup);
+
+  // 1. Pixel Wings (Cánh Thiên Thần / Cánh Rồng)
+  const wingsGroup = new THREE.Group();
+  wingsGroup.position.set(0, 0.24, -0.16);
+  specialEffectsGroup.add(wingsGroup);
+
+  const wingMat = new THREE.MeshStandardMaterial({
+    color: 0xFFFFFF,
+    emissive: 0xFEF08A,
+    emissiveIntensity: 0.65,
+    roughness: 0.25,
+    depthTest: true,
+    depthWrite: true
+  });
+  const wingTipMat = new THREE.MeshStandardMaterial({
+    color: 0xFDE047,
+    emissive: 0xF59E0B,
+    emissiveIntensity: 1.4,
+    depthTest: true,
+    depthWrite: true
+  });
+
+  // Left Wing Group
+  const wingLeft = new THREE.Group();
+  wingLeft.position.set(-0.10, 0, 0);
+  const wL1 = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.16, 0.03), wingMat);
+  wL1.position.set(-0.12, 0.06, 0);
+  wingLeft.add(wL1);
+  const wL2 = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.26, 0.025), wingMat);
+  wL2.position.set(-0.28, 0.18, 0);
+  wL2.rotation.z = 0.35;
+  wingLeft.add(wL2);
+  const wL3 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.025), wingTipMat);
+  wL3.position.set(-0.44, 0.32, 0);
+  wL3.rotation.z = 0.50;
+  wingLeft.add(wL3);
+  wingsGroup.add(wingLeft);
+
+  // Right Wing Group (Mirrored)
+  const wingRight = new THREE.Group();
+  wingRight.position.set(0.10, 0, 0);
+  const wR1 = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.16, 0.03), wingMat);
+  wR1.position.set(0.12, 0.06, 0);
+  wingRight.add(wR1);
+  const wR2 = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.26, 0.025), wingMat);
+  wR2.position.set(0.28, 0.18, 0);
+  wR2.rotation.z = -0.35;
+  wingRight.add(wR2);
+  const wR3 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.025), wingTipMat);
+  wR3.position.set(0.44, 0.32, 0);
+  wR3.rotation.z = -0.50;
+  wingRight.add(wR3);
+  wingsGroup.add(wingRight);
+
+  // Golden Halo above head for Angel Wings
+  const haloGroup = new THREE.Group();
+  haloGroup.position.set(0, 0.44, 0.16);
+  wingsGroup.add(haloGroup);
+  for (let i = 0; i < 8; i++) {
+    const rad = (i * Math.PI * 2) / 8;
+    const hMesh = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.025, 0.04), wingTipMat);
+    hMesh.position.set(Math.cos(rad) * 0.20, 0, Math.sin(rad) * 0.20);
+    haloGroup.add(hMesh);
+  }
+  wingsGroup.visible = false; // Hidden unless equipped!
+
+  // 2. Blink Sparkles Stars Group (Mấy hạt sao blink lấp lánh quanh người)
+  const blinkGroup = new THREE.Group();
+  specialEffectsGroup.add(blinkGroup);
+
+  const sparkleMat = new THREE.MeshStandardMaterial({
+    color: 0x38BDF8,
+    emissive: 0x00E5FF,
+    emissiveIntensity: 1.8,
+    roughness: 0.2,
+    depthTest: true,
+    depthWrite: true
+  });
+  const sparkleMeshes = [];
+  for (let i = 0; i < 20; i++) {
+    const angle = (i * Math.PI * 2) / 20;
+    const r = 0.36 + (i % 4) * 0.08;
+    const y = -0.42 + (i / 20) * 1.15;
+    const sMesh = new THREE.Mesh(new THREE.BoxGeometry(0.035, 0.035, 0.035), sparkleMat.clone());
+    sMesh.position.set(Math.cos(angle) * r, y, Math.sin(angle) * r);
+    sMesh.userData = { angle, r, baseY: y, phase: i * 0.7 };
+    blinkGroup.add(sMesh);
+    sparkleMeshes.push(sMesh);
+  }
+  blinkGroup.visible = false; // Hidden unless equipped!
+
+  // 3. Floating Aura Particles (Lửa, Khói, Hào quang)
+  const particlesGroup = new THREE.Group();
+  specialEffectsGroup.add(particlesGroup);
+
+  const particleColors = [0xFF5722, 0xF59E0B, 0x00E5FF, 0xA855F7, 0xFFFFFF];
+  const particleMeshes = [];
+
+  for (let i = 0; i < 18; i++) {
+    const angle = (i * Math.PI * 2) / 18;
+    const radius = 0.42 + (i % 3) * 0.09;
+    const y = -0.50 + (i / 18) * 1.30;
+    const size = 0.024 + (i % 3) * 0.01;
+    const col = particleColors[i % particleColors.length];
+
+    const pMat = new THREE.MeshStandardMaterial({
+      color: col,
+      emissive: col,
+      emissiveIntensity: 1.2,
+      roughness: 0.3,
+      depthTest: true,
+      depthWrite: true
+    });
+    const pMesh = new THREE.Mesh(new THREE.BoxGeometry(size, size, size), pMat);
+    pMesh.position.set(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
+    pMesh.userData = { angle, radius, baseY: y, speed: 0.8 + (i % 4) * 0.2 };
+    particlesGroup.add(pMesh);
+    particleMeshes.push(pMesh);
+  }
+  particlesGroup.visible = false; // Hidden unless equipped!
+
+  // =========================================================================
+  // Animation & Drag Interactivity
+  // =========================================================================
+  let rotationY = 0.20;
+  let targetRotationY = 0.20;
+  let autoRotate = true;
+  let isDragging = false;
+  let lastX = 0;
+
+  window.addEventListener('pointerdown', (e) => {
+    isDragging = true;
+    lastX = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
+    autoRotate = false;
+  });
+
+  window.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    const cx = e.clientX || (e.touches && e.touches[0]?.clientX) || 0;
+    const dx = cx - lastX;
+    targetRotationY += dx * 0.018;
+    lastX = cx;
+  });
+
+  window.addEventListener('pointerup', () => { isDragging = false; });
+  window.addEventListener('pointercancel', () => { isDragging = false; });
+
+  // Public Android Bridge APIs
+  window.toggleAutoRotate = function() {
+    autoRotate = !autoRotate;
+    return autoRotate;
+  };
+
+  window.zoomSlot = function(slot) {
+    if (slot === 'head' || slot === 'headwear' || slot === 'hair') {
+      targetCamY = 0.38;
+      targetCamZ = 1.65;
+      targetLookY = 0.40;
+    } else if (slot === 'top' || slot === 'shirt' || slot === 'torso') {
+      targetCamY = 0.08;
+      targetCamZ = 1.95;
+      targetLookY = 0.10;
+    } else if (slot === 'bottom' || slot === 'shorts' || slot === 'legs') {
+      targetCamY = -0.25;
+      targetCamZ = 1.95;
+      targetLookY = -0.20;
+    } else if (slot === 'shoes') {
+      targetCamY = -0.52;
+      targetCamZ = 1.60;
+      targetLookY = -0.48;
+    } else {
+      // Full
+      targetCamY = -0.04;
+      targetCamZ = 2.75;
+      targetLookY = 0.0;
+    }
+  };
+
+  window.setSpecialEffect = function(type, hexColor) {
+    if (!type || type === 'none' || type === 'null' || type === '') {
+      wingsGroup.visible = false;
+      blinkGroup.visible = false;
+      particlesGroup.visible = false;
+      return;
+    }
+    if (type === 'wings') {
+      wingsGroup.visible = true;
+      blinkGroup.visible = false;
+      particlesGroup.visible = true;
+      if (hexColor && hexColor !== '') {
+        wingMat.color.set(hexColor);
+        wingTipMat.color.set(hexColor);
+      }
+    } else if (type === 'blink' || type === 'sparkles') {
+      wingsGroup.visible = false;
+      blinkGroup.visible = true;
+      particlesGroup.visible = false;
+      if (hexColor && hexColor !== '') {
+        sparkleMeshes.forEach(s => {
+          s.material.color.set(hexColor);
+          s.material.emissive.set(hexColor);
+        });
+      }
+    } else {
+      // Aura / flame / smoke
+      wingsGroup.visible = false;
+      blinkGroup.visible = false;
+      particlesGroup.visible = true;
+      if (hexColor && hexColor !== '') {
+        particleMeshes.forEach(p => {
+          p.material.color.set(hexColor);
+          p.material.emissive.set(hexColor);
+        });
+      }
+    }
+  };
+
+  window.equipHeadwear = function(hexColor) {
+    if (!hexColor || hexColor === 'none' || hexColor === '#00000000' || hexColor === 'transparent') {
+      headwearGroup.visible = false;
+      hairCap.visible = true;
+      hairBangs.visible = true;
+    } else {
+      headwearGroup.visible = true;
+      headbandMat.color.set(hexColor);
+      hatBrimMat.color.set(hexColor);
+      // Hide top hair underneath so the hat wraps cleanly around the entire head
+      hairCap.visible = false;
+      hairBangs.visible = false;
+    }
+  };
+
+  window.setOutfit = function(shirt, shorts, headband, shoes, hair, specialType, specialColor) {
+    if (shirt) shirtMat.color.set(shirt);
+    if (shorts) shortsMat.color.set(shorts);
+    if (shoes) shoeMat.color.set(shoes);
+    if (hair) hairMat.color.set(hair);
+    window.equipHeadwear(headband);
+    window.setSpecialEffect(specialType, specialColor);
+  };
+
+  window.equipItem = function(slot, hexColor, type) {
+    if (slot === 'top') shirtMat.color.set(hexColor);
+    else if (slot === 'bottom') shortsMat.color.set(hexColor);
+    else if (slot === 'head' || slot === 'headwear') window.equipHeadwear(hexColor);
+    else if (slot === 'shoes') shoeMat.color.set(hexColor);
+    else if (slot === 'hair') hairMat.color.set(hexColor);
+    else if (slot === 'special') window.setSpecialEffect(type || 'aura', hexColor);
+  };
+
+  // Main Render Loop
+  const clock = new THREE.Clock();
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    const delta = clock.getDelta();
+    const t = clock.getElapsedTime();
+
+    // Auto rotate
+    if (autoRotate && !isDragging) {
+      targetRotationY += delta * 0.65;
+    }
+
+    // Smooth rotation interpolation
+    rotationY += (targetRotationY - rotationY) * 0.12;
+    characterGroup.rotation.y = rotationY;
+
+    // Smooth camera zoom interpolation
+    camera.position.y += (targetCamY - camera.position.y) * 0.08;
+    camera.position.z += (targetCamZ - camera.position.z) * 0.08;
+    currentLookY += (targetLookY - currentLookY) * 0.08;
+    camera.lookAt(0, currentLookY, 0);
+
+    // Subtle living breathing motion
+    const breath = Math.sin(t * 1.8);
+    chestGroup.position.y = 0.20 + breath * 0.012;
+    chestGroup.scale.set(1 + breath * 0.012, 1 + breath * 0.010, 1 + breath * 0.012);
+    headGroup.position.y = 0.44 + breath * 0.012;
+    headGroup.rotation.x = Math.sin(t * 1.2) * 0.018;
+
+    // Synchronize neck and trapezius smoothly with breath
+    neckMesh.position.y = 0.40 + breath * 0.012;
+    trapMesh.position.y = 0.35 + breath * 0.012;
+
+    leftArmGroup.rotation.x = -0.04 + Math.sin(t * 1.8 + 0.3) * 0.015;
+    leftArmGroup.rotation.z = 0.06 + Math.cos(t * 1.5) * 0.010;
+    rightArmGroup.rotation.x = -0.04 - Math.sin(t * 1.8 + 0.3) * 0.015;
+    rightArmGroup.rotation.z = -0.06 - Math.cos(t * 1.5) * 0.010;
+
+    // Flapping Wings Animation (When Equipped)
+    if (wingsGroup.visible) {
+      wingLeft.rotation.y = -0.20 + Math.sin(t * 3.5) * 0.28;
+      wingLeft.rotation.z = Math.cos(t * 3.5) * 0.08;
+      wingRight.rotation.y = 0.20 - Math.sin(t * 3.5) * 0.28;
+      wingRight.rotation.z = -Math.cos(t * 3.5) * 0.08;
+      wingsGroup.position.y = 0.24 + Math.sin(t * 2.0) * 0.02;
+      haloGroup.rotation.y = t * 1.2;
+    }
+
+    // Twinkling Blink Sparkles Animation (When Equipped)
+    if (blinkGroup.visible) {
+      blinkGroup.rotation.y = t * 0.75;
+      sparkleMeshes.forEach((s) => {
+        const scale = 0.35 + 0.65 * Math.sin(t * 6.0 + s.userData.phase);
+        s.scale.set(scale, scale, scale);
+      });
+    }
+
+    // Particle Swarm Rotation (When Equipped)
+    if (particlesGroup.visible) {
+      particlesGroup.rotation.y = t * 0.45;
+      particleMeshes.forEach((p, idx) => {
+        p.position.y = p.userData.baseY + Math.sin(t * p.userData.speed + idx) * 0.04;
+      });
+    }
+
+    // Pulse inner ring
+    innerRingMesh.scale.setScalar(1 + Math.sin(t * 2.2) * 0.04);
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+})();
+</script>
+</body>
+</html>
