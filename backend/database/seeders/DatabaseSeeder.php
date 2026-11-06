@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
                 'birth_date' => '1998-05-15',
                 'gender' => 'male',
                 'activity_level' => 'very_active',
+                'email_verified_at' => now(),
             ]
         );
 
@@ -39,6 +40,10 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role' => 'user',
                 'gender' => 'female',
+                'weight_kg' => 60.0,
+                'height_cm' => 165.0,
+                'birth_date' => '2000-01-01',
+                'email_verified_at' => now(),
             ]
         );
 

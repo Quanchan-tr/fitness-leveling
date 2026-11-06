@@ -1,57 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand Primary Colors (Extracted from Figma FitTrack) -->
+    <!-- Brand Primary Colors (FitTrack Core Brand) -->
     <color name="primary">#FF5722</color>
     <color name="primary_variant">#E64A19</color>
     <color name="primary_light">#FFEBE5</color>
+    <color name="primary_soft">#FFF5F2</color>
     <color name="primary_blue">#2563EB</color>
-    <color name="nav_active">#FF7A00</color>
-    <color name="nav_inactive">#8E8E93</color>
-    <color name="border_gray">#CBD5E1</color>
+    <color name="primary_blue_dark">#1D4ED8</color>
+    <color name="primary_blue_soft">#EFF6FF</color>
     <color name="on_primary">#FFFFFF</color>
 
-    <!-- Backgrounds -->
+    <!-- Modern EdTech / Premium SaaS Surface & Backgrounds -->
     <color name="background">#FFFFFF</color>
     <color name="surface">#FFFFFF</color>
-    <color name="circle_button_bg">#F4F7FF</color>
+    <color name="bg_screen_gray">#F1F5F9</color>
+    <color name="surface_secondary">#F8FAFC</color>
+    <color name="surface_tertiary">#F1F5F9</color>
+    <color name="circle_button_bg">#F8FAFC</color>
 
-    <!-- Text Colors -->
-    <color name="text_primary">#191D23</color>
-    <color name="text_secondary">#6C6F72</color>
-    <color name="text_muted">#717D96</color>
-    <color name="text_placeholder">#BABABA</color>
-    <color name="text_link">#1443C3</color>
+    <!-- Navigation System Tokens -->
+    <color name="nav_active">#FF5722</color>
+    <color name="nav_inactive">#94A3B8</color>
+    <color name="nav_border_top">#E2E8F0</color>
 
-    <!-- Borders & Dividers -->
-    <color name="border_default">#CBD2E0</color>
-    <color name="border_focused">#FF5722</color>
-    <color name="divider">#DADADA</color>
+    <!-- Typography / Text Colors -->
+    <color name="text_primary">#0F172A</color>
+    <color name="text_dark">#0F172A</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="text_slate">#64748B</color>
+    <color name="text_muted">#94A3B8</color>
+    <color name="text_slate_light">#94A3B8</color>
+    <color name="slate_200">#E2E8F0</color>
+    <color name="text_placeholder">#94A3B8</color>
+    <color name="text_link">#2563EB</color>
 
-    <!-- State & Functional Colors -->
-    <color name="success">#2CB629</color>
-    <color name="error">#EA2A2A</color>
-    <color name="checkbox_checked">#59CDBE</color>
-
-    <!-- Onboarding & Cards -->
-    <color name="card_selected_bg">#FFF5F2</color>
+    <!-- Borders & Dividers (Standard 1px #E2E8F0) -->
     <color name="border_card">#E2E8F0</color>
+    <color name="border_default">#E2E8F0</color>
+    <color name="border_subtle">#F1F5F9</color>
+    <color name="border_gray">#E2E8F0</color>
+    <color name="border_focused">#FF5722</color>
+    <color name="divider">#E2E8F0</color>
+
+    <!-- State & Feedback Tokens (Pastel backgrounds + vivid indicators) -->
+    <color name="success">#16A34A</color>
+    <color name="success_bg">#F0FDF4</color>
+    <color name="error">#EF4444</color>
+    <color name="error_bg">#FEF2F2</color>
+    <color name="warning">#F97316</color>
+    <color name="warning_bg">#FFF7ED</color>
+    <color name="info">#2563EB</color>
+    <color name="info_bg">#EFF6FF</color>
+    <color name="checkbox_checked">#FF5722</color>
+
+    <!-- Badges & Indicators -->
+    <color name="badge_bg">#0F172A</color>
+    <color name="badge_streak_bg">#FFF7ED</color>
+    <color name="badge_streak_text">#F97316</color>
+    <color name="badge_streak_gradient_start">#FF5722</color>
+    <color name="badge_streak_gradient_end">#FF8A65</color>
+    <color name="card_selected_bg">#FFF5F2</color>
     <color name="segment_bg">#F1F5F9</color>
+
+    <!-- Vibrant Gradient & Fitness Vital Accents -->
+    <color name="gradient_cta_start">#FF5722</color>
+    <color name="gradient_cta_end">#FF3D00</color>
+    <color name="header_accent_glow">#FFF5F0</color>
+    <color name="card_vitals_water_bg">#F0F9FF</color>
+    <color name="card_vitals_water_text">#0284C7</color>
+    <color name="card_vitals_sleep_bg">#FAF5FF</color>
+    <color name="card_vitals_sleep_text">#9333EA</color>
+    <color name="card_vitals_steps_bg">#F0FDF4</color>
+    <color name="card_vitals_steps_text">#16A34A</color>
+    <color name="rpg_str_bg">#FEE2E2</color>
+    <color name="rpg_str_text">#DC2626</color>
+    <color name="rpg_end_bg">#D1FAE5</color>
+    <color name="rpg_end_text">#059669</color>
+    <color name="rpg_agi_bg">#DBEAFE</color>
+    <color name="rpg_agi_text">#2563EB</color>
+    <color name="gold_badge">#F59E0B</color>
+    <color name="gold_badge_bg">#FEF3C7</color>
+    <color name="blue_badge_bg">#DBEAFE</color>
+    <color name="blue_badge_text">#1D4ED8</color>
     <color name="segment_selected_bg">#FFFFFF</color>
     <color name="indicator_bg">#E2E8F0</color>
     <color name="indicator_active">#FF5722</color>
-
-    <!-- Core App Dashboard & Features -->
-    <color name="bg_screen_gray">#F8FAFC</color>
-    <color name="text_dark">#0F172A</color>
-    <color name="text_slate">#475569</color>
-    <color name="text_slate_light">#94A3B8</color>
-    <color name="badge_bg">#0F172A</color>
-    <color name="badge_streak_bg">#FFF7ED</color>
-    <color name="badge_streak_text">#EA580C</color>
     <color name="live_dark">#0F172A</color>
     <color name="live_green">#16A34A</color>
 
-    <!-- Modal & Popup Color Tokens (Figma FitTrack) -->
+    <!-- Modal & Popup Color Tokens -->
     <color name="modal_overlay">#8A000000</color>
     <color name="modal_quest_green_bg">#F0FDF4</color>
     <color name="modal_quest_badge_bg">#DCFCE7</color>
@@ -67,9 +104,13 @@
     <color name="modal_chip_orange_light">#FFF1E5</color>
     <color name="modal_chip_gray_text">#64748B</color>
 
+    <!-- Skeleton Shimmer Tokens -->
+    <color name="skeleton_base">#E2E8F0</color>
+    <color name="skeleton_highlight">#F8FAFC</color>
+
     <!-- Common -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="icon_tint">#292D32</color>
+    <color name="icon_tint">#0F172A</color>
     <color name="transparent">#00000000</color>
 </resources>

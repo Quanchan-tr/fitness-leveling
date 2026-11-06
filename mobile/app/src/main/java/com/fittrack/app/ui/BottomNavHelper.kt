@@ -2,6 +2,7 @@ package com.fittrack.app.ui
 
 import android.content.Intent
 import android.graphics.Typeface
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.fittrack.app.R
@@ -28,21 +29,23 @@ fun LayoutBottomNavBinding.setupBottomNav(
     val inactiveColor = ContextCompat.getColor(activity, R.color.nav_inactive)
 
     fun applyTabStyle(
+        dotIndicator: View,
         icon: android.widget.ImageView,
         label: android.widget.TextView,
         isActive: Boolean
     ) {
         val color = if (isActive) activeColor else inactiveColor
+        dotIndicator.visibility = if (isActive) View.VISIBLE else View.INVISIBLE
         icon.setColorFilter(color)
         label.setTextColor(color)
         label.typeface = if (isActive) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
     }
 
-    applyTabStyle(ivNavIconDashboard, tvNavLabelDashboard, activeTab == BottomNavTab.DASHBOARD)
-    applyTabStyle(ivNavIconWorkouts, tvNavLabelWorkouts, activeTab == BottomNavTab.WORKOUTS)
-    applyTabStyle(ivNavIconMetrics, tvNavLabelMetrics, activeTab == BottomNavTab.METRICS)
-    applyTabStyle(ivNavIconCommunity, tvNavLabelCommunity, activeTab == BottomNavTab.COMMUNITY)
-    applyTabStyle(ivNavIconProfile, tvNavLabelProfile, activeTab == BottomNavTab.PROFILE)
+    applyTabStyle(dotIndicatorDashboard, ivNavIconDashboard, tvNavLabelDashboard, activeTab == BottomNavTab.DASHBOARD)
+    applyTabStyle(dotIndicatorWorkouts, ivNavIconWorkouts, tvNavLabelWorkouts, activeTab == BottomNavTab.WORKOUTS)
+    applyTabStyle(dotIndicatorMetrics, ivNavIconMetrics, tvNavLabelMetrics, activeTab == BottomNavTab.METRICS)
+    applyTabStyle(dotIndicatorCommunity, ivNavIconCommunity, tvNavLabelCommunity, activeTab == BottomNavTab.COMMUNITY)
+    applyTabStyle(dotIndicatorProfile, ivNavIconProfile, tvNavLabelProfile, activeTab == BottomNavTab.PROFILE)
 
     fun navigateTo(targetClass: Class<*>, targetTab: BottomNavTab) {
         if (activeTab == targetTab) return

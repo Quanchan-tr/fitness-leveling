@@ -7,16 +7,17 @@
     android:background="@color/bg_screen_gray"
     tools:context=".ui.dashboard.DashboardActivity">
 
-    <!-- Top App Bar / Header -->
+    <!-- Top App Bar / Header (Modern SaaS Partitioned Top Bar) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_header"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@drawable/bg_top_header_bar"
+        android:elevation="0dp"
         android:paddingStart="@dimen/screen_padding_horizontal"
         android:paddingTop="44dp"
         android:paddingEnd="@dimen/screen_padding_horizontal"
-        android:paddingBottom="12dp"
+        android:paddingBottom="14dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -31,17 +32,23 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <!-- Top-Left User Avatar (Direct Access to Profile) -->
             <ImageView
-                android:layout_width="@dimen/icon_size_medium"
-                android:layout_height="@dimen/icon_size_medium"
-                android:contentDescription="@string/dashboard_app_title"
-                app:srcCompat="@drawable/ic_flame_solid"
+                android:id="@+id/iv_header_avatar"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:background="@drawable/bg_avatar_circle_border"
+                android:clickable="true"
+                android:contentDescription="@string/profile_title"
+                android:focusable="true"
+                android:padding="6dp"
+                app:srcCompat="@drawable/ic_user_solid"
                 app:tint="@color/primary" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="10dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -50,15 +57,16 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dashboard_app_title"
                     android:textColor="@color/text_dark"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:letterSpacing="0.04"
                     android:text="@string/dashboard_command_center"
                     android:textColor="@color/primary"
-                    android:textSize="9sp"
+                    android:textSize="9.5sp"
                     android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
@@ -79,9 +87,9 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_badge_streak"
                 android:paddingStart="12dp"
-                android:paddingTop="4dp"
+                android:paddingTop="5dp"
                 android:paddingEnd="12dp"
-                android:paddingBottom="4dp"
+                android:paddingBottom="5dp"
                 android:text="@string/dashboard_streak"
                 android:textColor="@color/badge_streak_text"
                 android:textSize="12sp"
@@ -124,24 +132,29 @@
             android:paddingBottom="24dp">
 
             <!-- Top Action Banner: Vào buổi tập ngay -->
+            <!-- Top Action Banner: Vào buổi tập ngay (Vibrant Gradient CTA) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_enter_workout_now"
-                style="@style/Widget.FitTrack.PrimaryButton"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="52dp"
                 android:layout_marginBottom="16dp"
-                android:text="@string/dashboard_enter_workout_banner"
+                android:background="@drawable/bg_gradient_workout_cta"
+                app:backgroundTint="@null"
+                android:text="⚡ VÀO BUỔI TẬP HÔM NAY"
+                android:textColor="@color/white"
                 android:textAllCaps="false"
-                android:textSize="14sp"
-                app:cornerRadius="12dp" />
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:cornerRadius="@dimen/radius_button"
+                app:elevation="2dp" />
 
-            <!-- Card 1: Avatar RPG Card -->
+            <!-- Card 1: Avatar RPG Card (Modern SaaS Surface) -->
             <LinearLayout
                 android:id="@+id/card_avatar_rpg"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_card_white"
-                android:elevation="2dp"
+                android:elevation="0dp"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -194,54 +207,77 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_tag_chip"
-                            android:paddingStart="8dp"
-                            android:paddingTop="4dp"
-                            android:paddingEnd="8dp"
-                            android:paddingBottom="4dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:paddingStart="10dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="5dp"
                             android:text="@string/dashboard_rotate_avatar"
-                            android:textColor="@color/text_slate"
-                            android:textSize="11sp" />
+                            android:textColor="@color/primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/btn_outfit_avatar"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
-                            android:background="@drawable/bg_tag_chip"
-                            android:paddingStart="8dp"
-                            android:paddingTop="4dp"
-                            android:paddingEnd="8dp"
-                            android:paddingBottom="4dp"
+                            android:background="@drawable/bg_badge_streak"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:paddingStart="10dp"
+                            android:paddingTop="5dp"
+                            android:paddingEnd="10dp"
+                            android:paddingBottom="5dp"
                             android:text="@string/dashboard_outfit_avatar"
                             android:textColor="@color/badge_streak_text"
-                            android:textSize="11sp" />
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <!-- Center 3D Avatar Frame -->
+                <!-- Center 3D Avatar Frame with Hardware-Accelerated Canvas (Prominent Half-Screen Hero Stage) -->
                 <FrameLayout
+                    android:id="@+id/fl_character_frame"
                     android:layout_width="match_parent"
-                    android:layout_height="140dp"
+                    android:layout_height="320dp"
                     android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_tag_chip">
+                    android:background="@drawable/bg_3d_stage"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <WebView
+                        android:id="@+id/webview_3d_character"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
 
                     <ImageView
                         android:id="@+id/tv_avatar_placeholder"
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:layout_gravity="center"
+                        android:visibility="gone"
                         android:contentDescription="@string/dashboard_avatar_subtitle"
                         app:srcCompat="@drawable/ic_user_solid"
                         app:tint="@color/primary" />
 
+                    <!-- Tap to expand full-screen hint badge -->
                     <TextView
+                        android:id="@+id/btn_expand_character"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|center_horizontal"
-                        android:layout_marginBottom="8dp"
-                        android:text="@string/dashboard_avatar_subtitle"
-                        android:textColor="@color/text_slate_light"
-                        android:textSize="10sp" />
+                        android:layout_gravity="bottom|end"
+                        android:layout_margin="10dp"
+                        android:background="@drawable/bg_badge_streak"
+                        android:paddingStart="10dp"
+                        android:paddingTop="4dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="4dp"
+                        android:text="⛶ Toàn màn hình"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
                 </FrameLayout>
 
                 <!-- Level Progress -->
@@ -293,7 +329,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_card_white"
-                android:elevation="2dp"
+                android:elevation="0dp"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -302,7 +338,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dashboard_today_focus_title"
                     android:textColor="@color/text_slate_light"
-                    android:textSize="10sp"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -373,9 +409,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/bg_tag_chip"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp"
                         android:text="@string/dashboard_exercise_1_tag"
                         android:textColor="@color/primary"
-                        android:textSize="9sp"
+                        android:textSize="10sp"
                         android:textStyle="bold" />
 
                     <LinearLayout
@@ -410,9 +451,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/bg_tag_chip"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp"
                         android:text="@string/dashboard_exercise_2_tag"
                         android:textColor="@color/primary"
-                        android:textSize="9sp"
+                        android:textSize="10sp"
                         android:textStyle="bold" />
 
                     <LinearLayout
@@ -447,9 +493,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/bg_tag_chip"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp"
                         android:text="@string/dashboard_exercise_3_tag"
                         android:textColor="@color/primary"
-                        android:textSize="9sp"
+                        android:textSize="10sp"
                         android:textStyle="bold" />
 
                     <LinearLayout
@@ -475,13 +526,13 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Tip Hint Box -->
+                <!-- Tip Hint Box (Pastel Light Background) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_tag_chip"
-                    android:padding="10dp"
+                    android:background="@drawable/bg_card_selectable"
+                    android:padding="12dp"
                     android:orientation="horizontal">
 
                     <TextView
@@ -494,7 +545,7 @@
 
             </LinearLayout>
 
-            <!-- Card 3 & 4: Energy & Water Side-by-Side Row -->
+            <!-- Card 3 & 4: Energy & Water Side-by-Side Row (2-Column Grid) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -507,9 +558,9 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@drawable/bg_card_white"
-                    android:elevation="2dp"
+                    android:elevation="0dp"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="14dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -525,7 +576,7 @@
                         android:layout_marginTop="4dp"
                         android:text="@string/dashboard_energy_val"
                         android:textColor="@color/text_dark"
-                        android:textSize="16sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -550,12 +601,12 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginStart="12dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_card_white"
-                    android:elevation="2dp"
+                    android:elevation="0dp"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="14dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -571,7 +622,7 @@
                         android:layout_marginTop="4dp"
                         android:text="@string/dashboard_water_val"
                         android:textColor="@color/text_dark"
-                        android:textSize="16sp"
+                        android:textSize="18sp"
                         android:textStyle="bold" />
 
                     <ProgressBar
@@ -585,7 +636,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="8dp"
                         android:orientation="horizontal">
 
                         <TextView
@@ -595,8 +646,8 @@
                             android:layout_weight="1"
                             android:background="@drawable/bg_tag_chip"
                             android:gravity="center"
-                            android:paddingTop="3dp"
-                            android:paddingBottom="3dp"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
                             android:text="@string/dashboard_water_add_250"
                             android:textColor="@color/primary_blue"
                             android:textSize="10sp"
@@ -610,8 +661,8 @@
                             android:layout_weight="1"
                             android:background="@drawable/bg_tag_chip"
                             android:gravity="center"
-                            android:paddingTop="3dp"
-                            android:paddingBottom="3dp"
+                            android:paddingTop="5dp"
+                            android:paddingBottom="5dp"
                             android:text="@string/dashboard_water_add_500"
                             android:textColor="@color/primary_blue"
                             android:textSize="10sp"
@@ -620,7 +671,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Card 5: Daily Quests Sticky Entry Banner -->
+            <!-- Card 5: Daily Quests Sticky Entry Banner (Soft Pastel Warning Surface) -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/btn_open_daily_quests"
                 android:layout_width="match_parent"
@@ -628,9 +679,9 @@
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_badge_streak"
                 android:clickable="true"
-                android:elevation="1dp"
+                android:elevation="0dp"
                 android:focusable="true"
-                android:padding="12dp">
+                android:padding="14dp">
 
                 <TextView
                     android:id="@+id/tv_quest_target_icon"
@@ -649,7 +700,7 @@
                     android:layout_marginEnd="8dp"
                     android:text="@string/dashboard_daily_quest_banner"
                     android:textColor="@color/badge_streak_text"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tv_quest_action"
@@ -662,7 +713,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/dashboard_daily_quest_action"
                     android:textColor="@color/primary"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -672,7 +723,83 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- Floating Active Workout Bar (Live Mini Player) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_floating_workout"
+        android:layout_width="0dp"
+        android:layout_height="52dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_primary_button"
+        android:backgroundTint="@color/live_dark"
+        android:clickable="true"
+        android:elevation="6dp"
+        android:focusable="true"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_floating_pulse"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:background="@drawable/bg_badge_streak"
+            android:contentDescription="@string/dashboard_workout_name"
+            android:padding="5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_dumbbell_solid"
+            app:tint="@color/primary" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tv_floating_continue"
+            app:layout_constraintStart_toEndOf="@+id/iv_floating_pulse"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Buổi tập đang diễn ra • 24:15"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ngực &amp; Tay Sau Cắt Nét"
+                android:textColor="@color/primary_light"
+                android:textSize="10.5sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_floating_continue"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:background="@drawable/bg_primary_button"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="Tiếp tục ›"
+            android:textColor="@color/white"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Bottom Navigation Bar (Preserved 100% IDs & Action) -->
     <include
         android:id="@+id/bottom_navigation"
         layout="@layout/layout_bottom_nav"

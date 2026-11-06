@@ -7,16 +7,16 @@
     android:background="@color/bg_screen_gray"
     tools:context=".ui.pose.AiPoseCoachActivity">
 
-    <!-- Top App Bar / Header -->
+    <!-- Top App Bar / Header (Partitioned) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_header"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@drawable/bg_top_header_bar"
         android:paddingStart="@dimen/screen_padding_horizontal"
         android:paddingTop="44dp"
         android:paddingEnd="@dimen/screen_padding_horizontal"
-        android:paddingBottom="12dp"
+        android:paddingBottom="14dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -74,7 +74,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_card_dark"
-                android:elevation="4dp"
+                android:elevation="0dp"
                 android:orientation="vertical"
                 android:padding="20dp">
 
@@ -120,7 +120,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_card_white"
-                android:elevation="2dp"
+                android:elevation="0dp"
                 android:orientation="vertical"
                 android:padding="16dp">
 

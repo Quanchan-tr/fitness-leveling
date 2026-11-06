@@ -7,41 +7,60 @@
     android:background="@color/bg_screen_gray"
     tools:context=".ui.metrics.BodyMetricsActivity">
 
-    <!-- Top App Bar / Header -->
+    <!-- Top App Bar / Header (Modern SaaS Partitioned Top Bar) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_header"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@drawable/bg_top_header_bar"
         android:paddingStart="@dimen/screen_padding_horizontal"
         android:paddingTop="44dp"
         android:paddingEnd="@dimen/screen_padding_horizontal"
-        android:paddingBottom="12dp"
+        android:paddingBottom="14dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/metrics_title"
-            android:textColor="@color/text_dark"
-            android:textSize="17sp"
-            android:textStyle="bold"
+            android:layout_marginEnd="12dp"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_log_metrics"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/metrics_title"
+                android:textColor="@color/text_dark"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_subtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/metrics_subtitle"
+                android:textColor="@color/text_slate"
+                android:textSize="11sp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/btn_log_metrics"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_primary_button"
-            android:paddingStart="12dp"
-            android:paddingTop="6dp"
-            android:paddingEnd="12dp"
-            android:paddingBottom="6dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingStart="14dp"
+            android:paddingTop="7dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="7dp"
             android:text="@string/btn_log_metrics"
             android:textColor="@color/white"
             android:textSize="12sp"
@@ -51,12 +70,13 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Sub-tab Bar -->
+    <!-- Sub-tab Segmented Bar (Unified Tab Bar) -->
     <LinearLayout
         android:id="@+id/layout_sub_tabs"
         android:layout_width="0dp"
-        android:layout_height="44dp"
-        android:background="@color/white"
+        android:layout_height="48dp"
+        android:background="@drawable/bg_top_header_bar"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="@dimen/screen_padding_horizontal"
         android:paddingEnd="@dimen/screen_padding_horizontal"
@@ -65,30 +85,39 @@
         app:layout_constraintTop_toBottomOf="@id/layout_header">
 
         <TextView
+            android:id="@+id/tab_body_metrics"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_subtab_pill_active"
+            android:clickable="true"
+            android:focusable="true"
             android:gravity="center"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
             android:text="@string/tab_body_metrics"
-            android:textColor="@color/primary"
-            android:textSize="13sp"
+            android:textColor="@color/white"
+            android:textSize="12sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/btn_to_nutrition"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginStart="24dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_height="32dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/bg_subtab_pill_inactive"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:text="@string/tab_nutrition_shortcut"
-            android:textColor="@color/text_slate"
-            android:textSize="13sp" />
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:text="@string/tab_nutrition_tab"
+            android:textColor="@color/text_dark"
+            android:textSize="12sp" />
     </LinearLayout>
 
-    <!-- Scrollable Content -->
+    <!-- Scrollable Body Metrics Content -->
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_body_metrics"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
@@ -119,7 +148,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="@drawable/bg_card_white"
-                    android:elevation="2dp"
+                    android:elevation="0dp"
                     android:orientation="vertical"
                     android:padding="12dp">
 
@@ -136,8 +165,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="@string/metric_weight_val"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
+                        android:textColor="@color/primary"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -146,7 +175,8 @@
                         android:layout_marginTop="2dp"
                         android:text="@string/metric_weight_diff"
                         android:textColor="@color/live_green"
-                        android:textSize="10sp" />
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <!-- BMI -->
@@ -156,7 +186,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_card_white"
-                    android:elevation="2dp"
+                    android:elevation="0dp"
                     android:orientation="vertical"
                     android:padding="12dp">
 
@@ -173,8 +203,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="@string/metric_bmi_val"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
+                        android:textColor="@color/primary_blue"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -182,8 +212,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="@string/metric_bmi_desc"
-                        android:textColor="@color/primary"
-                        android:textSize="10sp" />
+                        android:textColor="@color/primary_blue"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <!-- Body Fat -->
@@ -193,7 +224,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_card_white"
-                    android:elevation="2dp"
+                    android:elevation="0dp"
                     android:orientation="vertical"
                     android:padding="12dp">
 
@@ -210,8 +241,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:text="@string/metric_fat_val"
-                        android:textColor="@color/text_dark"
-                        android:textSize="16sp"
+                        android:textColor="@color/warning"
+                        android:textSize="17sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -220,7 +251,8 @@
                         android:layout_marginTop="2dp"
                         android:text="@string/metric_fat_diff"
                         android:textColor="@color/live_green"
-                        android:textSize="10sp" />
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -230,7 +262,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_card_white"
-                android:elevation="2dp"
+                android:elevation="0dp"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -290,7 +322,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_card_white"
-                android:elevation="2dp"
+                android:elevation="0dp"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -440,7 +472,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/bg_card_white"
-                android:elevation="2dp"
+                android:elevation="0dp"
                 android:orientation="vertical"
                 android:padding="16dp">
 
@@ -503,6 +535,442 @@
                         android:textColor="@color/text_slate"
                         android:textSize="11sp" />
                 </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Scrollable Nutrition Content (Toggled seamlessly inside tab) -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll_nutrition"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_sub_tabs">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/screen_padding_horizontal"
+            android:paddingTop="16dp"
+            android:paddingEnd="@dimen/screen_padding_horizontal"
+            android:paddingBottom="24dp">
+
+            <!-- Portion Multiplier Slider Card (Interactive) -->
+            <LinearLayout
+                android:id="@+id/card_portion_slider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_white"
+                android:elevation="0dp"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Thanh trượt điều chỉnh khẩu phần"
+                        android:textColor="@color/text_dark"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_portion_percent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_tag_chip"
+                        android:paddingStart="8dp"
+                        android:paddingTop="3dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="3dp"
+                        android:text="100% (Chuẩn)"
+                        android:textColor="@color/primary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Kéo thanh trượt để tự động tính toán lại mức Calo và Macro phù hợp"
+                    android:textColor="@color/text_slate"
+                    android:textSize="11sp" />
+
+                <SeekBar
+                    android:id="@+id/slider_portion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:max="150"
+                    android:min="50"
+                    android:progress="100"
+                    android:progressTint="@color/primary"
+                    android:thumbTint="@color/primary" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="50% (Ít calo)"
+                        android:textColor="@color/text_slate_light"
+                        android:textSize="10sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="100% (Mục tiêu)"
+                        android:textColor="@color/text_slate"
+                        android:textSize="10sp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:text="150% (Xả cơ)"
+                        android:textColor="@color/text_slate_light"
+                        android:textSize="10sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Calorie & Macros Target Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_card_white"
+                android:elevation="0dp"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nutrition_target_calories_title"
+                    android:textColor="@color/text_slate_light"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_calorie_goal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/nutrition_target_calories_val"
+                    android:textColor="@color/primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <!-- Macros Breakdown -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_protein_macro"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nutrition_macro_protein"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11sp" />
+
+                    <ProgressBar
+                        android:id="@+id/pb_protein"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="6dp"
+                        android:layout_marginTop="4dp"
+                        android:max="160"
+                        android:progress="135"
+                        android:progressTint="@color/primary" />
+
+                    <TextView
+                        android:id="@+id/tv_carb_macro"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/nutrition_macro_carb"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11sp" />
+
+                    <ProgressBar
+                        android:id="@+id/pb_carb"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="6dp"
+                        android:layout_marginTop="4dp"
+                        android:max="240"
+                        android:progress="180"
+                        android:progressTint="@color/primary_blue" />
+
+                    <TextView
+                        android:id="@+id/tv_fat_macro"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/nutrition_macro_fat"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11sp" />
+
+                    <ProgressBar
+                        android:id="@+id/pb_fat"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="6dp"
+                        android:layout_marginTop="4dp"
+                        android:max="65"
+                        android:progress="48"
+                        android:progressTint="@color/warning" />
+                </LinearLayout>
+
+                <!-- Actions Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/btn_add_meal"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_primary_button"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="@string/btn_add_meal"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btn_create_combo"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_marginStart="12dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_card_selectable"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="@string/btn_create_combo"
+                        android:textColor="@color/text_dark"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Card: Meals Logged Today -->
+            <LinearLayout
+                android:id="@+id/card_meals_today"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_card_white"
+                android:elevation="0dp"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nutrition_meals_today_title"
+                    android:textColor="@color/text_dark"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <!-- Meal 1 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nutrition_meal_1_name"
+                        android:textColor="@color/text_dark"
+                        android:textSize="13sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nutrition_meal_1_macro"
+                        android:textColor="@color/primary"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/border_subtle" />
+
+                <!-- Meal 2 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nutrition_meal_2_name"
+                        android:textColor="@color/text_dark"
+                        android:textSize="13sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nutrition_meal_2_macro"
+                        android:textColor="@color/primary"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/border_subtle" />
+
+                <!-- Meal 3 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nutrition_meal_3_name"
+                        android:textColor="@color/text_dark"
+                        android:textSize="13sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nutrition_meal_3_macro"
+                        android:textColor="@color/primary"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/border_subtle" />
+
+                <!-- Meal 4 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nutrition_meal_4_name"
+                        android:textColor="@color/text_dark"
+                        android:textSize="13sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/nutrition_meal_4_macro"
+                        android:textColor="@color/primary"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+
+            <!-- Card: Preset Combos -->
+            <LinearLayout
+                android:id="@+id/card_preset_combos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_card_white"
+                android:elevation="0dp"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/nutrition_combos_preset_title"
+                    android:textColor="@color/text_dark"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:padding="10dp"
+                    android:text="@string/nutrition_combo_1"
+                    android:textColor="@color/text_slate"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:padding="10dp"
+                    android:text="@string/nutrition_combo_2"
+                    android:textColor="@color/text_slate"
+                    android:textSize="11sp" />
             </LinearLayout>
 
         </LinearLayout>

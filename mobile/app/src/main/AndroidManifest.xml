@@ -74,6 +74,20 @@
             android:name=".ui.modal.LogMealModalActivity"
             android:exported="false"
             android:theme="@style/Theme.FitTrack.Modal" />
+        <activity
+            android:name=".ui.modal.WardrobeModalActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FitTrack.Modal" />
+        <activity
+            android:name=".ui.modal.LogMetricsModalActivity"
+            android:exported="false"
+            android:theme="@style/Theme.FitTrack.Modal" />
+        <activity
+            android:name=".ui.workout.AiWorkoutPlannerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.character.CharacterViewerActivity"
+            android:exported="false" />
 
     </application>
 

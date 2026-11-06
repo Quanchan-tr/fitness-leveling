@@ -21,6 +21,8 @@ export function createVoxelMat(
       color={color}
       roughness={roughness}
       metalness={metalness}
+      depthTest={true}
+      depthWrite={true}
       polygonOffset={true}
       polygonOffsetFactor={offsetFactor}
       polygonOffsetUnits={offsetFactor}
@@ -46,12 +48,12 @@ export const HeadwearRenderer: React.FC<{ item: AvatarItem | null }> = ({ item }
       <group position={[0, 0.28, 0]}>
         {/* Main Beanie Dome */}
         <mesh position={[0, 0.08, 0]} castShadow>
-          <boxGeometry args={[0.43, 0.24, 0.43]} />
+          <boxGeometry args={[0.44, 0.26, 0.44]} />
           {createVoxelMat(pColor, 0.85, 0.05, -1)}
         </mesh>
         {/* Ribbed Fold-over Brim with 3D texture ridges */}
         <mesh position={[0, -0.02, 0]} castShadow>
-          <boxGeometry args={[0.45, 0.12, 0.45]} />
+          <boxGeometry args={[0.46, 0.12, 0.46]} />
           {createVoxelMat('#991B1B', 0.9, 0.05, -1)}
         </mesh>
         {/* Knitted Rib Ridges */}
@@ -113,7 +115,7 @@ export const HeadwearRenderer: React.FC<{ item: AvatarItem | null }> = ({ item }
           {createVoxelMat(pColor, 0.7, 0.1, -1)}
         </mesh>
         <mesh position={[0, 0.12, 0]} castShadow>
-          <boxGeometry args={[0.42, 0.18, 0.42]} />
+          <boxGeometry args={[0.44, 0.22, 0.44]} />
           {createVoxelMat(pColor, 0.7, 0.1, -1)}
         </mesh>
         <mesh position={[-0.02, 0.26, -0.02]} castShadow>
@@ -1243,48 +1245,48 @@ export const BottomRenderer: React.FC<{
   // 1. BLUE JEANS (Quần Jean Xanh Bụi - Chỉ Vàng, Đinh Tán Đồng & Nhãn Da)
   if (code === 'blue_jeans') {
     return (
-      <group position={[0, -0.20, 0]}>
-        {/* Waistband & Hips */}
-        <mesh position={[0, 0.08, 0]} castShadow>
-          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.12, 0.24]} />
+      <group position={[0, 0, 0]}>
+        {/* Waistband & Hips (overlaps torso seamlessly) */}
+        <mesh position={[0, -0.04, 0]} castShadow>
+          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.18, 0.24]} />
           {createVoxelMat('#1E293B', 0.8, 0.05, -1)}
         </mesh>
         {/* Brown Leather Waistband Patch (Back Right) */}
-        <mesh position={[0.12, 0.10, -0.125]}>
+        <mesh position={[0.12, -0.02, -0.125]}>
           <boxGeometry args={[0.07, 0.04, 0.01]} />
           {createVoxelMat('#78350F', 0.6, 0.1, -2)}
         </mesh>
         {/* Metal Fly Button */}
-        <mesh position={[0, 0.10, 0.124]}>
+        <mesh position={[0, -0.02, 0.124]}>
           <boxGeometry args={[0.02, 0.02, 0.01]} />
           {createVoxelMat('#E2E8F0', 0.2, 0.8, -3)}
         </mesh>
         {/* Left Leg */}
-        <mesh position={[-legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.22]} />
+        <mesh position={[-legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.22]} />
           {createVoxelMat('#1E293B', 0.8, 0.05, -1)}
         </mesh>
         {/* Right Leg */}
-        <mesh position={[legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.22]} />
+        <mesh position={[legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.22]} />
           {createVoxelMat('#1E293B', 0.8, 0.05, -1)}
         </mesh>
         {/* Faded Wash Knee Highlights */}
-        <mesh position={[-legSpan, -0.14, 0.113]}>
+        <mesh position={[-legSpan, -0.28, 0.113]}>
           <boxGeometry args={[0.08, 0.10, 0.005]} />
           {createVoxelMat('#334155', 0.85, 0.05, -2)}
         </mesh>
-        <mesh position={[legSpan, -0.14, 0.113]}>
+        <mesh position={[legSpan, -0.28, 0.113]}>
           <boxGeometry args={[0.08, 0.10, 0.005]} />
           {createVoxelMat('#334155', 0.85, 0.05, -2)}
         </mesh>
         {/* Yellow Contrast Stitching Lines */}
-        <mesh position={[-legSpan - legWidth / 2 - 0.005, -0.14, 0]}>
-          <boxGeometry args={[0.008, 0.36, 0.02]} />
+        <mesh position={[-legSpan - legWidth / 2 - 0.005, -0.28, 0]}>
+          <boxGeometry args={[0.008, 0.38, 0.02]} />
           {createVoxelMat('#F59E0B', 0.9, 0.05, -3)}
         </mesh>
-        <mesh position={[legSpan + legWidth / 2 + 0.005, -0.14, 0]}>
-          <boxGeometry args={[0.008, 0.36, 0.02]} />
+        <mesh position={[legSpan + legWidth / 2 + 0.005, -0.28, 0]}>
+          <boxGeometry args={[0.008, 0.38, 0.02]} />
           {createVoxelMat('#F59E0B', 0.9, 0.05, -3)}
         </mesh>
       </group>
@@ -1294,35 +1296,35 @@ export const BottomRenderer: React.FC<{
   // 2. BROWN CARGO (Quần Kaki Nâu Túi Hộp - Đai Nịt + Khóa Kim Loại)
   if (code === 'brown_cargo') {
     return (
-      <group position={[0, -0.20, 0]}>
-        <mesh position={[0, 0.08, 0]} castShadow>
-          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.12, 0.24]} />
+      <group position={[0, 0, 0]}>
+        <mesh position={[0, -0.04, 0]} castShadow>
+          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.18, 0.24]} />
           {createVoxelMat('#3E2723', 0.8, 0.05, -1)}
         </mesh>
         {/* Heavy Olive Web Belt with Brass Buckle */}
-        <mesh position={[0, 0.11, 0.01]}>
+        <mesh position={[0, -0.01, 0.01]}>
           <boxGeometry args={[isFemale ? 0.37 : 0.43, 0.035, 0.25]} />
           {createVoxelMat('#1A2E05', 0.7, 0.2, -2)}
         </mesh>
-        <mesh position={[0, 0.11, 0.13]}>
+        <mesh position={[0, -0.01, 0.13]}>
           <boxGeometry args={[0.06, 0.045, 0.015]} />
           {createVoxelMat('#F59E0B', 0.2, 0.8, -3)}
         </mesh>
         {/* Legs */}
-        <mesh position={[-legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.22]} />
+        <mesh position={[-legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.22]} />
           {createVoxelMat('#3E2723', 0.8, 0.05, -1)}
         </mesh>
-        <mesh position={[legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.22]} />
+        <mesh position={[legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.22]} />
           {createVoxelMat('#3E2723', 0.8, 0.05, -1)}
         </mesh>
         {/* 3D Cargo Side Flap Pockets */}
-        <mesh position={[-legSpan - 0.07, -0.14, 0]} castShadow>
+        <mesh position={[-legSpan - 0.07, -0.28, 0]} castShadow>
           <boxGeometry args={[0.04, 0.12, 0.14]} />
           {createVoxelMat('#2E1C14', 0.85, 0.05, -2)}
         </mesh>
-        <mesh position={[legSpan + 0.07, -0.14, 0]} castShadow>
+        <mesh position={[legSpan + 0.07, -0.28, 0]} castShadow>
           <boxGeometry args={[0.04, 0.12, 0.14]} />
           {createVoxelMat('#2E1C14', 0.85, 0.05, -2)}
         </mesh>
@@ -1333,13 +1335,13 @@ export const BottomRenderer: React.FC<{
   // 3. BLUE SKIRT (Váy Xẻ Tà Chiến Binh - Viền Thêu Hoàng Kim)
   if (code === 'blue_skirt') {
     return (
-      <group position={[0, -0.18, 0]}>
-        <mesh position={[0, 0, 0]} castShadow>
-          <boxGeometry args={[0.42, 0.26, 0.28]} />
+      <group position={[0, 0, 0]}>
+        <mesh position={[0, -0.08, 0]} castShadow>
+          <boxGeometry args={[0.42, 0.28, 0.28]} />
           {createVoxelMat('#1E3A5F', 0.75, 0.1, -1)}
         </mesh>
         {/* Golden Embroidered Hem Border */}
-        <mesh position={[0, -0.12, 0]}>
+        <mesh position={[0, -0.21, 0]}>
           <boxGeometry args={[0.43, 0.035, 0.29]} />
           {createVoxelMat('#F59E0B', 0.3, 0.7, -2)}
         </mesh>
@@ -1350,26 +1352,26 @@ export const BottomRenderer: React.FC<{
   // 4. FEMALE LEGGINGS (Quần Legging Gym Nâng Mông Tôn Dáng)
   if (code === 'female_leggings') {
     return (
-      <group position={[0, -0.20, 0]}>
-        <mesh position={[0, 0.08, 0]} castShadow>
-          <boxGeometry args={[0.35, 0.12, 0.23]} />
+      <group position={[0, 0, 0]}>
+        <mesh position={[0, -0.04, 0]} castShadow>
+          <boxGeometry args={[0.35, 0.18, 0.23]} />
           {createVoxelMat('#09090B', 0.6, 0.2, -1)}
         </mesh>
-        <mesh position={[-legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.21]} />
+        <mesh position={[-legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.21]} />
           {createVoxelMat('#09090B', 0.6, 0.2, -1)}
         </mesh>
-        <mesh position={[legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.21]} />
+        <mesh position={[legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.21]} />
           {createVoxelMat('#09090B', 0.6, 0.2, -1)}
         </mesh>
         {/* Neon Orange Athletic Contour Curves */}
-        <mesh position={[-legSpan - legWidth / 2 - 0.005, -0.14, 0]}>
-          <boxGeometry args={[0.008, 0.36, 0.03]} />
+        <mesh position={[-legSpan - legWidth / 2 - 0.005, -0.28, 0]}>
+          <boxGeometry args={[0.008, 0.38, 0.03]} />
           {createVoxelMat('#FF5722', 0.4, 0.3, -2)}
         </mesh>
-        <mesh position={[legSpan + legWidth / 2 + 0.005, -0.14, 0]}>
-          <boxGeometry args={[0.008, 0.36, 0.03]} />
+        <mesh position={[legSpan + legWidth / 2 + 0.005, -0.28, 0]}>
+          <boxGeometry args={[0.008, 0.38, 0.03]} />
           {createVoxelMat('#FF5722', 0.4, 0.3, -2)}
         </mesh>
       </group>
@@ -1379,25 +1381,25 @@ export const BottomRenderer: React.FC<{
   // 5. CALISTHENICS SHORTS (Quần Đùi Xẻ Tà Viền Trắng)
   if (code === 'calisthenics_shorts') {
     return (
-      <group position={[0, -0.12, 0]}>
-        <mesh position={[0, 0.04, 0]} castShadow>
-          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.16, 0.24]} />
+      <group position={[0, 0, 0]}>
+        <mesh position={[0, -0.04, 0]} castShadow>
+          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.18, 0.24]} />
           {createVoxelMat('#18181B', 0.8, 0.05, -1)}
         </mesh>
-        <mesh position={[-legSpan, -0.06, 0]} castShadow>
-          <boxGeometry args={[legWidth + 0.015, 0.16, 0.22]} />
+        <mesh position={[-legSpan, -0.16, 0]} castShadow>
+          <boxGeometry args={[legWidth + 0.015, 0.18, 0.22]} />
           {createVoxelMat('#18181B', 0.8, 0.05, -1)}
         </mesh>
-        <mesh position={[legSpan, -0.06, 0]} castShadow>
-          <boxGeometry args={[legWidth + 0.015, 0.16, 0.22]} />
+        <mesh position={[legSpan, -0.16, 0]} castShadow>
+          <boxGeometry args={[legWidth + 0.015, 0.18, 0.22]} />
           {createVoxelMat('#18181B', 0.8, 0.05, -1)}
         </mesh>
         {/* White Curved Athletic Hem Piping */}
-        <mesh position={[-legSpan, -0.14, 0]}>
+        <mesh position={[-legSpan, -0.24, 0]}>
           <boxGeometry args={[legWidth + 0.02, 0.02, 0.225]} />
           {createVoxelMat('#F4F4F5', 0.5, 0.2, -2)}
         </mesh>
-        <mesh position={[legSpan, -0.14, 0]}>
+        <mesh position={[legSpan, -0.24, 0]}>
           <boxGeometry args={[legWidth + 0.02, 0.02, 0.225]} />
           {createVoxelMat('#F4F4F5', 0.5, 0.2, -2)}
         </mesh>
@@ -1408,25 +1410,25 @@ export const BottomRenderer: React.FC<{
   // 6. TECHWEAR JOGGERS (Đai Chéo D-Ring + Túi Hộp)
   if (code === 'techwear_pants') {
     return (
-      <group position={[0, -0.20, 0]}>
-        <mesh position={[0, 0.08, 0]} castShadow>
-          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.10, 0.24]} />
+      <group position={[0, 0, 0]}>
+        <mesh position={[0, -0.04, 0]} castShadow>
+          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.18, 0.24]} />
           {createVoxelMat('#18181B', 0.85, 0.1, -1)}
         </mesh>
-        <mesh position={[-legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.22]} />
+        <mesh position={[-legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.22]} />
           {createVoxelMat('#18181B', 0.85, 0.1, -1)}
         </mesh>
-        <mesh position={[legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.22]} />
+        <mesh position={[legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.22]} />
           {createVoxelMat('#18181B', 0.85, 0.1, -1)}
         </mesh>
         {/* Criss-Cross Hanging Straps */}
-        <mesh position={[-legSpan, -0.16, 0.115]} rotation={[0, 0, 0.35]}>
+        <mesh position={[-legSpan, -0.28, 0.115]} rotation={[0, 0, 0.35]}>
           <boxGeometry args={[0.16, 0.025, 0.01]} />
           {createVoxelMat('#52525B', 0.9, 0.1, -2)}
         </mesh>
-        <mesh position={[legSpan, -0.16, 0.115]} rotation={[0, 0, -0.35]}>
+        <mesh position={[legSpan, -0.28, 0.115]} rotation={[0, 0, -0.35]}>
           <boxGeometry args={[0.16, 0.025, 0.01]} />
           {createVoxelMat('#52525B', 0.9, 0.1, -2)}
         </mesh>
@@ -1437,28 +1439,28 @@ export const BottomRenderer: React.FC<{
   // 7. TRACK PANTS (Quần Thể Thao 3 Sọc Retro Trắng)
   if (code === 'track_pants') {
     return (
-      <group position={[0, -0.20, 0]}>
-        <mesh position={[0, 0.08, 0]} castShadow>
-          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.10, 0.24]} />
+      <group position={[0, 0, 0]}>
+        <mesh position={[0, -0.04, 0]} castShadow>
+          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.18, 0.24]} />
           {createVoxelMat('#1E293B', 0.8, 0.05, -1)}
         </mesh>
-        <mesh position={[-legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.22]} />
+        <mesh position={[-legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.22]} />
           {createVoxelMat('#1E293B', 0.8, 0.05, -1)}
         </mesh>
-        <mesh position={[legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.22]} />
+        <mesh position={[legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.22]} />
           {createVoxelMat('#1E293B', 0.8, 0.05, -1)}
         </mesh>
         {/* Triple White Stripes Down Sides */}
         {[-0.015, 0, 0.015].map((z, i) => (
           <React.Fragment key={i}>
-            <mesh position={[-legSpan - legWidth / 2 - 0.005, -0.14, z]}>
-              <boxGeometry args={[0.008, 0.36, 0.01]} />
+            <mesh position={[-legSpan - legWidth / 2 - 0.005, -0.28, z]}>
+              <boxGeometry args={[0.008, 0.38, 0.01]} />
               {createVoxelMat('#FFFFFF', 0.4, 0.2, -2)}
             </mesh>
-            <mesh position={[legSpan + legWidth / 2 + 0.005, -0.14, z]}>
-              <boxGeometry args={[0.008, 0.36, 0.01]} />
+            <mesh position={[legSpan + legWidth / 2 + 0.005, -0.28, z]}>
+              <boxGeometry args={[0.008, 0.38, 0.01]} />
               {createVoxelMat('#FFFFFF', 0.4, 0.2, -2)}
             </mesh>
           </React.Fragment>
@@ -1470,25 +1472,25 @@ export const BottomRenderer: React.FC<{
   // 8. TACTICAL CAMO CARGO (Quần Rằn Ri Rừng Rậm 3 Tông)
   if (code === 'cargo_tactical') {
     return (
-      <group position={[0, -0.20, 0]}>
-        <mesh position={[0, 0.08, 0]} castShadow>
-          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.10, 0.24]} />
+      <group position={[0, 0, 0]}>
+        <mesh position={[0, -0.04, 0]} castShadow>
+          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.18, 0.24]} />
           {createVoxelMat('#365314', 0.8, 0.05, -1)}
         </mesh>
-        <mesh position={[-legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.22]} />
+        <mesh position={[-legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.22]} />
           {createVoxelMat('#365314', 0.8, 0.05, -1)}
         </mesh>
-        <mesh position={[legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.22]} />
+        <mesh position={[legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.22]} />
           {createVoxelMat('#365314', 0.8, 0.05, -1)}
         </mesh>
         {/* Digital Camo Pixel Blocks */}
-        <mesh position={[-legSpan, -0.10, 0.113]}>
+        <mesh position={[-legSpan, -0.22, 0.113]}>
           <boxGeometry args={[0.06, 0.06, 0.005]} />
           {createVoxelMat('#1A2E05', 0.85, 0.05, -2)}
         </mesh>
-        <mesh position={[legSpan, -0.18, 0.113]}>
+        <mesh position={[legSpan, -0.32, 0.113]}>
           <boxGeometry args={[0.06, 0.06, 0.005]} />
           {createVoxelMat('#1A2E05', 0.85, 0.05, -2)}
         </mesh>
@@ -1499,26 +1501,26 @@ export const BottomRenderer: React.FC<{
   // 9. CYBER GLITCH PANTS (Quần Ma Trận Hư Không Neon Cyan)
   if (code === 'cyber_glitch_pants') {
     return (
-      <group position={[0, -0.20, 0]}>
-        <mesh position={[0, 0.08, 0]} castShadow>
-          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.10, 0.24]} />
+      <group position={[0, 0, 0]}>
+        <mesh position={[0, -0.04, 0]} castShadow>
+          <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.18, 0.24]} />
           {createVoxelMat('#020617', 0.8, 0.2, -1)}
         </mesh>
-        <mesh position={[-legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.22]} />
+        <mesh position={[-legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.22]} />
           {createVoxelMat('#020617', 0.8, 0.2, -1)}
         </mesh>
-        <mesh position={[legSpan, -0.14, 0]} castShadow>
-          <boxGeometry args={[legWidth, 0.36, 0.22]} />
+        <mesh position={[legSpan, -0.28, 0]} castShadow>
+          <boxGeometry args={[legWidth, 0.38, 0.22]} />
           {createVoxelMat('#020617', 0.8, 0.2, -1)}
         </mesh>
         {/* Glowing Matrix Circuit Stripes */}
-        <mesh position={[-legSpan, -0.14, 0.113]}>
-          <boxGeometry args={[0.015, 0.30, 0.005]} />
+        <mesh position={[-legSpan, -0.28, 0.113]}>
+          <boxGeometry args={[0.015, 0.32, 0.005]} />
           <meshStandardMaterial color="#06B6D4" emissive="#06B6D4" emissiveIntensity={0.8} />
         </mesh>
-        <mesh position={[legSpan, -0.14, 0.113]}>
-          <boxGeometry args={[0.015, 0.30, 0.005]} />
+        <mesh position={[legSpan, -0.28, 0.113]}>
+          <boxGeometry args={[0.015, 0.32, 0.005]} />
           <meshStandardMaterial color="#A855F7" emissive="#A855F7" emissiveIntensity={0.8} />
         </mesh>
       </group>
@@ -1527,26 +1529,23 @@ export const BottomRenderer: React.FC<{
 
   // Default Bottom
   return (
-    <group position={[0, -0.20, 0]}>
-      <mesh position={[0, 0.08, 0]} castShadow>
-        <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.10, 0.24]} />
+    <group position={[0, 0, 0]}>
+      <mesh position={[0, -0.04, 0]} castShadow>
+        <boxGeometry args={[isFemale ? 0.36 : 0.42, 0.18, 0.24]} />
         {createVoxelMat(item.colors?.primary || '#1E293B', 0.8, 0.05, -1)}
       </mesh>
-      <mesh position={[-legSpan, -0.14, 0]} castShadow>
-        <boxGeometry args={[legWidth, 0.36, 0.22]} />
+      <mesh position={[-legSpan, -0.28, 0]} castShadow>
+        <boxGeometry args={[legWidth, 0.38, 0.22]} />
         {createVoxelMat(item.colors?.primary || '#1E293B', 0.8, 0.05, -1)}
       </mesh>
-      <mesh position={[legSpan, -0.14, 0]} castShadow>
-        <boxGeometry args={[legWidth, 0.36, 0.22]} />
+      <mesh position={[legSpan, -0.28, 0]} castShadow>
+        <boxGeometry args={[legWidth, 0.38, 0.22]} />
         {createVoxelMat(item.colors?.primary || '#1E293B', 0.8, 0.05, -1)}
       </mesh>
     </group>
   );
 };
 
-// =========================================================================
-// 6. SHOES RENDERER (Giày, Ủng - Gai Đế, Dây Giày, Khóa Đồng)
-// =========================================================================
 export const ShoesRenderer: React.FC<{
   item: AvatarItem | null;
   gender: 'male' | 'female';
@@ -1563,7 +1562,7 @@ export const ShoesRenderer: React.FC<{
   // 1. COMBAT BOOTS (Ủng Da Chiến Đấu Đen - Gai Đế Hầm Hố + Dây Buộc)
   if (code === 'combat_boots') {
     return (
-      <group position={[0, -0.46, 0]}>
+      <group position={[0, -0.50, 0]}>
         {[-legSpan, legSpan].map((x, i) => (
           <group key={i} position={[x, 0, 0]}>
             {/* Ankle Collar */}
@@ -1597,7 +1596,7 @@ export const ShoesRenderer: React.FC<{
   // 2. RED SNEAKERS (Sneaker Cổ Cao Đỏ Trắng - Logo Ngôi Sao + Viền Đế Lưu Hóa)
   if (code === 'red_sneakers') {
     return (
-      <group position={[0, -0.46, 0]}>
+      <group position={[0, -0.50, 0]}>
         {[-legSpan, legSpan].map((x, i) => (
           <group key={i} position={[x, 0, 0]}>
             {/* Red Canvas Upper */}
@@ -1638,7 +1637,7 @@ export const ShoesRenderer: React.FC<{
   // 3. LEATHER BOOTS (Ủng Da Nâu - Cổ Gập Viền Vàng Kim)
   if (code === 'leather_boots') {
     return (
-      <group position={[0, -0.46, 0]}>
+      <group position={[0, -0.50, 0]}>
         {[-legSpan, legSpan].map((x, i) => (
           <group key={i} position={[x, 0, 0]}>
             <mesh position={[0, 0.05, 0]} castShadow>
@@ -1668,7 +1667,7 @@ export const ShoesRenderer: React.FC<{
   // 4. RETRO RUNNERS 80s (Giày Chạy Chunky Arcade 80s)
   if (code === 'retro_runners') {
     return (
-      <group position={[0, -0.46, 0]}>
+      <group position={[0, -0.50, 0]}>
         {[-legSpan, legSpan].map((x, i) => (
           <group key={i} position={[x, 0, 0]}>
             <mesh position={[0, -0.02, 0.03]} castShadow>
@@ -1693,7 +1692,7 @@ export const ShoesRenderer: React.FC<{
   // 5. PRO POWERLIFTERS (Giày Cử Tạ Powerlifting Pro - Đai Metatarsal)
   if (code === 'pro_powerlifters') {
     return (
-      <group position={[0, -0.46, 0]}>
+      <group position={[0, -0.50, 0]}>
         {[-legSpan, legSpan].map((x, i) => (
           <group key={i} position={[x, 0, 0]}>
             <mesh position={[0, -0.03, 0.04]} castShadow>
@@ -1719,7 +1718,7 @@ export const ShoesRenderer: React.FC<{
   // 6. CYBER HIGH TOPS (Sneaker LED Neon Phát Sáng Xanh Băng)
   if (code === 'cyber_high_tops') {
     return (
-      <group position={[0, -0.46, 0]}>
+      <group position={[0, -0.50, 0]}>
         {[-legSpan, legSpan].map((x, i) => (
           <group key={i} position={[x, 0, 0]}>
             <mesh position={[0, 0.04, 0]} castShadow>
@@ -1744,7 +1743,7 @@ export const ShoesRenderer: React.FC<{
   // 7. GOLDEN TITAN BOOTS (Ủng Đấu Sĩ Hoàng Kim Titan)
   if (code === 'golden_titan_boots') {
     return (
-      <group position={[0, -0.46, 0]}>
+      <group position={[0, -0.50, 0]}>
         {[-legSpan, legSpan].map((x, i) => (
           <group key={i} position={[x, 0, 0]}>
             <mesh position={[0, 0.06, 0]} castShadow>
@@ -1768,7 +1767,7 @@ export const ShoesRenderer: React.FC<{
 
   // Default Shoes
   return (
-    <group position={[0, -0.46, 0]}>
+    <group position={[0, -0.50, 0]}>
       {[-legSpan, legSpan].map((x, i) => (
         <group key={i} position={[x, 0, 0]}>
           <mesh position={[0, 0, 0.04]} castShadow>
@@ -1798,16 +1797,16 @@ export const AccessoryRenderer: React.FC<{
       return (
         <group position={[0, 0.22, 0.20]}>
           <mesh position={[-0.09, 0, 0]}>
-            <boxGeometry args={[0.08, 0.07, 0.02]} />
-            {createVoxelMat('#1E293B', 0.3, 0.7, -2)}
+            <boxGeometry args={[0.09, 0.07, 0.02]} />
+            {createVoxelMat('#0F172A', 0.3, 0.7, -2)}
           </mesh>
           <mesh position={[0.09, 0, 0]}>
-            <boxGeometry args={[0.08, 0.07, 0.02]} />
-            {createVoxelMat('#1E293B', 0.3, 0.7, -2)}
+            <boxGeometry args={[0.09, 0.07, 0.02]} />
+            {createVoxelMat('#0F172A', 0.3, 0.7, -2)}
           </mesh>
           <mesh position={[0, 0, 0]}>
-            <boxGeometry args={[0.04, 0.015, 0.015]} />
-            {createVoxelMat('#1E293B', 0.3, 0.7, -2)}
+            <boxGeometry args={[0.05, 0.015, 0.015]} />
+            {createVoxelMat('#0F172A', 0.3, 0.7, -2)}
           </mesh>
         </group>
       );
@@ -1815,18 +1814,37 @@ export const AccessoryRenderer: React.FC<{
 
     if (code === 'oni_mask') {
       return (
-        <group position={[0, 0.15, 0.205]}>
+        <group position={[0, 0.16, 0.205]}>
+          {/* Main Crimson Oni Mask Base */}
           <mesh castShadow>
-            <boxGeometry args={[0.30, 0.14, 0.04]} />
+            <boxGeometry args={[0.32, 0.16, 0.04]} />
             {createVoxelMat('#991B1B', 0.6, 0.2, -2)}
           </mesh>
-          {/* White Oni Fangs */}
-          <mesh position={[-0.06, -0.06, 0.025]}>
-            <boxGeometry args={[0.02, 0.04, 0.01]} />
+          {/* Terrifying Golden Horns */}
+          <mesh position={[-0.12, 0.12, 0.01]} rotation={[0, 0, -0.4]} castShadow>
+            <boxGeometry args={[0.04, 0.09, 0.04]} />
+            <meshStandardMaterial color="#F59E0B" emissive="#D97706" emissiveIntensity={0.6} metalness={0.8} />
+          </mesh>
+          <mesh position={[0.12, 0.12, 0.01]} rotation={[0, 0, 0.4]} castShadow>
+            <boxGeometry args={[0.04, 0.09, 0.04]} />
+            <meshStandardMaterial color="#F59E0B" emissive="#D97706" emissiveIntensity={0.6} metalness={0.8} />
+          </mesh>
+          {/* Glowing Demonic Red Eye Slits */}
+          <mesh position={[-0.07, 0.03, 0.025]}>
+            <boxGeometry args={[0.05, 0.02, 0.01]} />
+            <meshStandardMaterial color="#EF4444" emissive="#EF4444" emissiveIntensity={2.0} />
+          </mesh>
+          <mesh position={[0.07, 0.03, 0.025]}>
+            <boxGeometry args={[0.05, 0.02, 0.01]} />
+            <meshStandardMaterial color="#EF4444" emissive="#EF4444" emissiveIntensity={2.0} />
+          </mesh>
+          {/* Sharp White Oni Fangs */}
+          <mesh position={[-0.06, -0.07, 0.025]}>
+            <boxGeometry args={[0.025, 0.05, 0.015]} />
             {createVoxelMat('#FFFFFF', 0.2, 0.4, -3)}
           </mesh>
-          <mesh position={[0.06, -0.06, 0.025]}>
-            <boxGeometry args={[0.02, 0.04, 0.01]} />
+          <mesh position={[0.06, -0.07, 0.025]}>
+            <boxGeometry args={[0.025, 0.05, 0.015]} />
             {createVoxelMat('#FFFFFF', 0.2, 0.4, -3)}
           </mesh>
         </group>
@@ -1835,10 +1853,24 @@ export const AccessoryRenderer: React.FC<{
 
     if (code === 'cyber_visor') {
       return (
-        <group position={[0, 0.23, 0.21]}>
+        <group position={[0, 0.22, 0.21]}>
           <mesh>
-            <boxGeometry args={[0.36, 0.06, 0.03]} />
-            <meshStandardMaterial color="#06B6D4" emissive="#06B6D4" emissiveIntensity={0.8} transparent opacity={0.85} />
+            <boxGeometry args={[0.38, 0.07, 0.04]} />
+            <meshStandardMaterial color="#06B6D4" emissive="#06B6D4" emissiveIntensity={1.8} transparent opacity={0.88} />
+          </mesh>
+          {/* Cyan Scanline Telemetry */}
+          <mesh position={[0, 0, 0.022]}>
+            <boxGeometry args={[0.32, 0.015, 0.005]} />
+            <meshStandardMaterial color="#22D3EE" emissive="#22D3EE" emissiveIntensity={2.5} />
+          </mesh>
+          {/* Side Module Nodes */}
+          <mesh position={[-0.19, 0, -0.03]}>
+            <boxGeometry args={[0.03, 0.06, 0.08]} />
+            {createVoxelMat('#0F172A', 0.4, 0.8, -2)}
+          </mesh>
+          <mesh position={[0.19, 0, -0.03]}>
+            <boxGeometry args={[0.03, 0.06, 0.08]} />
+            {createVoxelMat('#0F172A', 0.4, 0.8, -2)}
           </mesh>
         </group>
       );
@@ -1849,15 +1881,25 @@ export const AccessoryRenderer: React.FC<{
   if (location === 'torso') {
     if (code === 'lifting_belt') {
       return (
-        <group position={[0, -0.10, 0]}>
-          <mesh>
-            <boxGeometry args={[0.46, 0.10, 0.28]} />
+        <group position={[0, -0.14, 0]}>
+          {/* Chunky 13mm Powerlifting Belt */}
+          <mesh castShadow>
+            <boxGeometry args={[0.48, 0.11, 0.29]} />
             {createVoxelMat('#18181B', 0.7, 0.2, -2)}
           </mesh>
-          {/* Steel Lever Latch Buckle */}
-          <mesh position={[0, 0, 0.145]}>
-            <boxGeometry args={[0.08, 0.06, 0.02]} />
-            {createVoxelMat('#E2E8F0', 0.2, 0.9, -3)}
+          {/* Inner Suede Contrast Trim */}
+          <mesh position={[0, 0, 0]}>
+            <boxGeometry args={[0.485, 0.02, 0.295]} />
+            {createVoxelMat('#DC2626', 0.6, 0.3, -3)}
+          </mesh>
+          {/* Steel Lever Latch Buckle (Bold & Chunky) */}
+          <mesh position={[0, 0, 0.155]}>
+            <boxGeometry args={[0.11, 0.08, 0.025]} />
+            <meshStandardMaterial color="#F8FAFC" metalness={0.95} roughness={0.1} />
+          </mesh>
+          <mesh position={[0.04, 0, 0.17]} rotation={[0, 0, -0.3]}>
+            <boxGeometry args={[0.08, 0.03, 0.015]} />
+            <meshStandardMaterial color="#F8FAFC" metalness={0.95} roughness={0.1} />
           </mesh>
         </group>
       );
@@ -1865,15 +1907,55 @@ export const AccessoryRenderer: React.FC<{
 
     if (code === 'gold_necklace') {
       return (
-        <group position={[0, 0.12, 0.135]}>
-          <mesh>
-            <boxGeometry args={[0.16, 0.015, 0.015]} />
-            <meshStandardMaterial color="#F59E0B" metalness={0.9} roughness={0.1} />
+        <group position={[0, 0.10, 0.168]}>
+          {/* Heavyweight Gold Chain Arc (Sits proudly ON TOP of clothing) */}
+          <mesh castShadow>
+            <boxGeometry args={[0.22, 0.025, 0.025]} />
+            <meshStandardMaterial color="#FBBF24" emissive="#D97706" emissiveIntensity={0.8} metalness={0.95} roughness={0.15} />
           </mesh>
-          {/* Dumbbell Pendant */}
-          <mesh position={[0, -0.04, 0.005]}>
-            <boxGeometry args={[0.05, 0.025, 0.02]} />
-            <meshStandardMaterial color="#F59E0B" metalness={0.9} roughness={0.1} />
+          {/* Angled Chain Strands draping to center */}
+          <mesh position={[-0.06, -0.04, 0]} rotation={[0, 0, 0.5]}>
+            <boxGeometry args={[0.08, 0.02, 0.02]} />
+            <meshStandardMaterial color="#FBBF24" emissive="#D97706" emissiveIntensity={0.8} metalness={0.95} roughness={0.15} />
+          </mesh>
+          <mesh position={[0.06, -0.04, 0]} rotation={[0, 0, -0.5]}>
+            <boxGeometry args={[0.08, 0.02, 0.02]} />
+            <meshStandardMaterial color="#FBBF24" emissive="#D97706" emissiveIntensity={0.8} metalness={0.95} roughness={0.15} />
+          </mesh>
+          {/* Massive 3D Golden Dumbbell Titan Medallion */}
+          <mesh position={[0, -0.08, 0.01]} castShadow>
+            <boxGeometry args={[0.10, 0.03, 0.03]} />
+            <meshStandardMaterial color="#FBBF24" emissive="#D97706" emissiveIntensity={0.9} metalness={0.95} roughness={0.15} />
+          </mesh>
+          {/* Left Olympic Heavyweight Plates */}
+          <mesh position={[-0.06, -0.08, 0.01]} castShadow>
+            <boxGeometry args={[0.035, 0.08, 0.065]} />
+            <meshStandardMaterial color="#FBBF24" emissive="#D97706" emissiveIntensity={0.9} metalness={0.95} roughness={0.15} />
+          </mesh>
+          {/* Right Olympic Heavyweight Plates */}
+          <mesh position={[0.06, -0.08, 0.01]} castShadow>
+            <boxGeometry args={[0.035, 0.08, 0.065]} />
+            <meshStandardMaterial color="#FBBF24" emissive="#D97706" emissiveIntensity={0.9} metalness={0.95} roughness={0.15} />
+          </mesh>
+          {/* Glowing Center Core Gem */}
+          <mesh position={[0, -0.08, 0.028]}>
+            <boxGeometry args={[0.03, 0.03, 0.01]} />
+            <meshStandardMaterial color="#FDE047" emissive="#F59E0B" emissiveIntensity={1.5} />
+          </mesh>
+        </group>
+      );
+    }
+
+    if (code === 'red_cowl') {
+      return (
+        <group position={[0, 0.18, 0.02]}>
+          <mesh castShadow>
+            <boxGeometry args={[0.44, 0.08, 0.28]} />
+            {createVoxelMat('#DC2626', 0.7, 0.1, -2)}
+          </mesh>
+          <mesh position={[-0.10, -0.08, 0.14]} castShadow>
+            <boxGeometry args={[0.08, 0.16, 0.03]} />
+            {createVoxelMat('#DC2626', 0.7, 0.1, -3)}
           </mesh>
         </group>
       );
@@ -1881,15 +1963,24 @@ export const AccessoryRenderer: React.FC<{
 
     if (code === 'tactical_backpack') {
       return (
-        <group position={[0, 0, -0.16]}>
+        <group position={[0, 0, -0.17]}>
           <mesh castShadow>
-            <boxGeometry args={[0.32, 0.34, 0.14]} />
+            <boxGeometry args={[0.34, 0.36, 0.16]} />
             {createVoxelMat('#27272A', 0.8, 0.1, -2)}
           </mesh>
           {/* Top Bedroll */}
-          <mesh position={[0, 0.20, 0]} castShadow>
-            <cylinderGeometry args={[0.04, 0.04, 0.34, 8]} />
+          <mesh position={[0, 0.21, 0]} castShadow>
+            <cylinderGeometry args={[0.045, 0.045, 0.36, 8]} />
             {createVoxelMat('#84CC16', 0.8, 0.05, -2)}
+          </mesh>
+          {/* Side Canteen Pockets */}
+          <mesh position={[-0.18, -0.06, 0]}>
+            <boxGeometry args={[0.05, 0.16, 0.10]} />
+            {createVoxelMat('#3F3F46', 0.8, 0.1, -3)}
+          </mesh>
+          <mesh position={[0.18, -0.06, 0]}>
+            <boxGeometry args={[0.05, 0.16, 0.10]} />
+            {createVoxelMat('#3F3F46', 0.8, 0.1, -3)}
           </mesh>
         </group>
       );
@@ -1900,10 +1991,15 @@ export const AccessoryRenderer: React.FC<{
   if (location === 'arm' && side === 'left') {
     if (code === 'wrist_wraps') {
       return (
-        <group position={[0, -0.32, 0]}>
+        <group position={[0, -0.28, 0]}>
           <mesh>
-            <boxGeometry args={[0.135, 0.06, 0.135]} />
-            {createVoxelMat('#FF5722', 0.6, 0.2, -2)}
+            <boxGeometry args={[0.145, 0.07, 0.145]} />
+            {createVoxelMat('#DC2626', 0.6, 0.2, -2)}
+          </mesh>
+          {/* Black Tension Strap Band */}
+          <mesh position={[0, 0, 0]}>
+            <boxGeometry args={[0.15, 0.025, 0.15]} />
+            {createVoxelMat('#18181B', 0.8, 0.1, -3)}
           </mesh>
         </group>
       );
@@ -1911,15 +2007,26 @@ export const AccessoryRenderer: React.FC<{
 
     if (code === 'smart_watch') {
       return (
-        <group position={[0, -0.32, 0]}>
+        <group position={[0, -0.28, 0]}>
+          {/* Chunky Matte-Black Sports Strap */}
           <mesh>
-            <boxGeometry args={[0.135, 0.04, 0.135]} />
+            <boxGeometry args={[0.145, 0.06, 0.145]} />
             {createVoxelMat('#09090B', 0.4, 0.6, -2)}
           </mesh>
-          {/* Biometric Green Glowing Screen */}
-          <mesh position={[-0.07, 0, 0]}>
-            <boxGeometry args={[0.01, 0.035, 0.035]} />
-            <meshStandardMaterial color="#10B981" emissive="#10B981" emissiveIntensity={1.0} />
+          {/* Titanium Case on Outside of Wrist */}
+          <mesh position={[-0.075, 0, 0]}>
+            <boxGeometry args={[0.02, 0.06, 0.06]} />
+            <meshStandardMaterial color="#475569" metalness={0.8} roughness={0.2} />
+          </mesh>
+          {/* Vivid Glowing Emerald AMOLED Screen */}
+          <mesh position={[-0.086, 0, 0]}>
+            <boxGeometry args={[0.005, 0.045, 0.045]} />
+            <meshStandardMaterial color="#10B981" emissive="#10B981" emissiveIntensity={2.2} />
+          </mesh>
+          {/* Pulsing Red Heart Rate Telemetry Bar */}
+          <mesh position={[-0.088, 0.012, 0]}>
+            <boxGeometry args={[0.005, 0.015, 0.025]} />
+            <meshStandardMaterial color="#EF4444" emissive="#EF4444" emissiveIntensity={2.5} />
           </mesh>
         </group>
       );
@@ -1929,81 +2036,272 @@ export const AccessoryRenderer: React.FC<{
   return null;
 };
 
-// =========================================================================
-// 8. SPECIAL EFFECTS RENDERER (Cánh Pixel & Aura - KHÔNG VÒNG ĐẾ)
-// =========================================================================
 export const SpecialRenderer: React.FC<{ item: AvatarItem | null }> = ({ item }) => {
   const groupRef = useRef<THREE.Group>(null);
   const leftWingRef = useRef<THREE.Group>(null);
   const rightWingRef = useRef<THREE.Group>(null);
+  const particlesRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     const t = state.clock.elapsedTime;
+    // Wing flapping animation
     if (leftWingRef.current) {
-      leftWingRef.current.rotation.y = -0.15 + Math.sin(t * 3.0) * 0.20;
+      leftWingRef.current.rotation.y = -0.20 + Math.sin(t * 3.5) * 0.28;
+      leftWingRef.current.rotation.z = Math.cos(t * 3.5) * 0.08;
     }
     if (rightWingRef.current) {
-      rightWingRef.current.rotation.y = 0.15 - Math.sin(t * 3.0) * 0.20;
+      rightWingRef.current.rotation.y = 0.20 - Math.sin(t * 3.5) * 0.28;
+      rightWingRef.current.rotation.z = -Math.cos(t * 3.5) * 0.08;
     }
+    // Main group gentle hovering
     if (groupRef.current) {
-      groupRef.current.position.y = Math.sin(t * 2.0) * 0.02;
+      groupRef.current.position.y = Math.sin(t * 2.0) * 0.025;
+    }
+    // Particle swarm swirling rotation
+    if (particlesRef.current) {
+      particlesRef.current.rotation.y = t * 0.8;
     }
   });
 
   if (!item) return null;
   const code = item.itemCode;
 
+  // 1. CÁNH THIÊN THẦN PIXEL & BỤI VÀNG (Angel Wings + Floating Holy Halo + 14 Dust Particles)
   if (code === 'angel_wings') {
     return (
-      <group ref={groupRef} position={[0, 0.28, -0.18]}>
-        <group ref={leftWingRef} position={[-0.08, 0, 0]}>
-          <mesh position={[-0.24, 0.12, 0]}>
-            <boxGeometry args={[0.34, 0.24, 0.02]} />
+      <group ref={groupRef} position={[0, 0.24, -0.18]}>
+        {/* Glowing Golden Halo Floating Over Head */}
+        <group position={[0, 0.66, 0.16]}>
+          {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => {
+            const rad = (deg * Math.PI) / 180;
+            return (
+              <mesh key={i} position={[Math.cos(rad) * 0.20, 0, Math.sin(rad) * 0.20]}>
+                <boxGeometry args={[0.04, 0.025, 0.04]} />
+                <meshStandardMaterial color="#FDE047" emissive="#F59E0B" emissiveIntensity={1.8} />
+              </mesh>
+            );
+          })}
+        </group>
+
+        {/* Left Wing (Multi-tier Pixel Feathers) */}
+        <group ref={leftWingRef} position={[-0.10, 0, 0]}>
+          {/* Base Joint */}
+          <mesh position={[-0.12, 0.06, 0]} castShadow>
+            <boxGeometry args={[0.18, 0.16, 0.03]} />
             <meshStandardMaterial color="#FFFFFF" emissive="#FEF08A" emissiveIntensity={0.5} roughness={0.2} />
+          </mesh>
+          {/* Upper Covert Feathers */}
+          <mesh position={[-0.26, 0.16, 0]} rotation={[0, 0, 0.25]} castShadow>
+            <boxGeometry args={[0.22, 0.22, 0.025]} />
+            <meshStandardMaterial color="#FFFFFF" emissive="#FEF08A" emissiveIntensity={0.6} roughness={0.2} />
+          </mesh>
+          {/* Long Primary Flight Feathers */}
+          <mesh position={[-0.42, 0.26, 0]} rotation={[0, 0, 0.45]} castShadow>
+            <boxGeometry args={[0.24, 0.28, 0.02]} />
+            <meshStandardMaterial color="#FFFFFF" emissive="#FEF08A" emissiveIntensity={0.7} roughness={0.2} />
+          </mesh>
+          {/* Golden Feather Tips */}
+          <mesh position={[-0.54, 0.38, 0]} rotation={[0, 0, 0.55]}>
+            <boxGeometry args={[0.10, 0.16, 0.025]} />
+            <meshStandardMaterial color="#FDE047" emissive="#F59E0B" emissiveIntensity={1.2} />
           </mesh>
         </group>
-        <group ref={rightWingRef} position={[0.08, 0, 0]}>
-          <mesh position={[0.24, 0.12, 0]}>
-            <boxGeometry args={[0.34, 0.24, 0.02]} />
+
+        {/* Right Wing (Multi-tier Pixel Feathers) */}
+        <group ref={rightWingRef} position={[0.10, 0, 0]}>
+          <mesh position={[0.12, 0.06, 0]} castShadow>
+            <boxGeometry args={[0.18, 0.16, 0.03]} />
             <meshStandardMaterial color="#FFFFFF" emissive="#FEF08A" emissiveIntensity={0.5} roughness={0.2} />
           </mesh>
+          <mesh position={[0.26, 0.16, 0]} rotation={[0, 0, -0.25]} castShadow>
+            <boxGeometry args={[0.22, 0.22, 0.025]} />
+            <meshStandardMaterial color="#FFFFFF" emissive="#FEF08A" emissiveIntensity={0.6} roughness={0.2} />
+          </mesh>
+          <mesh position={[0.42, 0.26, 0]} rotation={[0, 0, -0.45]} castShadow>
+            <boxGeometry args={[0.24, 0.28, 0.02]} />
+            <meshStandardMaterial color="#FFFFFF" emissive="#FEF08A" emissiveIntensity={0.7} roughness={0.2} />
+          </mesh>
+          <mesh position={[0.54, 0.38, 0]} rotation={[0, 0, -0.55]}>
+            <boxGeometry args={[0.10, 0.16, 0.025]} />
+            <meshStandardMaterial color="#FDE047" emissive="#F59E0B" emissiveIntensity={1.2} />
+          </mesh>
+        </group>
+
+        {/* Floating Holy Stardust Swarm */}
+        <group ref={particlesRef}>
+          {Array.from({ length: 14 }).map((_, i) => {
+            const angle = (i * Math.PI * 2) / 14;
+            const r = 0.35 + (i % 3) * 0.10;
+            const y = (i % 5) * 0.12 - 0.10;
+            return (
+              <mesh key={i} position={[Math.cos(angle) * r, y, Math.sin(angle) * r]}>
+                <boxGeometry args={[0.03, 0.03, 0.03]} />
+                <meshStandardMaterial color="#FDE047" emissive="#F59E0B" emissiveIntensity={1.6} />
+              </mesh>
+            );
+          })}
         </group>
       </group>
     );
   }
 
+  // 2. CÁNH HẮC LONG & ĐỐM LỬA TÍM (Shadow Demon Wings + Void Embers)
   if (code === 'shadow_wings') {
     return (
-      <group ref={groupRef} position={[0, 0.28, -0.18]}>
-        <group ref={leftWingRef} position={[-0.08, 0, 0]}>
-          <mesh position={[-0.28, 0.14, 0]}>
-            <boxGeometry args={[0.38, 0.28, 0.02]} />
-            <meshStandardMaterial color="#4C1D95" emissive="#A855F7" emissiveIntensity={0.7} roughness={0.2} />
+      <group ref={groupRef} position={[0, 0.24, -0.18]}>
+        {/* Left Obsidian Wing */}
+        <group ref={leftWingRef} position={[-0.10, 0, 0]}>
+          <mesh position={[-0.14, 0.06, 0]} castShadow>
+            <boxGeometry args={[0.20, 0.18, 0.03]} />
+            <meshStandardMaterial color="#1E1B4B" roughness={0.3} />
+          </mesh>
+          <mesh position={[-0.30, 0.18, 0]} rotation={[0, 0, 0.30]} castShadow>
+            <boxGeometry args={[0.26, 0.24, 0.025]} />
+            <meshStandardMaterial color="#581C87" emissive="#7E22CE" emissiveIntensity={0.9} roughness={0.2} />
+          </mesh>
+          <mesh position={[-0.48, 0.30, 0]} rotation={[0, 0, 0.50]} castShadow>
+            <boxGeometry args={[0.26, 0.30, 0.02]} />
+            <meshStandardMaterial color="#7E22CE" emissive="#A855F7" emissiveIntensity={1.4} roughness={0.2} />
+          </mesh>
+          {/* Jagged Obsidian Claws */}
+          <mesh position={[-0.60, 0.44, 0]} rotation={[0, 0, 0.65]}>
+            <boxGeometry args={[0.12, 0.16, 0.03]} />
+            <meshStandardMaterial color="#09090B" emissive="#C084FC" emissiveIntensity={1.6} />
           </mesh>
         </group>
-        <group ref={rightWingRef} position={[0.08, 0, 0]}>
-          <mesh position={[0.28, 0.14, 0]}>
-            <boxGeometry args={[0.38, 0.28, 0.02]} />
-            <meshStandardMaterial color="#4C1D95" emissive="#A855F7" emissiveIntensity={0.7} roughness={0.2} />
+
+        {/* Right Obsidian Wing */}
+        <group ref={rightWingRef} position={[0.10, 0, 0]}>
+          <mesh position={[0.14, 0.06, 0]} castShadow>
+            <boxGeometry args={[0.20, 0.18, 0.03]} />
+            <meshStandardMaterial color="#1E1B4B" roughness={0.3} />
           </mesh>
+          <mesh position={[0.30, 0.18, 0]} rotation={[0, 0, -0.30]} castShadow>
+            <boxGeometry args={[0.26, 0.24, 0.025]} />
+            <meshStandardMaterial color="#581C87" emissive="#7E22CE" emissiveIntensity={0.9} roughness={0.2} />
+          </mesh>
+          <mesh position={[0.48, 0.30, 0]} rotation={[0, 0, -0.50]} castShadow>
+            <boxGeometry args={[0.26, 0.30, 0.02]} />
+            <meshStandardMaterial color="#7E22CE" emissive="#A855F7" emissiveIntensity={1.4} roughness={0.2} />
+          </mesh>
+          <mesh position={[0.60, 0.44, 0]} rotation={[0, 0, -0.65]}>
+            <boxGeometry args={[0.12, 0.16, 0.03]} />
+            <meshStandardMaterial color="#09090B" emissive="#C084FC" emissiveIntensity={1.6} />
+          </mesh>
+        </group>
+
+        {/* Swirling Void Purple Embers */}
+        <group ref={particlesRef}>
+          {Array.from({ length: 16 }).map((_, i) => {
+            const angle = (i * Math.PI * 2) / 16;
+            const r = 0.36 + (i % 3) * 0.12;
+            const y = (i % 6) * 0.11 - 0.15;
+            return (
+              <mesh key={i} position={[Math.cos(angle) * r, y, Math.sin(angle) * r]}>
+                <boxGeometry args={[0.035, 0.035, 0.035]} />
+                <meshStandardMaterial color="#C084FC" emissive="#A855F7" emissiveIntensity={2.0} />
+              </mesh>
+            );
+          })}
         </group>
       </group>
     );
   }
 
-  if (code === 'sparkles_aura' || code === 'solar_flame_aura') {
+  // 3. AURA SAO LẤP LÁNH QUANH THÂN (Sparkles Aura - 24 Orbiting Stars Helix)
+  if (code === 'sparkles_aura') {
     return (
       <group ref={groupRef} position={[0, 0.20, 0]}>
-        {[-0.32, -0.18, 0.18, 0.32].map((x, i) => (
-          <mesh key={i} position={[x, (i % 2) * 0.25 - 0.10, ((i % 3) - 1) * 0.15]}>
-            <boxGeometry args={[0.035, 0.035, 0.035]} />
-            <meshStandardMaterial
-              color={code === 'solar_flame_aura' ? '#F59E0B' : '#38BDF8'}
-              emissive={code === 'solar_flame_aura' ? '#EF4444' : '#FBBF24'}
-              emissiveIntensity={1.0}
-            />
-          </mesh>
-        ))}
+        <group ref={particlesRef}>
+          {Array.from({ length: 24 }).map((_, i) => {
+            const angle = (i * Math.PI * 2) / 24;
+            const r = 0.32 + (i % 4) * 0.08;
+            const y = -0.45 + (i / 24) * 1.10;
+            const isGold = i % 3 === 0;
+            const isEmerald = i % 3 === 1;
+            const color = isGold ? '#FBBF24' : isEmerald ? '#34D399' : '#38BDF8';
+            const emissive = isGold ? '#F59E0B' : isEmerald ? '#10B981' : '#0284C7';
+            return (
+              <mesh key={i} position={[Math.cos(angle) * r, y, Math.sin(angle) * r]}>
+                <boxGeometry args={[0.035, 0.035, 0.035]} />
+                <meshStandardMaterial color={color} emissive={emissive} emissiveIntensity={1.8} />
+              </mesh>
+            );
+          })}
+        </group>
+      </group>
+    );
+  }
+
+  // 4. NGỌN LỬA THÁI DƯƠNG (Solar Sovereign Flame Vortex - 28 Fiery Rising Embers)
+  if (code === 'solar_flame_aura') {
+    return (
+      <group ref={groupRef} position={[0, 0.20, 0]}>
+        <group ref={particlesRef}>
+          {Array.from({ length: 28 }).map((_, i) => {
+            const angle = (i * Math.PI * 2) / 28;
+            const r = 0.28 + (i % 3) * 0.10;
+            const y = -0.45 + (i / 28) * 1.15;
+            const isYellow = i % 3 === 0;
+            const isOrange = i % 3 === 1;
+            const color = isYellow ? '#FDE047' : isOrange ? '#F97316' : '#EF4444';
+            const emissive = isYellow ? '#F59E0B' : isOrange ? '#EA580C' : '#B91C1C';
+            return (
+              <mesh key={i} position={[Math.cos(angle) * r, y, Math.sin(angle) * r]}>
+                <boxGeometry args={[0.045, 0.045, 0.045]} />
+                <meshStandardMaterial color={color} emissive={emissive} emissiveIntensity={2.4} />
+              </mesh>
+            );
+          })}
+        </group>
+      </group>
+    );
+  }
+
+  // 5. KHÓI PIXEL HUYỀN ẢO SHADOW SHINOBI (24 Billowing Dark Ninja Smoke Voxels)
+  if (code === 'shinobi_smoke') {
+    return (
+      <group ref={groupRef} position={[0, 0.10, 0]}>
+        <group ref={particlesRef}>
+          {Array.from({ length: 24 }).map((_, i) => {
+            const angle = (i * Math.PI * 2) / 24;
+            const r = 0.34 + (i % 3) * 0.10;
+            const y = -0.40 + (i / 24) * 0.90;
+            const isPurple = i % 2 === 0;
+            const color = isPurple ? '#581C87' : '#18181B';
+            const emissive = isPurple ? '#7E22CE' : '#3F3F46';
+            return (
+              <mesh key={i} position={[Math.cos(angle) * r, y, Math.sin(angle) * r]}>
+                <boxGeometry args={[0.055, 0.055, 0.055]} />
+                <meshStandardMaterial color={color} emissive={emissive} emissiveIntensity={0.9} transparent opacity={0.80} />
+              </mesh>
+            );
+          })}
+        </group>
+      </group>
+    );
+  }
+
+  // 6. MA TRẬN HƯ KHÔNG GLITCH SINGULARITY (24 Matrix Digital Glitch Cubes)
+  if (code === 'glitch_singularity') {
+    return (
+      <group ref={groupRef} position={[0, 0.20, 0]}>
+        <group ref={particlesRef}>
+          {Array.from({ length: 24 }).map((_, i) => {
+            const angle = (i * Math.PI * 2) / 24;
+            const r = 0.36 + ((i * 7) % 5) * 0.06;
+            const y = -0.40 + (i / 24) * 1.10;
+            const isCyan = i % 3 === 0;
+            const isMagenta = i % 3 === 1;
+            const color = isCyan ? '#06B6D4' : isMagenta ? '#D946EF' : '#84CC16';
+            return (
+              <mesh key={i} position={[Math.cos(angle) * r, y, Math.sin(angle) * r]}>
+                <boxGeometry args={[0.04, 0.04, 0.04]} />
+                <meshStandardMaterial color={color} emissive={color} emissiveIntensity={2.0} />
+              </mesh>
+            );
+          })}
+        </group>
       </group>
     );
   }

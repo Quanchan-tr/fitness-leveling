@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/modal_overlay"
+    android:clickable="true"
+    android:focusable="true"
+    tools:context=".ui.modal.WardrobeModalActivity">
+
+    <!-- Modal Card Container (Fills comfortably on mobile screens) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/card_modal"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/bg_modal_card_white"
+        android:padding="14dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <!-- Header -->
+        <TextView
+            android:id="@+id/tv_modal_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Phòng thay đồ &amp; Kho 3D"
+            android:textColor="@color/text_dark"
+            android:textSize="15.5sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_close_wardrobe"
+            app:layout_constraintEnd_toStartOf="@+id/tv_modal_level_badge"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_modal_level_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_badge_streak"
+            android:paddingStart="7dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="7dp"
+            android:paddingBottom="3dp"
+            android:text="Lv. 12"
+            android:textColor="@color/primary"
+            android:textSize="10.5sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_close_wardrobe"
+            app:layout_constraintEnd_toStartOf="@+id/btn_close_wardrobe"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/btn_close_wardrobe"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="@drawable/bg_modal_circle_close_light"
+            android:clickable="true"
+            android:contentDescription="@string/cd_close"
+            android:focusable="true"
+            android:padding="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_close"
+            app:tint="@color/text_slate" />
+
+        <!-- 3D Fitting Room Preview (Auto-zooming to selected slot) -->
+        <FrameLayout
+            android:id="@+id/fl_wardrobe_3d"
+            android:layout_width="0dp"
+            android:layout_height="180dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_card_selectable"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_modal_title">
+
+            <WebView
+                android:id="@+id/webview_wardrobe_character"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:id="@+id/tv_camera_zoom_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|start"
+                android:layout_margin="8dp"
+                android:background="@drawable/bg_tag_chip"
+                android:paddingStart="8dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="3dp"
+                android:text="🔍 Đang zoom: Áo"
+                android:textColor="@color/primary"
+                android:textSize="9.5sp"
+                android:textStyle="bold" />
+
+            <!-- Auto-rotate Toggle Pill Button -->
+            <TextView
+                android:id="@+id/btn_toggle_rotate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:layout_margin="8dp"
+                android:background="@drawable/bg_tag_chip"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingStart="8dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="3dp"
+                android:text="🔄 Xoay 360°"
+                android:textColor="@color/text_dark"
+                android:textSize="9.5sp"
+                android:textStyle="bold" />
+        </FrameLayout>
+
+        <!-- Equipment Slot Categories Bar (7 Horizontal Tabs) -->
+        <HorizontalScrollView
+            android:id="@+id/scroll_slots"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:overScrollMode="never"
+            android:scrollbars="none"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fl_wardrobe_3d">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp">
+
+                <TextView
+                    android:id="@+id/chip_slot_headwear"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:background="@drawable/bg_subtab_pill_inactive"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="11dp"
+                    android:paddingEnd="11dp"
+                    android:text="👑 Nón •"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/chip_slot_hair"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/bg_subtab_pill_inactive"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="11dp"
+                    android:paddingEnd="11dp"
+                    android:text="💇 Tóc •"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/chip_slot_top"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/bg_subtab_pill_active"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="11dp"
+                    android:paddingEnd="11dp"
+                    android:text="👕 Áo •"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/chip_slot_bottom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/bg_subtab_pill_inactive"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="11dp"
+                    android:paddingEnd="11dp"
+                    android:text="🩳 Quần •"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/chip_slot_shoes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/bg_subtab_pill_inactive"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="11dp"
+                    android:paddingEnd="11dp"
+                    android:text="👟 Giày •"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/chip_slot_accessories"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/bg_subtab_pill_inactive"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="11dp"
+                    android:paddingEnd="11dp"
+                    android:text="👓 Phụ kiện •"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/chip_slot_special"
+                    android:layout_width="wrap_content"
+                    android:layout_height="28dp"
+                    android:layout_marginStart="5dp"
+                    android:background="@drawable/bg_subtab_pill_inactive"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingStart="11dp"
+                    android:paddingEnd="11dp"
+                    android:text="✨ Hiệu ứng •"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- Sub-header bar: Item Count & Unequip Action -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_slot_action_bar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/scroll_slots">
+
+            <TextView
+                android:id="@+id/tv_slot_items_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Vật phẩm trang bị (5)"
+                android:textColor="@color/text_slate"
+                android:textSize="10.5sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/btn_unequip_slot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"
+                android:text="Tháo món này"
+                android:textColor="#EF4444"
+                android:textSize="10.5sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Equipment 2-Column Responsive Grid -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_equipment_grid"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="10dp"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            app:layout_constraintBottom_toTopOf="@+id/layout_modal_actions"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layout_slot_action_bar" />
+
+        <!-- Footer Actions Bar -->
+        <LinearLayout
+            android:id="@+id/layout_modal_actions"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_cancel_wardrobe"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:text="Đóng"
+                android:textColor="@color/text_dark"
+                android:textSize="12.5sp"
+                app:cornerRadius="12dp"
+                app:strokeColor="#CBD5E1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_apply_outfit"
+                style="@style/Widget.FitTrack.PrimaryButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="2"
+                android:text="✓ Lưu trang phục"
+                android:textSize="12.5sp"
+                app:cornerRadius="12dp" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

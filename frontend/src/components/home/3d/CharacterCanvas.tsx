@@ -110,10 +110,11 @@ export const CharacterCanvas: React.FC<CharacterCanvasProps> = ({
     <div className="w-full h-full relative select-none cursor-grab active:cursor-grabbing">
       <Canvas
         camera={{ position: [0, -0.04, 2.75], fov: 38, near: 0.1, far: 20 }}
-        dpr={typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, 1.5) : 1}
+        dpr={[1, 2]}
         gl={{
           antialias: true,
           alpha: true,
+          depth: true,
           powerPreference: 'high-performance',
         }}
       >

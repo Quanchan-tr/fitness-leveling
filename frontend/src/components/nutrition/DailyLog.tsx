@@ -3,8 +3,7 @@
 import React, { useMemo } from 'react';
 import { FoodLogItem, MealType, SavedCombo } from '@/types/nutrition.types';
 import { MealSection } from './MealSection';
-import { BookmarkPlus, CheckSquare, Utensils } from 'lucide-react';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { BookmarkPlus, CheckSquare } from 'lucide-react';
 
 interface DailyLogProps {
   foodLog: FoodLogItem[];
@@ -46,9 +45,9 @@ export const DailyLog: React.FC<DailyLogProps> = ({
   );
 
   return (
-    <div className="flex flex-col h-full space-y-3">
+    <div className="flex flex-col h-full space-y-2.5">
       {/* Sub-header info row */}
-      <div className="flex items-center justify-between pb-1 text-xs shrink-0">
+      <div className="flex items-center justify-between px-1 pb-1 text-xs shrink-0">
         <span className="font-semibold text-slate-500">
           Tổng cộng hôm nay:{' '}
           <span className="font-bold text-slate-900 tabular-nums">
@@ -56,13 +55,13 @@ export const DailyLog: React.FC<DailyLogProps> = ({
           </span>
         </span>
         <span className="font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full tabular-nums">
-          {foodLog.length} món
+          {foodLog.length} món đã ghi
         </span>
       </div>
 
       {/* Multi-Select Action Bar Banner */}
       {selectedLogIds.length > 0 && (
-        <div className="shrink-0 p-3 bg-orange-50 border border-orange-200 rounded-xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-1 duration-150">
+        <div className="shrink-0 p-2.5 bg-orange-50 border border-orange-200 rounded-xl flex items-center justify-between gap-3 animate-in fade-in slide-in-from-top-1 duration-150">
           <div className="flex items-center gap-2 text-xs font-bold text-[#FF5722]">
             <CheckSquare className="w-4 h-4" />
             <span>Đã chọn {selectedLogIds.length} món</span>
@@ -72,7 +71,7 @@ export const DailyLog: React.FC<DailyLogProps> = ({
             <button
               type="button"
               onClick={onClearSelection}
-              className="text-xs text-slate-500 hover:text-slate-700 px-2 py-1 rounded-lg hover:bg-white transition-colors"
+              className="text-xs text-slate-500 hover:text-slate-700 px-2 py-1 rounded-lg hover:bg-white transition-colors cursor-pointer"
             >
               Bỏ chọn
             </button>
@@ -88,51 +87,41 @@ export const DailyLog: React.FC<DailyLogProps> = ({
         </div>
       )}
 
-      {/* Scrollable list container that fixes height and prevents vertical box expanding */}
-      <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-4">
-        {foodLog.length === 0 ? (
-          <EmptyState
-            icon={Utensils}
-            title="Chưa có món ăn hôm nay"
-            description="Bạn chưa ghi lại bữa ăn nào trong ngày. Hãy tìm kiếm món ăn hoặc chọn từ Combo mẫu bên dưới để theo dõi lượng Calo & Macro."
-            className="border-dashed bg-slate-50/50 py-8"
-          />
-        ) : (
-          <div className="space-y-4 pb-2">
-            <MealSection
-              mealType="breakfast"
-              title="Bữa sáng"
-              items={breakfastItems}
-              selectedLogIds={selectedLogIds}
-              onToggleSelect={onToggleSelect}
-              onEdit={onEditFood}
-              onDelete={onDeleteFood}
-              onDropCombo={onDropCombo}
-            />
+      {/* Scrollable container with generous left/right padding so borders are never clipped */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-2 py-1 space-y-3">
+        {/* Always render all meal drop sections directly so users can drag & drop immediately */}
+        <MealSection
+          mealType="breakfast"
+          title="Bữa sáng"
+          items={breakfastItems}
+          selectedLogIds={selectedLogIds}
+          onToggleSelect={onToggleSelect}
+          onEdit={onEditFood}
+          onDelete={onDeleteFood}
+          onDropCombo={onDropCombo}
+        />
 
-            <MealSection
-              mealType="lunch"
-              title="Bữa trưa"
-              items={lunchItems}
-              selectedLogIds={selectedLogIds}
-              onToggleSelect={onToggleSelect}
-              onEdit={onEditFood}
-              onDelete={onDeleteFood}
-              onDropCombo={onDropCombo}
-            />
+        <MealSection
+          mealType="lunch"
+          title="Bữa trưa"
+          items={lunchItems}
+          selectedLogIds={selectedLogIds}
+          onToggleSelect={onToggleSelect}
+          onEdit={onEditFood}
+          onDelete={onDeleteFood}
+          onDropCombo={onDropCombo}
+        />
 
-            <MealSection
-              mealType="dinner"
-              title="Bữa tối"
-              items={dinnerItems}
-              selectedLogIds={selectedLogIds}
-              onToggleSelect={onToggleSelect}
-              onEdit={onEditFood}
-              onDelete={onDeleteFood}
-              onDropCombo={onDropCombo}
-            />
-          </div>
-        )}
+        <MealSection
+          mealType="dinner"
+          title="Bữa tối"
+          items={dinnerItems}
+          selectedLogIds={selectedLogIds}
+          onToggleSelect={onToggleSelect}
+          onEdit={onEditFood}
+          onDelete={onDeleteFood}
+          onDropCombo={onDropCombo}
+        />
       </div>
     </div>
   );

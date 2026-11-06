@@ -35,6 +35,9 @@ interface ModularVoxelCharacterProps {
  * - Volumetric layered voxel anime hair (never bald, never "1 chỏm")
  * - Dynamic idle breathing animation
  */
+
+// FloatingVoxelAura removed: Special effects now strictly render only when equipped in SPECIAL slot
+
 export const ModularVoxelCharacter: React.FC<ModularVoxelCharacterProps> = ({
   gender = 'male',
   equipped,
@@ -154,15 +157,17 @@ export const ModularVoxelCharacter: React.FC<ModularVoxelCharacterProps> = ({
 
         {/* Dedicated Front Face Decal Plane (Pixel Art Eyes, Eyebrows, Smile, Blush) */}
         {faceTexture && (
-          <mesh position={[0, 0.22, 0.191]}>
+          <mesh position={[0, 0.22, 0.192]}>
             <planeGeometry args={[0.38, 0.38]} />
             <meshStandardMaterial
               map={faceTexture}
               transparent={false}
+              depthTest={true}
+              depthWrite={true}
               roughness={0.65}
               polygonOffset={true}
-              polygonOffsetFactor={-1}
-              polygonOffsetUnits={-1}
+              polygonOffsetFactor={-2}
+              polygonOffsetUnits={-2}
             />
           </mesh>
         )}
@@ -189,9 +194,13 @@ export const ModularVoxelCharacter: React.FC<ModularVoxelCharacterProps> = ({
           <meshStandardMaterial color={skinTone} roughness={0.7} />
         </mesh>
 
-        {/* Neck */}
-        <mesh position={[0, 0.02, 0]} castShadow>
-          <boxGeometry args={[0.16, 0.08, 0.16]} />
+        {/* Athletic Muscular Neck & Trapezius */}
+        <mesh position={[0, -0.04, 0]} castShadow>
+          <boxGeometry args={[0.16, 0.16, 0.16]} />
+          <meshStandardMaterial color={skinTone} roughness={0.7} />
+        </mesh>
+        <mesh position={[0, -0.09, -0.02]} castShadow>
+          <boxGeometry args={[0.24, 0.08, 0.14]} />
           <meshStandardMaterial color={skinTone} roughness={0.7} />
         </mesh>
 
@@ -325,30 +334,30 @@ export const ModularVoxelCharacter: React.FC<ModularVoxelCharacterProps> = ({
       {/* =========================================================================
           4. LEGS & LOWER BODY (Pelvis + Smart Leg Skin + Optional Pants / Shoes)
          ========================================================================= */}
-      <group position={[0, -0.04, 0]}>
-        {/* Base Athletic Boxers / Pelvis (Only when not wearing long pants) */}
-        {!isLongPants && (
-          <mesh position={[0, -0.02, 0]} castShadow>
-            <boxGeometry args={[isFemale ? 0.34 : 0.40, 0.16, 0.22]} />
-            <meshStandardMaterial color={underwearColor} roughness={0.7} />
-          </mesh>
-        )}
+      <group position={[0, 0, 0]}>
+        {/* Base Athletic Pelvis & Boxers Core:
+            Always acts as connecting bridge between torso (bottom y = 0.00) and legs (top y = -0.09).
+            Top reaches y = +0.05, overlapping 5cm inside the torso for zero gaps! */}
+        <mesh position={[0, -0.04, 0]} castShadow>
+          <boxGeometry args={[isFemale ? 0.34 : 0.40, 0.18, 0.22]} />
+          <meshStandardMaterial color={underwearColor} roughness={0.7} />
+        </mesh>
 
         {/* Bare Skin Legs:
             - If long pants: DO NOT render duplicate skin legs inside pants = 0 Z-fighting!
-            - If shorts: render exposed lower legs only (y = -0.32)
-            - If unequipped: render full bare legs */}
+            - If shorts: render exposed lower legs only (y = -0.34)
+            - If unequipped: render full bare legs (y = -0.28) */}
         {!isLongPants && (
           <>
             {/* Left Leg Skin */}
             <mesh
-              position={[-legSpan, isShorts ? -0.32 : -0.28, 0]}
+              position={[-legSpan, isShorts ? -0.34 : -0.28, 0]}
               castShadow
             >
               <boxGeometry
                 args={[
                   legWidth,
-                  isShorts ? 0.26 : 0.44,
+                  isShorts ? 0.24 : 0.40,
                   0.19,
                 ]}
               />
@@ -357,13 +366,13 @@ export const ModularVoxelCharacter: React.FC<ModularVoxelCharacterProps> = ({
 
             {/* Right Leg Skin */}
             <mesh
-              position={[legSpan, isShorts ? -0.32 : -0.28, 0]}
+              position={[legSpan, isShorts ? -0.34 : -0.28, 0]}
               castShadow
             >
               <boxGeometry
                 args={[
                   legWidth,
-                  isShorts ? 0.26 : 0.44,
+                  isShorts ? 0.24 : 0.40,
                   0.19,
                 ]}
               />
@@ -377,10 +386,10 @@ export const ModularVoxelCharacter: React.FC<ModularVoxelCharacterProps> = ({
 
         {/* Bare Feet (Rendered only when SHOES slot is unequipped) */}
         {!hasShoes && (
-          <group position={[0, -0.52, 0]}>
+          <group position={[0, -0.50, 0]}>
             {[-legSpan, legSpan].map((x, i) => (
-              <mesh key={i} position={[x, 0, 0.04]} castShadow>
-                <boxGeometry args={[legWidth - 0.01, 0.06, 0.20]} />
+              <mesh key={i} position={[x, -0.04, 0.04]} castShadow>
+                <boxGeometry args={[legWidth - 0.01, 0.08, 0.22]} />
                 <meshStandardMaterial color={skinTone} roughness={0.65} />
               </mesh>
             ))}
@@ -395,6 +404,6 @@ export const ModularVoxelCharacter: React.FC<ModularVoxelCharacterProps> = ({
           5. SPECIAL EFFECTS SLOT (Cánh Pixel & Hạt Aura Lơ Lửng - KHÔNG VÒNG ĐẾ)
          ========================================================================= */}
       <SpecialRenderer item={equipped.SPECIAL || null} />
-    </group>
+          </group>
   );
 };

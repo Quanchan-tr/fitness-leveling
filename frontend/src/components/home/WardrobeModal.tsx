@@ -139,9 +139,9 @@ export const WardrobeModal: React.FC<WardrobeModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-5 bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="bg-white rounded-3xl border border-slate-200/90 shadow-2xl w-full max-w-5xl h-[92vh] max-h-[820px] flex flex-col overflow-hidden relative"
+        className="bg-white rounded-none sm:rounded-3xl border border-slate-200/90 shadow-2xl w-full max-w-5xl h-full sm:h-[92vh] max-h-[820px] flex flex-col overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ================= MODAL HEADER (Clean, no redundant subtitles) ================= */}
@@ -202,7 +202,7 @@ export const WardrobeModal: React.FC<WardrobeModalProps> = ({
         {/* ================= MODAL BODY: 2 COLUMNS ================= */}
         <div className="flex-1 grid grid-cols-1 md:grid-cols-12 overflow-hidden">
           {/* LEFT: 3D CHARACTER PREVIEW STAGE (5 COLS) */}
-          <div className="md:col-span-5 bg-gradient-to-b from-slate-50 via-slate-100/60 to-slate-50 border-b md:border-b-0 md:border-r border-slate-200/80 flex flex-col relative h-[340px] md:h-auto">
+          <div className="md:col-span-5 bg-gradient-to-b from-slate-50 via-slate-100/60 to-slate-50 border-b md:border-b-0 md:border-r border-slate-200/80 flex flex-col relative h-[210px] sm:h-[270px] md:h-auto shrink-0">
             {/* Stage Controls */}
             <div className="absolute top-3 left-3 right-3 z-10 flex items-center justify-between pointer-events-none">
               <div className="flex items-center gap-1.5 pointer-events-auto">

@@ -5,13 +5,26 @@
     <dimen name="screen_padding_top">48dp</dimen>
     <dimen name="screen_padding_bottom">24dp</dimen>
 
+    <!-- Design System Radius Tokens -->
+    <dimen name="radius_small_card">16dp</dimen>
+    <dimen name="radius_standard_card">18dp</dimen>
+    <dimen name="radius_large_container">22dp</dimen>
+    <dimen name="radius_modal">24dp</dimen>
+    <dimen name="radius_button">14dp</dimen>
+    <dimen name="radius_input">12dp</dimen>
+    <dimen name="radius_pill">999dp</dimen>
+
     <!-- Component Dimensions -->
     <dimen name="button_height">50dp</dimen>
-    <dimen name="button_corner_radius">25dp</dimen>
+    <dimen name="button_corner_radius">14dp</dimen>
     <dimen name="input_height">48dp</dimen>
-    <dimen name="input_corner_radius">6dp</dimen>
+    <dimen name="input_corner_radius">12dp</dimen>
     <dimen name="back_button_size">40dp</dimen>
     <dimen name="otp_box_size">48dp</dimen>
+
+    <!-- Border Tokens -->
+    <dimen name="border_width_standard">1dp</dimen>
+    <dimen name="border_width_active">1.5dp</dimen>
 
     <!-- Global Icon Sizing Tokens -->
     <dimen name="icon_size_xs">14dp</dimen>
@@ -19,7 +32,8 @@
     <dimen name="icon_size_medium">24dp</dimen>
     <dimen name="icon_size_large">32dp</dimen>
     <dimen name="icon_size_xlarge">48dp</dimen>
-    <dimen name="nav_icon_size">24dp</dimen>
+    <dimen name="nav_icon_size">22dp</dimen>
+    <dimen name="nav_dot_size">4dp</dimen>
 
     <!-- Spacings -->
     <dimen name="spacing_tiny">4dp</dimen>

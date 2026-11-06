@@ -7,40 +7,57 @@
     android:background="@color/bg_screen_gray"
     tools:context=".ui.profile.UserProfileActivity">
 
-    <!-- Top App Bar / Header -->
+    <!-- Top App Bar / Header (Modern SaaS Partitioned Top Bar) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_header"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@drawable/bg_top_header_bar"
         android:paddingStart="@dimen/screen_padding_horizontal"
         android:paddingTop="44dp"
         android:paddingEnd="@dimen/screen_padding_horizontal"
-        android:paddingBottom="12dp"
+        android:paddingBottom="14dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/tv_title"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/profile_title"
-            android:textColor="@color/text_dark"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:layout_marginEnd="12dp"
+            android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_settings"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/profile_title"
+                android:textColor="@color/text_dark"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="@string/profile_subtitle"
+                android:textColor="@color/text_slate"
+                android:textSize="11sp" />
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/btn_settings"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:background="@drawable/bg_icon_container_white"
             android:clickable="true"
             android:focusable="true"
-            android:padding="6dp"
+            android:padding="8dp"
+            android:contentDescription="@string/profile_title"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -68,81 +85,211 @@
             android:paddingEnd="@dimen/screen_padding_horizontal"
             android:paddingBottom="24dp">
 
-            <!-- Profile Overview Card -->
+            <!-- Section 1: Profile Overview Card (Identity, Badges, Counters) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_card_white"
-                android:elevation="2dp"
-                android:gravity="center_horizontal"
+                android:elevation="0dp"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="18dp">
 
-                <ImageView
-                    android:id="@+id/iv_avatar"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:background="@drawable/bg_icon_container_white"
-                    android:padding="16dp"
-                    app:srcCompat="@drawable/ic_user_solid"
-                    app:tint="@color/primary" />
-
-                <TextView
-                    android:id="@+id/tv_profile_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/dashboard_user_name"
-                    android:textColor="@color/text_dark"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <!-- Level & Streak Badges Row -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/btn_badges_link_lv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_badge_streak"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:paddingHorizontal="10dp"
-                        android:paddingVertical="4dp"
-                        android:text="@string/profile_level_title"
-                        android:textColor="@color/primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                    <!-- Avatar with Level Badge -->
+                    <FrameLayout
+                        android:layout_width="68dp"
+                        android:layout_height="68dp">
 
-                    <TextView
-                        android:id="@+id/btn_badges_link_streak"
-                        android:layout_width="wrap_content"
+                        <ImageView
+                            android:id="@+id/iv_avatar"
+                            android:layout_width="64dp"
+                            android:layout_height="64dp"
+                            android:background="@drawable/bg_avatar_circle_border"
+                            android:padding="12dp"
+                            android:contentDescription="@string/cd_avatar"
+                            app:srcCompat="@drawable/ic_user_solid"
+                            app:tint="@color/primary" />
+
+                        <TextView
+                            android:id="@+id/btn_badges_link_lv"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="bottom|end"
+                            android:background="@drawable/bg_badge_level"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:paddingStart="6dp"
+                            android:paddingTop="1dp"
+                            android:paddingEnd="6dp"
+                            android:paddingBottom="1dp"
+                            android:text="Lv. 12"
+                            android:textColor="@color/white"
+                            android:textSize="9.5sp"
+                            android:textStyle="bold" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_badge_streak"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:paddingHorizontal="10dp"
-                        android:paddingVertical="4dp"
-                        android:text="@string/profile_streak_badge"
-                        android:textColor="@color/primary"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/tv_profile_name"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/dashboard_user_name"
+                                android:textColor="@color/text_dark"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:background="@drawable/bg_badge_streak"
+                                android:paddingStart="7dp"
+                                android:paddingTop="2dp"
+                                android:paddingEnd="7dp"
+                                android:paddingBottom="2dp"
+                                android:text="Tăng cơ"
+                                android:textColor="@color/badge_streak_text"
+                                android:textSize="10sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Tập luyện để trở thành phiên bản tốt hơn mỗi ngày 🔥"
+                            android:textColor="@color/text_slate"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/btn_badges_link_streak"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/bg_tag_chip"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:paddingStart="8dp"
+                            android:paddingTop="2dp"
+                            android:paddingEnd="8dp"
+                            android:paddingBottom="2dp"
+                            android:text="🔥 17 ngày streak liên tục"
+                            android:textColor="@color/primary"
+                            android:textSize="10.5sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
                 </LinearLayout>
 
-                <!-- Stats Row -->
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- Counter Trio Grid (Tổng buổi tập, Người theo dõi, Đang theo dõi) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="@string/profile_stats"
-                    android:textColor="@color/text_slate"
-                    android:textSize="11sp" />
+                    android:orientation="horizontal">
+
+                    <!-- Box 1 -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_card_selectable"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TỔNG BUỔI TẬP"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="9sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="24"
+                            android:textColor="@color/text_dark"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Box 2 -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_card_selectable"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="NGƯỜI THEO DÕI"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="9sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="142"
+                            android:textColor="@color/text_dark"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Box 3 -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_card_selectable"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="ĐANG THEO DÕI"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="9sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="89"
+                            android:textColor="@color/text_dark"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
 
                 <!-- Edit Profile Button -->
                 <com.google.android.material.button.MaterialButton
@@ -150,140 +297,688 @@
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/btn_edit_profile"
+                    android:layout_marginTop="14dp"
+                    android:text="✏️ Chỉnh sửa thông tin hồ sơ"
                     android:textColor="@color/text_dark"
-                    android:textSize="13sp"
-                    app:cornerRadius="22dp"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
                     app:strokeColor="@color/border_card" />
             </LinearLayout>
 
-            <!-- 12-week Progress Stats Card -->
+            <!-- Section 2: Physical & Performance Metrics Grid (Thông số thể hình chi tiết) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 android:background="@drawable/bg_card_white"
-                android:elevation="2dp"
                 android:orientation="vertical"
                 android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/profile_progress_title"
+                    android:text="📊 Thông số thể hình &amp; Hiệu suất"
                     android:textColor="@color/text_dark"
-                    android:textSize="13sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="@string/profile_progress_desc"
-                    android:textColor="@color/text_slate"
-                    android:textSize="11sp" />
-            </LinearLayout>
-
-            <!-- Workout Log Card (4 Recent Workouts) -->
-            <LinearLayout
-                android:id="@+id/card_workout_logs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_card_white"
-                android:elevation="2dp"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/profile_recent_logs_title"
-                    android:textColor="@color/text_dark"
-                    android:textSize="13sp"
-                    android:textStyle="bold" />
-
-                <!-- Log Item 0 -->
+                <!-- Row 1: Chiều cao, Cân nặng, BMI -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:orientation="vertical">
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/profile_log_1_title"
-                        android:textColor="@color/text_dark"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_tag_chip"
+                        android:orientation="vertical"
+                        android:padding="10dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Chiều cao"
+                            android:textColor="@color/text_slate"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="175 cm"
+                            android:textColor="@color/text_dark"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/profile_log_1_stats"
-                        android:textColor="@color/text_slate"
-                        android:textSize="11sp" />
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_tag_chip"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cân nặng"
+                            android:textColor="@color/text_slate"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="68.5 kg"
+                            android:textColor="@color/text_dark"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_tag_chip"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Chỉ số BMI"
+                            android:textColor="@color/text_slate"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="22.4 (Chuẩn)"
+                            android:textColor="@color/live_green"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
                 </LinearLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="10dp"
-                    android:background="@color/border_card" />
-
-                <!-- Log Item 1 -->
+                <!-- Row 2: Tần suất, Tổng tải trọng, Tổng Reps -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="@string/profile_log_2_title"
-                        android:textColor="@color/text_dark"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_tag_chip"
+                        android:orientation="vertical"
+                        android:padding="10dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tần suất"
+                            android:textColor="@color/text_slate"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="4 buổi/tuần"
+                            android:textColor="@color/text_dark"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/profile_log_2_stats"
-                        android:textColor="@color/text_slate"
-                        android:textSize="11sp" />
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_tag_chip"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tải trọng tích lũy"
+                            android:textColor="@color/text_slate"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="34.500 kg"
+                            android:textColor="@color/primary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_tag_chip"
+                        android:orientation="vertical"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tổng Reps"
+                            android:textColor="@color/text_slate"
+                            android:textSize="10sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="4.820 reps"
+                            android:textColor="@color/text_dark"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
                 </LinearLayout>
+            </LinearLayout>
 
-                <View
+            <!-- Section 3: 12-week Progress Chart (Tiến trình tập luyện chuẩn web) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_card_white"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginVertical="10dp"
-                    android:background="@color/border_card" />
+                    android:layout_height="wrap_content">
 
-                <!-- Log Item 2 -->
+                    <TextView
+                        android:id="@+id/tv_chart_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📈 Thống kê tiến trình tập luyện"
+                        android:textColor="@color/text_dark"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_badge_streak"
+                        android:paddingStart="7dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="7dp"
+                        android:paddingBottom="2dp"
+                        android:text="12 tuần"
+                        android:textColor="@color/badge_streak_text"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Hoàn thành 42/48 buổi tập dự kiến • Đạt 87.5% mục tiêu"
+                    android:textColor="@color/text_slate"
+                    android:textSize="11sp" />
+
+                <!-- Metric Toggle Tabs (Thời lượng vs Số Reps) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tab_chart_duration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:background="@drawable/bg_subtab_pill_active"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:text="Thời lượng (phút)"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tab_chart_reps"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_subtab_pill_inactive"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:text="Số Reps"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/tab_chart_volume"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_subtab_pill_inactive"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp"
+                        android:text="Tải trọng (kg)"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11sp" />
+                </LinearLayout>
+
+                <!-- Visual 12-Week Bar Chart Container -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:gravity="bottom"
+                    android:orientation="horizontal"
+                    android:paddingStart="8dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="8dp">
+
+                    <!-- Bar T1 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
+                        <View android:layout_width="12dp" android:layout_height="48dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T1" android:textColor="@color/text_slate_light" android:textSize="8sp" />
+                    </LinearLayout>
+                    <!-- Bar T2 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
+                        <View android:layout_width="12dp" android:layout_height="54dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T2" android:textColor="@color/text_slate_light" android:textSize="8sp" />
+                    </LinearLayout>
+                    <!-- Bar T3 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
+                        <View android:layout_width="12dp" android:layout_height="62dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T3" android:textColor="@color/text_slate_light" android:textSize="8sp" />
+                    </LinearLayout>
+                    <!-- Bar T4 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
+                        <View android:layout_width="12dp" android:layout_height="58dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T4" android:textColor="@color/text_slate_light" android:textSize="8sp" />
+                    </LinearLayout>
+                    <!-- Bar T5 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
+                        <View android:layout_width="12dp" android:layout_height="72dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T5" android:textColor="@color/text_slate_light" android:textSize="8sp" />
+                    </LinearLayout>
+                    <!-- Bar T6 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
+                        <View android:layout_width="12dp" android:layout_height="66dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T6" android:textColor="@color/text_slate_light" android:textSize="8sp" />
+                    </LinearLayout>
+                    <!-- Bar T7 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
+                        <View android:layout_width="12dp" android:layout_height="78dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T7" android:textColor="@color/text_slate_light" android:textSize="8sp" />
+                    </LinearLayout>
+                    <!-- Bar T8 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
+                        <View android:layout_width="12dp" android:layout_height="75dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T8" android:textColor="@color/text_slate_light" android:textSize="8sp" />
+                    </LinearLayout>
+                    <!-- Bar T9 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
+                        <View android:layout_width="12dp" android:layout_height="84dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T9" android:textColor="@color/text_slate_light" android:textSize="8sp" />
+                    </LinearLayout>
+                    <!-- Bar T10 -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
+                        <View android:layout_width="12dp" android:layout_height="80dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T10" android:textColor="@color/text_slate_light" android:textSize="8sp" />
+                    </LinearLayout>
+                    <!-- Bar T11 (Peak Week Highlighted) -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
+                        <View android:layout_width="12dp" android:layout_height="94dp" android:background="@drawable/bg_gradient_workout_cta" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T11" android:textColor="@color/primary" android:textSize="8sp" android:textStyle="bold" />
+                    </LinearLayout>
+                    <!-- Bar T12 (Current Week) -->
+                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
+                        <View android:layout_width="12dp" android:layout_height="88dp" android:background="@drawable/bg_primary_button" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T12" android:textColor="@color/primary" android:textSize="8sp" android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Section 4: Detailed Workout Activity Logs (Web-Grade 3 Historical Sessions) -->
+            <LinearLayout
+                android:id="@+id/card_workout_logs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_card_white"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/profile_log_3_title"
+                        android:text="🏋️ Nhật ký hoạt động gần đây"
                         android:textColor="@color/text_dark"
-                        android:textSize="12sp"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_badge_streak"
+                        android:paddingStart="7dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="7dp"
+                        android:paddingBottom="2dp"
+                        android:text="24 buổi"
+                        android:textColor="@color/badge_streak_text"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <!-- Session 1: Ngực & Tay Sau -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Hôm nay, 28/09"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_subtab_pill_active"
+                            android:backgroundTint="@color/live_green"
+                            android:paddingStart="6dp"
+                            android:paddingTop="1dp"
+                            android:paddingEnd="6dp"
+                            android:paddingBottom="1dp"
+                            android:text="✓ Hoàn thành"
+                            android:textColor="@color/white"
+                            android:textSize="9sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Ngực &amp; Tay Sau Cắt Nét"
+                        android:textColor="@color/text_dark"
+                        android:textSize="13.5sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="@string/profile_log_3_stats"
+                        android:text="Barbell Bench • Incline DB Press • Dips Triceps"
                         android:textColor="@color/text_slate"
-                        android:textSize="11sp" />
+                        android:textSize="10.5sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⏱ 45 phút"
+                            android:textColor="@color/text_dark"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:text="🏋️ 4.250 kg"
+                            android:textColor="@color/primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:text="⚡ 10 sets"
+                            android:textColor="@color/text_slate"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Session 2: Lưng Xô & Tay Trước -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Thứ Bảy, 26/09"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_subtab_pill_active"
+                            android:backgroundTint="@color/live_green"
+                            android:paddingStart="6dp"
+                            android:paddingTop="1dp"
+                            android:paddingEnd="6dp"
+                            android:paddingBottom="1dp"
+                            android:text="✓ Hoàn thành"
+                            android:textColor="@color/white"
+                            android:textSize="9sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Lưng Xô &amp; Bắp Tay Trước"
+                        android:textColor="@color/text_dark"
+                        android:textSize="13.5sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Deadlift • Lat Pulldown • Barbell Curl"
+                        android:textColor="@color/text_slate"
+                        android:textSize="10.5sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⏱ 40 phút"
+                            android:textColor="@color/text_dark"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:text="🏋️ 3.800 kg"
+                            android:textColor="@color/primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:text="⚡ 8 sets"
+                            android:textColor="@color/text_slate"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Session 3: Chân & Core -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:orientation="vertical"
+                    android:padding="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Thứ Năm, 24/09"
+                            android:textColor="@color/text_slate_light"
+                            android:textSize="10sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_subtab_pill_active"
+                            android:backgroundTint="@color/live_green"
+                            android:paddingStart="6dp"
+                            android:paddingTop="1dp"
+                            android:paddingEnd="6dp"
+                            android:paddingBottom="1dp"
+                            android:text="✓ Hoàn thành"
+                            android:textColor="@color/white"
+                            android:textSize="9sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Chân Đùi &amp; Core Power"
+                        android:textColor="@color/text_dark"
+                        android:textSize="13.5sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Barbell Squat • Leg Press • Plank"
+                        android:textColor="@color/text_slate"
+                        android:textSize="10.5sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="⏱ 50 phút"
+                            android:textColor="@color/text_dark"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:text="🏋️ 5.100 kg"
+                            android:textColor="@color/primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:text="⚡ 12 sets"
+                            android:textColor="@color/text_slate"
+                            android:textSize="11sp" />
+                    </LinearLayout>
                 </LinearLayout>
 
             </LinearLayout>

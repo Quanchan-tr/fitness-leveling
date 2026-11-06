@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FitTrack</string>
+    <string name="app_name">FitnessLeveling</string>
 
     <!-- Common Controls & Navigation -->
     <string name="label_optional">Không bắt buộc</string>
     <string name="cd_back_button">Quay lại</string>
+    <string name="btn_back">Quay lại</string>
     <string name="cd_toggle_password">Ẩn/hiện mật khẩu</string>
     <string name="cd_close">Đóng</string>
     <string name="btn_continue">Tiếp tục</string>
@@ -41,7 +42,7 @@
 
     <!-- 4. Forgot Password Screen -->
     <string name="forgot_password_title">Quên mật khẩu</string>
-    <string name="forgot_password_description">Nhập địa chỉ email đã đăng ký. FitTrack sẽ gửi liên kết khôi phục mật khẩu vào hòm thư của bạn.</string>
+    <string name="forgot_password_description">Nhập địa chỉ email đã đăng ký. FitnessLeveling sẽ gửi liên kết khôi phục mật khẩu vào hòm thư của bạn.</string>
     <string name="btn_submit">Gửi yêu cầu</string>
     <string name="remember_password_full"><![CDATA[Đã nhớ lại mật khẩu? <font color="#1443C3"><b>Đăng nhập ngay</b></font>]]></string>
 
@@ -170,8 +171,8 @@
     <string name="nav_profile">Hồ sơ</string>
 
     <!-- 001. Dashboard -->
-    <string name="dashboard_app_title">FitTrack AI</string>
-    <string name="dashboard_command_center">TRUNG TÂM ĐIỀU KHIỂN</string>
+    <string name="dashboard_app_title">FitnessLeveling</string>
+    <string name="dashboard_command_center">LEVEL UP YOUR FITNESS</string>
     <string name="dashboard_streak">17 ngày</string>
     <string name="dashboard_enter_workout_cta">Vào buổi tập ngay</string>
     <string name="dashboard_user_name">Quan Tran</string>
@@ -198,6 +199,7 @@
 
     <!-- 002. Workouts -->
     <string name="workouts_title">Kế hoạch &amp; Lịch tập</string>
+    <string name="workouts_subtitle">Lịch tuần &amp; Thư viện giáo án</string>
     <string name="btn_create_routine">+ Tạo Routine</string>
     <string name="workouts_weekly_schedule_title">Lịch biểu luyện tập tuần này</string>
     <string name="workouts_status_legend">Đã tập  •  Hôm nay  •  Nghỉ</string>
@@ -228,7 +230,10 @@
     <string name="btn_start_ai_pose">Bắt đầu phiên AI Pose Coach ngay</string>
 
     <!-- 004. Body Metrics -->
-    <string name="metrics_title">Số đo &amp; Tiến trình vóc dáng</string>
+    <string name="metrics_title">Chỉ số &amp; Sức khỏe</string>
+    <string name="metrics_subtitle">Theo dõi vóc dáng &amp; Nhật ký dinh dưỡng</string>
+    <string name="tab_nutrition_tab">Dinh dưỡng &amp; Calo</string>
+    <string name="btn_log_nutrition">＋ Thêm món ăn</string>
     <string name="btn_log_metrics">＋ Ghi số đo</string>
     <string name="tab_body_metrics">Chỉ số cơ thể</string>
     <string name="tab_nutrition_shortcut">Dinh dưỡng</string>
@@ -257,7 +262,18 @@
     <string name="btn_create_combo">Tạo combo món</string>
 
     <!-- 006. Community -->
-    <string name="community_title">Cộng đồng FitTrack AI</string>
+    <string name="community_title">Cộng đồng FitnessLeveling</string>
+    <string name="community_subtitle">Chia sẻ giáo án &amp; Kết nối gymer</string>
+    <string name="community_filter_all">Tất cả</string>
+    <string name="community_filter_chest">Ngực &amp; Tay sau</string>
+    <string name="community_filter_back">Lưng &amp; Xô</string>
+    <string name="community_filter_legs">Chân &amp; Mông</string>
+    <string name="community_filter_pr">Kỷ lục PR</string>
+    <string name="community_routine_tag">Push Day Hypertrophy • 45 phút • 6 bài</string>
+    <string name="community_btn_save_routine">Lưu giáo án</string>
+    <string name="community_toast_routine_saved">Đã lưu giáo án vào danh sách tập của bạn!</string>
+    <string name="community_like_count">48</string>
+    <string name="community_comment_count">12</string>
     <string name="community_input_placeholder">Chia sẻ trải nghiệm buổi tập và giáo án...</string>
     <string name="community_post_user">Quan Tran [Lv. 12] • 10 phút trước</string>
     <string name="community_post_content">Vừa hoàn thành Push Day! PR Bench Press 90kg thành công nhờ AI Coach canh nhịp thở chuẩn</string>
@@ -268,6 +284,7 @@
 
     <!-- 007. User Profile -->
     <string name="profile_title">Hồ sơ cá nhân</string>
+    <string name="profile_subtitle">Thống kê cấp độ &amp; Lịch sử tập luyện</string>
     <string name="profile_level_title">Lv. 12 Chiến binh</string>
     <string name="profile_stats">42 BUỔI TẬP    154 NGƯỜI THEO DÕI    88 ĐANG THEO DÕI</string>
     <string name="btn_edit_profile">Chỉnh sửa hồ sơ cá nhân</string>
@@ -497,11 +514,17 @@
     <string name="dashboard_daily_quest_action">Xem ➔</string>
 
     <!-- Workouts -->
+    <string name="workouts_ai_planner_title">✨ AI Workout Planner</string>
+    <string name="workouts_ai_planner_desc">Tự động sinh lịch tập thông minh dựa trên mục tiêu, thể lực &amp; thời gian của bạn</string>
+    <string name="workouts_ai_planner_cta">Tạo lịch AI ➔</string>
+    <string name="workouts_action_add_calendar">Thêm vào lịch</string>
+    <string name="workouts_action_edit">Chỉnh sửa</string>
+    <string name="workouts_action_delete">Xóa routine</string>
     <string name="workouts_drag_routine_hint">⠿ Kéo thả Routine từ thư viện vào ngày tập để xếp lịch</string>
     <string name="workouts_today_scheduled_routine">Lịch hôm nay: Ngực &amp; Tay Sau Cắt Nét (3 bài)</string>
     <string name="workouts_today_scheduled_ex">• Barbell Bench Press  • Incline DB  • Dips Triceps</string>
     <string name="workouts_btn_detail">Chi tiết</string>
-    <string name="workouts_collection_title">Bộ sưu tập Routine &amp; Thư mục</string>
+    <string name="workouts_collection_title">Thư mục bài tập</string>
     <string name="workouts_collection_sub">4 routines • 3 thư mục</string>
     <string name="workouts_drag_to_cal">⠿ Kéo vào lịch</string>
     <string name="workouts_view_routine_detail_action">🔍 Xem chi tiết giáo án &amp; kỹ thuật tập ➔</string>

@@ -24,7 +24,7 @@ export default function VerifyPage() {
     if (user?.isEmailVerified && !user?.hasCompletedOnboarding) {
       router.replace('/onboarding');
     } else if (user?.isEmailVerified && user?.hasCompletedOnboarding) {
-      router.replace('/');
+      router.replace('/dashboard');
     }
   }, [user, router]);
 
@@ -188,7 +188,7 @@ export default function VerifyPage() {
           </button>
           <div className="w-px h-3 bg-slate-300" />
           <Link
-            href="/"
+            href="/dashboard"
             className="text-xs text-slate-500 hover:text-slate-900 font-semibold transition-colors"
           >
             Vào demo
