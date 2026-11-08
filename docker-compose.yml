@@ -4,12 +4,16 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
+      args:
+        - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000/api/v1}
+        - NEXT_PUBLIC_POSE_WS_URL=${NEXT_PUBLIC_POSE_WS_URL:-ws://localhost:8001}
     container_name: fitnessleveling-frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000/api/v1}
+      - NEXT_PUBLIC_POSE_WS_URL=${NEXT_PUBLIC_POSE_WS_URL:-ws://localhost:8001}
     depends_on:
       - backend
 
@@ -27,6 +31,8 @@ services:
     volumes:
       # Shared private storage: accessible by backend, queue-worker, and pose-worker
       - private_storage:/var/www/html/storage/app/private
+      - public_storage:/var/www/html/storage/app/public
+      - backend_logs:/var/www/html/storage/logs
     depends_on:
       - postgres
 
@@ -43,8 +49,10 @@ services:
     env_file:
       - ./backend/.env
     volumes:
-      # Must share the same private storage volume to read uploaded videos
+      # Must share the same storage volumes
       - private_storage:/var/www/html/storage/app/private
+      - public_storage:/var/www/html/storage/app/public
+      - backend_logs:/var/www/html/storage/logs
     depends_on:
       - backend
       - postgres
@@ -74,16 +82,15 @@ services:
 
   # --- DATABASE (POSTGRESQL 16) ---
   # Single source of truth: business data + database queue (jobs table).
+  # Khóa cổng 5432 trong mạng nội bộ Docker - không mở ra public Internet trên VPS.
   postgres:
     image: postgres:16-alpine
     container_name: fitnessleveling-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_DB: fitnessleveling
-      POSTGRES_USER: fitnessleveling_user
-      POSTGRES_PASSWORD: fitnessleveling_password
-    ports:
-      - "5432:5432"
+      POSTGRES_DB: ${DB_DATABASE:-fitnessleveling}
+      POSTGRES_USER: ${DB_USERNAME:-fitnessleveling_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-fitnessleveling_password}
     volumes:
       - pgdata:/var/lib/postgresql/data
 
@@ -91,3 +98,7 @@ volumes:
   pgdata:
   # Named volume for pose video files — shared between backend, queue-worker, and pose-worker.
   private_storage:
+  # Named volume for publicly uploaded files (e.g. avatars).
+  public_storage:
+  # Named volume for Laravel application log retention.
+  backend_logs:

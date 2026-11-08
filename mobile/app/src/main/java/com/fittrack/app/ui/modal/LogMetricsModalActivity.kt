@@ -7,7 +7,14 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.models.CreateBodyMetricRequest
+import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityModalLogMetricsBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LogMetricsModalActivity : AppCompatActivity() {
 
@@ -34,19 +41,49 @@ class LogMetricsModalActivity : AppCompatActivity() {
         binding.etHeight.addTextChangedListener(bmiWatcher)
 
         binding.btnSaveMetrics.setOnClickListener {
-            val weight = binding.etWeight.text.toString().trim()
-            val height = binding.etHeight.text.toString().trim()
-            val fat = binding.etBodyFat.text.toString().trim()
-
-            val resultIntent = Intent().apply {
-                if (weight.isNotEmpty()) putExtra("SAVED_WEIGHT", weight)
-                if (height.isNotEmpty()) putExtra("SAVED_HEIGHT", height)
-                if (fat.isNotEmpty()) putExtra("SAVED_FAT", fat)
-            }
-            setResult(Activity.RESULT_OK, resultIntent)
-            Toast.makeText(this, "Đã lưu số đo cơ thể thành công!", Toast.LENGTH_SHORT).show()
-            finish()
+            handleSaveMetrics()
         }
+    }
+
+    private fun handleSaveMetrics() {
+        val weightStr = binding.etWeight.text.toString().trim()
+        val heightStr = binding.etHeight.text.toString().trim()
+        val fatStr = binding.etBodyFat.text.toString().trim()
+
+        val weightKg = weightStr.toDoubleOrNull()
+        if (weightKg == null || weightKg <= 0.0) {
+            Toast.makeText(this, "Vui lòng nhập cân nặng hợp lệ (kg)", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val fatPct = fatStr.toDoubleOrNull()
+
+        val session = SessionManager.getInstance(this)
+        if (session.isLoggedIn) {
+            lifecycleScope.launch {
+                try {
+                    withContext(Dispatchers.IO) {
+                        ApiClient.getService(this@LogMetricsModalActivity).createBodyMetric(
+                            CreateBodyMetricRequest(
+                                weightKg = weightKg,
+                                bodyFatPercentage = fatPct
+                            )
+                        )
+                    }
+                } catch (_: Exception) {
+                    // Non-blocking sync
+                }
+            }
+        }
+
+        val resultIntent = Intent().apply {
+            putExtra("SAVED_WEIGHT", weightStr)
+            if (heightStr.isNotEmpty()) putExtra("SAVED_HEIGHT", heightStr)
+            if (fatStr.isNotEmpty()) putExtra("SAVED_FAT", fatStr)
+        }
+        setResult(Activity.RESULT_OK, resultIntent)
+        Toast.makeText(this, "✓ Đã lưu số đo thể chất thành công!", Toast.LENGTH_SHORT).show()
+        finish()
     }
 
     private fun calculateBmi() {
@@ -66,4 +103,3 @@ class LogMetricsModalActivity : AppCompatActivity() {
         }
     }
 }
-

@@ -5,24 +5,64 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.fittrack.app.R
+import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityUserProfileBinding
 import com.fittrack.app.ui.BottomNavTab
 import com.fittrack.app.ui.settings.SettingsActivity
 import com.fittrack.app.ui.setupBottomNav
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class UserProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityUserProfileBinding
+    private lateinit var session: SessionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityUserProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        session = SessionManager.getInstance(this)
+
+        bindUserData()
         setupInteractions()
         setupChartTabs()
         setupBottomNav()
+
+        fetchFreshProfile()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        bindUserData()
+    }
+
+    private fun bindUserData() {
+        binding.tvProfileName.text = session.userName
+    }
+
+    private fun fetchFreshProfile() {
+        if (!session.isLoggedIn) return
+
+        lifecycleScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ApiClient.getService(this@UserProfileActivity).getMe()
+                }
+                if (response.isSuccessful && response.body()?.data != null) {
+                    val profile = response.body()!!.data!!
+                    session.userName = profile.name
+                    bindUserData()
+                }
+            } catch (_: Exception) {
+                // Offline fallback
+            }
+        }
     }
 
     private fun setupInteractions() {

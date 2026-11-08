@@ -5,14 +5,24 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.fittrack.app.R
+import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.models.CreatePostRequest
+import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityCommunityBinding
 import com.fittrack.app.ui.BottomNavTab
 import com.fittrack.app.ui.setupBottomNav
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.UUID
 
 class CommunityActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCommunityBinding
+    private lateinit var session: SessionManager
+
     private var isLiked1 = true
     private var likeCount1 = 48
     private var isLiked2 = false
@@ -24,6 +34,8 @@ class CommunityActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCommunityBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        session = SessionManager.getInstance(this)
 
         setupBottomNav()
         setupFeedInteractions()
@@ -70,9 +82,33 @@ class CommunityActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            val finalContent = if (content.isNotEmpty()) content else "Vừa hoàn thành buổi tập với thành tích mới!"
+
+            // Sync with backend API
+            if (session.isLoggedIn) {
+                val api = ApiClient.getService(this)
+                val mediaUrl = when (attachedMediaType) {
+                    "IMAGE" -> "https://images.unsplash.com/photo-1517838277536-f5f99be501cd"
+                    "VIDEO" -> "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+                    else -> null
+                }
+                lifecycleScope.launch {
+                    try {
+                        withContext(Dispatchers.IO) {
+                            api.createCommunityPost(
+                                idempotencyKey = UUID.randomUUID().toString(),
+                                request = CreatePostRequest(content = finalContent, mediaUrl = mediaUrl)
+                            )
+                        }
+                    } catch (_: Exception) {
+                        // Non-blocking sync
+                    }
+                }
+            }
+
             // Display newly created post card
             binding.cardNewlyCreatedPost.visibility = View.VISIBLE
-            binding.tvNewPostContent.text = if (content.isNotEmpty()) content else "Vừa hoàn thành buổi tập với thành tích mới!"
+            binding.tvNewPostContent.text = finalContent
 
             if (attachedMediaType == "IMAGE") {
                 binding.cardNewPostMedia.visibility = View.VISIBLE
@@ -93,7 +129,7 @@ class CommunityActivity : AppCompatActivity() {
             binding.layoutPreviewImage.visibility = View.GONE
             binding.layoutPreviewVideo.visibility = View.GONE
 
-            Toast.makeText(this, "✓ Đã đăng bài viết kèm đa phương tiện thành công!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "✓ Đã đăng bài viết lên Bang hội thành công!", Toast.LENGTH_SHORT).show()
         }
 
         // Play video clicks

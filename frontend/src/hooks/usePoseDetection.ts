@@ -957,7 +957,8 @@ export function usePoseDetection({ exercise, onRepCompleted, onVideoEnded }: Use
       console.warn('[usePoseDetection] MediaPipe WASM unavailable, enabling WebSocket fallback:', err);
       isWsFallbackRef.current = true;
       try {
-        const wsUrl = `ws://localhost:8001/ws/pose-stream/${exercise}`;
+        const wsBase = process.env.NEXT_PUBLIC_POSE_WS_URL || (typeof window !== 'undefined' ? `ws://${window.location.hostname}:8001` : 'ws://localhost:8001');
+        const wsUrl = `${wsBase}/ws/pose-stream/${exercise}`;
         const ws = new WebSocket(wsUrl);
         ws.onopen = () => {
           console.info(`[usePoseDetection] Connected to Pose Worker WebSocket fallback: ${wsUrl}`);
@@ -977,8 +978,8 @@ export function usePoseDetection({ exercise, onRepCompleted, onVideoEnded }: Use
           } catch (e) {}
         };
         ws.onerror = () => {
-          console.warn('[usePoseDetection] WebSocket fallback server offline at ws://localhost:8001');
-          setError('Không thể tải mô hình MediaPipe và máy chủ WebSocket (cổng 8001) đang offline.');
+          console.warn(`[usePoseDetection] WebSocket fallback server offline at ${wsBase}`);
+          setError(`Không thể tải mô hình MediaPipe và máy chủ WebSocket (${wsBase}) đang offline.`);
         };
       } catch (wsErr) {
         setError('Không thể khởi tạo phân tích tư thế (Cả client-side và WebSocket fallback đều không khả dụng).');

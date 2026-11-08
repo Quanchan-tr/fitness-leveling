@@ -166,6 +166,10 @@ class SquatRule(BasePoseRule):
                 if "11" in lm and "12" in lm:
                     sh_center_3d = (self.get_point_3d(lm, "11") + self.get_point_3d(lm, "12")) / 2.0
                     raw_lean = calculate_vertical_angle_3d(hip_center_3d, sh_center_3d)
+                elif "11" in lm:
+                    raw_lean = calculate_vertical_angle_3d(l_hip_3d, self.get_point_3d(lm, "11"))
+                elif "12" in lm:
+                    raw_lean = calculate_vertical_angle_3d(r_hip_3d, self.get_point_3d(lm, "12"))
                 else:
                     raw_lean = 0.0
 
@@ -243,8 +247,8 @@ class SquatRule(BasePoseRule):
 
                 if is_bottom_depth:
                     state = "BOTTOM"
-                elif ka > current_min_knee + 12.0 and current_min_knee <= self.KNEE_HALF_SQUAT:
-                    # Incomplete depth ascent (e.g. half squat)
+                elif ka > current_min_knee + 12.0:
+                    # Incomplete depth ascent (e.g. half squat or no-rep)
                     state = "ASCENDING"
 
             elif state == "BOTTOM":
@@ -262,8 +266,8 @@ class SquatRule(BasePoseRule):
                 rep_camera_views.append(frame_view)
 
                 is_standing_up = (ka >= self.KNEE_REP_COMPLETE) or (
-                    ka > current_min_knee + 35.0 and ka >= 135.0
-                ) or (frame_view == "FRONT_VIEW" and hip_drop_ratio <= 0.08)
+                    frame_view == "FRONT_VIEW" and hip_drop_ratio <= 0.08
+                )
 
                 if is_standing_up:
                     rep_duration = frame_idx - rep_start_frame
