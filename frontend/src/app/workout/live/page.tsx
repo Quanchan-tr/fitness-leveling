@@ -28,17 +28,14 @@ import exerciseDataset from '@/data/exerciseDataset.json';
 
 function resolveExerciseMedia(exercise: any): string | null {
   if (!exercise) return null;
-  if (exercise.gif_url && typeof exercise.gif_url === 'string' && exercise.gif_url.endsWith('.gif')) {
+  if (exercise.gif_url && typeof exercise.gif_url === 'string') {
     return exercise.gif_url;
   }
-  if (exercise.gifPlaceholderUrl && typeof exercise.gifPlaceholderUrl === 'string' && exercise.gifPlaceholderUrl.endsWith('.gif')) {
+  if (exercise.gifPlaceholderUrl && typeof exercise.gifPlaceholderUrl === 'string') {
     return exercise.gifPlaceholderUrl;
   }
   if (exercise.thumbnail_url && typeof exercise.thumbnail_url === 'string') {
     return exercise.thumbnail_url;
-  }
-  if (exercise.gif_url && typeof exercise.gif_url === 'string') {
-    return exercise.gif_url;
   }
 
   // Lookup in dataset by ID or name
@@ -505,17 +502,17 @@ export default function LiveWorkoutPlayerPage() {
               </div>
             </div>
 
-            {/* Section 12.2: Exercise Animation GIF */}
+            {/* Section 12.2: Exercise Animation GIF / WebP */}
             {(() => {
               const mediaUrl = resolveExerciseMedia(currentExercise);
               if (!mediaUrl) return null;
               return (
                 <div className="w-full flex justify-center py-2">
-                  <div className="relative bg-slate-950 border border-slate-800/90 rounded-3xl overflow-hidden shadow-xl flex items-center justify-center p-3 sm:p-4 w-full max-w-xl">
+                  <div className="relative bg-white border border-slate-200/80 rounded-3xl overflow-hidden shadow-sm flex items-center justify-center p-3 sm:p-4 w-full max-w-md">
                     <img
                       src={mediaUrl}
                       alt={currentExercise.name}
-                      className="w-full max-h-[380px] sm:max-h-[460px] object-contain rounded-2xl"
+                      className="w-full max-h-[320px] sm:max-h-[360px] object-contain rounded-2xl"
                       loading="eager"
                     />
                   </div>
@@ -523,16 +520,38 @@ export default function LiveWorkoutPlayerPage() {
               );
             })()}
 
-            {/* Technical Pinned Notes */}
-            {(currentItem.pinnedNote || currentExercise.description) && (
-              <div className="bg-amber-50/80 border border-amber-200/80 rounded-xl p-4 flex items-start gap-3 text-xs sm:text-sm text-amber-900">
-                <Info className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-bold">Lưu ý kỹ thuật: </span>
-                  <span>{currentItem.pinnedNote || currentExercise.description}</span>
+            {/* Technical Pinned Notes & Step-by-Step Instructions */}
+            {(() => {
+              const rawDesc = currentItem.pinnedNote || currentExercise.description || '';
+              if (!rawDesc) return null;
+              const steps = rawDesc
+                .split(/\.\s+|\.\n+/)
+                .map((s) => s.trim())
+                .filter((s) => s.length > 3);
+
+              return (
+                <div className="bg-amber-50/90 border border-amber-200/80 rounded-2xl p-4 space-y-2.5 text-xs sm:text-sm text-amber-950">
+                  <div className="flex items-center gap-2 font-bold text-amber-900">
+                    <Info className="w-4 h-4 text-amber-600 shrink-0" />
+                    <span>Lưu ý kỹ thuật:</span>
+                  </div>
+                  {steps.length > 0 ? (
+                    <div className="space-y-2">
+                      {steps.map((step, idx) => (
+                        <div key={idx} className="flex items-start gap-2.5 leading-relaxed">
+                          <span className="w-5 h-5 rounded-full bg-orange-100 text-[#FF5722] font-black text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                            {idx + 1}
+                          </span>
+                          <span className="flex-1">{step.endsWith('.') ? step : `${step}.`}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="leading-relaxed">{rawDesc}</p>
+                  )}
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Section 12.3: Set Input Table with "Hoàn thành Set" button */}
             <div className="space-y-4 pt-2">

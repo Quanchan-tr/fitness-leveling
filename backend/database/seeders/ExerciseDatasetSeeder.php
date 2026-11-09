@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 class ExerciseDatasetSeeder extends Seeder
 {
-    private const CDN_BASE_URL = 'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/';
+    private const CDN_BASE_URL = 'https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/';
 
     public function run(): void
     {
@@ -67,21 +67,33 @@ class ExerciseDatasetSeeder extends Seeder
 
                 $gifUrl = null;
                 if (!empty($item['gif_url'])) {
-                    $gifUrl = str_starts_with($item['gif_url'], 'http')
-                        ? $item['gif_url']
-                        : self::CDN_BASE_URL . ltrim($item['gif_url'], '/');
+                    if (str_starts_with($item['gif_url'], 'http') || str_starts_with($item['gif_url'], '/')) {
+                        $gifUrl = $item['gif_url'];
+                    } elseif (str_starts_with($item['gif_url'], 'exercises/')) {
+                        $gifUrl = '/' . $item['gif_url'];
+                    } else {
+                        $gifUrl = self::CDN_BASE_URL . ltrim($item['gif_url'], '/');
+                    }
                 }
 
                 $thumbUrl = null;
-                if (!empty($item['image'])) {
+                if (!empty($item['thumbnail_url'])) {
+                    $thumbUrl = $item['thumbnail_url'];
+                } elseif (!empty($item['image'])) {
                     $thumbUrl = str_starts_with($item['image'], 'http')
                         ? $item['image']
                         : self::CDN_BASE_URL . ltrim($item['image'], '/');
+                } else {
+                    $thumbUrl = $gifUrl;
                 }
 
-                // Format description from English instructions if available
+                // Format description prioritizing Vietnamese instructions if available
                 $desc = null;
-                if (isset($item['instructions']['en']) && is_string($item['instructions']['en'])) {
+                if (isset($item['instruction_steps']['vi']) && is_array($item['instruction_steps']['vi']) && count($item['instruction_steps']['vi']) > 0) {
+                    $desc = implode(' ', $item['instruction_steps']['vi']);
+                } elseif (isset($item['instructions']['vi']) && is_string($item['instructions']['vi'])) {
+                    $desc = $item['instructions']['vi'];
+                } elseif (isset($item['instructions']['en']) && is_string($item['instructions']['en'])) {
                     $desc = $item['instructions']['en'];
                 } elseif (isset($item['instruction_steps']['en']) && is_array($item['instruction_steps']['en'])) {
                     $desc = implode(' ', $item['instruction_steps']['en']);
@@ -92,6 +104,10 @@ class ExerciseDatasetSeeder extends Seeder
                 $instructions = $item['instructions'] ?? $item['instruction_steps'] ?? null;
                 $secondaryMuscles = $item['secondary_muscles'] ?? $item['secondaryMuscles'] ?? null;
 
+                $targetMuscle = $item['target_vi'] ?? $item['target'] ?? $item['target_muscle'] ?? null;
+                $equipment = $item['equipment_vi'] ?? $item['equipment'] ?? 'body weight';
+                $bodyPart = $item['body_part_vi'] ?? $item['body_part'] ?? $item['bodyPart'] ?? null;
+
                 $records[] = [
                     'id' => (string) Str::uuid(),
                     'external_id' => (string) ($item['id'] ?? Str::random(8)),
@@ -99,11 +115,11 @@ class ExerciseDatasetSeeder extends Seeder
                     'name' => $name,
                     'description' => $desc,
                     'category' => $item['category'] ?? null,
-                    'body_part' => $item['body_part'] ?? $item['bodyPart'] ?? null,
-                    'target_muscle' => $item['target'] ?? $item['target_muscle'] ?? null,
+                    'body_part' => $bodyPart,
+                    'target_muscle' => $targetMuscle,
                     'secondary_muscles' => $secondaryMuscles ? json_encode($secondaryMuscles) : null,
-                    'muscle_group' => $item['body_part'] ?? $item['category'] ?? $item['muscle_group'] ?? 'general',
-                    'equipment' => $item['equipment'] ?? 'body weight',
+                    'muscle_group' => $bodyPart ?? $item['category'] ?? $item['muscle_group'] ?? 'general',
+                    'equipment' => $equipment,
                     'difficulty' => 'beginner',
                     'video_url' => null,
                     'thumbnail_url' => $thumbUrl,
