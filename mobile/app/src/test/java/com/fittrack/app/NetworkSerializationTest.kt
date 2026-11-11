@@ -97,7 +97,7 @@ class NetworkSerializationTest {
 
     @Test
     fun testDefaultBaseUrlFormat() {
-        assertEquals("http://10.0.2.2:8000/api/v1/", SessionManager.DEFAULT_BASE_URL)
+        assertEquals("https://fittrack.eastasia.cloudapp.azure.com/api/v1/", SessionManager.DEFAULT_BASE_URL)
     }
 }
 
