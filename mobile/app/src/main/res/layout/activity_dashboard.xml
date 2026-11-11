@@ -571,6 +571,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_energy_val"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -580,6 +581,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_energy_target"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -588,6 +590,7 @@
                         android:textSize="10sp" />
 
                     <ProgressBar
+                        android:id="@+id/pb_energy"
                         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="6dp"
@@ -617,6 +620,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_water_val"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -626,12 +630,13 @@
                         android:textStyle="bold" />
 
                     <ProgressBar
+                        android:id="@+id/pb_water"
                         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="6dp"
                         android:layout_marginTop="8dp"
-                        android:max="100"
-                        android:progress="90" />
+                        android:max="2500"
+                        android:progress="2100" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -720,10 +725,44 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <!-- Card 6: Real Weight Trend Chart Card (Synced with Metrics Tab) -->
+            <LinearLayout
+                android:id="@+id/card_weight_trend_home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_card_white"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📈 XU HƯỚNG CÂN NẶNG"
+                    android:textColor="@color/text_dark"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <com.fittrack.app.ui.views.WeightTrendChartView
+                    android:id="@+id/chart_weight_trend_home"
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:layout_marginTop="10dp" />
+
+                <TextView
+                    android:id="@+id/tv_weight_trend_note"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Dữ liệu cân nặng đồng bộ thời gian thực từ tab Chỉ số"
+                    android:textColor="@color/text_slate"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Floating Active Workout Bar (Live Mini Player) -->
+    <!-- Floating Active Workout Bar (Live Mini Player - Hidden by default unless workout is active) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_floating_workout"
         android:layout_width="0dp"
@@ -738,6 +777,7 @@
         android:focusable="true"
         android:paddingStart="14dp"
         android:paddingEnd="14dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -759,28 +799,45 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="8dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tv_floating_continue"
+            app:layout_constraintEnd_toStartOf="@+id/btn_close_floating_workout"
             app:layout_constraintStart_toEndOf="@+id/iv_floating_pulse"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/tv_floating_workout_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Buổi tập đang diễn ra • 24:15"
+                android:text="Buổi tập đang diễn ra"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tv_floating_workout_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ngực &amp; Tay Sau Cắt Nét"
+                android:text="Nhấn để tiếp tục tập"
                 android:textColor="@color/primary_light"
                 android:textSize="10.5sp" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/btn_close_floating_workout"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="6dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:text="✕"
+            android:textColor="#94A3B8"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_floating_continue"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_floating_continue"

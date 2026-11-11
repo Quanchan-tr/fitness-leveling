@@ -14,6 +14,7 @@ import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityDashboardBinding
 import com.fittrack.app.ui.BottomNavTab
 import com.fittrack.app.ui.character.CharacterViewerActivity
+import com.fittrack.app.ui.metrics.BodyMetricsActivity
 import com.fittrack.app.ui.modal.DailyQuestsModalActivity
 import com.fittrack.app.ui.modal.WardrobeModalActivity
 import com.fittrack.app.ui.profile.UserProfileActivity
@@ -23,6 +24,7 @@ import com.fittrack.app.ui.workout.ActiveWorkoutActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -65,7 +67,17 @@ class DashboardActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         bindCachedUserData()
+        checkFloatingWorkoutBar()
         fetchFreshDataFromBackend()
+    }
+
+    private fun checkFloatingWorkoutBar() {
+        if (session.isWorkoutActive) {
+            binding.layoutFloatingWorkout.visibility = View.VISIBLE
+            binding.tvFloatingWorkoutSubtitle.text = session.activeWorkoutName
+        } else {
+            binding.layoutFloatingWorkout.visibility = View.GONE
+        }
     }
 
     private fun bindCachedUserData() {
@@ -78,6 +90,17 @@ class DashboardActivity : AppCompatActivity() {
         binding.tvXpProgress.text = "XP: $currentXp / $maxXp"
         binding.progressLevelXp.max = maxXp
         binding.progressLevelXp.progress = currentXp
+
+        bindHydration()
+    }
+
+    private fun bindHydration() {
+        val currentWater = session.waterLoggedMl
+        val targetWater = 2500
+        val waterLiters = currentWater / 1000f
+        binding.tvWaterVal.text = String.format(Locale.US, "%.1fL / %.1fL", waterLiters, targetWater / 1000f)
+        binding.pbWater.max = targetWater
+        binding.pbWater.progress = minOf(currentWater, targetWater)
     }
 
     private fun fetchFreshDataFromBackend() {
@@ -143,6 +166,29 @@ class DashboardActivity : AppCompatActivity() {
             } catch (_: Exception) {
                 // Keep current 3D avatar state
             }
+
+            // 4. Fetch Nutrition Logs for Real Energy & Calo
+            try {
+                val nutRes = withContext(Dispatchers.IO) { apiService.getNutritionLogs() }
+                if (nutRes.isSuccessful && nutRes.body()?.data != null) {
+                    val logs = nutRes.body()!!.data!!
+                    val totalCalories = logs.sumOf { it.calories }
+                    if (totalCalories > 0) {
+                        binding.tvEnergyVal.text = "$totalCalories kcal"
+                        binding.pbEnergy.progress = minOf(totalCalories, binding.pbEnergy.max)
+                    }
+                }
+            } catch (_: Exception) {}
+
+            // 5. Fetch Body Metrics for Weight Trend Chart
+            try {
+                val metricsRes = withContext(Dispatchers.IO) { apiService.getBodyMetrics() }
+                if (metricsRes.isSuccessful && metricsRes.body()?.data?.isNotEmpty() == true) {
+                    val list = metricsRes.body()!!.data!!.reversed()
+                    val points = list.map { Pair(it.logDate?.takeLast(5) ?: "Gần đây", it.weightKg.toFloat()) }
+                    binding.chartWeightTrendHome.setData(points)
+                }
+            } catch (_: Exception) {}
         }
     }
 
@@ -216,14 +262,25 @@ class DashboardActivity : AppCompatActivity() {
             startActivity(Intent(this, ActiveWorkoutActivity::class.java))
         }
 
+        binding.btnCloseFloatingWorkout.setOnClickListener {
+            session.isWorkoutActive = false
+            binding.layoutFloatingWorkout.visibility = View.GONE
+        }
+
+        binding.cardWeightTrendHome.setOnClickListener {
+            startActivity(Intent(this, BodyMetricsActivity::class.java))
+        }
+
         // Hydration quick logging
         binding.btnAddWater250.setOnClickListener {
             val total = session.addWater(250)
+            bindHydration()
             Toast.makeText(this, "💧 +250ml nước đã nạp! Tổng hôm nay: ${total}ml / 2500ml", Toast.LENGTH_SHORT).show()
         }
 
         binding.btnAddWater500.setOnClickListener {
             val total = session.addWater(500)
+            bindHydration()
             Toast.makeText(this, "💧 +500ml nước đã nạp! Tổng hôm nay: ${total}ml / 2500ml", Toast.LENGTH_SHORT).show()
         }
     }

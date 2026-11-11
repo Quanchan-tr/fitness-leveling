@@ -595,80 +595,12 @@
                         android:textSize="11sp" />
                 </LinearLayout>
 
-                <!-- Visual 12-Week Bar Chart Container -->
-                <LinearLayout
+                <!-- Visual 12-Week Bar Chart Container (Native Dynamic Canvas) -->
+                <com.fittrack.app.ui.views.WorkoutStatsBarChartView
+                    android:id="@+id/chart_workout_stats"
                     android:layout_width="match_parent"
-                    android:layout_height="110dp"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_tag_chip"
-                    android:gravity="bottom"
-                    android:orientation="horizontal"
-                    android:paddingStart="8dp"
-                    android:paddingTop="12dp"
-                    android:paddingEnd="8dp"
-                    android:paddingBottom="8dp">
-
-                    <!-- Bar T1 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
-                        <View android:layout_width="12dp" android:layout_height="48dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T1" android:textColor="@color/text_slate_light" android:textSize="8sp" />
-                    </LinearLayout>
-                    <!-- Bar T2 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
-                        <View android:layout_width="12dp" android:layout_height="54dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T2" android:textColor="@color/text_slate_light" android:textSize="8sp" />
-                    </LinearLayout>
-                    <!-- Bar T3 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
-                        <View android:layout_width="12dp" android:layout_height="62dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T3" android:textColor="@color/text_slate_light" android:textSize="8sp" />
-                    </LinearLayout>
-                    <!-- Bar T4 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
-                        <View android:layout_width="12dp" android:layout_height="58dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T4" android:textColor="@color/text_slate_light" android:textSize="8sp" />
-                    </LinearLayout>
-                    <!-- Bar T5 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
-                        <View android:layout_width="12dp" android:layout_height="72dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T5" android:textColor="@color/text_slate_light" android:textSize="8sp" />
-                    </LinearLayout>
-                    <!-- Bar T6 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
-                        <View android:layout_width="12dp" android:layout_height="66dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T6" android:textColor="@color/text_slate_light" android:textSize="8sp" />
-                    </LinearLayout>
-                    <!-- Bar T7 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
-                        <View android:layout_width="12dp" android:layout_height="78dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T7" android:textColor="@color/text_slate_light" android:textSize="8sp" />
-                    </LinearLayout>
-                    <!-- Bar T8 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
-                        <View android:layout_width="12dp" android:layout_height="75dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T8" android:textColor="@color/text_slate_light" android:textSize="8sp" />
-                    </LinearLayout>
-                    <!-- Bar T9 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
-                        <View android:layout_width="12dp" android:layout_height="84dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T9" android:textColor="@color/text_slate_light" android:textSize="8sp" />
-                    </LinearLayout>
-                    <!-- Bar T10 -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
-                        <View android:layout_width="12dp" android:layout_height="80dp" android:background="@drawable/bg_primary_button" android:backgroundTint="@color/border_card" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T10" android:textColor="@color/text_slate_light" android:textSize="8sp" />
-                    </LinearLayout>
-                    <!-- Bar T11 (Peak Week Highlighted) -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
-                        <View android:layout_width="12dp" android:layout_height="94dp" android:background="@drawable/bg_gradient_workout_cta" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T11" android:textColor="@color/primary" android:textSize="8sp" android:textStyle="bold" />
-                    </LinearLayout>
-                    <!-- Bar T12 (Current Week) -->
-                    <LinearLayout android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="bottom|center_horizontal" android:orientation="vertical">
-                        <View android:layout_width="12dp" android:layout_height="88dp" android:background="@drawable/bg_primary_button" />
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="T12" android:textColor="@color/primary" android:textSize="8sp" android:textStyle="bold" />
-                    </LinearLayout>
-                </LinearLayout>
+                    android:layout_height="140dp"
+                    android:layout_marginTop="12dp" />
             </LinearLayout>
 
             <!-- Section 4: Detailed Workout Activity Logs (Web-Grade 3 Historical Sessions) -->

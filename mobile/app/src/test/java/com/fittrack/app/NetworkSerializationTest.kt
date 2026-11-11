@@ -99,5 +99,77 @@ class NetworkSerializationTest {
     fun testDefaultBaseUrlFormat() {
         assertEquals("https://fittrack.eastasia.cloudapp.azure.com/api/v1/", SessionManager.DEFAULT_BASE_URL)
     }
+
+    @Test
+    fun testWorkoutLogDtoWithSetsDeserialization() {
+        val rawJson = """
+            {
+                "data": [
+                    {
+                        "id": "log-1",
+                        "user_id": "u-1",
+                        "log_date": "2026-11-12",
+                        "sets": [
+                            {
+                                "id": "s-1",
+                                "exercise_id": "ex-1",
+                                "set_number": 1,
+                                "reps": 10,
+                                "weight_kg": 75.0,
+                                "duration_sec": 60
+                            },
+                            {
+                                "id": "s-2",
+                                "exercise_id": "ex-1",
+                                "set_number": 2,
+                                "reps": 8,
+                                "weight_kg": 80.0,
+                                "duration_sec": 75
+                            }
+                        ]
+                    }
+                ]
+            }
+        """.trimIndent()
+
+        val type = object : TypeToken<ApiResponse<List<com.fittrack.app.data.models.WorkoutLogDto>>>() {}.type
+        val res: ApiResponse<List<com.fittrack.app.data.models.WorkoutLogDto>> = gson.fromJson(rawJson, type)
+
+        assertNotNull(res.data)
+        assertEquals(1, res.data!!.size)
+        val sets = res.data!![0].sets
+        assertNotNull(sets)
+        assertEquals(2, sets!!.size)
+        assertEquals(10, sets[0].reps)
+        assertEquals(75.0, sets[0].weightKg ?: 0.0, 0.01)
+        assertEquals(1390.0, (sets[0].weightKg!! * sets[0].reps) + (sets[1].weightKg!! * sets[1].reps), 0.01)
+    }
+
+    @Test
+    fun testExerciseDtoWithInstructionsDeserialization() {
+        val rawJson = """
+            {
+                "data": {
+                    "id": "0025",
+                    "name": "Barbell Bench Press",
+                    "target_muscle": "Chest",
+                    "instructions": [
+                        "Nằm thẳng lưng trên ghế phẳng",
+                        "Hạ đòn tạ xuống ngực giữa",
+                        "Đẩy thanh đòn lên dứt khoát"
+                    ]
+                }
+            }
+        """.trimIndent()
+
+        val type = object : TypeToken<ApiResponse<com.fittrack.app.data.models.ExerciseDto>>() {}.type
+        val res: ApiResponse<com.fittrack.app.data.models.ExerciseDto> = gson.fromJson(rawJson, type)
+
+        assertNotNull(res.data)
+        val ex = res.data!!
+        assertEquals("Barbell Bench Press", ex.name)
+        assertEquals(3, ex.instructions?.size)
+        assertEquals("Nằm thẳng lưng trên ghế phẳng", ex.instructions?.get(0))
+    }
 }
 

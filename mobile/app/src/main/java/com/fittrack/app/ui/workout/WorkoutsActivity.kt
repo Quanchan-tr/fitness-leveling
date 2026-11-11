@@ -2,6 +2,7 @@ package com.fittrack.app.ui.workout
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
@@ -12,14 +13,18 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.fittrack.app.R
 import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.models.ExerciseDto
 import com.fittrack.app.data.models.WorkoutRoutineDto
 import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityWorkoutsBinding
+import com.fittrack.app.databinding.ItemExerciseCatalogCardBinding
 import com.fittrack.app.ui.BottomNavTab
 import com.fittrack.app.ui.aipose.AiPoseCoachActivity
+import com.fittrack.app.ui.modal.ExerciseDetailBottomSheet
 import com.fittrack.app.ui.routine.CreateRoutineActivity
 import com.fittrack.app.ui.routine.RoutineDetailActivity
 import com.fittrack.app.ui.setupBottomNav
+import com.fittrack.app.util.loadUrl
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,6 +48,7 @@ class WorkoutsActivity : AppCompatActivity() {
         setupExerciseSearch()
 
         fetchRoutinesFromBackend()
+        fetchExercisesFromBackend()
     }
 
     override fun onResume() {
@@ -92,16 +98,16 @@ class WorkoutsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ApiClient.getService(this@WorkoutsActivity).getExercises(perPage = 10, search = query)
+                    ApiClient.getService(this@WorkoutsActivity).getExercises(perPage = 30, search = query)
                 }
                 if (response.isSuccessful && response.body()?.data != null) {
                     val list = response.body()!!.data!!
                     if (list.isNotEmpty()) {
-                        val names = list.take(3).joinToString("\n• ") { it.name }
+                        renderExerciseCatalog(list)
                         Toast.makeText(
                             this@WorkoutsActivity,
-                            "🔍 Tìm thấy ${list.size} bài tập phù hợp trên VPS:\n• $names",
-                            Toast.LENGTH_LONG
+                            "🔍 Tìm thấy ${list.size} bài tập phù hợp trên VPS",
+                            Toast.LENGTH_SHORT
                         ).show()
                     } else {
                         Toast.makeText(
@@ -118,6 +124,49 @@ class WorkoutsActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+        }
+    }
+
+    private fun fetchExercisesFromBackend() {
+        lifecycleScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ApiClient.getService(this@WorkoutsActivity).getExercises(perPage = 60)
+                }
+                if (response.isSuccessful && response.body()?.data != null) {
+                    val list = response.body()!!.data!!
+                    renderExerciseCatalog(list)
+                }
+            } catch (_: Exception) {}
+        }
+    }
+
+    private fun renderExerciseCatalog(exercises: List<ExerciseDto>) {
+        binding.llExerciseCatalogList.removeAllViews()
+        val inflater = LayoutInflater.from(this)
+
+        for (ex in exercises) {
+            val itemBinding = ItemExerciseCatalogCardBinding.inflate(inflater, binding.llExerciseCatalogList, false)
+            itemBinding.tvItemExerciseName.text = ex.name
+            val muscle = ex.targetMuscle ?: ex.bodyPart ?: "Toàn thân"
+            val equip = ex.equipment ?: "Tự do"
+            itemBinding.tvItemExerciseMuscle.text = "💪 $muscle • 🏋️ $equip"
+            itemBinding.tvItemExerciseCategory.text = (ex.category ?: ex.bodyPart ?: "STRENGTH").uppercase()
+
+            if (ex.hasAiCheck) {
+                itemBinding.tvItemExerciseAiBadge.visibility = View.VISIBLE
+            } else {
+                itemBinding.tvItemExerciseAiBadge.visibility = View.GONE
+            }
+
+            val imgUrl = ex.gifUrl?.takeIf { it.isNotBlank() } ?: ex.thumbnailUrl
+            itemBinding.ivItemExerciseThumb.loadUrl(imgUrl, R.drawable.ic_dumbbell_solid)
+
+            itemBinding.root.setOnClickListener {
+                ExerciseDetailBottomSheet.newInstance(ex).show(supportFragmentManager, "exercise_detail")
+            }
+
+            binding.llExerciseCatalogList.addView(itemBinding.root)
         }
     }
 

@@ -152,6 +152,14 @@ class SessionManager(context: Context) {
         get() = prefs.getString(KEY_OB_EQUIPMENT, "full_gym") ?: "full_gym"
         set(value) = prefs.edit().putString(KEY_OB_EQUIPMENT, value).apply()
 
+    var isWorkoutActive: Boolean
+        get() = prefs.getBoolean("is_workout_active", false)
+        set(value) = prefs.edit().putBoolean("is_workout_active", value).apply()
+
+    var activeWorkoutName: String
+        get() = prefs.getString("active_workout_name", "Buổi tập thể lực") ?: "Buổi tập thể lực"
+        set(value) = prefs.edit().putString("active_workout_name", value).apply()
+
     fun saveUserSession(
         token: String,
         id: String,

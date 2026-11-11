@@ -60,7 +60,8 @@ class BodyMetricsActivity : AppCompatActivity() {
             try {
                 val res = withContext(Dispatchers.IO) { api.getBodyMetrics() }
                 if (res.isSuccessful && res.body()?.data?.isNotEmpty() == true) {
-                    val latest = res.body()!!.data!!.first()
+                    val rawList = res.body()!!.data!!
+                    val latest = rawList.first()
                     binding.tvMetricWeightVal.text = String.format(Locale.US, "%.1f kg", latest.weightKg)
 
                     val heightM = (latest.heightCm?.takeIf { it > 50.0 } ?: 175.0) / 100.0
@@ -75,6 +76,13 @@ class BodyMetricsActivity : AppCompatActivity() {
                     latest.bodyFatPct?.let { fat ->
                         binding.tvMetricFatVal.text = String.format(Locale.US, "%.1f%%", fat)
                     }
+
+                    // Feed weight trend points into real chart
+                    val chartPoints = rawList.reversed().map { item ->
+                        val dateLabel = item.logDate?.let { if (it.length >= 10) it.substring(5, 10) else it } ?: "Gần đây"
+                        Pair(dateLabel, item.weightKg.toFloat())
+                    }
+                    binding.chartWeightTrend.setData(chartPoints)
                 }
             } catch (_: Exception) {
                 // Giữ nguyên giao diện offline

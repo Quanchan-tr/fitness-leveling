@@ -81,6 +81,11 @@ interface ApiService {
         @Path("id") id: String
     ): Response<ApiResponse<Map<String, Any>>>
 
+    @GET("workout-logs")
+    suspend fun getWorkoutLogs(
+        @Query("per_page") perPage: Int = 100
+    ): Response<ApiResponse<List<WorkoutLogDto>>>
+
     @POST("workout-logs")
     suspend fun createWorkoutLog(
         @Header("Idempotency-Key") idempotencyKey: String,

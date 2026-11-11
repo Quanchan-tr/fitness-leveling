@@ -153,16 +153,21 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_edit_text_default"
+                android:clickable="true"
+                android:cursorVisible="false"
+                android:focusable="false"
                 android:hint="@string/hint_profile_goal"
-                android:inputType="text"
+                android:inputType="none"
                 android:minHeight="48dp"
                 android:paddingStart="16dp"
                 android:paddingTop="12dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="12dp"
-                android:text="@string/default_profile_goal"
+                android:text="Tăng cơ (Gain Muscle)"
                 android:textColor="@color/text_dark"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                app:drawableEndCompat="@drawable/ic_arrow_forward"
+                app:drawableTint="@color/text_muted" />
 
             <!-- Height & Weight row -->
             <LinearLayout
@@ -281,16 +286,21 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_edit_text_default"
+                android:clickable="true"
+                android:cursorVisible="false"
+                android:focusable="false"
                 android:hint="@string/hint_profile_gender"
-                android:inputType="text"
+                android:inputType="none"
                 android:minHeight="48dp"
                 android:paddingStart="16dp"
                 android:paddingTop="12dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="12dp"
-                android:text="@string/hint_profile_gender"
+                android:text="Nam"
                 android:textColor="@color/text_dark"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                app:drawableEndCompat="@drawable/ic_arrow_forward"
+                app:drawableTint="@color/text_muted" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

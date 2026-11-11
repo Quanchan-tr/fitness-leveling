@@ -13,7 +13,8 @@ data class ExerciseDto(
     @SerializedName("gif_url") val gifUrl: String? = null,
     @SerializedName("thumbnail_url") val thumbnailUrl: String? = null,
     @SerializedName("has_ai_check") val hasAiCheck: Boolean = false,
-    @SerializedName("description") val description: String? = null
+    @SerializedName("description") val description: String? = null,
+    @SerializedName("instructions") val instructions: List<String>? = null
 )
 
 // ── Workout Routines & Logs ─────────────────────────────────
@@ -46,7 +47,18 @@ data class WorkoutLogDto(
     @SerializedName("user_id") val userId: String,
     @SerializedName("log_date") val logDate: String,
     @SerializedName("status") val status: String? = null,
-    @SerializedName("total_xp_earned") val totalXpEarned: Int = 0
+    @SerializedName("total_xp_earned") val totalXpEarned: Int = 0,
+    @SerializedName("sets") val sets: List<WorkoutLogSetDto>? = null
+)
+
+data class WorkoutLogSetDto(
+    @SerializedName("id") val id: String? = null,
+    @SerializedName("workout_log_id") val workoutLogId: String? = null,
+    @SerializedName("exercise_id") val exerciseId: String? = null,
+    @SerializedName("set_number") val setNumber: Int = 1,
+    @SerializedName("reps") val reps: Int = 0,
+    @SerializedName("weight_kg") val weightKg: Double? = 0.0,
+    @SerializedName("duration_sec") val durationSec: Int? = 0
 )
 
 // ── Nutrition Logs ──────────────────────────────────────────
