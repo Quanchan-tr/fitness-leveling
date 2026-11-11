@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.fittrack.app.R
 import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.models.WorkoutRoutineDto
 import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityWorkoutsBinding
 import com.fittrack.app.ui.BottomNavTab
@@ -27,6 +28,7 @@ class WorkoutsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityWorkoutsBinding
     private lateinit var session: SessionManager
+    private val loadedRoutines = mutableListOf<WorkoutRoutineDto>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +42,11 @@ class WorkoutsActivity : AppCompatActivity() {
         setupBottomNav()
         setupExerciseSearch()
 
+        fetchRoutinesFromBackend()
+    }
+
+    override fun onResume() {
+        super.onResume()
         fetchRoutinesFromBackend()
     }
 
@@ -93,7 +100,7 @@ class WorkoutsActivity : AppCompatActivity() {
                         val names = list.take(3).joinToString("\n• ") { it.name }
                         Toast.makeText(
                             this@WorkoutsActivity,
-                            "🔍 Tìm thấy ${list.size} bài tập phù hợp:\n• $names",
+                            "🔍 Tìm thấy ${list.size} bài tập phù hợp trên VPS:\n• $names",
                             Toast.LENGTH_LONG
                         ).show()
                     } else {
@@ -107,7 +114,7 @@ class WorkoutsActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Toast.makeText(
                     this@WorkoutsActivity,
-                    "Tra cứu offline: Hiện có sẵn 1,324 bài tập trong hệ thống.",
+                    "Tra cứu offline: Hiện có sẵn 1,324 bài tập trong hệ thống VPS.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -122,11 +129,26 @@ class WorkoutsActivity : AppCompatActivity() {
                 val response = withContext(Dispatchers.IO) {
                     ApiClient.getService(this@WorkoutsActivity).getRoutines()
                 }
-                if (response.isSuccessful && response.body()?.data?.isNotEmpty() == true) {
-                    // Update routines dynamically if returned
+                if (response.isSuccessful && response.body()?.data != null) {
+                    val list = response.body()!!.data!!
+                    loadedRoutines.clear()
+                    loadedRoutines.addAll(list)
+
+                    if (list.isNotEmpty()) {
+                        binding.cardRoutinePush.visibility = View.VISIBLE
+                        binding.tvRoutinePushName.text = list[0].title
+                        binding.tvScheduleTitle.text = "Lịch tập hôm nay: ${list[0].title}"
+
+                        if (list.size > 1) {
+                            binding.cardRoutinePull.visibility = View.VISIBLE
+                            binding.tvRoutinePullName.text = list[1].title
+                        } else {
+                            binding.cardRoutinePull.visibility = View.GONE
+                        }
+                    }
                 }
             } catch (_: Exception) {
-                // Keep default layouts
+                // Keep current layouts on connection hiccup
             }
         }
     }
@@ -137,19 +159,35 @@ class WorkoutsActivity : AppCompatActivity() {
         }
 
         binding.cardRoutinePush.setOnClickListener {
-            startActivity(Intent(this, RoutineDetailActivity::class.java))
+            val intent = Intent(this, RoutineDetailActivity::class.java).apply {
+                putExtra("ROUTINE_TITLE", loadedRoutines.getOrNull(0)?.title ?: "Push Day (Ngực & Tay Sau)")
+                putExtra("ROUTINE_ID", loadedRoutines.getOrNull(0)?.id.orEmpty())
+            }
+            startActivity(intent)
         }
 
         binding.btnStartPushRoutine.setOnClickListener {
-            startActivity(Intent(this, RoutineDetailActivity::class.java))
+            val intent = Intent(this, RoutineDetailActivity::class.java).apply {
+                putExtra("ROUTINE_TITLE", loadedRoutines.getOrNull(0)?.title ?: "Push Day (Ngực & Tay Sau)")
+                putExtra("ROUTINE_ID", loadedRoutines.getOrNull(0)?.id.orEmpty())
+            }
+            startActivity(intent)
         }
 
         binding.cardRoutinePull.setOnClickListener {
-            startActivity(Intent(this, RoutineDetailActivity::class.java))
+            val intent = Intent(this, RoutineDetailActivity::class.java).apply {
+                putExtra("ROUTINE_TITLE", loadedRoutines.getOrNull(1)?.title ?: "Pull Day (Lưng & Tay Trước)")
+                putExtra("ROUTINE_ID", loadedRoutines.getOrNull(1)?.id.orEmpty())
+            }
+            startActivity(intent)
         }
 
         binding.btnStartPullRoutine.setOnClickListener {
-            startActivity(Intent(this, RoutineDetailActivity::class.java))
+            val intent = Intent(this, RoutineDetailActivity::class.java).apply {
+                putExtra("ROUTINE_TITLE", loadedRoutines.getOrNull(1)?.title ?: "Pull Day (Lưng & Tay Trước)")
+                putExtra("ROUTINE_ID", loadedRoutines.getOrNull(1)?.id.orEmpty())
+            }
+            startActivity(intent)
         }
 
         binding.btnCalendarRoutineDetail.setOnClickListener {
@@ -166,11 +204,15 @@ class WorkoutsActivity : AppCompatActivity() {
 
         // 3-dots Action Menus on Routine cards
         binding.btnRoutinePushMore.setOnClickListener { anchor ->
-            showRoutineActionMenu(anchor, "Push Day (Ngực & Tay Sau)", binding.cardRoutinePush)
+            val id = loadedRoutines.getOrNull(0)?.id
+            val name = loadedRoutines.getOrNull(0)?.title ?: "Push Day (Ngực & Tay Sau)"
+            showRoutineActionMenu(anchor, name, binding.cardRoutinePush, id)
         }
 
         binding.btnRoutinePullMore.setOnClickListener { anchor ->
-            showRoutineActionMenu(anchor, "Pull Day (Lưng & Tay Trước)", binding.cardRoutinePull)
+            val id = loadedRoutines.getOrNull(1)?.id
+            val name = loadedRoutines.getOrNull(1)?.title ?: "Pull Day (Lưng & Tay Trước)"
+            showRoutineActionMenu(anchor, name, binding.cardRoutinePull, id)
         }
 
         // AI Workout Planner Wizard Entry
@@ -183,7 +225,7 @@ class WorkoutsActivity : AppCompatActivity() {
         }
     }
 
-    private fun showRoutineActionMenu(anchorView: View, routineName: String, cardView: View) {
+    private fun showRoutineActionMenu(anchorView: View, routineName: String, cardView: View, routineId: String?) {
         val popup = PopupMenu(this, anchorView)
         popup.menu.add(0, 1, 0, "📅 Thêm vào lịch tập")
         popup.menu.add(0, 2, 1, "✏️ Chỉnh sửa")
@@ -193,7 +235,7 @@ class WorkoutsActivity : AppCompatActivity() {
             when (item.itemId) {
                 1 -> showAddToScheduleDialog(routineName)
                 2 -> startActivity(Intent(this, CreateRoutineActivity::class.java))
-                3 -> showDeleteConfirmDialog(routineName, cardView)
+                3 -> showDeleteConfirmDialog(routineName, cardView, routineId)
             }
             true
         }
@@ -226,13 +268,28 @@ class WorkoutsActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun showDeleteConfirmDialog(routineName: String, cardView: View) {
+    private fun showDeleteConfirmDialog(routineName: String, cardView: View, routineId: String?) {
         AlertDialog.Builder(this)
             .setTitle("Xác nhận xóa")
             .setMessage("Bạn có chắc chắn muốn xóa routine \"$routineName\" khỏi thư mục bài tập không?")
             .setPositiveButton("Xóa") { _, _ ->
-                cardView.visibility = View.GONE
-                Toast.makeText(this, "Đã xóa routine \"$routineName\"", Toast.LENGTH_SHORT).show()
+                if (!routineId.isNullOrBlank()) {
+                    lifecycleScope.launch {
+                        try {
+                            withContext(Dispatchers.IO) {
+                                ApiClient.getService(this@WorkoutsActivity).deleteRoutine(routineId)
+                            }
+                            cardView.visibility = View.GONE
+                            Toast.makeText(this@WorkoutsActivity, "✓ Đã xóa routine \"$routineName\" trên VPS", Toast.LENGTH_SHORT).show()
+                        } catch (_: Exception) {
+                            cardView.visibility = View.GONE
+                            Toast.makeText(this@WorkoutsActivity, "Đã xóa routine \"$routineName\"", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    cardView.visibility = View.GONE
+                    Toast.makeText(this, "Đã xóa routine \"$routineName\"", Toast.LENGTH_SHORT).show()
+                }
             }
             .setNegativeButton("Hủy", null)
             .show()

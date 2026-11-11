@@ -15,16 +15,30 @@ class RoutineDetailActivity : AppCompatActivity() {
         binding = ActivityRoutineDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val routineTitle = intent.getStringExtra("ROUTINE_TITLE")
+        if (!routineTitle.isNullOrBlank()) {
+            binding.tvRoutineName.text = routineTitle
+        }
+
         binding.btnBack.setOnClickListener {
             finish()
         }
 
-        binding.btnStartWorkoutNow.setOnClickListener {
-            startActivity(Intent(this, ActiveWorkoutActivity::class.java))
+        val startWorkoutAction = {
+            val intent = Intent(this, ActiveWorkoutActivity::class.java).apply {
+                putExtra("ROUTINE_TITLE", binding.tvRoutineName.text.toString())
+            }
+            startActivity(intent)
         }
 
-        binding.cardExercise1.setOnClickListener {
-            startActivity(Intent(this, ActiveWorkoutActivity::class.java))
+        binding.btnStartWorkoutNow.setOnClickListener {
+            startWorkoutAction()
         }
+
+        binding.cardExercise1.setOnClickListener { startWorkoutAction() }
+        binding.cardExercise2.setOnClickListener { startWorkoutAction() }
+        binding.cardExercise3.setOnClickListener { startWorkoutAction() }
+        binding.cardExercise4.setOnClickListener { startWorkoutAction() }
+        binding.cardExercise5.setOnClickListener { startWorkoutAction() }
     }
 }
