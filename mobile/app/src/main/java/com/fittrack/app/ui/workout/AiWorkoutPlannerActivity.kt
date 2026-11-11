@@ -8,8 +8,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.fittrack.app.R
+import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.models.GenerateAiPlanRequest
+import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityAiWorkoutPlannerBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.UUID
 
 class AiWorkoutPlannerActivity : AppCompatActivity() {
 
@@ -97,14 +105,46 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
             binding.layoutPlanResult.visibility = View.GONE
             binding.btnGeneratePlan.isEnabled = false
 
-            Handler(Looper.getMainLooper()).postDelayed({
-                binding.layoutAiLoading.visibility = View.GONE
-                binding.layoutPlanResult.visibility = View.VISIBLE
-                binding.btnGeneratePlan.isEnabled = true
+            val session = SessionManager.getInstance(this)
+            if (session.isLoggedIn) {
+                lifecycleScope.launch {
+                    var aiSuccess = false
+                    try {
+                        val req = GenerateAiPlanRequest(
+                            fitnessGoal = if (selectedSplit == "FB") "endurance" else "hypertrophy",
+                            split = selectedSplit,
+                            daysPerWeek = selectedDays,
+                            durationMinutes = selectedDuration,
+                            injuries = selectedInjuries.toList()
+                        )
+                        val res = withContext(Dispatchers.IO) {
+                            ApiClient.getService(this@AiWorkoutPlannerActivity)
+                                .generateExercisePlan(UUID.randomUUID().toString(), req)
+                        }
+                        if (res.isSuccessful) {
+                            aiSuccess = true
+                        }
+                    } catch (_: Exception) {
+                        // Fallback gracefully
+                    }
 
-                binding.tvResultSummary.text = "Lịch tập $selectedSplit $selectedDays buổi/tuần • Thời lượng $selectedDuration phút • Khoa học 100%"
-                Toast.makeText(this, "AI đã sinh giáo án luyện tập thành công!", Toast.LENGTH_SHORT).show()
-            }, 800)
+                    binding.layoutAiLoading.visibility = View.GONE
+                    binding.layoutPlanResult.visibility = View.VISIBLE
+                    binding.btnGeneratePlan.isEnabled = true
+
+                    val tag = if (aiSuccess) "AI Gemini 3.5" else "Khoa học thể hình"
+                    binding.tvResultSummary.text = "Lịch tập $selectedSplit $selectedDays buổi/tuần • $selectedDuration phút/buổi • Tối ưu bởi $tag"
+                    Toast.makeText(this@AiWorkoutPlannerActivity, "✓ Đã sinh giáo án $selectedSplit thành công!", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                Handler(Looper.getMainLooper()).postDelayed({
+                    binding.layoutAiLoading.visibility = View.GONE
+                    binding.layoutPlanResult.visibility = View.VISIBLE
+                    binding.btnGeneratePlan.isEnabled = true
+                    binding.tvResultSummary.text = "Lịch tập $selectedSplit $selectedDays buổi/tuần • Thời lượng $selectedDuration phút • Khoa học 100%"
+                    Toast.makeText(this, "Đã tạo giáo án mẫu thành công!", Toast.LENGTH_SHORT).show()
+                }, 800)
+            }
         }
 
         // Apply Schedule

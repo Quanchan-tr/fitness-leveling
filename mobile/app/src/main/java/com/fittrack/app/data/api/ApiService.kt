@@ -98,5 +98,12 @@ interface ApiService {
     suspend fun equipAvatarItem(
         @Body request: EquipAvatarRequest
     ): Response<ApiResponse<AvatarConfigDto>>
+
+    // ── AI Workout & Meal Planner ──────────────────────────────
+    @POST("ai/exercise-plan")
+    suspend fun generateExercisePlan(
+        @Header("Idempotency-Key") idempotencyKey: String,
+        @Body request: com.fittrack.app.data.models.GenerateAiPlanRequest
+    ): Response<ApiResponse<Any>>
 }
 

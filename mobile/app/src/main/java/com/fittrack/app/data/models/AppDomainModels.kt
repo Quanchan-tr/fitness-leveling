@@ -78,6 +78,15 @@ data class CreateBodyMetricRequest(
     @SerializedName("height_cm") val heightCm: Double? = null
 )
 
+// ── AI Planner ──────────────────────────────────────────────
+data class GenerateAiPlanRequest(
+    @SerializedName("fitness_goal") val fitnessGoal: String = "hypertrophy",
+    @SerializedName("split") val split: String = "PPL",
+    @SerializedName("days_per_week") val daysPerWeek: Int = 4,
+    @SerializedName("duration_minutes") val durationMinutes: Int = 60,
+    @SerializedName("injuries") val injuries: List<String> = emptyList()
+)
+
 // ── Community ───────────────────────────────────────────────
 data class CommunityPostDto(
     @SerializedName("id") val id: String,
