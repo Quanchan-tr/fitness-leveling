@@ -13,6 +13,10 @@ echo "🗄️ [3/5] Chạy cập nhật Cơ sở dữ liệu (Migration)..."
 docker compose exec -T backend php artisan migrate --force
 
 echo "⚡ [4/5] Tối ưu hóa bộ nhớ Cache Laravel..."
+# Tạo đầy đủ các thư mục cache nếu chưa có và cấp quyền ghi
+docker compose exec -T backend mkdir -p storage/framework/views storage/framework/cache storage/framework/sessions
+docker compose exec -T backend chmod -R 775 storage bootstrap/cache
+
 docker compose exec -T backend php artisan config:cache
 docker compose exec -T backend php artisan route:cache
 docker compose exec -T backend php artisan view:cache
