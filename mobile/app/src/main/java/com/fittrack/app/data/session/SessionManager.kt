@@ -18,7 +18,26 @@ class SessionManager(context: Context) {
         private const val KEY_USER_STREAK = "user_streak"
         private const val KEY_BASE_URL = "base_url"
 
-        // Default Production Azure API URL
+        // User Physical Metrics
+        private const val KEY_USER_WEIGHT = "user_weight"
+        private const val KEY_USER_HEIGHT = "user_height"
+        private const val KEY_USER_GOAL = "user_goal"
+        private const val KEY_USER_GENDER = "user_gender"
+        private const val KEY_USER_BIRTH_DATE = "user_birth_date"
+        private const val KEY_WATER_ML = "water_logged_ml"
+
+        // Onboarding Temp Survey State
+        private const val KEY_OB_GENDER = "ob_gender"
+        private const val KEY_OB_BIRTH_DATE = "ob_birth_date"
+        private const val KEY_OB_WEIGHT = "ob_weight"
+        private const val KEY_OB_HEIGHT = "ob_height"
+        private const val KEY_OB_GOAL = "ob_goal"
+        private const val KEY_OB_EXPERIENCE = "ob_experience"
+        private const val KEY_OB_FREQUENCY = "ob_frequency"
+        private const val KEY_OB_FOCUS_MUSCLE = "ob_focus_muscle"
+        private const val KEY_OB_EQUIPMENT = "ob_equipment"
+
+        // Production Azure API URL (strictly locked)
         const val DEFAULT_BASE_URL = "https://fittrack.eastasia.cloudapp.azure.com/api/v1/"
 
         @Volatile
@@ -63,10 +82,85 @@ class SessionManager(context: Context) {
         set(value) = prefs.edit().putInt(KEY_USER_STREAK, value).apply()
 
     var baseUrl: String
-        get() = prefs.getString(KEY_BASE_URL, DEFAULT_BASE_URL) ?: DEFAULT_BASE_URL
-        set(value) = prefs.edit().putString(KEY_BASE_URL, value).apply()
+        get() = DEFAULT_BASE_URL
+        set(_) = Unit // Locked to production VPS
 
-    fun saveUserSession(token: String, id: String, name: String, email: String, level: Int, xp: Int, streak: Int) {
+    var userWeight: Float
+        get() = prefs.getFloat(KEY_USER_WEIGHT, 70.0f)
+        set(value) = prefs.edit().putFloat(KEY_USER_WEIGHT, value).apply()
+
+    var userHeight: Float
+        get() = prefs.getFloat(KEY_USER_HEIGHT, 175.0f)
+        set(value) = prefs.edit().putFloat(KEY_USER_HEIGHT, value).apply()
+
+    var userGoal: String
+        get() = prefs.getString(KEY_USER_GOAL, "Tăng cơ") ?: "Tăng cơ"
+        set(value) = prefs.edit().putString(KEY_USER_GOAL, value).apply()
+
+    var userGender: String
+        get() = prefs.getString(KEY_USER_GENDER, "male") ?: "male"
+        set(value) = prefs.edit().putString(KEY_USER_GENDER, value).apply()
+
+    var userBirthDate: String
+        get() = prefs.getString(KEY_USER_BIRTH_DATE, "1998-01-01") ?: "1998-01-01"
+        set(value) = prefs.edit().putString(KEY_USER_BIRTH_DATE, value).apply()
+
+    var waterLoggedMl: Int
+        get() = prefs.getInt(KEY_WATER_ML, 1250)
+        set(value) = prefs.edit().putInt(KEY_WATER_ML, value).apply()
+
+    fun addWater(ml: Int): Int {
+        val total = waterLoggedMl + ml
+        waterLoggedMl = total
+        return total
+    }
+
+    // ── Onboarding Temporary Fields ──────────────────────────
+    var obGender: String
+        get() = prefs.getString(KEY_OB_GENDER, "male") ?: "male"
+        set(value) = prefs.edit().putString(KEY_OB_GENDER, value).apply()
+
+    var obBirthDate: String
+        get() = prefs.getString(KEY_OB_BIRTH_DATE, "1998-05-15") ?: "1998-05-15"
+        set(value) = prefs.edit().putString(KEY_OB_BIRTH_DATE, value).apply()
+
+    var obWeight: Float
+        get() = prefs.getFloat(KEY_OB_WEIGHT, 70.0f)
+        set(value) = prefs.edit().putFloat(KEY_OB_WEIGHT, value).apply()
+
+    var obHeight: Float
+        get() = prefs.getFloat(KEY_OB_HEIGHT, 175.0f)
+        set(value) = prefs.edit().putFloat(KEY_OB_HEIGHT, value).apply()
+
+    var obGoal: String
+        get() = prefs.getString(KEY_OB_GOAL, "gain_muscle") ?: "gain_muscle"
+        set(value) = prefs.edit().putString(KEY_OB_GOAL, value).apply()
+
+    var obExperience: String
+        get() = prefs.getString(KEY_OB_EXPERIENCE, "intermediate") ?: "intermediate"
+        set(value) = prefs.edit().putString(KEY_OB_EXPERIENCE, value).apply()
+
+    var obFrequency: Int
+        get() = prefs.getInt(KEY_OB_FREQUENCY, 4)
+        set(value) = prefs.edit().putInt(KEY_OB_FREQUENCY, value).apply()
+
+    var obFocusMuscle: String
+        get() = prefs.getString(KEY_OB_FOCUS_MUSCLE, "chest") ?: "chest"
+        set(value) = prefs.edit().putString(KEY_OB_FOCUS_MUSCLE, value).apply()
+
+    var obEquipment: String
+        get() = prefs.getString(KEY_OB_EQUIPMENT, "full_gym") ?: "full_gym"
+        set(value) = prefs.edit().putString(KEY_OB_EQUIPMENT, value).apply()
+
+    fun saveUserSession(
+        token: String,
+        id: String,
+        name: String,
+        email: String,
+        level: Int = 1,
+        xp: Int = 0,
+        streak: Int = 0
+    ) {
         prefs.edit()
             .putString(KEY_AUTH_TOKEN, token)
             .putString(KEY_USER_ID, id)
@@ -90,4 +184,3 @@ class SessionManager(context: Context) {
             .apply()
     }
 }
-

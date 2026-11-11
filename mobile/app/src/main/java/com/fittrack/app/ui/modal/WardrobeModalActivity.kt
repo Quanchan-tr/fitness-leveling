@@ -13,10 +13,17 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.fittrack.app.R
+import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.models.EquipAvatarRequest
+import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityModalWardrobeBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 data class WardrobeItem(
     val id: String,
@@ -34,7 +41,7 @@ class WardrobeModalActivity : AppCompatActivity() {
     private lateinit var binding: ActivityModalWardrobeBinding
 
     private var activeSlot = "top"
-    private val userLevel = 12 // User level from profile
+    private var userLevel = 1
 
     // Currently equipped item IDs per slot
     private val equippedMap = mutableMapOf(
@@ -133,6 +140,7 @@ class WardrobeModalActivity : AppCompatActivity() {
         binding = ActivityModalWardrobeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        userLevel = SessionManager.getInstance(this).userLevel.coerceAtLeast(1)
         binding.tvModalLevelBadge.text = "Lv. $userLevel"
 
         setup3DPreview()
@@ -281,6 +289,22 @@ class WardrobeModalActivity : AppCompatActivity() {
         binding.cardModal.setOnClickListener { /* prevent dismiss */ }
 
         binding.btnApplyOutfit.setOnClickListener {
+            val session = SessionManager.getInstance(this)
+            if (session.isLoggedIn) {
+                lifecycleScope.launch {
+                    try {
+                        val api = ApiClient.getService(this@WardrobeModalActivity)
+                        withContext(Dispatchers.IO) {
+                            equippedMap.forEach { (slot, itemId) ->
+                                api.equipAvatarItem(EquipAvatarRequest(slot = slot, itemId = itemId))
+                            }
+                        }
+                    } catch (_: Exception) {
+                        // Non-blocking sync
+                    }
+                }
+            }
+
             val resultIntent = Intent().apply {
                 putExtra("SELECTED_SHIRT_COLOR", shirtColor)
                 putExtra("SELECTED_SHORTS_COLOR", shortsColor)

@@ -24,7 +24,16 @@ data class WorkoutRoutineDto(
     @SerializedName("target_split") val targetSplit: String? = null,
     @SerializedName("estimated_minutes") val estimatedMinutes: Int = 45,
     @SerializedName("is_active") val isActive: Boolean = false,
-    @SerializedName("routine_data") val routineData: Map<String, Any>? = null
+    @SerializedName("routine_data") val routineData: Map<String, Any>? = null,
+    @SerializedName("schedule_days") val scheduleDays: List<String>? = null
+)
+
+data class CreateRoutineRequest(
+    @SerializedName("title") val title: String,
+    @SerializedName("description") val description: String? = null,
+    @SerializedName("target_split") val targetSplit: String? = "full_body",
+    @SerializedName("schedule_days") val scheduleDays: List<String> = listOf("monday", "wednesday", "friday"),
+    @SerializedName("is_active") val isActive: Boolean = true
 )
 
 data class CreateWorkoutLogRequest(
@@ -80,11 +89,11 @@ data class CreateBodyMetricRequest(
 
 // ── AI Planner ──────────────────────────────────────────────
 data class GenerateAiPlanRequest(
-    @SerializedName("fitness_goal") val fitnessGoal: String = "hypertrophy",
-    @SerializedName("split") val split: String = "PPL",
+    @SerializedName("goal") val goal: String = "gain_muscle",
+    @SerializedName("split_type") val splitType: String = "auto",
     @SerializedName("days_per_week") val daysPerWeek: Int = 4,
     @SerializedName("duration_minutes") val durationMinutes: Int = 60,
-    @SerializedName("injuries") val injuries: List<String> = emptyList()
+    @SerializedName("equipment") val equipment: String = "all"
 )
 
 // ── Community ───────────────────────────────────────────────
@@ -108,7 +117,8 @@ data class CreatePostRequest(
 // ── 3D Avatar & Wardrobe ────────────────────────────────────
 data class AvatarData(
     @SerializedName("config") val config: AvatarConfigDto? = null,
-    @SerializedName("inventory") val inventory: List<AvatarItemDto> = emptyList()
+    @SerializedName("inventory") val inventory: List<AvatarItemDto> = emptyList(),
+    @SerializedName("catalog") val catalog: List<AvatarItemDto> = emptyList()
 )
 
 data class AvatarConfigDto(
@@ -128,11 +138,16 @@ data class AvatarItemDto(
     @SerializedName("slot") val slot: String,
     @SerializedName("name") val name: String,
     @SerializedName("rarity") val rarity: String = "common",
-    @SerializedName("model_id") val modelId: String
+    @SerializedName("model_id") val modelId: String? = null
 )
 
 data class EquipAvatarRequest(
-    @SerializedName("slot") val slot: String,
-    @SerializedName("item_id") val itemId: String
+    @SerializedName("gender") val gender: String = "male",
+    @SerializedName("headwear_id") val headwearId: String? = null,
+    @SerializedName("hair_id") val hairId: String? = null,
+    @SerializedName("top_id") val topId: String? = null,
+    @SerializedName("bottom_id") val bottomId: String? = null,
+    @SerializedName("shoes_id") val shoesId: String? = null,
+    @SerializedName("accessory_id") val accessoryId: String? = null,
+    @SerializedName("special_id") val specialId: String? = null
 )
-

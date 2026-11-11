@@ -45,6 +45,17 @@ interface ApiService {
     @GET("routines")
     suspend fun getRoutines(): Response<ApiResponse<List<WorkoutRoutineDto>>>
 
+    @POST("routines")
+    suspend fun createRoutine(
+        @Header("Idempotency-Key") idempotencyKey: String,
+        @Body request: CreateRoutineRequest
+    ): Response<ApiResponse<WorkoutRoutineDto>>
+
+    @DELETE("routines/{id}")
+    suspend fun deleteRoutine(
+        @Path("id") id: String
+    ): Response<ApiResponse<Map<String, Any>>>
+
     @POST("workout-logs")
     suspend fun createWorkoutLog(
         @Header("Idempotency-Key") idempotencyKey: String,
