@@ -2,7 +2,6 @@ package com.fittrack.app.ui.settings
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -34,11 +33,11 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.btnMore.setOnClickListener {
-            showServerConfigDialog()
+            showServerInfoDialog()
         }
 
         binding.rowLanguage.setOnClickListener {
-            showServerConfigDialog()
+            Toast.makeText(this, "Ngôn ngữ hiển thị: Tiếng Việt (Mặc định)", Toast.LENGTH_SHORT).show()
         }
 
         binding.btnLogout.setOnClickListener {
@@ -48,33 +47,11 @@ class SettingsActivity : AppCompatActivity() {
         binding.bottomNavigation.setupBottomNav(this, BottomNavTab.PROFILE)
     }
 
-    private fun showServerConfigDialog() {
-        val input = EditText(this).apply {
-            setText(session.baseUrl)
-            setSelection(text.length)
-            hint = "http://10.0.2.2:8000/api/v1/"
-            setPadding(48, 32, 48, 32)
-        }
-
+    private fun showServerInfoDialog() {
         AlertDialog.Builder(this)
-            .setTitle("⚙️ Cấu hình Máy chủ Backend")
-            .setMessage("Nhập địa chỉ API Backend (Dùng 10.0.2.2 cho Android Emulator, hoặc IP mạng LAN như 192.168.x.x cho máy thật):")
-            .setView(input)
-            .setPositiveButton("Lưu") { _, _ ->
-                val newUrl = input.text.toString().trim()
-                if (newUrl.isNotBlank()) {
-                    val finalUrl = if (newUrl.endsWith("/")) newUrl else "$newUrl/"
-                    session.baseUrl = finalUrl
-                    ApiClient.resetService()
-                    Toast.makeText(this, "Đã lưu địa chỉ máy chủ: $finalUrl", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Hủy", null)
-            .setNeutralButton("Mặc định (10.0.2.2)") { _, _ ->
-                session.baseUrl = SessionManager.DEFAULT_BASE_URL
-                ApiClient.resetService()
-                Toast.makeText(this, "Đã khôi phục mặc định: ${SessionManager.DEFAULT_BASE_URL}", Toast.LENGTH_SHORT).show()
-            }
+            .setTitle("🌐 Máy chủ Đám mây (Azure Cloud)")
+            .setMessage("Ứng dụng đang kết nối trực tiếp đến Production VPS:\n\nhttps://fittrack.eastasia.cloudapp.azure.com/api/v1/\n\nTrạng thái: Đã bảo mật qua HTTPS & Hoạt động ổn định.")
+            .setPositiveButton("Đã hiểu", null)
             .show()
     }
 

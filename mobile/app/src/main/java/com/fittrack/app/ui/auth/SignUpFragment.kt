@@ -14,7 +14,7 @@ import com.fittrack.app.data.api.ApiClient
 import com.fittrack.app.data.models.RegisterRequest
 import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivitySignUpBinding
-import com.fittrack.app.ui.dashboard.DashboardActivity
+import com.fittrack.app.ui.onboarding.OnboardingGenderActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -113,11 +113,11 @@ class SignUpFragment : Fragment() {
 
                     Toast.makeText(
                         requireContext(),
-                        "🎉 Đăng ký thành công! Chào mừng Thợ săn mới.",
+                        "🎉 Đăng ký thành công! Hãy bắt đầu thiết lập thể lực của bạn.",
                         Toast.LENGTH_SHORT
                     ).show()
 
-                    val intent = Intent(requireContext(), DashboardActivity::class.java)
+                    val intent = Intent(requireContext(), OnboardingGenderActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     requireActivity().finish()
@@ -130,7 +130,7 @@ class SignUpFragment : Fragment() {
             } catch (e: IOException) {
                 Toast.makeText(
                     requireContext(),
-                    "Không thể kết nối đến máy chủ (${session.baseUrl}). Vui lòng kiểm tra kết nối mạng.",
+                    "Không thể kết nối đến máy chủ FitTrack VPS Cloud. Vui lòng kiểm tra lại kết nối mạng.",
                     Toast.LENGTH_LONG
                 ).show()
                 binding.btnSignup.isEnabled = true
