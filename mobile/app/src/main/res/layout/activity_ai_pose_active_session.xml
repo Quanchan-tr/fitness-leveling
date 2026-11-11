@@ -7,12 +7,11 @@
     android:background="#0B0F19"
     tools:context=".ui.aipose.AiPoseActiveSessionActivity">
 
-    <!-- Simulated Camera Feed Background Container -->
-    <View
-        android:id="@+id/view_camera_placeholder"
+    <!-- CameraX Live Camera Preview -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/preview_view_camera"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#1E293B"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -218,11 +218,13 @@ class DashboardActivity : AppCompatActivity() {
 
         // Hydration quick logging
         binding.btnAddWater250.setOnClickListener {
-            Toast.makeText(this, "💧 +250ml Nước khoáng đã nạp! Duy trì phong độ nhé.", Toast.LENGTH_SHORT).show()
+            val total = session.addWater(250)
+            Toast.makeText(this, "💧 +250ml nước đã nạp! Tổng hôm nay: ${total}ml / 2500ml", Toast.LENGTH_SHORT).show()
         }
 
         binding.btnAddWater500.setOnClickListener {
-            Toast.makeText(this, "💧 +500ml Nước khoáng đã nạp! Hydration tối ưu.", Toast.LENGTH_SHORT).show()
+            val total = session.addWater(500)
+            Toast.makeText(this, "💧 +500ml nước đã nạp! Tổng hôm nay: ${total}ml / 2500ml", Toast.LENGTH_SHORT).show()
         }
     }
 
