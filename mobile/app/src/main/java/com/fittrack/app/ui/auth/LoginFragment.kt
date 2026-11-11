@@ -54,11 +54,6 @@ class LoginFragment : Fragment() {
     }
 
     private fun setupNavigation() {
-        binding.tvTitle.setOnLongClickListener {
-            showServerConfigDialog()
-            true
-        }
-
         binding.btnLogin.setOnClickListener {
             handleLogin()
         }
@@ -132,13 +127,11 @@ class LoginFragment : Fragment() {
                     binding.btnLogin.text = originalText
                 }
             } catch (e: IOException) {
-                val errorMsg = "Không thể kết nối đến máy chủ (${session.baseUrl})."
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Lỗi kết nối máy chủ")
-                    .setMessage("$errorMsg\n\nBạn có muốn đổi địa chỉ IP máy chủ Backend không?")
-                    .setPositiveButton("Đổi IP máy chủ") { _, _ -> showServerConfigDialog() }
-                    .setNegativeButton("Đóng", null)
-                    .show()
+                Toast.makeText(
+                    requireContext(),
+                    "Không thể kết nối đến máy chủ FitTrack VPS Cloud. Vui lòng kiểm tra lại kết nối mạng.",
+                    Toast.LENGTH_LONG
+                ).show()
                 binding.btnLogin.isEnabled = true
                 binding.btnLogin.text = originalText
             } catch (e: Exception) {
@@ -147,36 +140,6 @@ class LoginFragment : Fragment() {
                 binding.btnLogin.text = originalText
             }
         }
-    }
-
-    private fun showServerConfigDialog() {
-        val session = SessionManager.getInstance(requireContext())
-        val input = EditText(requireContext()).apply {
-            setText(session.baseUrl)
-            setSelection(text.length)
-            hint = "http://10.0.2.2:8000/api/v1/"
-        }
-
-        AlertDialog.Builder(requireContext())
-            .setTitle("Cấu hình địa chỉ máy chủ")
-            .setMessage("Nhập URL Backend API (ví dụ: http://13.75.74.115:8000/api/v1/):")
-            .setView(input)
-            .setPositiveButton("Lưu") { _, _ ->
-                val newUrl = input.text.toString().trim()
-                if (newUrl.isNotBlank()) {
-                    val finalUrl = if (newUrl.endsWith("/")) newUrl else "$newUrl/"
-                    session.baseUrl = finalUrl
-                    ApiClient.resetService()
-                    Toast.makeText(requireContext(), "Đã lưu địa chỉ máy chủ: $finalUrl", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Hủy", null)
-            .setNeutralButton("Mặc định (10.0.2.2)") { _, _ ->
-                session.baseUrl = SessionManager.DEFAULT_BASE_URL
-                ApiClient.resetService()
-                Toast.makeText(requireContext(), "Đã khôi phục mặc định: ${SessionManager.DEFAULT_BASE_URL}", Toast.LENGTH_SHORT).show()
-            }
-            .show()
     }
 
     override fun onDestroyView() {
