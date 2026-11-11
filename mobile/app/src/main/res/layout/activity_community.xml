@@ -657,7 +657,7 @@
                             android:orientation="horizontal">
 
                             <TextView
-                                android:id="@+id/tv_new_post_author"
+                                android:id="@+id/tv_post1_author"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Quan Tran"
@@ -692,6 +692,7 @@
 
                 <!-- Post Text -->
                 <TextView
+                    android:id="@+id/tv_post1_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
@@ -935,6 +936,7 @@
                             android:orientation="horizontal">
 
                             <TextView
+                                android:id="@+id/tv_post2_author"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Minh Anh"
@@ -969,6 +971,7 @@
 
                 <!-- Post Text -->
                 <TextView
+                    android:id="@+id/tv_post2_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"

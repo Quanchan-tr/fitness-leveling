@@ -67,6 +67,8 @@ class CommunityActivity : AppCompatActivity() {
                     if (posts.isNotEmpty()) {
                         val p1 = posts[0]
                         post1Id = p1.id
+                        binding.tvPost1Author.text = p1.userName ?: "Thợ săn cao cấp"
+                        binding.tvPost1Content.text = p1.content
                         likeCount1 = p1.likesCount
                         isLiked1 = p1.isLiked
                         binding.tvLikeCount1.text = likeCount1.toString()
@@ -75,6 +77,8 @@ class CommunityActivity : AppCompatActivity() {
                     if (posts.size > 1) {
                         val p2 = posts[1]
                         post2Id = p2.id
+                        binding.tvPost2Author.text = p2.userName ?: "Chiến binh Fitness"
+                        binding.tvPost2Content.text = p2.content
                         likeCount2 = p2.likesCount
                         isLiked2 = p2.isLiked
                         binding.tvLikeCount2.text = likeCount2.toString()
