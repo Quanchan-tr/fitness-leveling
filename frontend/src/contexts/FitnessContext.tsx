@@ -95,6 +95,41 @@ function calculateRealStreak(history: WorkoutHistoryRecord[]): number {
   return streak;
 }
 
+function getOrUpdateLoginStreak(currentServerStreak?: number): number {
+  if (typeof window === 'undefined') return currentServerStreak ?? 1;
+  try {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const raw = localStorage.getItem('fittrack_daily_login_streak');
+    if (!raw) {
+      const initial = currentServerStreak && currentServerStreak > 0 ? currentServerStreak : 1;
+      localStorage.setItem('fittrack_daily_login_streak', JSON.stringify({ lastDate: todayStr, streak: initial }));
+      return initial;
+    }
+    const data = JSON.parse(raw);
+    const lastDate = data.lastDate;
+    if (lastDate === todayStr) {
+      return currentServerStreak !== undefined && currentServerStreak > data.streak
+        ? currentServerStreak
+        : (data.streak || 1);
+    }
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+    let newStreak = 1;
+    if (lastDate === yesterdayStr) {
+      newStreak = (data.streak || 0) + 1;
+    } else {
+      // Skipped a day or more: streak resets to 1 upon app access today
+      newStreak = 1;
+    }
+    localStorage.setItem('fittrack_daily_login_streak', JSON.stringify({ lastDate: todayStr, streak: newStreak }));
+    return newStreak;
+  } catch {
+    return currentServerStreak ?? 1;
+  }
+}
+
 function calculateLevelFromWorkouts(totalWorkouts: number): { level: number; xp: number; maxXp: number } {
   const totalXp = totalWorkouts * 120;
   const maxXp = 1000;
@@ -105,6 +140,8 @@ function calculateLevelFromWorkouts(totalWorkouts: number): { level: number; xp:
 import { playRestTimerBeep } from '@/lib/soundUtils';
 import { apiRequest, fetchExercises } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
+
+export const DEFAULT_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2394A3B8'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z'/%3E%3C/svg%3E";
 
 export interface UserFitnessProfile {
   id: string;
@@ -461,7 +498,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       level: stats.level,
       xp: stats.xp,
       maxXp: stats.maxXp,
-      avatar: user?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+      avatar: (typeof window !== 'undefined' ? localStorage.getItem('fittrack_profile_avatar') : null) || user?.avatarUrl || DEFAULT_AVATAR,
       bio: 'Chiến binh thể hình FitLevel • Bắt đầu hành trình bứt phá',
       goal: (user?.goal as any) || 'gain_muscle',
       streak: 0,
@@ -474,6 +511,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Prioritize server-authoritative gamification stats if available
   useEffect(() => {
     if (user?.gamification) {
+      const activeStreak = getOrUpdateLoginStreak(user.gamification.current_streak);
       setProfile((prev) => ({
         ...prev,
         id: user.id || prev.id,
@@ -481,18 +519,20 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         level: user.gamification?.level ?? prev.level,
         xp: user.gamification?.xp ?? prev.xp,
         maxXp: user.gamification?.next_level_xp ?? prev.maxXp,
-        streak: user.gamification?.current_streak ?? prev.streak,
+        streak: activeStreak,
       }));
     }
   }, [user]);
 
   useEffect(() => {
     if (user?.gamification) return;
-    const streak = calculateRealStreak(workoutHistory);
+    const loginStreak = getOrUpdateLoginStreak();
+    const workoutStreak = calculateRealStreak(workoutHistory);
+    const effectiveStreak = Math.max(loginStreak, workoutStreak);
     const { level, xp, maxXp } = calculateLevelFromWorkouts(workoutHistory.length);
     setProfile((prev) => ({
       ...prev,
-      streak,
+      streak: effectiveStreak,
       totalWorkouts: workoutHistory.length,
       level,
       xp,
@@ -513,13 +553,18 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // 5. Vitals State (Water, Weight, Sleep, Steps, Nutrition)
   const [vitals, setVitals] = useState<VitalsState>(() => {
     const todayNutrition = calculateTodayNutritionFromStorage();
+    const todayStr = typeof window !== 'undefined' ? new Date().toISOString().split('T')[0] : '';
     if (typeof window !== 'undefined') {
       try {
         const saved = getSavedStorage(STORAGE_KEY_VITALS, 'fittrack_vitals');
         if (saved) {
           const parsed = JSON.parse(saved);
+          const isSameDay = parsed.lastDate === todayStr;
           return {
             ...parsed,
+            water: isSameDay ? (parsed.water || { current: 0, target: 2.0 }) : { current: 0, target: parsed.water?.target || 2.0 },
+            weightHistory: parsed.weightHistory || [],
+            steps: isSameDay ? (parsed.steps || 0) : 0,
             nutrition: {
               calories: {
                 current: todayNutrition.calories.current,
@@ -547,18 +592,10 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
     }
     return {
-      water: { current: 1.8, target: 2.0 },
-      weightHistory: [
-        { date: '2026-09-28', weightKg: 68.4 },
-        { date: '2026-09-29', weightKg: 68.2 },
-        { date: '2026-09-30', weightKg: 68.3 },
-        { date: '2026-10-01', weightKg: 68.0 },
-        { date: '2026-10-02', weightKg: 67.9 },
-        { date: '2026-10-03', weightKg: 67.7 },
-        { date: '2026-10-04', weightKg: 67.6 },
-      ],
-      sleep: { hours: 7, minutes: 30 },
-      steps: 5421,
+      water: { current: 0, target: 2.0 },
+      weightHistory: [],
+      sleep: { hours: 0, minutes: 0 },
+      steps: 0,
       nutrition: todayNutrition,
     };
   });
@@ -566,7 +603,8 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem(STORAGE_KEY_VITALS, JSON.stringify(vitals));
+        const todayStr = new Date().toISOString().split('T')[0];
+        localStorage.setItem(STORAGE_KEY_VITALS, JSON.stringify({ ...vitals, lastDate: todayStr }));
       } catch (e) {
         console.error('Failed saving vitals to localStorage', e);
       }
@@ -1679,7 +1717,23 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updateProfile = useCallback((updated: Partial<UserFitnessProfile>) => {
-    setProfile((prev) => ({ ...prev, ...updated }));
+    setProfile((prev) => {
+      const next = { ...prev, ...updated };
+      if (updated.avatar && typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('fittrack_profile_avatar', updated.avatar);
+          const savedUser = localStorage.getItem('fitnessleveling_user');
+          if (savedUser) {
+            const parsed = JSON.parse(savedUser);
+            parsed.avatarUrl = updated.avatar;
+            localStorage.setItem('fitnessleveling_user', JSON.stringify(parsed));
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+      return next;
+    });
   }, []);
 
   return (

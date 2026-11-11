@@ -37,7 +37,9 @@ class AuthController extends Controller
             'role' => 'user',
             'xp' => 0,
             'level' => 1,
-            'current_streak' => 0,
+            'current_streak' => 1,
+            'last_active_date' => now()->toDateString(),
+            'email_verified_at' => now(),
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -69,6 +71,16 @@ class AuthController extends Controller
             ], 401);
         }
 
+        // Auto verify email if needed
+        if ($user->email_verified_at === null) {
+            $user->email_verified_at = now();
+            $user->save();
+        }
+
+        // Record daily active login streak
+        $this->gamificationService->recordDailyLogin($user);
+        $user->refresh();
+
         $token = $user->createToken('auth_token')->plainTextToken;
         $gamification = $this->gamificationService->getGamificationSummary($user);
 
@@ -86,6 +98,8 @@ class AuthController extends Controller
     public function me(Request $request): JsonResponse
     {
         $user = $request->user();
+        $this->gamificationService->recordDailyLogin($user);
+        $user->refresh();
         $gamification = $this->gamificationService->getGamificationSummary($user);
 
         return response()->json([

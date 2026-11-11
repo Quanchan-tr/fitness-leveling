@@ -118,7 +118,7 @@ export const RoutineDetailView: React.FC<RoutineDetailViewProps> = ({
                     className="w-full px-3.5 py-2 text-left text-slate-700 hover:bg-slate-50 flex items-center gap-2 font-medium"
                   >
                     <Pencil className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Sửa Routine</span>
+                    <span>Sửa Lịch tập</span>
                   </button>
                   <button
                     type="button"
@@ -129,7 +129,7 @@ export const RoutineDetailView: React.FC<RoutineDetailViewProps> = ({
                     className="w-full px-3.5 py-2 text-left text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-medium border-t border-slate-100"
                   >
                     <Trash2 className="w-3.5 h-3.5 text-rose-500" />
-                    <span>Xóa Routine</span>
+                    <span>Xóa Lịch tập</span>
                   </button>
                 </div>
               </>
@@ -141,7 +141,7 @@ export const RoutineDetailView: React.FC<RoutineDetailViewProps> = ({
       {copiedLink && (
         <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs px-4 py-2.5 rounded-xl flex items-center gap-2 animate-in fade-in duration-150">
           <Check className="w-4 h-4 text-emerald-600" />
-          <span>Đã sao chép liên kết Routine vào bộ nhớ tạm!</span>
+          <span>Đã sao chép liên kết Lịch tập vào bộ nhớ tạm!</span>
         </div>
       )}
 
@@ -230,7 +230,7 @@ export const RoutineDetailView: React.FC<RoutineDetailViewProps> = ({
           {/* Creator Widget */}
           <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm space-y-4">
             <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Tác giả Routine
+              Tác giả Lịch tập
             </h4>
             <div className="flex items-center gap-3">
               <img
@@ -255,7 +255,7 @@ export const RoutineDetailView: React.FC<RoutineDetailViewProps> = ({
                 className="py-2 px-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Pencil className="w-3.5 h-3.5 text-slate-500" />
-                <span>Sửa Routine</span>
+                <span>Sửa Lịch tập</span>
               </button>
 
               <button
@@ -272,7 +272,7 @@ export const RoutineDetailView: React.FC<RoutineDetailViewProps> = ({
           {/* Routine Summary Card */}
           <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm space-y-3">
             <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              Tổng quan Routine
+              Tổng quan Lịch tập
             </h4>
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80">

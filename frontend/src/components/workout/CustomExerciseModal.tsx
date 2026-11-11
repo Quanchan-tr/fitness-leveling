@@ -108,16 +108,16 @@ export const CustomExerciseModal: React.FC<CustomExerciseModalProps> = ({
                 onChange={(e) => setMuscleGroup(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:border-[#FF5722] bg-white cursor-pointer"
               >
-                <option value="chest">Ngực (Chest)</option>
-                <option value="back">Lưng xô (Back/Lats)</option>
-                <option value="shoulders">Vai (Shoulders)</option>
-                <option value="biceps">Tay trước (Biceps)</option>
-                <option value="triceps">Tay sau (Triceps)</option>
-                <option value="quads">Đùi trước (Quads)</option>
-                <option value="hamstrings">Đùi sau (Hamstrings)</option>
-                <option value="glutes">Cơ mông (Glutes)</option>
-                <option value="abs">Cơ bụng (Abs/Core)</option>
-                <option value="calves">Bắp chân (Calves)</option>
+                <option value="chest">Ngực</option>
+                <option value="back">Lưng xô</option>
+                <option value="shoulders">Vai</option>
+                <option value="biceps">Tay trước</option>
+                <option value="triceps">Tay sau</option>
+                <option value="quads">Đùi trước</option>
+                <option value="hamstrings">Đùi sau</option>
+                <option value="glutes">Cơ mông</option>
+                <option value="abs">Cơ bụng</option>
+                <option value="calves">Bắp chân</option>
               </select>
             </div>
 
@@ -130,11 +130,11 @@ export const CustomExerciseModal: React.FC<CustomExerciseModalProps> = ({
                 onChange={(e) => setEquipment(e.target.value as EquipmentType)}
                 className="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:border-[#FF5722] bg-white cursor-pointer"
               >
-                <option value="dumbbell">Dumbbell (Tạ đơn)</option>
-                <option value="barbell">Barbell (Tạ đòn)</option>
-                <option value="machine">Machine (Máy tập)</option>
-                <option value="cable">Cable (Dây cáp)</option>
-                <option value="bodyweight">Bodyweight (Trọng lượng cơ thể)</option>
+                <option value="dumbbell">Tạ đơn</option>
+                <option value="barbell">Tạ đòn</option>
+                <option value="machine">Máy tập</option>
+                <option value="cable">Dây cáp</option>
+                <option value="bodyweight">Trọng lượng cơ thể</option>
                 <option value="cardio">Cardio</option>
               </select>
             </div>
@@ -142,17 +142,17 @@ export const CustomExerciseModal: React.FC<CustomExerciseModalProps> = ({
 
           <div>
             <label className="font-bold text-slate-700 block mb-1">
-              Hình thức bài tập (Loại thông số)
+              Hình thức bài tập
             </label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value as ExerciseType)}
               className="w-full px-3 py-2 rounded-xl border border-slate-300 outline-none focus:border-[#FF5722] bg-white cursor-pointer"
             >
-              <option value="weight_reps">Khối lượng &amp; Số lần (Kg × Reps)</option>
-              <option value="bodyweight_reps">Thể trọng &amp; Số lần (Bodyweight × Reps)</option>
-              <option value="duration">Thời gian giữ (Timed / Plank)</option>
-              <option value="distance_duration">Khoảng cách &amp; Thời gian (Km × Phút)</option>
+              <option value="weight_reps">Khối lượng &amp; Số lần</option>
+              <option value="bodyweight_reps">Thể trọng &amp; Số lần</option>
+              <option value="duration">Thời gian giữ</option>
+              <option value="distance_duration">Khoảng cách &amp; Thời gian</option>
             </select>
           </div>
 

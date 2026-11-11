@@ -108,7 +108,7 @@ const PoseCheckScreen: React.FC = () => {
         </div>
 
         <div className="bg-emerald-950/70 border border-emerald-700/80 rounded-lg px-2.5 py-1.5 flex items-center justify-between text-emerald-200 text-[10px]">
-          <span>Biên độ đạt chuẩn (Parallel)</span>
+          <span>Biên độ đạt chuẩn</span>
           <span className="font-bold text-white">REPS +1</span>
         </div>
       </div>

@@ -84,7 +84,7 @@ export default function WorkoutPage() {
   const handleAddExerciseToRoutine = (ex: Exercise) => {
     handleOpenEditor({
       id: '',
-      title: `Routine với ${ex.name}`,
+      title: `Lịch tập với ${ex.name}`,
       restTimerSeconds: 60,
       createdBy: {
         userId: profile.id,
@@ -228,11 +228,11 @@ export default function WorkoutPage() {
               <div>
                 <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight flex items-center gap-3">
                   <Dumbbell className="w-7 h-7 sm:w-8 sm:h-8 text-[#FF5722]" />
-                  <span>Kế hoạch &amp; Routine tập</span>
+                  <span>Kế hoạch &amp; Lịch tập</span>
                 </h1>
               </div>
 
-              {/* Action Buttons: Tạo Routine & Tạo Thư mục & Ngân hàng bài tập */}
+              {/* Action Buttons: Tạo Lịch tập & Tạo Thư mục & Ngân hàng bài tập */}
               <div className="flex items-center gap-2.5 flex-wrap">
                 <button
                   onClick={() => setIsFolderModalOpen(true)}
@@ -256,7 +256,7 @@ export default function WorkoutPage() {
                   className="px-4 py-2 rounded-xl bg-[#FF5722] hover:bg-[#E64A19] text-white text-xs sm:text-sm font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-sm"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Tạo Routine mới</span>
+                  <span>Tạo Lịch tập mới</span>
                 </button>
               </div>
             </div>
@@ -284,7 +284,7 @@ export default function WorkoutPage() {
                       }`}
                   >
                     <Layers className="w-4 h-4" />
-                    <span>Bộ sưu tập Routine &amp; Thư mục</span>
+                    <span>Bộ sưu tập Lịch tập &amp; Thư mục</span>
                     <span className="text-[11px] font-bold px-1.5 py-0.2 rounded-md bg-slate-100 text-slate-700">
                       {routines.length}
                     </span>
@@ -308,7 +308,7 @@ export default function WorkoutPage() {
 
                 <span className="text-xs font-semibold text-slate-500">
                   {collectionTab === 'routines'
-                    ? `${routines.length} routines • ${folders.length} thư mục`
+                    ? `${routines.length} lịch tập • ${folders.length} thư mục`
                     : '1.324 bài tập kèm GIF động & AI Pose Check'}
                 </span>
               </div>
@@ -361,7 +361,7 @@ export default function WorkoutPage() {
                                 {folder.name}
                               </h3>
                               <span className="text-[11px] text-slate-400 font-medium">
-                                {folderRoutines.length} routine
+                                {folderRoutines.length} lịch tập
                               </span>
                             </div>
                           </div>
@@ -412,7 +412,7 @@ export default function WorkoutPage() {
                                     className="w-full text-left px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer transition-colors"
                                   >
                                     <Plus className="w-3.5 h-3.5 text-slate-500" />
-                                    <span>Thêm routine</span>
+                                    <span>Thêm lịch tập</span>
                                   </button>
 
                                   <div className="my-1 border-t border-slate-100" />
@@ -421,7 +421,7 @@ export default function WorkoutPage() {
                                     type="button"
                                     onClick={() => {
                                       setOpenFolderMenuId(null);
-                                      if (confirm(`Bạn có chắc muốn xóa thư mục "${folder.name}"? Các routine bên trong sẽ được chuyển về mục Chưa phân loại.`)) {
+                                      if (confirm(`Bạn có chắc muốn xóa thư mục "${folder.name}"? Các lịch tập bên trong sẽ được chuyển về mục Chưa phân loại.`)) {
                                         deleteFolder(folder.id);
                                       }
                                     }}
@@ -456,7 +456,7 @@ export default function WorkoutPage() {
                               </div>
                             ) : (
                               <div className="p-8 text-center text-xs text-slate-400 border border-dashed border-slate-200 rounded-xl">
-                                Thư mục trống. Bạn có thể kéo hoặc tạo routine mới vào đây.
+                                Thư mục trống. Bạn có thể kéo hoặc tạo lịch tập mới vào đây.
                               </div>
                             )}
                           </div>
@@ -472,7 +472,7 @@ export default function WorkoutPage() {
                         <div className="flex items-center gap-2">
                           <Folder className="w-4 h-4 text-slate-400" />
                           <h3 className="font-extrabold text-sm sm:text-base text-slate-900">
-                            Routine chưa phân loại
+                            Lịch tập chưa phân loại
                           </h3>
                         </div>
                       </div>
@@ -497,10 +497,10 @@ export default function WorkoutPage() {
                   {folders.length === 0 && routines.length === 0 && (
                     <EmptyState
                       icon={Layers}
-                      title="Chưa có Routine tập luyện nào"
-                      description="Bạn chưa tạo giáo án tập nào. Hãy bắt đầu bằng cách tạo Routine mới hoặc chọn bài tập từ danh sách để thiết lập lịch tập cá nhân."
+                      title="Chưa có Lịch tập nào"
+                      description="Bạn chưa tạo lịch tập nào. Hãy bắt đầu bằng cách tạo Lịch tập mới hoặc chọn bài tập từ danh sách để thiết lập kế hoạch cá nhân."
                       action={{
-                        label: 'Tạo Routine đầu tiên',
+                        label: 'Tạo Lịch tập đầu tiên',
                         onClick: () => handleOpenEditor(),
                         icon: Plus,
                       }}
@@ -639,7 +639,7 @@ export default function WorkoutPage() {
           setIsExerciseDrawerOpen(false);
           handleOpenEditor({
             id: '',
-            title: `Routine với ${ex.name}`,
+            title: `Lịch tập với ${ex.name}`,
             restTimerSeconds: 60,
             createdBy: {
               userId: profile.id,

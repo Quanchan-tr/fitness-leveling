@@ -322,7 +322,7 @@ export const ExerciseCatalogView: React.FC<ExerciseCatalogViewProps> = ({
                       className="flex-1 py-2 px-2.5 rounded-xl bg-slate-50 hover:bg-orange-50 text-slate-700 hover:text-[#FF5722] border border-slate-200 hover:border-orange-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>Thêm vào Routine</span>
+                      <span>Thêm vào Lịch tập</span>
                     </button>
 
                     <button

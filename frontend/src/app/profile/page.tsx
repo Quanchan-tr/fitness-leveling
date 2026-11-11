@@ -1,8 +1,8 @@
 'use strict';
 'use client';
 
-import React, { useState } from 'react';
-import { useFitness } from '@/contexts/FitnessContext';
+import React, { useState, useRef } from 'react';
+import { useFitness, DEFAULT_AVATAR } from '@/contexts/FitnessContext';
 import {
   User,
   Calendar,
@@ -20,6 +20,7 @@ import {
   X,
   Check,
   Share2,
+  Camera,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -38,6 +39,20 @@ export default function ProfilePage() {
 
   // Calendar selected date for inspecting historical workout
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        updateProfile({ avatar: dataUrl });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,16 +158,39 @@ export default function ProfilePage() {
         <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 sm:p-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
             <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-              <div className="relative">
+              <div className="relative group cursor-pointer" onClick={() => avatarInputRef.current?.click()}>
                 <img
-                  src={profile.avatar}
+                  src={profile.avatar || DEFAULT_AVATAR}
                   alt={profile.name}
-                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover border-4 border-orange-500/30 shadow-md"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = DEFAULT_AVATAR;
+                  }}
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover border-4 border-orange-500/30 shadow-md group-hover:opacity-85 transition-opacity bg-slate-100"
                 />
+                <div
+                  className="absolute inset-0 bg-black/40 rounded-3xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white"
+                  title="Nhấn để đổi ảnh đại diện"
+                >
+                  <Camera className="w-7 h-7 text-white" />
+                </div>
+                <button
+                  type="button"
+                  title="Đổi ảnh đại diện"
+                  className="absolute -top-1 -right-1 w-7 h-7 rounded-full bg-[#FF5722] text-white flex items-center justify-center shadow-xs border-2 border-white cursor-pointer"
+                >
+                  <Camera className="w-3.5 h-3.5" />
+                </button>
                 <span className="absolute -bottom-2 -right-2 bg-slate-900 text-white font-extrabold text-xs px-2.5 py-1 rounded-full border-2 border-white shadow-xs">
                   Lv. {profile.level}
                 </span>
               </div>
+              <input
+                type="file"
+                ref={avatarInputRef}
+                onChange={handleAvatarFile}
+                accept="image/*"
+                className="hidden"
+              />
 
               <div className="space-y-1.5">
                 <div className="flex items-center gap-3">
@@ -291,38 +329,57 @@ export default function ProfilePage() {
 
             {/* Interactive Clean Bar Chart */}
             <div className="pt-2">
-              <div className="h-56 flex items-end justify-between gap-1.5 sm:gap-2 px-2 pt-6 pb-2 bg-slate-50/70 border border-slate-200/80 rounded-2xl">
-                {activeChartData.map((d, idx) => {
-                  const barHeight = Math.round((d.value / maxChartValue) * 100);
-                  const isLatest = idx === activeChartData.length - 1;
+              {workoutHistory.length === 0 ? (
+                <div className="h-56 flex flex-col items-center justify-center text-center p-6 bg-slate-50/70 border border-slate-200/80 rounded-2xl">
+                  <div className="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-200 text-[#FF5722] flex items-center justify-center mb-3">
+                    <BarChart3 className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-sm font-bold text-slate-800">Chưa có dữ liệu tiến trình tập luyện</h4>
+                  <p className="text-xs text-slate-500 max-w-sm mt-1">
+                    Bạn chưa hoàn thành buổi tập nào. Hãy bắt đầu buổi tập đầu tiên để hệ thống tự động ghi nhận khối lượng và thời lượng tập!
+                  </p>
+                  <Link
+                    href="/workout"
+                    className="mt-3 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-2xs"
+                  >
+                    <Dumbbell className="w-3.5 h-3.5 text-orange-400" />
+                    <span>Bắt đầu buổi tập ngay</span>
+                  </Link>
+                </div>
+              ) : (
+                <div className="h-56 flex items-end justify-between gap-1.5 sm:gap-2 px-2 pt-6 pb-2 bg-slate-50/70 border border-slate-200/80 rounded-2xl">
+                  {activeChartData.map((d, idx) => {
+                    const barHeight = Math.round((d.value / maxChartValue) * 100);
+                    const isLatest = idx === activeChartData.length - 1;
 
-                  return (
-                    <div
-                      key={`bar-${idx}`}
-                      className="flex-1 flex flex-col items-center gap-2 group relative"
-                    >
-                      {/* Tooltip on hover */}
-                      <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] font-bold px-2 py-0.5 rounded pointer-events-none tabular-nums z-10 whitespace-nowrap">
-                        {d.value} {statTab === 'duration' ? 'phút' : 'reps'}
-                      </div>
+                    return (
+                      <div
+                        key={`bar-${idx}`}
+                        className="flex-1 flex flex-col items-center gap-2 group relative"
+                      >
+                        {/* Tooltip on hover */}
+                        <div className="absolute -top-7 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[10px] font-bold px-2 py-0.5 rounded pointer-events-none tabular-nums z-10 whitespace-nowrap">
+                          {d.value} {statTab === 'duration' ? 'phút' : 'reps'}
+                        </div>
 
-                      <div className="w-full max-w-[28px] bg-slate-200 rounded-t-lg h-40 flex items-end overflow-hidden">
-                        <div
-                          className={`w-full rounded-t-lg transition-all duration-500 ${
-                            isLatest
-                              ? 'bg-[#FF5722]'
-                              : 'bg-slate-700 group-hover:bg-[#FF5722]'
-                          }`}
-                          style={{ height: `${barHeight}%` }}
-                        />
+                        <div className="w-full max-w-[28px] bg-slate-200 rounded-t-lg h-40 flex items-end overflow-hidden">
+                          <div
+                            className="w-full rounded-t-lg transition-all duration-500 ${
+                              isLatest
+                                ? 'bg-[#FF5722]'
+                                : 'bg-slate-700 group-hover:bg-[#FF5722]'
+                            }"
+                            style={{ height: `${barHeight}%` }}
+                          />
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-400">
+                          {d.label}
+                        </span>
                       </div>
-                      <span className="text-[10px] font-bold text-slate-400">
-                        {d.label}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
 

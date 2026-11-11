@@ -463,7 +463,7 @@ export default function AiCoachPage() {
                     </div>
                     <div className="bg-slate-900/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-slate-700">
                       <div className="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">
-                        Hợp lệ (ROM)
+                        Hợp lệ
                       </div>
                       <div className="text-2xl font-black text-emerald-400 tabular-nums leading-none">
                         {metrics.validRepCount}
@@ -599,9 +599,9 @@ export default function AiCoachPage() {
                   disabled={isRunning}
                   className="w-full bg-slate-50 px-3 py-2 rounded-lg border border-slate-200 text-xs sm:text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#FF5722] disabled:opacity-50"
                 >
-                  <option value="squat">Barbell Squat / Bodyweight Squat</option>
-                  <option value="pushup">Hít đất (Standard Push-up)</option>
-                  <option value="plank">Plank tĩnh (Isometric Plank)</option>
+                  <option value="squat">Squat cơ bản</option>
+                  <option value="pushup">Hít đất</option>
+                  <option value="plank">Plank tĩnh</option>
                 </select>
                 <p className="text-[11px] text-slate-400 mt-1.5">
                   {poseExercise === 'squat' &&
@@ -660,7 +660,7 @@ export default function AiCoachPage() {
               {/* Realtime Feedback Issues */}
               <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
                 <span className="text-xs font-bold uppercase tracking-wide text-slate-700 block">
-                  Phân tích động học (Realtime)
+                  Phân tích động học trực tiếp
                 </span>
 
                 {metrics.issues.length === 0 ? (

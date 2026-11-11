@@ -69,7 +69,7 @@ export const TopBar: React.FC<TopBarProps> = ({
     goal: (profile?.goal as 'gain_muscle' | 'lose_fat') || 'gain_muscle',
   };
 
-  const streak = propStreak !== undefined ? propStreak : (profile?.streak || 17);
+  const streak = propStreak !== undefined ? propStreak : (profile?.streak ?? 0);
   const [currentDateTime, setCurrentDateTime] = useState<string>('');
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -425,13 +425,8 @@ export const TopBar: React.FC<TopBarProps> = ({
                     <EmptyState
                       icon={Bell}
                       title="Chưa có thông báo nào"
-                      description="Bạn sẽ nhận được thông báo khi có lịch tập hôm nay, lời nhắc uống nước hoặc cập nhật từ cộng đồng."
+                      description="Hòm thông báo của bạn đang trống. Bạn sẽ nhận được thông báo khi có lượt thích hoặc bình luận từ mạng xã hội, hoặc khi đến giờ tập theo lịch."
                       className="py-8 border-0 shadow-none bg-transparent"
-                      action={{
-                        label: 'Tạo thông báo thử',
-                        onClick: handleAddSampleNotification,
-                        variant: 'secondary',
-                      }}
                     />
                   ) : (
                     notifications.map((item) => {
@@ -580,13 +575,6 @@ export const TopBar: React.FC<TopBarProps> = ({
                         ? `Đang chọn ${selectedIds.length} / ${notifications.length} tin`
                         : `${notifications.length} thông báo`}
                     </span>
-                    <button
-                      type="button"
-                      onClick={handleAddSampleNotification}
-                      className="text-[11px] font-bold text-slate-600 hover:text-[#FF5722] transition-colors cursor-pointer"
-                    >
-                      + Thêm tin thử nghiệm
-                    </button>
                   </div>
                 )}
               </div>

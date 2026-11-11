@@ -79,20 +79,15 @@ export const initialFitnessData: FitnessDataState = {
     gender: "male",
   },
   today: {
-    calories: 1820,
+    calories: 0,
     calorieGoal: 2400,
-    workoutMinutes: 42,
-    steps: 8421,
-    water: 1.8,
-    waterGoal: 2.5,
-    streak: 17,
+    workoutMinutes: 0,
+    steps: 0,
+    water: 0,
+    waterGoal: 2.0,
+    streak: 0,
   },
-  recentMetrics: [
-    { date: "2026-09-01", weight: 70.2, bodyFat: 16.5, muscle: 53.2 },
-    { date: "2026-09-07", weight: 69.5, bodyFat: 16.0, muscle: 53.6 },
-    { date: "2026-09-14", weight: 68.9, bodyFat: 15.5, muscle: 54.0 },
-    { date: "2026-09-20", weight: 68.4, bodyFat: 15.2, muscle: 54.2 },
-  ],
+  recentMetrics: [],
   progressPhotos: [
     {
       id: "photo-1",

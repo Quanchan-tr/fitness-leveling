@@ -208,9 +208,8 @@ export const starterSchedule: DaySchedule[] = [
   {
     dayOfWeek: 'Thứ 2',
     dateStr: 'Thứ 2',
-    assignedRoutine: starterRoutines[0],
-    assignedRoutines: [starterRoutines[0]],
-    status: 'planned',
+    assignedRoutines: [],
+    status: 'rest',
   },
   {
     dayOfWeek: 'Thứ 3',
@@ -221,9 +220,8 @@ export const starterSchedule: DaySchedule[] = [
   {
     dayOfWeek: 'Thứ 4',
     dateStr: 'Thứ 4',
-    assignedRoutine: starterRoutines[1],
-    assignedRoutines: [starterRoutines[1]],
-    status: 'planned',
+    assignedRoutines: [],
+    status: 'rest',
   },
   {
     dayOfWeek: 'Thứ 5',
@@ -234,9 +232,8 @@ export const starterSchedule: DaySchedule[] = [
   {
     dayOfWeek: 'Thứ 6',
     dateStr: 'Thứ 6',
-    assignedRoutine: starterRoutines[2],
-    assignedRoutines: [starterRoutines[2]],
-    status: 'planned',
+    assignedRoutines: [],
+    status: 'rest',
   },
   {
     dayOfWeek: 'Thứ 7',

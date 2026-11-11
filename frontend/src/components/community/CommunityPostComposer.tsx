@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { useFitness } from '@/contexts/FitnessContext';
+import { useFitness, DEFAULT_AVATAR } from '@/contexts/FitnessContext';
 import {
   Image as ImageIcon,
   Video,
@@ -184,9 +184,12 @@ export const CommunityPostComposer: React.FC = () => {
 
       <div className="flex items-center gap-3">
         <img
-          src={profile.avatar}
+          src={profile.avatar || DEFAULT_AVATAR}
           alt={profile.name}
-          className="w-10 h-10 rounded-xl object-cover border border-slate-200"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = DEFAULT_AVATAR;
+          }}
+          className="w-10 h-10 rounded-xl object-cover border border-slate-200 bg-slate-100"
         />
         <div>
           <span className="font-extrabold text-sm text-slate-900 block leading-tight">
