@@ -40,3 +40,4 @@ class AuthOtpMail extends Mailable
         );
     }
 }
+

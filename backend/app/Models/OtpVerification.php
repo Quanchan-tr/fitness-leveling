@@ -28,3 +28,4 @@ class OtpVerification extends Model
         return $this->expires_at->isPast();
     }
 }
+
