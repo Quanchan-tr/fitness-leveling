@@ -297,6 +297,7 @@ class WardrobeModalActivity : AppCompatActivity() {
                         withContext(Dispatchers.IO) {
                             api.equipAvatarItem(
                                 EquipAvatarRequest(
+                                    gender = session.userGender,
                                     headwearId = equippedMap["headwear"],
                                     hairId = equippedMap["hair"],
                                     topId = equippedMap["top"],

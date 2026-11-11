@@ -82,6 +82,9 @@ class EditProfileActivity : AppCompatActivity() {
         }
 
         session.userName = name
+        height?.let { session.userHeight = it.toFloat() }
+        weight?.let { session.userWeight = it.toFloat() }
+        goal?.let { session.userGoal = it }
 
         if (session.isLoggedIn) {
             lifecycleScope.launch {
