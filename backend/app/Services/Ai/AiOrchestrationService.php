@@ -63,9 +63,9 @@ class AiOrchestrationService
 
             // Branch A: Google Gemini
             if ($provider === 'gemini' || ($hasGemini && !$hasOpenAi)) {
-                $geminiModel = config('ai.model', 'gemini-3.5-flash');
+                $geminiModel = config('ai.model', 'gemini-3.5-flash-lite');
                 if (empty($geminiModel) || $geminiModel === 'gpt-4o-mini') {
-                    $geminiModel = 'gemini-3.5-flash';
+                    $geminiModel = 'gemini-3.5-flash-lite';
                 }
 
                 $geminiEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key={$geminiKey}";
