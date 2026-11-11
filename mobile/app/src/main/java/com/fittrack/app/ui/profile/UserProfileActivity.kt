@@ -44,6 +44,7 @@ class UserProfileActivity : AppCompatActivity() {
 
     private fun bindUserData() {
         binding.tvProfileName.text = session.userName
+        binding.btnBadgesLinkStreak.text = "🔥 ${session.userStreak} ngày streak"
     }
 
     private fun fetchFreshProfile() {

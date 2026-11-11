@@ -115,7 +115,7 @@ export const SetRow: React.FC<SetRowProps> = ({
           <option value="7">RPE 7 (Vừa)</option>
           <option value="8">RPE 8 (Chuẩn)</option>
           <option value="9">RPE 9 (Nặng)</option>
-          <option value="10">RPE 10 (Max)</option>
+          <option value="10">RPE 10 (Tối đa)</option>
         </select>
       </div>
 

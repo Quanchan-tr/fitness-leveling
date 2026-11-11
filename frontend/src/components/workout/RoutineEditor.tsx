@@ -205,7 +205,7 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
 
   const handleSaveRoutine = () => {
     if (!title.trim()) {
-      alert('Vui lòng nhập tiêu đề cho Routine');
+      alert('Vui lòng nhập tiêu đề cho Lịch tập');
       return;
     }
 
@@ -250,7 +250,7 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
           </button>
           <div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              {initialRoutine?.id ? 'Chỉnh sửa Routine' : 'Tạo Routine mới'}
+              {initialRoutine?.id ? 'Chỉnh sửa Lịch tập' : 'Tạo Lịch tập mới'}
             </h1>
             <p className="text-xs text-slate-500">
               Thiết lập bài tập, số hiệp linh hoạt theo loại và theo dõi heatmap cơ bắp thời gian thực
@@ -272,7 +272,7 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
             className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#FF5722] hover:bg-[#E64A19] text-white font-bold text-xs sm:text-sm transition-colors cursor-pointer shadow-sm"
           >
             <Save className="w-4 h-4" />
-            <span>Lưu Routine</span>
+            <span>Lưu Lịch tập</span>
           </button>
         </div>
       </div>
@@ -285,7 +285,7 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
           <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Tiêu đề Routine *
+                Tiêu đề Lịch tập *
               </label>
               <input
                 type="text"
@@ -378,7 +378,7 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
                 className="p-8 text-center bg-white rounded-2xl border-2 border-dashed border-slate-200 hover:border-[#FF5722] hover:bg-orange-50/20 transition-all cursor-pointer space-y-2 group"
               >
                 <Dumbbell className="w-8 h-8 mx-auto text-slate-300 group-hover:text-[#FF5722] transition-colors" />
-                <p className="text-xs font-bold text-slate-700">Chưa có bài tập nào trong Routine</p>
+                <p className="text-xs font-bold text-slate-700">Chưa có bài tập nào trong Lịch tập</p>
                 <p className="text-[11px] text-slate-400">Nhấn vào đây hoặc nút trên để mở Ngân hàng chọn bài tập</p>
               </div>
             )}
@@ -432,7 +432,7 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     <div>
                       <label className="font-semibold text-slate-600 block mb-1">
-                        Ghi chú kỹ thuật (Pinned Note)
+                        Ghi chú kỹ thuật
                       </label>
                       <input
                         type="text"
@@ -514,19 +514,19 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
                             <th className="py-1.5 px-2 w-12 text-center">Set</th>
                             {ex.type === 'weight_reps' && (
                               <>
-                                <th className="py-1.5 px-2">Khối lượng (Kg)</th>
-                                <th className="py-1.5 px-2">Số lần (Reps)</th>
+                                <th className="py-1.5 px-2">Khối lượng (kg)</th>
+                                <th className="py-1.5 px-2">Số lần tập</th>
                               </>
                             )}
                             {ex.type === 'bodyweight_reps' && (
-                              <th className="py-1.5 px-2">Số lần (Reps)</th>
+                              <th className="py-1.5 px-2">Số lần tập</th>
                             )}
                             {ex.type === 'duration' && (
                               <th className="py-1.5 px-2">Thời gian giữ (giây)</th>
                             )}
                             {ex.type === 'distance_duration' && (
                               <>
-                                <th className="py-1.5 px-2">Quãng đường (Km)</th>
+                                <th className="py-1.5 px-2">Quãng đường (km)</th>
                                 <th className="py-1.5 px-2">Thời gian (giây)</th>
                               </>
                             )}
@@ -691,7 +691,7 @@ export const RoutineEditor: React.FC<RoutineEditorProps> = ({
                   <span>Ngân hàng bài tập</span>
                 </h3>
                 <p className="text-xs text-slate-400">
-                  Tìm kiếm và nhấn (+) để thêm vào Routine
+                  Tìm kiếm và nhấn (+) để thêm vào Lịch tập
                 </p>
               </div>
 

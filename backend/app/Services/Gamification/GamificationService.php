@@ -118,6 +118,45 @@ class GamificationService
     }
 
     /**
+     * Record daily login / active app entry.
+     * Increases streak if logged in consecutive days, resets to 1 if a day was skipped.
+     */
+    public function recordDailyLogin(User $user): int
+    {
+        $today = Carbon::today();
+        $lastActive = $user->last_active_date ? Carbon::parse($user->last_active_date)->startOfDay() : null;
+        $currentStreak = $user->current_streak ?? 0;
+
+        if ($lastActive === null) {
+            $currentStreak = 1;
+            $user->current_streak = $currentStreak;
+            $user->last_active_date = $today->toDateString();
+            $user->save();
+        } elseif ($lastActive->isToday()) {
+            // Already active today, streak remains unchanged
+            if ($currentStreak <= 0) {
+                $currentStreak = 1;
+                $user->current_streak = 1;
+                $user->save();
+            }
+        } elseif ($lastActive->copy()->addDay()->isToday()) {
+            // Consecutive day login (yesterday was last active)
+            $currentStreak += 1;
+            $user->current_streak = $currentStreak;
+            $user->last_active_date = $today->toDateString();
+            $user->save();
+        } else {
+            // Broken streak (more than 1 day missed), reset to 1
+            $currentStreak = 1;
+            $user->current_streak = $currentStreak;
+            $user->last_active_date = $today->toDateString();
+            $user->save();
+        }
+
+        return $currentStreak;
+    }
+
+    /**
      * Compute dynamic daily quests for today.
      * No separate database table or midnight cronjob needed.
      */

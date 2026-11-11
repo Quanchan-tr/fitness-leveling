@@ -358,9 +358,9 @@ export default function SettingsPage() {
                       onChange={(e) => setGoal(e.target.value as any)}
                       className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-bold text-sm text-slate-900 outline-none focus:border-[#FF5722] bg-white cursor-pointer"
                     >
-                      <option value="gain_muscle">💪 Tăng cơ bắp (Hypertrophy / Lean Bulk)</option>
-                      <option value="lose_weight">🔥 Giảm cân / Giảm mỡ (Fat Loss)</option>
-                      <option value="maintain">⚖️ Duy trì vóc dáng & Sức khỏe (Maintenance)</option>
+                      <option value="gain_muscle">💪 Tăng cơ bắp</option>
+                      <option value="lose_weight">🔥 Giảm cân / Giảm mỡ</option>
+                      <option value="maintain">⚖️ Duy trì vóc dáng & Sức khỏe</option>
                     </select>
                   </div>
 
@@ -499,38 +499,6 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-4">
-                  {/* Weight Unit */}
-                  <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 flex items-center justify-between gap-4">
-                    <div>
-                      <h4 className="font-bold text-xs sm:text-sm text-slate-900">Đơn vị đo khối lượng tạ & cơ thể</h4>
-                      <p className="text-[11px] text-slate-500 mt-0.5">Chọn hiển thị theo Kilogram (kg) hoặc Pound (lbs)</p>
-                    </div>
-                    <div className="flex items-center bg-slate-200/80 p-1 rounded-xl">
-                      <button
-                        type="button"
-                        onClick={() => handleTogglePreference('weightUnit', 'kg')}
-                        className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                          preferences.weightUnit === 'kg'
-                            ? 'bg-white text-slate-900 shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        Kilogram (kg)
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleTogglePreference('weightUnit', 'lbs')}
-                        className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-                          preferences.weightUnit === 'lbs'
-                            ? 'bg-white text-slate-900 shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        Pound (lbs)
-                      </button>
-                    </div>
-                  </div>
-
                   {/* Rest Timer Audio Beep */}
                   <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/70 flex items-center justify-between gap-4">
                     <div>
@@ -621,7 +589,7 @@ export default function SettingsPage() {
                   {/* App Version Info */}
                   <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
                     <span className="font-bold text-slate-600">Phiên bản Web:</span>
-                    <span className="font-black text-slate-900">FitnessLeveling v2.5.0 (Command Center)</span>
+                    <span className="font-black text-slate-900">FitnessLeveling v2.5.0</span>
                   </div>
 
                   {/* Sign Out Action */}

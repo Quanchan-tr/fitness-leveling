@@ -1,25 +1,60 @@
 'use strict';
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import Link from 'next/link';
-import { useFitness } from '@/contexts/FitnessContext';
-import { User, Users, Check, UserPlus, Flame, Dumbbell } from 'lucide-react';
+import { useFitness, DEFAULT_AVATAR } from '@/contexts/FitnessContext';
+import { User, Users, Check, UserPlus, Flame, Dumbbell, Camera } from 'lucide-react';
 
 export const CommunitySidebar: React.FC = () => {
-  const { profile, athletes, toggleFollowAthlete } = useFitness();
+  const { profile, updateProfile, athletes, toggleFollowAthlete } = useFitness();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        updateProfile({ avatar: dataUrl });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <aside className="space-y-5 select-none">
       {/* 1. My Profile Widget */}
       <div className="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-sm space-y-4">
         <div className="flex items-center gap-3">
-          <img
-            src={profile.avatar}
-            alt={profile.name}
-            className="w-13 h-13 rounded-2xl object-cover border-2 border-[#FF5722]/30 shadow-xs"
+          <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+            <img
+              src={profile.avatar || DEFAULT_AVATAR}
+              alt={profile.name}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = DEFAULT_AVATAR;
+              }}
+              className="w-14 h-14 rounded-2xl object-cover border-2 border-[#FF5722]/30 shadow-xs group-hover:opacity-85 transition-opacity bg-slate-100"
+            />
+            <div
+              className="absolute inset-0 bg-black/40 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white"
+              title="Nhấn để đổi ảnh đại diện"
+            >
+              <Camera className="w-5 h-5 text-white" />
+            </div>
+            <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-[#FF5722] text-white flex items-center justify-center shadow-xs border border-white">
+              <Camera className="w-3 h-3" />
+            </div>
+          </div>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleAvatarFile}
+            accept="image/*"
+            className="hidden"
           />
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <h3 className="font-black text-sm sm:text-base text-slate-900 truncate">
               {profile.name}
             </h3>
@@ -27,9 +62,13 @@ export const CommunitySidebar: React.FC = () => {
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-900 text-white tabular-nums">
                 Lv. {profile.level}
               </span>
-              <span className="text-[11px] text-slate-400 font-semibold truncate">
-                Chiến binh
-              </span>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-[11px] text-[#FF5722] hover:underline font-semibold truncate cursor-pointer"
+              >
+                Đổi ảnh đại diện
+              </button>
             </div>
           </div>
         </div>

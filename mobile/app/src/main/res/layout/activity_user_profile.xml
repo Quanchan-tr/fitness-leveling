@@ -190,7 +190,7 @@
                             android:paddingTop="2dp"
                             android:paddingEnd="8dp"
                             android:paddingBottom="2dp"
-                            android:text="🔥 17 ngày streak liên tục"
+                            android:text="🔥 Chuỗi ngày streak"
                             android:textColor="@color/primary"
                             android:textSize="10.5sp"
                             android:textStyle="bold" />

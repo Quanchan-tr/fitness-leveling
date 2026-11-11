@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import { CommunityPost, RoutineItem } from '@/types/fitnessleveling.types';
-import { useFitness } from '@/contexts/FitnessContext';
+import { useFitness, DEFAULT_AVATAR } from '@/contexts/FitnessContext';
 import {
   Heart,
   MessageCircle,
@@ -97,9 +97,12 @@ export const FeedPostCard: React.FC<FeedPostCardProps> = ({ post }) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img
-            src={post.author.avatar}
+            src={post.author.avatar || DEFAULT_AVATAR}
             alt={post.author.name}
-            className="w-11 h-11 rounded-xl object-cover border border-slate-200"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = DEFAULT_AVATAR;
+            }}
+            className="w-11 h-11 rounded-xl object-cover border border-slate-200 bg-slate-100"
           />
           <div>
             <div className="flex items-center gap-2">

@@ -86,17 +86,17 @@
 
     <!-- 005. Select Goal -->
     <string name="onboarding_goal_title">Mục tiêu tập luyện hàng đầu của bạn?</string>
-    <string name="goal_build_muscle">Tăng cơ (Hypertrophy)</string>
-    <string name="goal_gain_strength">Tăng sức mạnh (Strength)</string>
-    <string name="goal_fat_loss">Giảm mỡ (Fat Loss)</string>
+    <string name="goal_build_muscle">Tăng cơ bắp</string>
+    <string name="goal_gain_strength">Tăng sức mạnh</string>
+    <string name="goal_fat_loss">Giảm mỡ</string>
 
     <!-- 006. Select Experience -->
     <string name="onboarding_experience_title">Kinh nghiệm tập luyện thể hình của bạn?</string>
-    <string name="exp_beginner_title">Mới bắt đầu (Beginner)</string>
+    <string name="exp_beginner_title">Mới bắt đầu</string>
     <string name="exp_beginner_desc">Dưới 1 năm tập luyện</string>
-    <string name="exp_intermediate_title">Đã có kinh nghiệm (Intermediate)</string>
+    <string name="exp_intermediate_title">Đã có kinh nghiệm</string>
     <string name="exp_intermediate_desc">1 - 3 năm tập luyện</string>
-    <string name="exp_advanced_title">Nâng cao (Advanced)</string>
+    <string name="exp_advanced_title">Nâng cao</string>
     <string name="exp_advanced_desc">Trên 3 năm tập luyện</string>
 
     <!-- 007. Guide Or Not -->
@@ -122,24 +122,24 @@
     <!-- 010. Focus Muscle -->
     <string name="onboarding_muscle_title">Nhóm cơ bạn muốn tập trung phát triển?</string>
     <string name="onboarding_muscle_subtitle">Giáo án vẫn đảm bảo cân đối toàn diện, nhưng bạn có thể ưu tiên thêm cho một nhóm cơ.</string>
-    <string name="muscle_balanced">Toàn diện (Full Body)</string>
-    <string name="muscle_core">Core</string>
-    <string name="muscle_chest">Cơ Ngực (Chest)</string>
-    <string name="muscle_arms">Cơ Tay (Arms)</string>
-    <string name="muscle_legs">Cơ Chân (Legs)</string>
-    <string name="muscle_shoulders">Cơ Vai (Shoulders)</string>
+    <string name="muscle_balanced">Toàn diện</string>
+    <string name="muscle_core">Cơ trọng tâm</string>
+    <string name="muscle_chest">Cơ Ngực</string>
+    <string name="muscle_arms">Cơ Tay</string>
+    <string name="muscle_legs">Cơ Chân</string>
+    <string name="muscle_shoulders">Cơ Vai</string>
 
     <!-- 011. Destination -->
     <string name="onboarding_destination_title">Địa điểm tập luyện thường xuyên của bạn?</string>
     <string name="onboarding_destination_subtitle">Chọn nơi bạn thường xuyên rèn luyện để AI tùy biến bài tập phù hợp</string>
-    <string name="dest_large_gym_title">Phòng Gym lớn (Fitness Club)</string>
+    <string name="dest_large_gym_title">Phòng Gym lớn</string>
     <string name="dest_large_gym_desc">Trung tâm thể hình quy mô đầy đủ máy khối, tạ rời và phụ kiện chuyên sâu</string>
     <string name="dest_commercial_gym_title">Phòng Gym thương mại</string>
     <string name="dest_commercial_gym_desc">Phòng tập tiêu chuẩn với đầy đủ thanh đòn, tạ đơn và máy tập cơ bản</string>
-    <string name="dest_garage_gym_title">Phòng tập tại gia (Garage Gym)</string>
+    <string name="dest_garage_gym_title">Phòng tập tại gia</string>
     <string name="dest_garage_gym_desc">Trang bị thanh đòn, giá Squat rack, tạ đơn, ghế tập đa năng</string>
-    <string name="dest_home_title">Tập tại nhà (Home Workout)</string>
-    <string name="dest_home_desc">Dụng cụ tối giản: tạ đơn, xà đơn hoặc bài tập Bodyweight</string>
+    <string name="dest_home_title">Tập tại nhà</string>
+    <string name="dest_home_desc">Dụng cụ tối giản: tạ đơn, xà đơn hoặc bài tập thể trọng</string>
 
     <!-- 012 & 013. Equipment -->
     <string name="onboarding_equipment_title">Chọn các dụng cụ tập luyện bạn có sẵn</string>
@@ -172,8 +172,8 @@
 
     <!-- 001. Dashboard -->
     <string name="dashboard_app_title">FitnessLeveling</string>
-    <string name="dashboard_command_center">LEVEL UP YOUR FITNESS</string>
-    <string name="dashboard_streak">17 ngày</string>
+    <string name="dashboard_command_center">NÂNG CẤP BẢN THÂN MỖI NGÀY</string>
+    <string name="dashboard_streak">1 ngày</string>
     <string name="dashboard_enter_workout_cta">Vào buổi tập ngay</string>
     <string name="dashboard_user_name">Quan Tran</string>
     <string name="dashboard_user_level">Lv. 12</string>
@@ -255,23 +255,23 @@
     <string name="nutrition_title">Nhật ký dinh dưỡng &amp; Calo</string>
     <string name="nutrition_target_calories_title">Mục tiêu Calo hôm nay:</string>
     <string name="nutrition_target_calories_val">1.850 kcal</string>
-    <string name="nutrition_macro_protein">Đạm (Protein): 135 / 160g</string>
-    <string name="nutrition_macro_carb">Tinh bột (Carb): 180 / 240g</string>
-    <string name="nutrition_macro_fat">Chất béo (Fat): 48 / 65g</string>
+    <string name="nutrition_macro_protein">Đạm: 135 / 160g</string>
+    <string name="nutrition_macro_carb">Tinh bột: 180 / 240g</string>
+    <string name="nutrition_macro_fat">Chất béo: 48 / 65g</string>
     <string name="btn_add_meal">＋ Thêm món ăn</string>
     <string name="btn_create_combo">Tạo combo món</string>
 
     <!-- 006. Community -->
     <string name="community_title">Cộng đồng FitnessLeveling</string>
-    <string name="community_subtitle">Chia sẻ giáo án &amp; Kết nối gymer</string>
+    <string name="community_subtitle">Chia sẻ lịch tập &amp; Kết nối gymer</string>
     <string name="community_filter_all">Tất cả</string>
     <string name="community_filter_chest">Ngực &amp; Tay sau</string>
     <string name="community_filter_back">Lưng &amp; Xô</string>
     <string name="community_filter_legs">Chân &amp; Mông</string>
-    <string name="community_filter_pr">Kỷ lục PR</string>
-    <string name="community_routine_tag">Push Day Hypertrophy • 45 phút • 6 bài</string>
-    <string name="community_btn_save_routine">Lưu giáo án</string>
-    <string name="community_toast_routine_saved">Đã lưu giáo án vào danh sách tập của bạn!</string>
+    <string name="community_filter_pr">Kỷ lục cá nhân</string>
+    <string name="community_routine_tag">Push Day Tăng cơ • 45 phút • 6 bài</string>
+    <string name="community_btn_save_routine">Lưu lịch tập</string>
+    <string name="community_toast_routine_saved">Đã lưu lịch tập vào danh sách của bạn!</string>
     <string name="community_like_count">48</string>
     <string name="community_comment_count">12</string>
     <string name="community_input_placeholder">Chia sẻ trải nghiệm buổi tập và giáo án...</string>
@@ -328,18 +328,18 @@
     <string name="active_workout_status_1">● Đang tập Bài 1/2</string>
     <string name="active_workout_status_2">● Đang tập Bài 2/2 (Cuối)</string>
     <string name="btn_quit_workout">Kết thúc</string>
-    <string name="active_workout_rest_label">Thời gian nghỉ (Rest):</string>
+    <string name="active_workout_rest_label">Thời gian nghỉ:</string>
     <string name="active_workout_rest_time">01:30</string>
-    <string name="btn_start_rest">Bắt đầu nghỉ (Rest)</string>
+    <string name="btn_start_rest">Bắt đầu nghỉ</string>
     <string name="btn_ai_check_form">AI Check Form</string>
     <string name="btn_next_exercise">Hoàn thành Bài 1 • Sang Bài 2</string>
     <string name="btn_finish_workout_xp">Hoàn thành buổi tập &amp; Lưu kỷ lục (+350 XP)</string>
     <string name="active_workout_demo_guide">Hướng dẫn chuyển động chuẩn</string>
-    <string name="active_workout_th_set">SET</string>
+    <string name="active_workout_th_set">HIỆP</string>
     <string name="active_workout_th_kg">KG</string>
-    <string name="active_workout_th_reps">REPS</string>
+    <string name="active_workout_th_reps">SỐ LẦN</string>
     <string name="active_workout_th_done">XONG</string>
-    <string name="btn_add_set">＋ Thêm Set (Add Set)</string>
+    <string name="btn_add_set">＋ Thêm hiệp</string>
     <string name="active_workout_ex1_name">Barbell Bench Press</string>
     <string name="active_workout_ex1_target">Cơ ngực giữa &amp; Tay sau • Khởi động kỹ khớp vai</string>
     <string name="active_workout_ex2_name">Incline Dumbbell Press</string>
@@ -348,14 +348,14 @@
     <!-- 012. Create Routine -->
     <string name="create_routine_screen_title">Tạo giáo án mới</string>
     <string name="label_routine_name">TÊN GIÁO ÁN TẬP</string>
-    <string name="hint_routine_name">Push Hypertrophy - Tăng cơ Ngực &amp; Vai</string>
+    <string name="hint_routine_name">Tăng cơ Ngực &amp; Vai</string>
     <string name="label_target_muscle">NHÓM CƠ MỤC TIÊU</string>
     <string name="btn_save_routine">Lưu vào Danh sách Luyện tập</string>
-    <string name="chip_muscle_chest">Ngực (Chest)</string>
-    <string name="chip_muscle_back">Lưng xô (Back)</string>
-    <string name="chip_muscle_triceps">Tay sau (Triceps)</string>
-    <string name="chip_muscle_shoulders">Vai (Shoulders)</string>
-    <string name="chip_muscle_legs">Đùi &amp; Mông (Legs)</string>
+    <string name="chip_muscle_chest">Ngực</string>
+    <string name="chip_muscle_back">Lưng xô</string>
+    <string name="chip_muscle_triceps">Tay sau</string>
+    <string name="chip_muscle_shoulders">Vai</string>
+    <string name="chip_muscle_legs">Đùi &amp; Mông</string>
     <string name="label_exercises_in_routine">BÀI TẬP TRONG GIÁO ÁN</string>
     <string name="btn_add_exercise_to_routine">＋ Thêm bài tập</string>
     <string name="cd_reorder">Thay đổi thứ tự</string>
@@ -389,14 +389,14 @@
     <string name="settings_voice_coach">Huấn luyện viên giọng nói AI</string>
     <string name="settings_weight_unit">Đơn vị khối lượng</string>
     <string name="settings_weight_unit_val">Kilogram (kg) ›</string>
-    <string name="settings_rest_time">Thời gian nghỉ mặc định (Rest)</string>
+    <string name="settings_rest_time">Thời gian nghỉ mặc định</string>
     <string name="settings_rest_time_val">90 giây ›</string>
     <string name="settings_general">Cài đặt chung</string>
     <string name="settings_notifications">Thông báo nhắc nhở luyện tập</string>
     <string name="settings_health_sync">Đồng bộ Google Fit / Sức khỏe</string>
     <string name="settings_health_connected">Đã kết nối</string>
     <string name="settings_language">Ngôn ngữ ứng dụng</string>
-    <string name="settings_language_val">Tiếng Việt (VN) ›</string>
+    <string name="settings_language_val">Tiếng Việt ›</string>
     <string name="btn_logout">Đăng xuất tài khoản</string>
 
     <!-- 015. Edit Profile -->
@@ -406,7 +406,7 @@
     <string name="hint_profile_fullname">Nhập họ và tên</string>
     <string name="label_profile_goal">MỤC TIÊU LUYỆN TẬP</string>
     <string name="hint_profile_goal">Mục tiêu tập luyện</string>
-    <string name="default_profile_goal">Tăng cơ giảm mỡ (Body Recomposition)</string>
+    <string name="default_profile_goal">Tăng cơ giảm mỡ</string>
     <string name="label_profile_height">CHIỀU CAO (CM)</string>
     <string name="label_profile_weight">CÂN NẶNG (KG)</string>
     <string name="label_profile_birthday">NGÀY SINH</string>
@@ -453,17 +453,17 @@
     <!-- 019. Workout Summary Modal -->
     <string name="modal_summary_title">BUỔI TẬP HOÀN THÀNH!</string>
     <string name="modal_summary_level_up">THĂNG CẤP! BẠN ĐÃ ĐẠT CẤP 18</string>
-    <string name="modal_summary_level_xp">+350 Điểm Kinh Nghiệm (XP)</string>
+    <string name="modal_summary_level_xp">+350 Điểm Kinh Nghiệm</string>
     <string name="modal_summary_time_label">Thời gian</string>
     <string name="modal_summary_time_val">42 phút</string>
     <string name="modal_summary_volume_label">Khối lượng</string>
     <string name="modal_summary_volume_val">3.840 kg</string>
     <string name="modal_summary_form_label">AI Pose Form</string>
     <string name="modal_summary_form_val">98% Chuẩn</string>
-    <string name="modal_summary_rpg_title">TĂNG CHỈ SỐ NHÂN VẬT THỢ SĂN</string>
-    <string name="modal_summary_stat_str">Sức mạnh (STR): +3 (84 → 87)</string>
-    <string name="modal_summary_stat_sta">Thể lực (STA): +2 (79 → 81)</string>
-    <string name="modal_summary_stat_agi">Khéo léo (AGI): +1 (75 → 76)</string>
+    <string name="modal_summary_rpg_title">TĂNG CHỈ SỐ NHÂN VẬT</string>
+    <string name="modal_summary_stat_str">Sức mạnh: +3 (84 → 87)</string>
+    <string name="modal_summary_stat_sta">Thể lực: +2 (79 → 81)</string>
+    <string name="modal_summary_stat_agi">Khéo léo: +1 (75 → 76)</string>
     <string name="modal_summary_btn_share">Chia sẻ thành tích lên Cộng đồng</string>
     <string name="modal_summary_btn_close">Đóng lại</string>
     <string name="toast_open_community">Đang mở trang Cộng đồng để chia sẻ kỷ lục...</string>
@@ -483,8 +483,8 @@
     <string name="modal_meal_tab_combo">Chọn Combo có sẵn</string>
     <string name="modal_meal_search_hint">Nhập tên món: Ức gà, Trứng, Bò, Cơm...</string>
     <string name="modal_meal_chip_all">Tất cả</string>
-    <string name="modal_meal_chip_protein">Đạm (Protein)</string>
-    <string name="modal_meal_chip_carb">Tinh bột (Carb)</string>
+    <string name="modal_meal_chip_protein">Đạm</string>
+    <string name="modal_meal_chip_carb">Tinh bột</string>
     <string name="modal_meal_chip_veggie">Rau củ</string>
     <string name="modal_meal_chip_whey">Whey &amp; Thực phẩm bổ sung</string>
     <string name="modal_meal_food1_name">Ức gà áp chảo (100g)</string>
@@ -495,7 +495,7 @@
     <string name="modal_meal_food3_macro">156 kcal • P: 13g • C: 1.1g • F: 10g</string>
     <string name="modal_meal_btn_add_item">+ Thêm</string>
     <string name="modal_meal_btn_added">Đã chọn</string>
-    <string name="modal_meal_btn_confirm">Lưu món vào thực đơn (+ Calo &amp; Macro)</string>
+    <string name="modal_meal_btn_confirm">Lưu món vào thực đơn</string>
     <string name="toast_meal_selected">Đã chọn: %1$s</string>
     <string name="toast_meals_saved">Đã lưu %1$d món vào thực đơn hôm nay thành công!</string>
 
@@ -507,7 +507,7 @@
     <string name="dashboard_energy_val">1,800 kcal</string>
     <string name="dashboard_energy_target">Mục tiêu 2,400 (Còn 600)</string>
     <string name="dashboard_water_title">💧 Nước uống &amp; Vận động</string>
-    <string name="dashboard_water_val">1.8L / 2.0L (90%)</string>
+    <string name="dashboard_water_val">0.0L / 2.0L (0%)</string>
     <string name="dashboard_water_add_250">+250ml</string>
     <string name="dashboard_water_add_500">+500ml</string>
     <string name="dashboard_daily_quest_banner">Nhiệm vụ hôm nay: 2/3 hoàn thành (+150 XP)</string>
@@ -519,15 +519,15 @@
     <string name="workouts_ai_planner_cta">Tạo lịch AI ➔</string>
     <string name="workouts_action_add_calendar">Thêm vào lịch</string>
     <string name="workouts_action_edit">Chỉnh sửa</string>
-    <string name="workouts_action_delete">Xóa routine</string>
-    <string name="workouts_drag_routine_hint">⠿ Kéo thả Routine từ thư viện vào ngày tập để xếp lịch</string>
+    <string name="workouts_action_delete">Xóa lịch tập</string>
+    <string name="workouts_drag_routine_hint">⠿ Kéo thả Lịch tập từ thư viện vào ngày tập để xếp lịch</string>
     <string name="workouts_today_scheduled_routine">Lịch hôm nay: Ngực &amp; Tay Sau Cắt Nét (3 bài)</string>
     <string name="workouts_today_scheduled_ex">• Barbell Bench Press  • Incline DB  • Dips Triceps</string>
     <string name="workouts_btn_detail">Chi tiết</string>
     <string name="workouts_collection_title">Thư mục bài tập</string>
-    <string name="workouts_collection_sub">4 routines • 3 thư mục</string>
+    <string name="workouts_collection_sub">4 lịch tập • 3 thư mục</string>
     <string name="workouts_drag_to_cal">⠿ Kéo vào lịch</string>
-    <string name="workouts_view_routine_detail_action">🔍 Xem chi tiết giáo án &amp; kỹ thuật tập ➔</string>
+    <string name="workouts_view_routine_detail_action">🔍 Xem chi tiết lịch tập &amp; kỹ thuật tập ➔</string>
     <string name="workouts_routine_pull_title">Lưng Xô &amp; Bắp Tay Trước</string>
     <string name="workouts_routine_pull_stats">⚡ 3 bài tập  •  8 sets  •  ⏱ 40 phút  •  ⏳ Nghỉ 90s</string>
     <string name="workouts_routine_pull_ex1">1. Conventional Deadlift (Kéo đòn)\n3 sets × 6 reps</string>
@@ -556,25 +556,25 @@
     <!-- Nutrition Tracker -->
     <string name="nutrition_meals_today_title">Bữa ăn đã nạp hôm nay (3 bữa):</string>
     <string name="nutrition_meal_1_name">Bữa sáng: Phở bò tái lăn</string>
-    <string name="nutrition_meal_1_macro">480 kcal (32g Protein)</string>
+    <string name="nutrition_meal_1_macro">480 kcal • 32g Đạm</string>
     <string name="nutrition_meal_2_name">Bữa trưa: Cơm ức gà xào nấm</string>
-    <string name="nutrition_meal_2_macro">620 kcal (48g Protein)</string>
+    <string name="nutrition_meal_2_macro">620 kcal • 48g Đạm</string>
     <string name="nutrition_meal_3_name">Bữa phụ: Whey Isolate + Chuối</string>
-    <string name="nutrition_meal_3_macro">280 kcal (28g Protein)</string>
+    <string name="nutrition_meal_3_macro">280 kcal • 28g Đạm</string>
     <string name="nutrition_meal_4_name">Bữa tối: Salad cá hồi áp chảo</string>
-    <string name="nutrition_meal_4_macro">470 kcal (35g Protein)</string>
+    <string name="nutrition_meal_4_macro">470 kcal • 35g Đạm</string>
     <string name="nutrition_combos_preset_title">Gợi ý combo món chuẩn macro:</string>
     <string name="nutrition_combo_1">Combo Tăng Cơ Chuẩn: Ức gà 200g + Khoai lang 150g</string>
     <string name="nutrition_combo_2">Combo Eat Clean: Salad cá ngừ + Bánh mì đen</string>
 
     <!-- Community -->
     <string name="community_post_2_user">Minh Anh  [Lv. 8] • 1 giờ trước</string>
-    <string name="community_post_2_content" formatted="false">Đạt chuỗi 17 ngày streak liên tục rồi mọi người ơi! Body fat giảm từ 18% xuống 15.2% cảm giác người nhẹ hẳn.</string>
-    <string name="community_post_2_tag">🔥 Streak 17 ngày</string>
+    <string name="community_post_2_content" formatted="false">Duy trì chuỗi ngày streak liên tục rồi mọi người ơi! Cảm giác cơ thể nhẹ và săn chắc hơn hẳn.</string>
+    <string name="community_post_2_tag">🔥 Chuỗi ngày streak</string>
     <string name="community_post_reactions_figma">❤️ 42 Thích   💬 8 Bình luận   🔗 Chia sẻ</string>
 
     <!-- User Profile -->
-    <string name="profile_streak_badge">🔥 17</string>
+    <string name="profile_streak_badge">🔥 1</string>
     <string name="profile_recent_logs_title">Nhật ký hoạt động (4 buổi gần nhất):</string>
     <string name="profile_log_1_title">Thứ Sáu, 02/10 - Ngực &amp; Tay Sau Cắt Nét</string>
     <string name="profile_log_1_stats">⏱ 45p • 🏋️ 2.680 kg • ⚡ 10 sets</string>
@@ -608,16 +608,16 @@
     <string name="btn_back_to_workouts">‹ Luyện tập</string>
     <string name="btn_start_workout_figma">🚀 Bắt đầu buổi tập ngay ➔</string>
     <string name="routine_ex_list_figma">Danh sách bài tập (5 bài):</string>
-    <string name="routine_ex1_f_title">1. Barbell Bench Press (Nằm đẩy tạ đòn)</string>
+    <string name="routine_ex1_f_title">1. Nằm đẩy tạ đòn</string>
     <string name="routine_ex1_f_desc">4 sets x 8-10 reps • 70-80 kg</string>
-    <string name="routine_ex2_f_title">2. Incline Dumbbell Press (Đẩy ngực trên)</string>
+    <string name="routine_ex2_f_title">2. Đẩy ngực trên với tạ đơn</string>
     <string name="routine_ex2_f_desc">3 sets x 10-12 reps • 24 kg/tay</string>
-    <string name="routine_ex3_f_title">3. Cable Chest Fly (Ép ngực cáp)</string>
+    <string name="routine_ex3_f_title">3. Ép ngực cáp</string>
     <string name="routine_ex3_f_desc">3 sets x 12-15 reps • 15 kg/bên</string>
-    <string name="routine_ex4_f_title">4. Triceps Rope Pushdown (Kéo cáp tay sau)</string>
+    <string name="routine_ex4_f_title">4. Kéo cáp tay sau</string>
     <string name="routine_ex4_f_desc">4 sets x 12 reps • 25 kg</string>
-    <string name="routine_ex5_f_title">5. Dips (Xà kép tay sau &amp; ngực dưới)</string>
-    <string name="routine_ex5_f_desc">3 sets x max reps • Bodyweight</string>
+    <string name="routine_ex5_f_title">5. Xà kép tay sau &amp; ngực dưới</string>
+    <string name="routine_ex5_f_desc">3 sets x max reps • Trọng lượng cơ thể</string>
 
     <!-- AI Pose Active Session Extras -->
     <string name="btn_back_to_workouts_session">‹ Trở về</string>

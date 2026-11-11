@@ -147,9 +147,9 @@ export const PostComposer: React.FC<PostComposerProps> = ({ currentUser, onPostC
                     onChange={(e) => setEquipment(e.target.value)}
                     className="w-full bg-white px-2 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold"
                   >
-                    <option value="barbell">Đòn tạ (Barbell)</option>
-                    <option value="dumbbell">Tạ đơn (Dumbbell)</option>
-                    <option value="bodyweight">Bodyweight</option>
+                    <option value="barbell">Đòn tạ</option>
+                    <option value="dumbbell">Tạ đơn</option>
+                    <option value="bodyweight">Trọng lượng cơ thể</option>
                     <option value="cable">Máy / Cáp</option>
                   </select>
                 </div>
