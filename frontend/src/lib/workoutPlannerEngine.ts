@@ -563,8 +563,10 @@ export function convertPlanToScheduleAndRoutines(
 
     // Build RoutineExerciseItem[]
     const routineExercises: RoutineExerciseItem[] = session.exercises.map((item) => {
-      // Find full exercise in dataset by ID or by name matching
+      // Find full exercise in dataset by ID, exact name, or token matching
       const nameNorm = (item.exercise_name || '').toLowerCase().trim();
+      const tokens = nameNorm.split(/[\s\-_,]+/).filter((w) => w.length > 2);
+
       const foundInDataset =
         (item.exercise_id ? datasetCache.find((d) => d.id === item.exercise_id) : undefined) ||
         datasetCache.find((d) => d.name?.toLowerCase().trim() === nameNorm) ||
@@ -573,7 +575,13 @@ export function convertPlanToScheduleAndRoutines(
           (d) =>
             nameNorm &&
             (d.name?.toLowerCase().includes(nameNorm) || nameNorm.includes(d.name?.toLowerCase() || ''))
-        );
+        ) ||
+        (tokens.length > 1
+          ? datasetCache.find((d) => {
+              const dName = d.name?.toLowerCase() || '';
+              return tokens.every((t) => dName.includes(t));
+            })
+          : undefined);
 
       const exObj: Exercise = foundInDataset
         ? {
