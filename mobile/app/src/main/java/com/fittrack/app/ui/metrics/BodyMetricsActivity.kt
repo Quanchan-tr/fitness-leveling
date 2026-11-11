@@ -63,8 +63,8 @@ class BodyMetricsActivity : AppCompatActivity() {
                     val latest = res.body()!!.data!!.first()
                     binding.tvMetricWeightVal.text = String.format(Locale.US, "%.1f kg", latest.weightKg)
 
-                    val defaultHeight = 1.75
-                    val bmi = latest.weightKg / (defaultHeight * defaultHeight)
+                    val heightM = (latest.heightCm?.takeIf { it > 50.0 } ?: 175.0) / 100.0
+                    val bmi = latest.weightKg / (heightM * heightM)
                     binding.tvMetricBmiVal.text = String.format(Locale.US, "%.1f", bmi)
                     binding.tvMetricBmiDesc.text = when {
                         bmi < 18.5 -> "Gầy"
@@ -72,7 +72,7 @@ class BodyMetricsActivity : AppCompatActivity() {
                         else -> "Thừa cân"
                     }
 
-                    latest.bodyFatPercentage?.let { fat ->
+                    latest.bodyFatPct?.let { fat ->
                         binding.tvMetricFatVal.text = String.format(Locale.US, "%.1f%%", fat)
                     }
                 }

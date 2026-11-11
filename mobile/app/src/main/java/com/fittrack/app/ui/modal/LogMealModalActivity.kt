@@ -41,10 +41,13 @@ class LogMealModalActivity : AppCompatActivity() {
             // Prevent dismiss when tapping inside
         }
 
+        val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+
         binding.btnAddFood1.setOnClickListener {
             addedItemsCount++
             selectedMeals.add(
                 CreateNutritionLogRequest(
+                    logDate = todayStr,
                     mealType = "lunch",
                     foodName = getString(R.string.modal_meal_food1_name),
                     calories = 380,
@@ -61,6 +64,7 @@ class LogMealModalActivity : AppCompatActivity() {
             addedItemsCount++
             selectedMeals.add(
                 CreateNutritionLogRequest(
+                    logDate = todayStr,
                     mealType = "lunch",
                     foodName = getString(R.string.modal_meal_food2_name),
                     calories = 220,
@@ -77,6 +81,7 @@ class LogMealModalActivity : AppCompatActivity() {
             addedItemsCount++
             selectedMeals.add(
                 CreateNutritionLogRequest(
+                    logDate = todayStr,
                     mealType = "lunch",
                     foodName = getString(R.string.modal_meal_food3_name),
                     calories = 140,

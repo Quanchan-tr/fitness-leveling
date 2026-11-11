@@ -46,34 +46,36 @@ data class NutritionLogDto(
     @SerializedName("meal_type") val mealType: String,
     @SerializedName("food_name") val foodName: String,
     @SerializedName("calories") val calories: Int,
-    @SerializedName("protein_grams") val proteinGrams: Double = 0.0,
-    @SerializedName("carbs_grams") val carbsGrams: Double = 0.0,
-    @SerializedName("fat_grams") val fatGrams: Double = 0.0,
-    @SerializedName("logged_at") val loggedAt: String? = null
+    @SerializedName("protein_g") val proteinGrams: Double = 0.0,
+    @SerializedName("carbs_g") val carbsGrams: Double = 0.0,
+    @SerializedName("fat_g") val fatGrams: Double = 0.0,
+    @SerializedName("log_date") val logDate: String? = null
 )
 
 data class CreateNutritionLogRequest(
+    @SerializedName("log_date") val logDate: String,
     @SerializedName("meal_type") val mealType: String,
     @SerializedName("food_name") val foodName: String,
     @SerializedName("calories") val calories: Int,
-    @SerializedName("protein_grams") val proteinGrams: Double,
-    @SerializedName("carbs_grams") val carbsGrams: Double,
-    @SerializedName("fat_grams") val fatGrams: Double
+    @SerializedName("protein_g") val proteinGrams: Double = 0.0,
+    @SerializedName("carbs_g") val carbsGrams: Double = 0.0,
+    @SerializedName("fat_g") val fatGrams: Double = 0.0
 )
 
 // ── Body Metrics ────────────────────────────────────────────
 data class BodyMetricDto(
     @SerializedName("id") val id: String,
     @SerializedName("weight_kg") val weightKg: Double,
-    @SerializedName("body_fat_percentage") val bodyFatPercentage: Double? = null,
-    @SerializedName("muscle_mass_percentage") val muscleMassPercentage: Double? = null,
-    @SerializedName("measured_at") val measuredAt: String? = null
+    @SerializedName("body_fat_pct") val bodyFatPct: Double? = null,
+    @SerializedName("height_cm") val heightCm: Double? = null,
+    @SerializedName("log_date") val logDate: String? = null
 )
 
 data class CreateBodyMetricRequest(
+    @SerializedName("log_date") val logDate: String,
     @SerializedName("weight_kg") val weightKg: Double,
-    @SerializedName("body_fat_percentage") val bodyFatPercentage: Double? = null,
-    @SerializedName("muscle_mass_percentage") val muscleMassPercentage: Double? = null
+    @SerializedName("body_fat_pct") val bodyFatPct: Double? = null,
+    @SerializedName("height_cm") val heightCm: Double? = null
 )
 
 // ── Community ───────────────────────────────────────────────

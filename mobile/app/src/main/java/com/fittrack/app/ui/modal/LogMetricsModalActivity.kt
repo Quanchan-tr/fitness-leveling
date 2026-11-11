@@ -57,6 +57,8 @@ class LogMetricsModalActivity : AppCompatActivity() {
         }
 
         val fatPct = fatStr.toDoubleOrNull()
+        val heightCm = heightStr.toDoubleOrNull()
+        val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
 
         val session = SessionManager.getInstance(this)
         if (session.isLoggedIn) {
@@ -65,8 +67,10 @@ class LogMetricsModalActivity : AppCompatActivity() {
                     withContext(Dispatchers.IO) {
                         ApiClient.getService(this@LogMetricsModalActivity).createBodyMetric(
                             CreateBodyMetricRequest(
+                                logDate = todayStr,
                                 weightKg = weightKg,
-                                bodyFatPercentage = fatPct
+                                bodyFatPct = fatPct,
+                                heightCm = heightCm
                             )
                         )
                     }
