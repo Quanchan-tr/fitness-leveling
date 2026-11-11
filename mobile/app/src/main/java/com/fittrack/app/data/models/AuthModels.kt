@@ -70,3 +70,12 @@ data class DailyQuestDto(
     @SerializedName("completed") val completed: Boolean = false
 )
 
+data class UpdateProfileRequest(
+    @SerializedName("name") val name: String? = null,
+    @SerializedName("weight_kg") val weightKg: Double? = null,
+    @SerializedName("height_cm") val heightCm: Double? = null,
+    @SerializedName("goal") val goal: String? = null,
+    @SerializedName("gender") val gender: String? = null,
+    @SerializedName("birth_date") val birthDate: String? = null
+)
+

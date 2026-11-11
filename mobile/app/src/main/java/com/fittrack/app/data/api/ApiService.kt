@@ -20,6 +20,11 @@ interface ApiService {
     @GET("auth/me")
     suspend fun getMe(): Response<ApiResponse<UserProfileDto>>
 
+    @PUT("auth/profile")
+    suspend fun updateProfile(
+        @Body request: com.fittrack.app.data.models.UpdateProfileRequest
+    ): Response<ApiResponse<Any>>
+
     @POST("auth/logout")
     suspend fun logout(): Response<ApiResponse<Map<String, String>>>
 
