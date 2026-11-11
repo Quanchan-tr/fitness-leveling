@@ -18,9 +18,8 @@ class SessionManager(context: Context) {
         private const val KEY_USER_STREAK = "user_streak"
         private const val KEY_BASE_URL = "base_url"
 
-        // Default Android Emulator address for host loopback.
-        // On physical devices, set to your computer local IP e.g. "http://192.168.1.100:8000/api/v1/"
-        const val DEFAULT_BASE_URL = "http://10.0.2.2:8000/api/v1/"
+        // Default Production Azure API URL
+        const val DEFAULT_BASE_URL = "https://fittrack.eastasia.cloudapp.azure.com/api/v1/"
 
         @Volatile
         private var instance: SessionManager? = null
