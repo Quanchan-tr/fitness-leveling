@@ -100,7 +100,7 @@ class LoginFragment : Fragment() {
                 if (response.isSuccessful && response.body()?.data != null) {
                     val authData = response.body()!!.data!!
                     session.saveUserSession(
-                        token = authData.token,
+                        token = authData.token ?: "",
                         id = authData.user.id,
                         name = authData.user.name,
                         email = authData.user.email,
@@ -119,6 +119,25 @@ class LoginFragment : Fragment() {
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     requireActivity().finish()
+                } else if (response.code() == 403) {
+                    val errorBodyStr = response.errorBody()?.string() ?: ""
+                    if (errorBodyStr.contains("EMAIL_NOT_VERIFIED")) {
+                        Toast.makeText(
+                            requireContext(),
+                            "⚠️ Tài khoản chưa xác thực email. Đã gửi mã OTP mới tới email của bạn.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        val bundle = Bundle().apply {
+                            putString("email", email)
+                        }
+                        findNavController().navigate(R.id.action_loginFragment_to_verifyEmailFragment, bundle)
+                        binding.btnLogin.isEnabled = true
+                        binding.btnLogin.text = originalText
+                    } else {
+                        Toast.makeText(requireContext(), "Truy cập bị từ chối (403)", Toast.LENGTH_LONG).show()
+                        binding.btnLogin.isEnabled = true
+                        binding.btnLogin.text = originalText
+                    }
                 } else {
                     val errMsg = response.body()?.error?.message 
                         ?: "Đăng nhập thất bại (Mã lỗi HTTP ${response.code()}). Vui lòng kiểm tra lại tài khoản."

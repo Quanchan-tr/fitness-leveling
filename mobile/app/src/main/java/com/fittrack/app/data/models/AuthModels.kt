@@ -19,7 +19,46 @@ data class RegisterRequest(
 
 data class AuthData(
     @SerializedName("user") val user: UserDto,
-    @SerializedName("token") val token: String
+    @SerializedName("token") val token: String? = null,
+    @SerializedName("requires_email_verification") val requiresEmailVerification: Boolean = false,
+    @SerializedName("email") val email: String? = null,
+    @SerializedName("message") val message: String? = null
+)
+
+data class VerifyEmailRequest(
+    @SerializedName("email") val email: String,
+    @SerializedName("code") val code: String
+)
+
+data class ResendVerificationRequest(
+    @SerializedName("email") val email: String
+)
+
+data class ForgotPasswordRequest(
+    @SerializedName("email") val email: String
+)
+
+data class VerifyResetCodeRequest(
+    @SerializedName("email") val email: String,
+    @SerializedName("code") val code: String
+)
+
+data class VerifyResetCodeResponse(
+    @SerializedName("email") val email: String? = null,
+    @SerializedName("reset_token") val resetToken: String? = null,
+    @SerializedName("message") val message: String? = null
+)
+
+data class ResetPasswordRequest(
+    @SerializedName("email") val email: String,
+    @SerializedName("reset_token") val resetToken: String,
+    @SerializedName("password") val password: String,
+    @SerializedName("password_confirmation") val passwordConfirmation: String
+)
+
+data class SimpleMessageResponse(
+    @SerializedName("message") val message: String? = null,
+    @SerializedName("email") val email: String? = null
 )
 
 data class UserDto(

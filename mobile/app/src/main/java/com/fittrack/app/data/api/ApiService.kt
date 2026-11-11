@@ -17,6 +17,31 @@ interface ApiService {
         @Body request: RegisterRequest
     ): Response<ApiResponse<AuthData>>
 
+    @POST("auth/verify-email")
+    suspend fun verifyEmail(
+        @Body request: VerifyEmailRequest
+    ): Response<ApiResponse<AuthData>>
+
+    @POST("auth/resend-verification")
+    suspend fun resendVerification(
+        @Body request: ResendVerificationRequest
+    ): Response<ApiResponse<SimpleMessageResponse>>
+
+    @POST("auth/forgot-password")
+    suspend fun forgotPassword(
+        @Body request: ForgotPasswordRequest
+    ): Response<ApiResponse<SimpleMessageResponse>>
+
+    @POST("auth/verify-reset-code")
+    suspend fun verifyResetCode(
+        @Body request: VerifyResetCodeRequest
+    ): Response<ApiResponse<VerifyResetCodeResponse>>
+
+    @POST("auth/reset-password")
+    suspend fun resetPassword(
+        @Body request: ResetPasswordRequest
+    ): Response<ApiResponse<SimpleMessageResponse>>
+
     @GET("auth/me")
     suspend fun getMe(): Response<ApiResponse<UserProfileDto>>
 

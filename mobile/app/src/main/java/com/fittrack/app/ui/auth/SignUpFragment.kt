@@ -101,26 +101,38 @@ class SignUpFragment : Fragment() {
 
                 if (response.isSuccessful && response.body()?.data != null) {
                     val authData = response.body()!!.data!!
-                    session.saveUserSession(
-                        token = authData.token,
-                        id = authData.user.id,
-                        name = authData.user.name,
-                        email = authData.user.email,
-                        level = authData.user.level,
-                        xp = authData.user.xp,
-                        streak = authData.user.currentStreak
-                    )
+                    if (authData.requiresEmailVerification || authData.token.isNullOrEmpty()) {
+                        Toast.makeText(
+                            requireContext(),
+                            "🎉 Đăng ký thành công! Vui lòng nhập mã OTP đã gửi đến email của bạn.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        val bundle = Bundle().apply {
+                            putString("email", email)
+                        }
+                        findNavController().navigate(R.id.action_signUpFragment_to_verifyEmailFragment, bundle)
+                    } else {
+                        session.saveUserSession(
+                            token = authData.token,
+                            id = authData.user.id,
+                            name = authData.user.name,
+                            email = authData.user.email,
+                            level = authData.user.level,
+                            xp = authData.user.xp,
+                            streak = authData.user.currentStreak
+                        )
 
-                    Toast.makeText(
-                        requireContext(),
-                        "🎉 Đăng ký thành công! Hãy bắt đầu thiết lập thể lực của bạn.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "🎉 Đăng ký thành công! Hãy bắt đầu thiết lập thể lực của bạn.",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
-                    val intent = Intent(requireContext(), OnboardingGenderActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                    requireActivity().finish()
+                        val intent = Intent(requireContext(), OnboardingGenderActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        requireActivity().finish()
+                    }
                 } else {
                     val errMsg = response.body()?.error?.message ?: "Đăng ký thất bại. Email có thể đã tồn tại."
                     Toast.makeText(requireContext(), errMsg, Toast.LENGTH_LONG).show()
