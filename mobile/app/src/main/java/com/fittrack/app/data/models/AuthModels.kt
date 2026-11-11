@@ -66,8 +66,11 @@ data class HunterStatsDto(
 data class DailyQuestDto(
     @SerializedName("id") val id: String,
     @SerializedName("title") val title: String,
-    @SerializedName("xp_reward") val xpReward: Int = 50,
-    @SerializedName("completed") val completed: Boolean = false
+    @SerializedName("description") val description: String? = null,
+    @SerializedName("target") val target: Int = 1,
+    @SerializedName("current") val current: Int = 0,
+    @SerializedName("completed") val completed: Boolean = false,
+    @SerializedName("xp_reward") val xpReward: Int = 50
 )
 
 data class UpdateProfileRequest(

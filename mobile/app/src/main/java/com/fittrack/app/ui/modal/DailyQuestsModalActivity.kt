@@ -3,7 +3,14 @@ package com.fittrack.app.ui.modal
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.fittrack.app.R
+import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityModalDailyQuestsBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class DailyQuestsModalActivity : AppCompatActivity() {
 
@@ -15,6 +22,7 @@ class DailyQuestsModalActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupListeners()
+        loadQuestsFromBackend()
     }
 
     private fun setupListeners() {
@@ -31,8 +39,49 @@ class DailyQuestsModalActivity : AppCompatActivity() {
         }
 
         binding.btnClaimAll.setOnClickListener {
-            Toast.makeText(this, getString(com.fittrack.app.R.string.toast_quests_claimed), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_quests_claimed), Toast.LENGTH_SHORT).show()
             finish()
+        }
+    }
+
+    private fun loadQuestsFromBackend() {
+        val session = SessionManager.getInstance(this)
+        if (!session.isLoggedIn) return
+
+        lifecycleScope.launch {
+            try {
+                val res = withContext(Dispatchers.IO) {
+                    ApiClient.getService(this@DailyQuestsModalActivity).getMe()
+                }
+                if (res.isSuccessful && res.body()?.data?.gamification?.dailyQuests != null) {
+                    val quests = res.body()!!.data!!.gamification!!.dailyQuests
+                    if (quests.isNotEmpty()) {
+                        val q1 = quests.getOrNull(0)
+                        val q2 = quests.getOrNull(1)
+                        val q3 = quests.getOrNull(2)
+
+                        q1?.let {
+                            binding.tvQ1Title.text = it.title
+                            binding.tvQ1Progress.text = "${it.current}/${it.target}" + if (it.completed) " • Hoàn thành" else ""
+                            binding.badgeQ1Xp.text = "+${it.xpReward} XP"
+                        }
+
+                        q2?.let {
+                            binding.tvQ2Title.text = it.title
+                            binding.tvQ2Progress.text = "${it.current}/${it.target}" + if (it.completed) " • Hoàn thành" else ""
+                            binding.badgeQ2Xp.text = "+${it.xpReward} XP"
+                        }
+
+                        q3?.let {
+                            binding.tvQ3Title.text = it.title
+                            binding.tvQ3Progress.text = "${it.current}/${it.target}" + if (it.completed) " • Hoàn thành" else ""
+                            binding.badgeQ3Xp.text = "+${it.xpReward} XP"
+                        }
+                    }
+                }
+            } catch (_: Exception) {
+                // Keep default offline UI
+            }
         }
     }
 }
