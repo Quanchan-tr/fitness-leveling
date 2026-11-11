@@ -161,6 +161,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_metric_weight_val"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -199,6 +200,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_metric_bmi_val"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -208,6 +210,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_metric_bmi_desc"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
@@ -237,6 +240,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_metric_fat_val"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
