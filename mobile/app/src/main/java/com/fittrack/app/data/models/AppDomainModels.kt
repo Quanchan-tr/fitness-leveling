@@ -89,11 +89,14 @@ data class CreateBodyMetricRequest(
 
 // ── AI Planner ──────────────────────────────────────────────
 data class GenerateAiPlanRequest(
+    @SerializedName("fitness_goal") val fitnessGoal: String = "hypertrophy",
     @SerializedName("goal") val goal: String = "gain_muscle",
+    @SerializedName("split") val split: String = "PPL",
     @SerializedName("split_type") val splitType: String = "auto",
     @SerializedName("days_per_week") val daysPerWeek: Int = 4,
     @SerializedName("duration_minutes") val durationMinutes: Int = 60,
-    @SerializedName("equipment") val equipment: String = "all"
+    @SerializedName("equipment") val equipment: String = "all",
+    @SerializedName("injuries") val injuries: List<String> = emptyList()
 )
 
 // ── Community ───────────────────────────────────────────────

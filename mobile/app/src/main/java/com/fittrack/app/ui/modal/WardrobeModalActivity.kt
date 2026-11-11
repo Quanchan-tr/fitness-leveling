@@ -295,9 +295,17 @@ class WardrobeModalActivity : AppCompatActivity() {
                     try {
                         val api = ApiClient.getService(this@WardrobeModalActivity)
                         withContext(Dispatchers.IO) {
-                            equippedMap.forEach { (slot, itemId) ->
-                                api.equipAvatarItem(EquipAvatarRequest(slot = slot, itemId = itemId))
-                            }
+                            api.equipAvatarItem(
+                                EquipAvatarRequest(
+                                    headwearId = equippedMap["headwear"],
+                                    hairId = equippedMap["hair"],
+                                    topId = equippedMap["top"],
+                                    bottomId = equippedMap["bottom"],
+                                    shoesId = equippedMap["shoes"],
+                                    accessoryId = equippedMap["accessories"],
+                                    specialId = equippedMap["special"]
+                                )
+                            )
                         }
                     } catch (_: Exception) {
                         // Non-blocking sync
