@@ -39,7 +39,16 @@ class DailyQuestsModalActivity : AppCompatActivity() {
         }
 
         binding.btnClaimAll.setOnClickListener {
-            Toast.makeText(this, getString(R.string.toast_quests_claimed), Toast.LENGTH_SHORT).show()
+            val session = SessionManager.getInstance(this)
+            session.userXp += 150
+            val neededXp = maxOf(200, session.userLevel * 200)
+            if (session.userXp >= neededXp) {
+                session.userLevel += 1
+                session.userXp -= neededXp
+                Toast.makeText(this, "🎉 LÊN CẤP ${session.userLevel}! Nhận +150 XP.", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "✓ Đã nhận thưởng +150 XP Nhiệm vụ Hàng ngày!", Toast.LENGTH_SHORT).show()
+            }
             finish()
         }
     }

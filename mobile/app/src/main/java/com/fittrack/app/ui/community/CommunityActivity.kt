@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.fittrack.app.R
 import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.models.CommunityPostDto
 import com.fittrack.app.data.models.CreatePostRequest
 import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityCommunityBinding
@@ -23,8 +24,11 @@ class CommunityActivity : AppCompatActivity() {
     private lateinit var binding: ActivityCommunityBinding
     private lateinit var session: SessionManager
 
+    private var post1Id: String? = null
     private var isLiked1 = true
     private var likeCount1 = 48
+
+    private var post2Id: String? = null
     private var isLiked2 = false
     private var likeCount2 = 35
 
@@ -40,6 +44,46 @@ class CommunityActivity : AppCompatActivity() {
         setupBottomNav()
         setupFeedInteractions()
         setupComposerInteractions()
+
+        fetchCommunityFeed()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        fetchCommunityFeed()
+    }
+
+    private fun fetchCommunityFeed() {
+        if (!session.isLoggedIn) return
+
+        lifecycleScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    ApiClient.getService(this@CommunityActivity).getCommunityPosts()
+                }
+                if (response.isSuccessful && response.body()?.data?.isNotEmpty() == true) {
+                    val posts = response.body()!!.data!!
+
+                    if (posts.isNotEmpty()) {
+                        val p1 = posts[0]
+                        post1Id = p1.id
+                        likeCount1 = p1.likesCount
+                        isLiked1 = p1.isLiked
+                        binding.tvLikeCount1.text = likeCount1.toString()
+                    }
+
+                    if (posts.size > 1) {
+                        val p2 = posts[1]
+                        post2Id = p2.id
+                        likeCount2 = p2.likesCount
+                        isLiked2 = p2.isLiked
+                        binding.tvLikeCount2.text = likeCount2.toString()
+                    }
+                }
+            } catch (_: Exception) {
+                // Keep default offline feed
+            }
+        }
     }
 
     private fun setupComposerInteractions() {
@@ -84,7 +128,7 @@ class CommunityActivity : AppCompatActivity() {
 
             val finalContent = if (content.isNotEmpty()) content else "Vừa hoàn thành buổi tập với thành tích mới!"
 
-            // Sync with backend API
+            // Sync with VPS Backend API
             if (session.isLoggedIn) {
                 val api = ApiClient.getService(this)
                 val mediaUrl = when (attachedMediaType) {
@@ -129,7 +173,7 @@ class CommunityActivity : AppCompatActivity() {
             binding.layoutPreviewImage.visibility = View.GONE
             binding.layoutPreviewVideo.visibility = View.GONE
 
-            Toast.makeText(this, "✓ Đã đăng bài viết lên Bang hội thành công!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "✓ Đã đăng bài viết lên Bang hội VPS thành công!", Toast.LENGTH_SHORT).show()
         }
 
         // Play video clicks
@@ -153,6 +197,16 @@ class CommunityActivity : AppCompatActivity() {
             binding.icLikePost1.setColorFilter(
                 ContextCompat.getColor(this, if (isLiked1) R.color.primary else R.color.text_slate)
             )
+
+            post1Id?.let { id ->
+                lifecycleScope.launch {
+                    try {
+                        withContext(Dispatchers.IO) {
+                            ApiClient.getService(this@CommunityActivity).togglePostLike(id)
+                        }
+                    } catch (_: Exception) {}
+                }
+            }
         }
 
         binding.btnLikePost2.setOnClickListener {
@@ -162,6 +216,16 @@ class CommunityActivity : AppCompatActivity() {
             binding.icLikePost2.setColorFilter(
                 ContextCompat.getColor(this, if (isLiked2) R.color.primary else R.color.text_slate)
             )
+
+            post2Id?.let { id ->
+                lifecycleScope.launch {
+                    try {
+                        withContext(Dispatchers.IO) {
+                            ApiClient.getService(this@CommunityActivity).togglePostLike(id)
+                        }
+                    } catch (_: Exception) {}
+                }
+            }
         }
     }
 

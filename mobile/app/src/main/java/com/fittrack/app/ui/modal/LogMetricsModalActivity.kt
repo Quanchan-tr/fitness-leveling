@@ -61,6 +61,9 @@ class LogMetricsModalActivity : AppCompatActivity() {
         val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
 
         val session = SessionManager.getInstance(this)
+        session.userWeight = weightKg.toFloat()
+        heightCm?.let { session.userHeight = it.toFloat() }
+
         if (session.isLoggedIn) {
             lifecycleScope.launch {
                 try {
