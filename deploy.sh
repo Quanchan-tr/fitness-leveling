@@ -3,7 +3,8 @@
 set -e
 
 echo "🚀 [1/5] Kéo mã nguồn mới nhất từ GitHub..."
-git pull origin dev
+git fetch origin dev
+git reset --hard origin/dev
 
 echo "📦 [2/5] Build và khởi động lại các Container..."
 docker compose up -d --build
