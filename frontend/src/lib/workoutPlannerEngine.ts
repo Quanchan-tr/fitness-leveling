@@ -563,23 +563,33 @@ export function convertPlanToScheduleAndRoutines(
 
     // Build RoutineExerciseItem[]
     const routineExercises: RoutineExerciseItem[] = session.exercises.map((item) => {
-      // Find full exercise in dataset or create conformant Exercise object
-      const foundInDataset = datasetCache.find((d) => d.id === item.exercise_id);
+      // Find full exercise in dataset by ID or by name matching
+      const nameNorm = (item.exercise_name || '').toLowerCase().trim();
+      const foundInDataset =
+        (item.exercise_id ? datasetCache.find((d) => d.id === item.exercise_id) : undefined) ||
+        datasetCache.find((d) => d.name?.toLowerCase().trim() === nameNorm) ||
+        datasetCache.find((d) => (d as any).nameVi?.toLowerCase().trim() === nameNorm) ||
+        datasetCache.find(
+          (d) =>
+            nameNorm &&
+            (d.name?.toLowerCase().includes(nameNorm) || nameNorm.includes(d.name?.toLowerCase() || ''))
+        );
+
       const exObj: Exercise = foundInDataset
         ? {
             ...foundInDataset,
             targetMuscles: Array.isArray(foundInDataset.targetMuscles)
               ? foundInDataset.targetMuscles
-              : [foundInDataset.target_muscle || item.target_muscle],
+              : [foundInDataset.target_muscle || item.target_muscle || 'Toàn thân'],
             type: foundInDataset.type || 'weight_reps',
           }
         : {
-            id: item.exercise_id,
+            id: item.exercise_id || `ex-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
             name: item.exercise_name,
-            targetMuscles: [item.target_muscle],
+            targetMuscles: [item.target_muscle || 'Toàn thân'],
             type: 'weight_reps',
-            category: item.target_muscle,
-            equipment: item.equipment,
+            category: item.target_muscle || 'Toàn thân',
+            equipment: item.equipment || 'dumbbell',
             gif_url: item.gif_url,
             thumbnail_url: item.thumbnail_url,
             has_ai_check: item.has_ai_check,

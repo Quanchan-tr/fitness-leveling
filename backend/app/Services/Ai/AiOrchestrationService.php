@@ -32,7 +32,7 @@ class AiOrchestrationService
 
         $provider = config('ai.provider', 'openai');
         $apiKey = config('ai.api_key');
-        $geminiKey = env('GEMINI_API_KEY');
+        $geminiKey = env('GEMINI_API_KEY') ?: ($provider === 'gemini' ? $apiKey : null);
         $model = config('ai.model', 'gpt-4o-mini');
 
         $hasOpenAi = !empty($apiKey) && !str_starts_with($apiKey, 'sk-proj-YOUR_API_KEY');
@@ -63,10 +63,22 @@ class AiOrchestrationService
 
             // Branch A: Google Gemini
             if ($provider === 'gemini' || ($hasGemini && !$hasOpenAi)) {
-                $geminiEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$geminiKey}";
-                $promptText = "You are an elite fitness architect. Design a 7-day workout plan based on this user profile: " . json_encode($context) . ". Respond ONLY with a valid JSON object matching: { plan_id, plan_name, split_type, split_label, rationale, duration_weeks: 4, days_per_week, sessions: [{ day_of_week, is_rest: boolean, session_title, focus_area, estimated_duration_min, exercises: [{ exercise_name, sets, reps, rpe, rest_seconds }] }] }";
+                $geminiModel = config('ai.model', 'gemini-1.5-flash');
+                if (empty($geminiModel) || $geminiModel === 'gpt-4o-mini' || str_contains($geminiModel, '3.5')) {
+                    // Normalize invalid model name to gemini-1.5-flash
+                    $geminiModel = 'gemini-1.5-flash';
+                }
+
+                $geminiEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$geminiModel}:generateContent?key={$geminiKey}";
+                $promptText = "You are an elite fitness architect. Design a 7-day science-based weekly workout plan based on this user profile: " . json_encode($context) . ". "
+                    . "Select standard exercises matching standard gym databases (e.g. Barbell Bench Press, Incline Dumbbell Press, Lat Pulldown, Barbell Squat, Romanian Deadlift, Overhead Press, Bicep Curl, Lateral Raise, Plank, Push-up, Leg Extension, Seated Cable Row, Triceps Pushdown). "
+                    . "Respond ONLY with a valid JSON object matching: { plan_id, plan_name, split_type, split_label, rationale, duration_weeks: 4, days_per_week, sessions: [{ day_of_week, is_rest: boolean, session_title, focus_area, estimated_duration_min, exercises: [{ exercise_name, sets, reps, rpe, rest_seconds, notes }] }] }";
 
                 $response = Http::timeout(config('ai.timeout', 15))
+                    ->withHeaders([
+                        'x-goog-api-key' => $geminiKey,
+                        'Content-Type' => 'application/json',
+                    ])
                     ->post($geminiEndpoint, [
                         'contents' => [
                             ['parts' => [['text' => $promptText]]]
@@ -80,7 +92,7 @@ class AiOrchestrationService
                 $rawContent = $response->json('candidates.0.content.parts.0.text');
                 $cleanedJson = $this->repairJson($rawContent);
                 $parsed = json_decode($cleanedJson, true);
-                $modelUsed = 'gemini-1.5-flash';
+                $modelUsed = $geminiModel;
             } 
             // Branch B: OpenAI
             else {
