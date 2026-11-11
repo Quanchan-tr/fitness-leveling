@@ -49,7 +49,9 @@ export const FoodLogItemRow: React.FC<FoodLogItemRowProps> = ({
               {item.name}
             </span>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-semibold tabular-nums">
-              {item.multiplier}x
+              {item.foodId?.startsWith('raw_')
+                ? `${Math.round((item.multiplier || 1) * 100)}g`
+                : `${item.multiplier || 1}x`}
             </span>
           </div>
 

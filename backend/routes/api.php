@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\AvatarController;
 use App\Http\Controllers\Api\V1\BodyMetricController;
 use App\Http\Controllers\Api\V1\CommunityController;
 use App\Http\Controllers\Api\V1\ExerciseController;
+use App\Http\Controllers\Api\V1\FoodController;
 use App\Http\Controllers\Api\V1\NutritionLogController;
 use App\Http\Controllers\Api\V1\PoseCheckController;
 use App\Http\Controllers\Api\V1\WorkoutLogController;
@@ -42,6 +43,10 @@ Route::prefix('v1')->group(function () {
     // --- PUBLIC EXERCISE CATALOG ---
     Route::get('exercises', [ExerciseController::class, 'index']);
     Route::get('exercises/{id}', [ExerciseController::class, 'show']);
+
+    // --- PUBLIC NUTRITION / FOOD CATALOG ---
+    Route::get('foods', [FoodController::class, 'index']);
+    Route::get('foods/{id}', [FoodController::class, 'show']);
 
     // --- PROTECTED DOMAIN ROUTES ---
     Route::middleware(['auth:sanctum'])->group(function () {

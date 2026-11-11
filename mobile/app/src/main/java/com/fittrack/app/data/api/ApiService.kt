@@ -93,6 +93,15 @@ interface ApiService {
     ): Response<ApiResponse<WorkoutLogDto>>
 
     // ── Nutrition ───────────────────────────────────────────────
+    @GET("foods")
+    suspend fun getFoods(
+        @Query("per_page") perPage: Int = 50,
+        @Query("page") page: Int = 1,
+        @Query("category") category: String? = null,
+        @Query("item_type") itemType: String? = null,
+        @Query("q") query: String? = null
+    ): Response<ApiResponse<List<FoodItemDto>>>
+
     @GET("nutrition-logs")
     suspend fun getNutritionLogs(): Response<ApiResponse<List<NutritionLogDto>>>
 

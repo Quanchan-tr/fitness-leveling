@@ -62,7 +62,7 @@ export default function ForgotPasswordPage() {
     setIsSubmitting(true);
     setError(null);
     try {
-      await authService.resetPassword(email.trim().toLowerCase(), newPassword);
+      await authService.resetPassword(email.trim().toLowerCase(), newPassword, otp.trim());
       setStep('success');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Không thể đặt lại mật khẩu. Vui lòng thử lại.');

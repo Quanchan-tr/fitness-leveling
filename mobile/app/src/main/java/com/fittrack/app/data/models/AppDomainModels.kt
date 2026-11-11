@@ -71,6 +71,25 @@ data class CreateNutritionLogRequest(
     @SerializedName("fat_g") val fatGrams: Double = 0.0
 )
 
+data class FoodItemDto(
+    @SerializedName("id") val id: String,
+    @SerializedName("name") val name: String,
+    @SerializedName("category") val category: String,
+    @SerializedName("item_type") val itemType: String? = "DISH",
+    @SerializedName("base_serving") val baseServing: String? = null,
+    @SerializedName("serving_size") val servingSize: String? = null,
+    @SerializedName("serving_weight_g") val servingWeightG: Double? = 100.0,
+    @SerializedName("base_calories") val baseCalories: Int = 0,
+    @SerializedName("calories") val calories: Int = 0,
+    @SerializedName("protein") val protein: Double = 0.0,
+    @SerializedName("carbs") val carbs: Double = 0.0,
+    @SerializedName("fat") val fat: Double = 0.0,
+    @SerializedName("fiber") val fiber: Double? = 0.0,
+    @SerializedName("description") val description: String? = null,
+    @SerializedName("tags") val tags: List<String>? = null,
+    @SerializedName("name_en") val nameEn: String? = null
+)
+
 // ── Body Metrics ────────────────────────────────────────────
 data class BodyMetricDto(
     @SerializedName("id") val id: String,
