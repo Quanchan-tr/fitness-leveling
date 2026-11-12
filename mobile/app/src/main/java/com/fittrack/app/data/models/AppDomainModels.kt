@@ -1,5 +1,6 @@
 package com.fittrack.app.data.models
 
+import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
 
 // ── Exercises ───────────────────────────────────────────────
@@ -14,8 +15,39 @@ data class ExerciseDto(
     @SerializedName("thumbnail_url") val thumbnailUrl: String? = null,
     @SerializedName("has_ai_check") val hasAiCheck: Boolean = false,
     @SerializedName("description") val description: String? = null,
-    @SerializedName("instructions") val instructions: List<String>? = null
-)
+    @SerializedName("instructions") val rawInstructions: JsonElement? = null
+) {
+    val instructions: List<String>
+        get() {
+            if (rawInstructions == null || rawInstructions.isJsonNull) {
+                return splitDescriptionToSteps(description)
+            }
+            if (rawInstructions.isJsonArray) {
+                return rawInstructions.asJsonArray.mapNotNull { if (it.isJsonPrimitive) it.asString else null }
+            }
+            if (rawInstructions.isJsonObject) {
+                val obj = rawInstructions.asJsonObject
+                val text = when {
+                    obj.has("vi") && obj.get("vi").isJsonPrimitive -> obj.get("vi").asString
+                    obj.has("en") && obj.get("en").isJsonPrimitive -> obj.get("en").asString
+                    else -> obj.entrySet().firstOrNull()?.value?.let { if (it.isJsonPrimitive) it.asString else null }
+                }
+                return splitDescriptionToSteps(text ?: description)
+            }
+            if (rawInstructions.isJsonPrimitive) {
+                return splitDescriptionToSteps(rawInstructions.asString)
+            }
+            return splitDescriptionToSteps(description)
+        }
+
+    private fun splitDescriptionToSteps(text: String?): List<String> {
+        if (text.isNullOrBlank()) return emptyList()
+        val steps = text.split(Regex("(?<=[.!?])\\s+"))
+            .map { it.trim() }
+            .filter { it.length > 5 }
+        return if (steps.isNotEmpty()) steps else listOf(text.trim())
+    }
+}
 
 // ── Workout Routines & Logs ─────────────────────────────────
 data class WorkoutRoutineDto(

@@ -58,6 +58,7 @@ interface ApiService {
     suspend fun getExercises(
         @Query("per_page") perPage: Int = 100,
         @Query("category") category: String? = null,
+        @Query("q") q: String? = null,
         @Query("search") search: String? = null
     ): Response<ApiResponse<List<ExerciseDto>>>
 

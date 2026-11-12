@@ -168,8 +168,34 @@ class NetworkSerializationTest {
         assertNotNull(res.data)
         val ex = res.data!!
         assertEquals("Barbell Bench Press", ex.name)
-        assertEquals(3, ex.instructions?.size)
-        assertEquals("Nằm thẳng lưng trên ghế phẳng", ex.instructions?.get(0))
+        assertEquals(3, ex.instructions.size)
+        assertEquals("Nằm thẳng lưng trên ghế phẳng", ex.instructions[0])
+    }
+
+    @Test
+    fun testExerciseDtoWithJsonObjectInstructionsDeserialization() {
+        val rawJson = """
+            {
+                "data": {
+                    "id": "0001",
+                    "name": "3/4 sit-up",
+                    "description": "Nằm ngửa gập đầu gối. Siết cơ bụng nâng người lên 45 độ.",
+                    "instructions": {
+                        "vi": "Nằm ngửa gập đầu gối. Siết cơ bụng nâng người lên 45 độ.",
+                        "en": "Lie flat on your back with knees bent. Engage your abs."
+                    }
+                }
+            }
+        """.trimIndent()
+
+        val type = object : TypeToken<ApiResponse<com.fittrack.app.data.models.ExerciseDto>>() {}.type
+        val res: ApiResponse<com.fittrack.app.data.models.ExerciseDto> = gson.fromJson(rawJson, type)
+
+        assertNotNull(res.data)
+        val ex = res.data!!
+        assertEquals("3/4 sit-up", ex.name)
+        assertTrue(ex.instructions.isNotEmpty())
+        assertEquals("Nằm ngửa gập đầu gối.", ex.instructions[0])
     }
 }
 

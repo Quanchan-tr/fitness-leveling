@@ -107,7 +107,7 @@
             android:gravity="center"
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
-            android:text="Thư viện bài tập (100+)"
+            android:text="Thư viện bài tập"
             android:textColor="@color/text_dark"
             android:textSize="12sp" />
     </LinearLayout>

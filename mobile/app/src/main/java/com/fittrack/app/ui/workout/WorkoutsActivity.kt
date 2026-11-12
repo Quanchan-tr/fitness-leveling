@@ -77,8 +77,63 @@ class WorkoutsActivity : AppCompatActivity() {
 
             binding.tabMyRoutines.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_inactive)
             binding.tabMyRoutines.setTextColor(ContextCompat.getColor(this, R.color.text_dark))
+
+            if (binding.llExerciseCatalogList.childCount == 0) {
+                fetchExercisesFromBackend()
+            }
         }
     }
+
+    private val fallbackExercises = listOf(
+        ExerciseDto(
+            id = "0025",
+            name = "Barbell Bench Press (Nằm đẩy tạ đòn)",
+            category = "chest",
+            bodyPart = "Cơ ngực",
+            targetMuscle = "Cơ ngực giữa",
+            equipment = "Thanh đòn",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp",
+            hasAiCheck = false,
+            description = "Nằm phẳng trên ghế tập, hai chân đặt chắc chắn trên sàn. Cầm đòn tạ rộng hơn vai một chút, hạ tạ chạm nhẹ ngực và thở ra đẩy mạnh lên vị trí ban đầu."
+        ),
+        ExerciseDto(
+            id = "0314",
+            name = "Incline Dumbbell Press (Đẩy ngực trên tạ đơn)",
+            category = "chest",
+            bodyPart = "Cơ ngực",
+            targetMuscle = "Cơ ngực trên",
+            equipment = "Tạ đơn",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0314-ns0SIbU.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0314-ns0SIbU.webp",
+            hasAiCheck = false,
+            description = "Chỉnh ghế dốc góc 30-45 độ. Hạ tạ ngang ngực trên sao cho cẳng tay vuông góc sàn, thở ra đẩy hai quả tạ lên theo hình vòng cung nhẹ."
+        ),
+        ExerciseDto(
+            id = "0001",
+            name = "3/4 Sit-up (Gập bụng 3/4)",
+            category = "waist",
+            bodyPart = "Cơ bụng / Eo",
+            targetMuscle = "Cơ bụng",
+            equipment = "Trọng lượng cơ thể",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0001-2gPfomN.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0001-2gPfomN.webp",
+            hasAiCheck = false,
+            description = "Nằm ngửa gập đầu gối, hai tay sau đầu với khuỷu tay hướng ra ngoài. Siết cơ bụng nâng thân trên lên góc 45 độ rồi từ từ hạ xuống vị trí ban đầu."
+        ),
+        ExerciseDto(
+            id = "0662",
+            name = "Push Up (Hít đất tiêu chuẩn)",
+            category = "chest",
+            bodyPart = "Cơ ngực & Tay sau",
+            targetMuscle = "Ngực & Cốt lõi",
+            equipment = "Trọng lượng cơ thể",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0662-n3V3r4M.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0662-n3V3r4M.webp",
+            hasAiCheck = true,
+            description = "Giữ toàn bộ thân người thẳng từ đầu đến gót chân. Hạ ngực xuống cách sàn 3-5cm rồi dùng cơ ngực đẩy mạnh người trở lại tư thế ban đầu."
+        )
+    )
 
     private fun setupExerciseSearch() {
         binding.etSearchExercise.setOnEditorActionListener { _, actionId, _ ->
@@ -98,7 +153,7 @@ class WorkoutsActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
-                    ApiClient.getService(this@WorkoutsActivity).getExercises(perPage = 30, search = query)
+                    ApiClient.getService(this@WorkoutsActivity).getExercises(perPage = 60, q = query, search = query)
                 }
                 if (response.isSuccessful && response.body()?.data != null) {
                     val list = response.body()!!.data!!
@@ -106,23 +161,29 @@ class WorkoutsActivity : AppCompatActivity() {
                         renderExerciseCatalog(list)
                         Toast.makeText(
                             this@WorkoutsActivity,
-                            "🔍 Tìm thấy ${list.size} bài tập phù hợp trên VPS",
+                            "🔍 Tìm thấy ${list.size} bài tập phù hợp",
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        Toast.makeText(
-                            this@WorkoutsActivity,
-                            "Không tìm thấy bài tập nào khớp với \"$query\"",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        val localFiltered = fallbackExercises.filter {
+                            it.name.contains(query, ignoreCase = true) || it.targetMuscle?.contains(query, ignoreCase = true) == true
+                        }
+                        if (localFiltered.isNotEmpty()) {
+                            renderExerciseCatalog(localFiltered)
+                        } else {
+                            Toast.makeText(
+                                this@WorkoutsActivity,
+                                "Không tìm thấy bài tập nào khớp với \"$query\"",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             } catch (e: Exception) {
-                Toast.makeText(
-                    this@WorkoutsActivity,
-                    "Tra cứu offline: Hiện có sẵn 1,324 bài tập trong hệ thống VPS.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val localFiltered = fallbackExercises.filter {
+                    it.name.contains(query, ignoreCase = true) || it.targetMuscle?.contains(query, ignoreCase = true) == true
+                }
+                renderExerciseCatalog(if (localFiltered.isNotEmpty()) localFiltered else fallbackExercises)
             }
         }
     }
@@ -133,11 +194,17 @@ class WorkoutsActivity : AppCompatActivity() {
                 val response = withContext(Dispatchers.IO) {
                     ApiClient.getService(this@WorkoutsActivity).getExercises(perPage = 60)
                 }
-                if (response.isSuccessful && response.body()?.data != null) {
+                if (response.isSuccessful && response.body()?.data?.isNotEmpty() == true) {
                     val list = response.body()!!.data!!
                     renderExerciseCatalog(list)
+                } else if (binding.llExerciseCatalogList.childCount == 0) {
+                    renderExerciseCatalog(fallbackExercises)
                 }
-            } catch (_: Exception) {}
+            } catch (_: Exception) {
+                if (binding.llExerciseCatalogList.childCount == 0) {
+                    renderExerciseCatalog(fallbackExercises)
+                }
+            }
         }
     }
 
