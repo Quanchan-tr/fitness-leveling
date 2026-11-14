@@ -64,33 +64,42 @@ class LogMetricsModalActivity : AppCompatActivity() {
         session.userWeight = weightKg.toFloat()
         heightCm?.let { session.userHeight = it.toFloat() }
 
-        if (session.isLoggedIn) {
-            lifecycleScope.launch {
-                try {
-                    withContext(Dispatchers.IO) {
-                        ApiClient.getService(this@LogMetricsModalActivity).createBodyMetric(
-                            CreateBodyMetricRequest(
-                                logDate = todayStr,
-                                weightKg = weightKg,
-                                bodyFatPct = fatPct,
-                                heightCm = heightCm
-                            )
-                        )
-                    }
-                } catch (_: Exception) {
-                    // Non-blocking sync
-                }
-            }
+        if (!session.isLoggedIn) {
+            Toast.makeText(this, "Vui lòng đăng nhập để lưu chỉ số", Toast.LENGTH_SHORT).show()
+            return
         }
 
-        val resultIntent = Intent().apply {
-            putExtra("SAVED_WEIGHT", weightStr)
-            if (heightStr.isNotEmpty()) putExtra("SAVED_HEIGHT", heightStr)
-            if (fatStr.isNotEmpty()) putExtra("SAVED_FAT", fatStr)
+        binding.btnSaveMetrics.isEnabled = false
+        lifecycleScope.launch {
+            try {
+                val res = withContext(Dispatchers.IO) {
+                    ApiClient.getService(this@LogMetricsModalActivity).createBodyMetric(
+                        CreateBodyMetricRequest(
+                            logDate = todayStr,
+                            weightKg = weightKg,
+                            bodyFatPct = fatPct,
+                            heightCm = heightCm
+                        )
+                    )
+                }
+                if (res.isSuccessful) {
+                    val resultIntent = Intent().apply {
+                        putExtra("SAVED_WEIGHT", weightStr)
+                        if (heightStr.isNotEmpty()) putExtra("SAVED_HEIGHT", heightStr)
+                        if (fatStr.isNotEmpty()) putExtra("SAVED_FAT", fatStr)
+                    }
+                    setResult(Activity.RESULT_OK, resultIntent)
+                    Toast.makeText(this@LogMetricsModalActivity, "✓ Đã lưu số đo thể chất lên VPS!", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    binding.btnSaveMetrics.isEnabled = true
+                    Toast.makeText(this@LogMetricsModalActivity, "Không thể lưu chỉ số (${res.code()})", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                binding.btnSaveMetrics.isEnabled = true
+                Toast.makeText(this@LogMetricsModalActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
         }
-        setResult(Activity.RESULT_OK, resultIntent)
-        Toast.makeText(this, "✓ Đã lưu số đo thể chất thành công!", Toast.LENGTH_SHORT).show()
-        finish()
     }
 
     private fun calculateBmi() {

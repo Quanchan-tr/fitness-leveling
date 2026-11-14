@@ -41,6 +41,21 @@ class LogMealModalActivity : AppCompatActivity() {
             // Prevent dismiss when tapping inside
         }
 
+        binding.tabSearchLibrary.setOnClickListener {
+            binding.tabSearchLibrary.setBackgroundResource(R.drawable.bg_subtab_pill_active)
+            binding.tabSearchLibrary.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.white))
+            binding.tabComboMode.setBackgroundResource(R.drawable.bg_subtab_pill_inactive)
+            binding.tabComboMode.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.text_dark))
+        }
+
+        binding.tabComboMode.setOnClickListener {
+            binding.tabComboMode.setBackgroundResource(R.drawable.bg_subtab_pill_active)
+            binding.tabComboMode.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.white))
+            binding.tabSearchLibrary.setBackgroundResource(R.drawable.bg_subtab_pill_inactive)
+            binding.tabSearchLibrary.setTextColor(androidx.core.content.ContextCompat.getColor(this, R.color.text_dark))
+            Toast.makeText(this, "Chọn các món bên dưới để gộp thành combo bữa ăn", Toast.LENGTH_SHORT).show()
+        }
+
         val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
 
         binding.btnAddFood1.setOnClickListener {
@@ -101,26 +116,40 @@ class LogMealModalActivity : AppCompatActivity() {
 
     private fun handleConfirmAddMeal() {
         val session = SessionManager.getInstance(this)
-        if (session.isLoggedIn && selectedMeals.isNotEmpty()) {
-            val api = ApiClient.getService(this)
-            lifecycleScope.launch {
-                try {
-                    withContext(Dispatchers.IO) {
-                        for (meal in selectedMeals) {
-                            api.createNutritionLog(
-                                idempotencyKey = UUID.randomUUID().toString(),
-                                request = meal
-                            )
-                        }
-                    }
-                } catch (_: Exception) {
-                    // Non-blocking sync
-                }
-            }
+        if (selectedMeals.isEmpty()) {
+            Toast.makeText(this, "Vui lòng chọn ít nhất 1 món ăn", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!session.isLoggedIn) {
+            Toast.makeText(this, "Vui lòng đăng nhập để ghi nhận bữa ăn", Toast.LENGTH_SHORT).show()
+            return
         }
 
-        val total = if (addedItemsCount == 0) 1 else addedItemsCount
-        Toast.makeText(this, "✓ Đã ghi nhận $total món ăn vào nhật ký dinh dưỡng!", Toast.LENGTH_SHORT).show()
-        finish()
+        val api = ApiClient.getService(this)
+        binding.btnConfirmAddMeal.isEnabled = false
+        lifecycleScope.launch {
+            try {
+                var savedCount = 0
+                withContext(Dispatchers.IO) {
+                    for (meal in selectedMeals) {
+                        val res = api.createNutritionLog(
+                            idempotencyKey = UUID.randomUUID().toString(),
+                            request = meal
+                        )
+                        if (res.isSuccessful) savedCount++
+                    }
+                }
+                if (savedCount > 0) {
+                    Toast.makeText(this@LogMealModalActivity, "✓ Đã ghi nhận $savedCount món ăn lên VPS!", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    binding.btnConfirmAddMeal.isEnabled = true
+                    Toast.makeText(this@LogMealModalActivity, "Không thể lưu nhật ký dinh dưỡng", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                binding.btnConfirmAddMeal.isEnabled = true
+                Toast.makeText(this@LogMealModalActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

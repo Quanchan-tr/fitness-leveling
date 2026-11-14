@@ -54,7 +54,6 @@ object ApiClient {
             val original = chain.request()
             val requestBuilder = original.newBuilder()
                 .header("Accept", "application/json")
-                .header("Content-Type", "application/json")
 
             val token = session.authToken
             if (!token.isNullOrBlank()) {

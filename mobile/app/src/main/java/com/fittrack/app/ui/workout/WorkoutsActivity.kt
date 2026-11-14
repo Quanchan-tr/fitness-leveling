@@ -114,7 +114,7 @@ class WorkoutsActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 Toast.makeText(
                     this@WorkoutsActivity,
-                    "Tra cứu offline: Hiện có sẵn 1,324 bài tập trong hệ thống VPS.",
+                    "Lỗi tra cứu bài tập: ${e.localizedMessage}",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -122,7 +122,12 @@ class WorkoutsActivity : AppCompatActivity() {
     }
 
     private fun fetchRoutinesFromBackend() {
-        if (!session.isLoggedIn) return
+        if (!session.isLoggedIn) {
+            binding.cardRoutinePush.visibility = View.GONE
+            binding.cardRoutinePull.visibility = View.GONE
+            binding.tvScheduleTitle.text = "Đăng nhập để xem lịch tập của bạn"
+            return
+        }
 
         lifecycleScope.launch {
             try {
@@ -145,10 +150,16 @@ class WorkoutsActivity : AppCompatActivity() {
                         } else {
                             binding.cardRoutinePull.visibility = View.GONE
                         }
+                    } else {
+                        binding.cardRoutinePush.visibility = View.GONE
+                        binding.cardRoutinePull.visibility = View.GONE
+                        binding.tvScheduleTitle.text = "Chưa có giáo án nào. Hãy tạo giáo án mới!"
                     }
+                } else {
+                    Toast.makeText(this@WorkoutsActivity, "Không thể tải giáo án (${response.code()})", Toast.LENGTH_SHORT).show()
                 }
-            } catch (_: Exception) {
-                // Keep current layouts on connection hiccup
+            } catch (e: Exception) {
+                Toast.makeText(this@WorkoutsActivity, "Lỗi kết nối máy chủ: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -158,45 +169,25 @@ class WorkoutsActivity : AppCompatActivity() {
             startActivity(Intent(this, CreateRoutineActivity::class.java))
         }
 
-        binding.cardRoutinePush.setOnClickListener {
-            val intent = Intent(this, RoutineDetailActivity::class.java).apply {
-                putExtra("ROUTINE_TITLE", loadedRoutines.getOrNull(0)?.title ?: "Push Day (Ngực & Tay Sau)")
-                putExtra("ROUTINE_ID", loadedRoutines.getOrNull(0)?.id.orEmpty())
+        val openRoutine: (Int) -> Unit = { idx ->
+            val routine = loadedRoutines.getOrNull(idx)
+            if (routine != null) {
+                val intent = Intent(this, RoutineDetailActivity::class.java).apply {
+                    putExtra("ROUTINE_TITLE", routine.title)
+                    putExtra("ROUTINE_ID", routine.id)
+                }
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "Chưa có giáo án để mở", Toast.LENGTH_SHORT).show()
             }
-            startActivity(intent)
         }
 
-        binding.btnStartPushRoutine.setOnClickListener {
-            val intent = Intent(this, RoutineDetailActivity::class.java).apply {
-                putExtra("ROUTINE_TITLE", loadedRoutines.getOrNull(0)?.title ?: "Push Day (Ngực & Tay Sau)")
-                putExtra("ROUTINE_ID", loadedRoutines.getOrNull(0)?.id.orEmpty())
-            }
-            startActivity(intent)
-        }
-
-        binding.cardRoutinePull.setOnClickListener {
-            val intent = Intent(this, RoutineDetailActivity::class.java).apply {
-                putExtra("ROUTINE_TITLE", loadedRoutines.getOrNull(1)?.title ?: "Pull Day (Lưng & Tay Trước)")
-                putExtra("ROUTINE_ID", loadedRoutines.getOrNull(1)?.id.orEmpty())
-            }
-            startActivity(intent)
-        }
-
-        binding.btnStartPullRoutine.setOnClickListener {
-            val intent = Intent(this, RoutineDetailActivity::class.java).apply {
-                putExtra("ROUTINE_TITLE", loadedRoutines.getOrNull(1)?.title ?: "Pull Day (Lưng & Tay Trước)")
-                putExtra("ROUTINE_ID", loadedRoutines.getOrNull(1)?.id.orEmpty())
-            }
-            startActivity(intent)
-        }
-
-        binding.btnCalendarRoutineDetail.setOnClickListener {
-            startActivity(Intent(this, RoutineDetailActivity::class.java))
-        }
-
-        binding.cardTodayScheduledRoutine.setOnClickListener {
-            startActivity(Intent(this, RoutineDetailActivity::class.java))
-        }
+        binding.cardRoutinePush.setOnClickListener { openRoutine(0) }
+        binding.btnStartPushRoutine.setOnClickListener { openRoutine(0) }
+        binding.cardRoutinePull.setOnClickListener { openRoutine(1) }
+        binding.btnStartPullRoutine.setOnClickListener { openRoutine(1) }
+        binding.btnCalendarRoutineDetail.setOnClickListener { openRoutine(0) }
+        binding.cardTodayScheduledRoutine.setOnClickListener { openRoutine(0) }
 
         binding.cardAiPoseCoachEntry.setOnClickListener {
             startActivity(Intent(this, AiPoseCoachActivity::class.java))
@@ -204,15 +195,13 @@ class WorkoutsActivity : AppCompatActivity() {
 
         // 3-dots Action Menus on Routine cards
         binding.btnRoutinePushMore.setOnClickListener { anchor ->
-            val id = loadedRoutines.getOrNull(0)?.id
-            val name = loadedRoutines.getOrNull(0)?.title ?: "Push Day (Ngực & Tay Sau)"
-            showRoutineActionMenu(anchor, name, binding.cardRoutinePush, id)
+            val routine = loadedRoutines.getOrNull(0) ?: return@setOnClickListener
+            showRoutineActionMenu(anchor, routine.title, binding.cardRoutinePush, routine.id)
         }
 
         binding.btnRoutinePullMore.setOnClickListener { anchor ->
-            val id = loadedRoutines.getOrNull(1)?.id
-            val name = loadedRoutines.getOrNull(1)?.title ?: "Pull Day (Lưng & Tay Trước)"
-            showRoutineActionMenu(anchor, name, binding.cardRoutinePull, id)
+            val routine = loadedRoutines.getOrNull(1) ?: return@setOnClickListener
+            showRoutineActionMenu(anchor, routine.title, binding.cardRoutinePull, routine.id)
         }
 
         // AI Workout Planner Wizard Entry
@@ -233,7 +222,7 @@ class WorkoutsActivity : AppCompatActivity() {
 
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
-                1 -> showAddToScheduleDialog(routineName)
+                1 -> showAddToScheduleDialog(routineName, routineId)
                 2 -> startActivity(Intent(this, CreateRoutineActivity::class.java))
                 3 -> showDeleteConfirmDialog(routineName, cardView, routineId)
             }
@@ -242,26 +231,44 @@ class WorkoutsActivity : AppCompatActivity() {
         popup.show()
     }
 
-    private fun showAddToScheduleDialog(routineName: String) {
+    private fun showAddToScheduleDialog(routineName: String, routineId: String?) {
         val days = arrayOf("Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật")
+        val dayKeys = arrayOf("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
         val checkedItems = booleanArrayOf(false, false, false, false, false, false, false)
-        val selectedDays = mutableListOf<String>()
+        val selectedDayKeys = mutableListOf<String>()
 
         AlertDialog.Builder(this)
             .setTitle("Chọn ngày xếp vào lịch tập")
             .setMultiChoiceItems(days, checkedItems) { _, which, isChecked ->
+                val key = dayKeys[which]
                 if (isChecked) {
-                    selectedDays.add(days[which])
+                    if (!selectedDayKeys.contains(key)) selectedDayKeys.add(key)
                 } else {
-                    selectedDays.remove(days[which])
+                    selectedDayKeys.remove(key)
                 }
             }
             .setPositiveButton("Xếp vào lịch") { _, _ ->
-                if (selectedDays.isEmpty()) {
+                if (selectedDayKeys.isEmpty() || routineId.isNullOrBlank()) {
                     Toast.makeText(this, "Vui lòng chọn ít nhất một ngày tập", Toast.LENGTH_SHORT).show()
                 } else {
-                    val daysStr = selectedDays.joinToString(", ")
-                    Toast.makeText(this, "✓ Đã xếp \"$routineName\" vào $daysStr!", Toast.LENGTH_LONG).show()
+                    lifecycleScope.launch {
+                        try {
+                            val res = withContext(Dispatchers.IO) {
+                                ApiClient.getService(this@WorkoutsActivity).updateRoutine(
+                                    routineId,
+                                    com.fittrack.app.data.models.UpdateRoutineRequest(scheduleDays = selectedDayKeys)
+                                )
+                            }
+                            if (res.isSuccessful) {
+                                Toast.makeText(this@WorkoutsActivity, "✓ Đã cập nhật lịch cho \"$routineName\" trên VPS!", Toast.LENGTH_LONG).show()
+                                fetchRoutinesFromBackend()
+                            } else {
+                                Toast.makeText(this@WorkoutsActivity, "Lỗi cập nhật lịch (${res.code()})", Toast.LENGTH_SHORT).show()
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(this@WorkoutsActivity, "Lỗi kết nối: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             }
             .setNegativeButton("Hủy", null)
@@ -273,22 +280,25 @@ class WorkoutsActivity : AppCompatActivity() {
             .setTitle("Xác nhận xóa")
             .setMessage("Bạn có chắc chắn muốn xóa routine \"$routineName\" khỏi thư mục bài tập không?")
             .setPositiveButton("Xóa") { _, _ ->
-                if (!routineId.isNullOrBlank()) {
-                    lifecycleScope.launch {
-                        try {
-                            withContext(Dispatchers.IO) {
-                                ApiClient.getService(this@WorkoutsActivity).deleteRoutine(routineId)
-                            }
+                if (routineId.isNullOrBlank()) {
+                    Toast.makeText(this, "Không xác định được ID giáo án", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                lifecycleScope.launch {
+                    try {
+                        val res = withContext(Dispatchers.IO) {
+                            ApiClient.getService(this@WorkoutsActivity).deleteRoutine(routineId)
+                        }
+                        if (res.isSuccessful) {
                             cardView.visibility = View.GONE
                             Toast.makeText(this@WorkoutsActivity, "✓ Đã xóa routine \"$routineName\" trên VPS", Toast.LENGTH_SHORT).show()
-                        } catch (_: Exception) {
-                            cardView.visibility = View.GONE
-                            Toast.makeText(this@WorkoutsActivity, "Đã xóa routine \"$routineName\"", Toast.LENGTH_SHORT).show()
+                            fetchRoutinesFromBackend()
+                        } else {
+                            Toast.makeText(this@WorkoutsActivity, "Không thể xóa (${res.code()})", Toast.LENGTH_SHORT).show()
                         }
+                    } catch (e: Exception) {
+                        Toast.makeText(this@WorkoutsActivity, "Lỗi kết nối: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
                     }
-                } else {
-                    cardView.visibility = View.GONE
-                    Toast.makeText(this, "Đã xóa routine \"$routineName\"", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Hủy", null)

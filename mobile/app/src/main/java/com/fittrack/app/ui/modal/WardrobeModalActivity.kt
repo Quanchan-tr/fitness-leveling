@@ -43,16 +43,8 @@ class WardrobeModalActivity : AppCompatActivity() {
     private var activeSlot = "top"
     private var userLevel = 1
 
-    // Currently equipped item IDs per slot
-    private val equippedMap = mutableMapOf(
-        "headwear" to "hw-3",
-        "hair" to "hair-1",
-        "top" to "top-1",
-        "bottom" to "bot-1",
-        "shoes" to "shoe-1",
-        "accessories" to "acc-1",
-        "special" to "spec-1"
-    )
+    // Currently equipped item IDs per slot (populated from VPS GET /avatar)
+    private val equippedMap = mutableMapOf<String, String>()
 
     // Current color & effect state for 3D bridge
     private var shirtColor = "#FF5722"
@@ -63,75 +55,7 @@ class WardrobeModalActivity : AppCompatActivity() {
     private var specialType = "none"
     private var specialColor = ""
 
-    // Full Equipment Catalog synchronized with Web STARTER_AVATAR_CATALOG
-    private val fullCatalog = listOf(
-        // HEADWEAR
-        WardrobeItem("hw-1", "headwear", "Mũ Beanie Len Đỏ", "Casual Fitness", "COMMON", "🧢", "#B91C1C", 0),
-        WardrobeItem("hw-2", "headwear", "Nón Kết Gymer Pro", "Sport Pro", "COMMON", "🧢", "#0F172A", 0),
-        WardrobeItem("hw-3", "headwear", "Băng Đô Retro 80s", "Retro Runner", "COMMON", "🎗️", "#FF5722", 0),
-        WardrobeItem("hw-4", "headwear", "Mũ Rơm Phiêu Lưu", "Adventure", "RARE", "👒", "#FDE047", 5),
-        WardrobeItem("hw-5", "headwear", "Mũ Lông Thợ Săn", "Winter Explorer", "RARE", "💂", "#78350F", 7),
-        WardrobeItem("hw-6", "headwear", "Mũ Phù Thủy Ma Thuật", "Fantasy Hero", "EPIC", "🧙", "#1E1B4B", 15),
-        WardrobeItem("hw-7", "headwear", "Vương Miện Quán Quân", "Champions Set", "LEGENDARY", "👑", "#F59E0B", 25),
-        WardrobeItem("hw-8", "headwear", "Mũ Bucket Dã Ngoại Kaki", "Outdoor Tactical", "RARE", "🧢", "#166534", 8),
-        WardrobeItem("hw-9", "headwear", "Băng Đô Ninja Hắc Ám", "Shadow Shinobi", "EPIC", "🥷", "#312E81", 18),
-        WardrobeItem("hw-10", "headwear", "Mũ Giáp Cyber Valkyrie", "Cyber Valkyrie", "LEGENDARY", "⚡", "#06B6D4", 35),
-
-        // HAIR
-        WardrobeItem("hair-1", "hair", "Tóc Ngắn Thể Thao", "Casual", "COMMON", "💇", "#2D1E18", 0),
-        WardrobeItem("hair-2", "hair", "Tóc Anime Gai Lãng Tử", "Anime Hero", "RARE", "⚡", "#EAB308", 4),
-        WardrobeItem("hair-3", "hair", "Tóc Đuôi Ngựa Chiến Binh", "Warrior", "EPIC", "🦹", "#7C3AED", 12),
-        WardrobeItem("hair-4", "hair", "Mái Tóc Saiyan Hoàng Kim", "Mythic Legend", "LEGENDARY", "🔥", "#FDE047", 30),
-        WardrobeItem("hair-5", "hair", "Tóc Undercut Vuốt Lệch", "Modern Street", "RARE", "💈", "#475569", 6),
-        WardrobeItem("hair-6", "hair", "Tóc Dài Layer Phóng Khoáng", "Bohemian Drift", "EPIC", "💇‍♀️", "#9333EA", 14),
-        WardrobeItem("hair-7", "hair", "Mái Tóc Băng Phong Hàn Băng", "Frost Sovereign", "LEGENDARY", "❄️", "#38BDF8", 42),
-
-        // TOP
-        WardrobeItem("top-1", "top", "Áo Ba Lỗ Thể Thao Cam", "Casual Fitness", "COMMON", "🎽", "#FF5722", 0),
-        WardrobeItem("top-2", "top", "Áo Sơ Mi Caro Cam", "Urban Casual", "RARE", "👔", "#EA580C", 3),
-        WardrobeItem("top-3", "top", "Áo Nén Cơ Bắp Pro", "Athletic Pro", "RARE", "👕", "#2563EB", 8),
-        WardrobeItem("top-4", "top", "Khung Xương Trợ Lực", "Cyberpunk Mecha", "EPIC", "🦾", "#0284C7", 16),
-        WardrobeItem("top-5", "top", "Bộ Giáp Glitch Singularity", "Sci-Fi Void", "LEGENDARY", "🛡️", "#7C3AED", 35),
-        WardrobeItem("top-6", "top", "Áo Hoodie Oversize Thể Thao Đen", "Streetwear Pro", "RARE", "🧥", "#18181B", 10),
-        WardrobeItem("top-7", "top", "Áo Polo Thể Thao Golf Xanh Navy", "Preppy Sport", "EPIC", "👕", "#1E3A8A", 20),
-        WardrobeItem("top-8", "top", "Chiến Giáp Thái Dương Titan", "Solar Sovereign", "LEGENDARY", "⚜️", "#D97706", 45),
-
-        // BOTTOM
-        WardrobeItem("bot-1", "bottom", "Quần Đùi Gym Than", "Casual Fitness", "COMMON", "🩳", "#1E293B", 0),
-        WardrobeItem("bot-2", "bottom", "Quần Jogger Xám Khói", "Streetwear", "RARE", "👖", "#475569", 4),
-        WardrobeItem("bot-3", "bottom", "Quần Nén Bó Cơ Neon", "Athletic Pro", "EPIC", "🩲", "#0F172A", 14),
-        WardrobeItem("bot-4", "bottom", "Quần Giáp Công Nghệ Nano", "Sci-Fi Void", "LEGENDARY", "🦿", "#7C3AED", 28),
-        WardrobeItem("bot-5", "bottom", "Quần Đùi 2 Lớp Chạy Bộ Phản Quang", "Marathon Speed", "RARE", "🩳", "#0D9488", 7),
-        WardrobeItem("bot-6", "bottom", "Quần Kaki Rằn Ri Rừng Rậm Camo", "Tactical Force", "EPIC", "👖", "#3F6212", 16),
-        WardrobeItem("bot-7", "bottom", "Quần Bó Tốc Độ Plasma Neon", "Quantum Surge", "LEGENDARY", "⚡", "#EC4899", 38),
-
-        // SHOES
-        WardrobeItem("shoe-1", "shoes", "Sneaker Chạy Bộ Cam", "Casual Fitness", "COMMON", "👟", "#FF5722", 0),
-        WardrobeItem("shoe-2", "shoes", "Giày Bóng Rổ High-Top", "Court Legend", "RARE", "🏀", "#2563EB", 6),
-        WardrobeItem("shoe-3", "shoes", "Giày Cử Tạ Powerlift Pro", "Heavy Lifting", "EPIC", "🏋️", "#DC2626", 15),
-        WardrobeItem("shoe-4", "shoes", "Giày Phản Trọng Lực Mag-Lev", "Cyberpunk", "LEGENDARY", "🚀", "#06B6D4", 32),
-        WardrobeItem("shoe-5", "shoes", "Giày Lười Canvas Trắng Tối Giản", "Urban Walk", "RARE", "👟", "#F8FAFC", 5),
-        WardrobeItem("shoe-6", "shoes", "Ủng Dã Ngoại Trekking Chống Nước", "Alpine Explorer", "EPIC", "🥾", "#78350F", 18),
-        WardrobeItem("shoe-7", "shoes", "Ủng Đấu Sĩ Hoàng Kim Titan", "Solar Sovereign", "LEGENDARY", "✨", "#F59E0B", 44),
-
-        // ACCESSORIES
-        WardrobeItem("acc-1", "accessories", "Kính Râm Thể Thao UV", "Outdoor", "COMMON", "🕶️", "#0F172A", 0),
-        WardrobeItem("acc-2", "accessories", "Găng Tay Da Nâng Tạ", "Powerhouse", "RARE", "🥊", "#78350F", 5),
-        WardrobeItem("acc-3", "accessories", "Tai Nghe Chống Ồn Pro", "Music Gym", "EPIC", "🎧", "#38BDF8", 10),
-        WardrobeItem("acc-4", "accessories", "Đai Lưng Vô Địch Vàng", "Champion", "LEGENDARY", "🥇", "#F59E0B", 20),
-        WardrobeItem("acc-5", "accessories", "Đồng Hồ FitTrack Ultra Biometric", "Smart Fitness", "RARE", "⌚", "#0284C7", 8),
-        WardrobeItem("acc-6", "accessories", "Mặt Nạ Oni Chiến Binh Bóng Đêm", "Shadow Shinobi", "EPIC", "👹", "#BE123C", 22),
-        WardrobeItem("acc-7", "accessories", "Dây Chuyền Quả Tạ Hoàng Kim Titan", "Solar Sovereign", "LEGENDARY", "📿", "#F59E0B", 40),
-
-        // SPECIAL
-        WardrobeItem("spec-1", "special", "Hào Quang Chiến Binh Cam", "Energy Aura", "RARE", "✨", "#FF5722", 5),
-        WardrobeItem("spec-2", "special", "Ngọn Lửa Năng Lượng Tím", "Shadow Flame", "EPIC", "🔮", "#A855F7", 18),
-        WardrobeItem("spec-3", "special", "Cánh Thiên Thần Pixel & Bụi Vàng", "Celestial", "LEGENDARY", "🪽", "#F59E0B", 40),
-        WardrobeItem("spec-4", "special", "Vòng Xoáy Glitch Đa Không Gian", "Singularity", "LEGENDARY", "🌌", "#06B6D4", 50),
-        WardrobeItem("spec-5", "special", "Khói Pixel Huyền Ảo Shadow Shinobi", "Ninja Stealth", "RARE", "💨", "#64748B", 12),
-        WardrobeItem("spec-6", "special", "Cánh Hắc Long & Đốm Lửa Tím", "Dragon Void", "EPIC", "🦇", "#7E22CE", 25),
-        WardrobeItem("spec-7", "special", "Ngọn Lửa Thái Dương Solar Sovereign", "Solar Sovereign", "LEGENDARY", "☀️", "#EA580C", 48)
-    )
+    private var fullCatalog: List<WardrobeItem> = emptyList()
 
     private lateinit var adapter: EquipmentAdapter
 
@@ -147,6 +71,75 @@ class WardrobeModalActivity : AppCompatActivity() {
         setupSlotCategories()
         setupRecyclerView()
         setupActionButtons()
+        fetchAvatarCatalogFromBackend()
+    }
+
+    private fun fetchAvatarCatalogFromBackend() {
+        val session = SessionManager.getInstance(this)
+        if (!session.isLoggedIn) {
+            Toast.makeText(this, "Vui lòng đăng nhập để mở tủ đồ trên VPS", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        lifecycleScope.launch {
+            try {
+                val res = withContext(Dispatchers.IO) {
+                    ApiClient.getService(this@WardrobeModalActivity).getAvatarConfig()
+                }
+                val data = res.body()?.data
+                if (res.isSuccessful && data != null) {
+                    fullCatalog = data.catalog.map { dto ->
+                        val slotLower = dto.slot.lowercase()
+                        val icon = when (slotLower) {
+                            "headwear" -> "🧢"
+                            "hair" -> "💇"
+                            "top" -> "👕"
+                            "bottom" -> "👖"
+                            "shoes" -> "👟"
+                            "accessories" -> "🕶️"
+                            "special" -> "✨"
+                            else -> "🎒"
+                        }
+                        WardrobeItem(
+                            id = dto.id,
+                            slot = slotLower,
+                            name = dto.name,
+                            set = dto.theme ?: dto.rarity,
+                            tier = dto.rarity.uppercase(),
+                            icon = icon,
+                            colorHex = dto.colorHex ?: "#FF5722",
+                            unlockLevel = dto.unlockLevel
+                        )
+                    }
+
+                    equippedMap.clear()
+                    data.equipped.forEach { (slotKey, item) ->
+                        if (item != null) {
+                            val lower = slotKey.lowercase()
+                            equippedMap[lower] = item.id
+                            when (lower) {
+                                "top" -> shirtColor = item.colorHex ?: shirtColor
+                                "bottom" -> shortsColor = item.colorHex ?: shortsColor
+                                "headwear" -> headbandColor = item.colorHex ?: headbandColor
+                                "shoes" -> shoeColor = item.colorHex ?: shoeColor
+                                "hair" -> hairColor = item.colorHex ?: hairColor
+                                "special" -> {
+                                    specialColor = item.colorHex ?: ""
+                                    specialType = if (item.name.contains("Cánh", ignoreCase = true)) "wings" else "aura"
+                                }
+                            }
+                        }
+                    }
+
+                    update3DModel()
+                    refreshCategoryItems()
+                } else {
+                    Toast.makeText(this@WardrobeModalActivity, "Không thể tải tủ đồ (${res.code()})", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this@WardrobeModalActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun setup3DPreview() {
@@ -290,42 +283,51 @@ class WardrobeModalActivity : AppCompatActivity() {
 
         binding.btnApplyOutfit.setOnClickListener {
             val session = SessionManager.getInstance(this)
-            if (session.isLoggedIn) {
-                lifecycleScope.launch {
-                    try {
-                        val api = ApiClient.getService(this@WardrobeModalActivity)
-                        withContext(Dispatchers.IO) {
-                            api.equipAvatarItem(
-                                EquipAvatarRequest(
-                                    gender = session.userGender,
-                                    headwearId = equippedMap["headwear"],
-                                    hairId = equippedMap["hair"],
-                                    topId = equippedMap["top"],
-                                    bottomId = equippedMap["bottom"],
-                                    shoesId = equippedMap["shoes"],
-                                    accessoryId = equippedMap["accessories"],
-                                    specialId = equippedMap["special"]
-                                )
-                            )
-                        }
-                    } catch (_: Exception) {
-                        // Non-blocking sync
-                    }
-                }
+            if (!session.isLoggedIn) {
+                Toast.makeText(this, "Vui lòng đăng nhập để lưu trang phục", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
-            val resultIntent = Intent().apply {
-                putExtra("SELECTED_SHIRT_COLOR", shirtColor)
-                putExtra("SELECTED_SHORTS_COLOR", shortsColor)
-                putExtra("SELECTED_HEADBAND_COLOR", headbandColor)
-                putExtra("SELECTED_SHOE_COLOR", shoeColor)
-                putExtra("SELECTED_HAIR_COLOR", hairColor)
-                putExtra("SELECTED_SPECIAL_TYPE", specialType)
-                putExtra("SELECTED_SPECIAL_COLOR", specialColor)
+            binding.btnApplyOutfit.isEnabled = false
+            lifecycleScope.launch {
+                try {
+                    val api = ApiClient.getService(this@WardrobeModalActivity)
+                    val res = withContext(Dispatchers.IO) {
+                        api.equipAvatarItem(
+                            EquipAvatarRequest(
+                                gender = session.userGender,
+                                headwearId = equippedMap["headwear"],
+                                hairId = equippedMap["hair"],
+                                topId = equippedMap["top"],
+                                bottomId = equippedMap["bottom"],
+                                shoesId = equippedMap["shoes"],
+                                accessoryId = equippedMap["accessories"],
+                                specialId = equippedMap["special"]
+                            )
+                        )
+                    }
+                    if (res.isSuccessful) {
+                        val resultIntent = Intent().apply {
+                            putExtra("SELECTED_SHIRT_COLOR", shirtColor)
+                            putExtra("SELECTED_SHORTS_COLOR", shortsColor)
+                            putExtra("SELECTED_HEADBAND_COLOR", headbandColor)
+                            putExtra("SELECTED_SHOE_COLOR", shoeColor)
+                            putExtra("SELECTED_HAIR_COLOR", hairColor)
+                            putExtra("SELECTED_SPECIAL_TYPE", specialType)
+                            putExtra("SELECTED_SPECIAL_COLOR", specialColor)
+                        }
+                        setResult(RESULT_OK, resultIntent)
+                        Toast.makeText(this@WardrobeModalActivity, "✓ Đã lưu trang phục lên VPS!", Toast.LENGTH_SHORT).show()
+                        finish()
+                    } else {
+                        binding.btnApplyOutfit.isEnabled = true
+                        Toast.makeText(this@WardrobeModalActivity, "Không thể lưu trang phục (${res.code()})", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    binding.btnApplyOutfit.isEnabled = true
+                    Toast.makeText(this@WardrobeModalActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
             }
-            setResult(Activity.RESULT_OK, resultIntent)
-            Toast.makeText(this, "✓ Đã áp dụng trang phục 3D thành công!", Toast.LENGTH_SHORT).show()
-            finish()
         }
     }
 

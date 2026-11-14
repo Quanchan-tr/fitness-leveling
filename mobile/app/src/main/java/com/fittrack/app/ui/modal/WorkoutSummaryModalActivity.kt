@@ -33,27 +33,58 @@ class WorkoutSummaryModalActivity : AppCompatActivity() {
 
     private fun syncWorkoutCompletion() {
         val session = SessionManager.getInstance(this)
-        if (!session.isLoggedIn) return
+        if (!session.isLoggedIn) {
+            Toast.makeText(this, "Vui lòng đăng nhập để lưu kết quả tập luyện", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val existingLogId = intent.getStringExtra("WORKOUT_LOG_ID")
 
         lifecycleScope.launch {
             try {
-                withContext(Dispatchers.IO) {
+                val completedLog = withContext(Dispatchers.IO) {
                     val api = ApiClient.getService(this@WorkoutSummaryModalActivity)
-                    val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                    val createRes = api.createWorkoutLog(
-                        idempotencyKey = UUID.randomUUID().toString(),
-                        request = CreateWorkoutLogRequest(
-                            logDate = today,
-                            notes = "Hoàn thành buổi tập luyện trên Mobile App"
+                    val logId = if (!existingLogId.isNullOrBlank()) {
+                        existingLogId
+                    } else {
+                        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                        val createRes = api.createWorkoutLog(
+                            idempotencyKey = UUID.randomUUID().toString(),
+                            request = CreateWorkoutLogRequest(
+                                logDate = today,
+                                notes = "Hoàn thành buổi tập luyện trên Mobile App"
+                            )
                         )
-                    )
-                    if (createRes.isSuccessful && createRes.body()?.data != null) {
-                        val logId = createRes.body()!!.data!!.id
-                        api.completeWorkoutLog(logId)
+                        if (createRes.isSuccessful) createRes.body()?.data?.id else null
+                    }
+
+                    if (!logId.isNullOrBlank()) {
+                        val compRes = api.completeWorkoutLog(logId)
+                        if (compRes.isSuccessful) compRes.body()?.data else null
+                    } else {
+                        null
                     }
                 }
-            } catch (_: Exception) {
-                // Non-blocking sync
+
+                if (completedLog != null) {
+                    Toast.makeText(
+                        this@WorkoutSummaryModalActivity,
+                        "✓ Đã lưu buổi tập! +${completedLog.totalXpEarned} XP",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    Toast.makeText(
+                        this@WorkoutSummaryModalActivity,
+                        "Không thể xác nhận hoàn tất buổi tập trên VPS",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this@WorkoutSummaryModalActivity,
+                    "Lỗi đồng bộ buổi tập: ${e.localizedMessage}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

@@ -38,24 +38,15 @@ class DailyQuestsModalActivity : AppCompatActivity() {
             // Prevent dismiss when tapping inside modal content
         }
 
-        binding.btnClaimAll.setOnClickListener {
-            val session = SessionManager.getInstance(this)
-            session.userXp += 150
-            val neededXp = maxOf(200, session.userLevel * 200)
-            if (session.userXp >= neededXp) {
-                session.userLevel += 1
-                session.userXp -= neededXp
-                Toast.makeText(this, "🎉 LÊN CẤP ${session.userLevel}! Nhận +150 XP.", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "✓ Đã nhận thưởng +150 XP Nhiệm vụ Hàng ngày!", Toast.LENGTH_SHORT).show()
-            }
-            finish()
-        }
+        binding.btnClaimAll.visibility = android.view.View.GONE
     }
 
     private fun loadQuestsFromBackend() {
         val session = SessionManager.getInstance(this)
-        if (!session.isLoggedIn) return
+        if (!session.isLoggedIn) {
+            Toast.makeText(this, "Vui lòng đăng nhập để xem nhiệm vụ hằng ngày", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         lifecycleScope.launch {
             try {
@@ -64,32 +55,39 @@ class DailyQuestsModalActivity : AppCompatActivity() {
                 }
                 if (res.isSuccessful && res.body()?.data?.gamification?.dailyQuests != null) {
                     val quests = res.body()!!.data!!.gamification!!.dailyQuests
-                    if (quests.isNotEmpty()) {
-                        val q1 = quests.getOrNull(0)
-                        val q2 = quests.getOrNull(1)
-                        val q3 = quests.getOrNull(2)
-
-                        q1?.let {
-                            binding.tvQ1Title.text = it.title
-                            binding.tvQ1Progress.text = "${it.current}/${it.target}" + if (it.completed) " • Hoàn thành" else ""
-                            binding.badgeQ1Xp.text = "+${it.xpReward} XP"
-                        }
-
-                        q2?.let {
-                            binding.tvQ2Title.text = it.title
-                            binding.tvQ2Progress.text = "${it.current}/${it.target}" + if (it.completed) " • Hoàn thành" else ""
-                            binding.badgeQ2Xp.text = "+${it.xpReward} XP"
-                        }
-
-                        q3?.let {
-                            binding.tvQ3Title.text = it.title
-                            binding.tvQ3Progress.text = "${it.current}/${it.target}" + if (it.completed) " • Hoàn thành" else ""
-                            binding.badgeQ3Xp.text = "+${it.xpReward} XP"
-                        }
+                    if (quests.isEmpty()) {
+                        binding.tvQ1Title.text = "Chưa có nhiệm vụ hôm nay"
+                        binding.tvQ1Progress.text = ""
+                        binding.badgeQ1Xp.text = ""
+                        return@launch
                     }
+
+                    val q1 = quests.getOrNull(0)
+                    val q2 = quests.getOrNull(1)
+                    val q3 = quests.getOrNull(2)
+
+                    q1?.let {
+                        binding.tvQ1Title.text = it.title
+                        binding.tvQ1Progress.text = "${it.current}/${it.target}" + if (it.completed) " • Hoàn thành" else ""
+                        binding.badgeQ1Xp.text = "+${it.xpReward} XP"
+                    }
+
+                    q2?.let {
+                        binding.tvQ2Title.text = it.title
+                        binding.tvQ2Progress.text = "${it.current}/${it.target}" + if (it.completed) " • Hoàn thành" else ""
+                        binding.badgeQ2Xp.text = "+${it.xpReward} XP"
+                    }
+
+                    q3?.let {
+                        binding.tvQ3Title.text = it.title
+                        binding.tvQ3Progress.text = "${it.current}/${it.target}" + if (it.completed) " • Hoàn thành" else ""
+                        binding.badgeQ3Xp.text = "+${it.xpReward} XP"
+                    }
+                } else {
+                    Toast.makeText(this@DailyQuestsModalActivity, "Không thể tải nhiệm vụ (${res.code()})", Toast.LENGTH_SHORT).show()
                 }
-            } catch (_: Exception) {
-                // Keep default offline UI
+            } catch (e: Exception) {
+                Toast.makeText(this@DailyQuestsModalActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
         }
     }

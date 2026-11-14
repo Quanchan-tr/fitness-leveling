@@ -36,9 +36,24 @@ data class CreateRoutineRequest(
     @SerializedName("is_active") val isActive: Boolean = true
 )
 
+data class UpdateRoutineRequest(
+    @SerializedName("title") val title: String? = null,
+    @SerializedName("description") val description: String? = null,
+    @SerializedName("target_split") val targetSplit: String? = null,
+    @SerializedName("schedule_days") val scheduleDays: List<String>? = null,
+    @SerializedName("is_active") val isActive: Boolean? = null
+)
+
 data class CreateWorkoutLogRequest(
     @SerializedName("log_date") val logDate: String,
     @SerializedName("notes") val notes: String? = null
+)
+
+data class AddWorkoutSetRequest(
+    @SerializedName("exercise_id") val exerciseId: String,
+    @SerializedName("set_number") val setNumber: Int,
+    @SerializedName("reps") val reps: Int,
+    @SerializedName("weight_kg") val weightKg: Double = 0.0
 )
 
 data class WorkoutLogDto(
@@ -46,7 +61,10 @@ data class WorkoutLogDto(
     @SerializedName("user_id") val userId: String,
     @SerializedName("log_date") val logDate: String,
     @SerializedName("status") val status: String? = null,
-    @SerializedName("total_xp_earned") val totalXpEarned: Int = 0
+    @SerializedName("duration_minutes") val durationMinutes: Int = 0,
+    @SerializedName("total_volume_kg") val totalVolumeKg: Double = 0.0,
+    @SerializedName("total_xp_earned") val totalXpEarned: Int = 0,
+    @SerializedName("notes") val notes: String? = null
 )
 
 // ── Nutrition Logs ──────────────────────────────────────────
@@ -117,9 +135,15 @@ data class CreatePostRequest(
     @SerializedName("media_url") val mediaUrl: String? = null
 )
 
+data class AddCommentRequest(
+    @SerializedName("content") val content: String
+)
+
 // ── 3D Avatar & Wardrobe ────────────────────────────────────
 data class AvatarData(
+    @SerializedName("gender") val gender: String = "male",
     @SerializedName("config") val config: AvatarConfigDto? = null,
+    @SerializedName("equipped") val equipped: Map<String, AvatarItemDto?> = emptyMap(),
     @SerializedName("inventory") val inventory: List<AvatarItemDto> = emptyList(),
     @SerializedName("catalog") val catalog: List<AvatarItemDto> = emptyList()
 )
@@ -140,8 +164,29 @@ data class AvatarItemDto(
     @SerializedName("id") val id: String,
     @SerializedName("slot") val slot: String,
     @SerializedName("name") val name: String,
-    @SerializedName("rarity") val rarity: String = "common",
-    @SerializedName("model_id") val modelId: String? = null
+    @SerializedName("rarity") val rarity: String = "COMMON",
+    @SerializedName("model_id") val modelId: String? = null,
+    @SerializedName("color_hex") val colorHex: String? = null,
+    @SerializedName("unlock_level") val unlockLevel: Int = 0,
+    @SerializedName("theme") val theme: String? = null
+)
+
+// ── Pose Check ──────────────────────────────────────────────
+data class PoseRealtimeResultRequest(
+    @SerializedName("exercise_id") val exerciseId: String,
+    @SerializedName("rep_count") val repCount: Int,
+    @SerializedName("score") val score: Int,
+    @SerializedName("feedback_json") val feedbackJson: Map<String, Any> = emptyMap()
+)
+
+data class PoseSessionDto(
+    @SerializedName("id") val id: String,
+    @SerializedName("exercise_id") val exerciseId: String? = null,
+    @SerializedName("mode") val mode: String? = null,
+    @SerializedName("status") val status: String? = null,
+    @SerializedName("rep_count") val repCount: Int? = null,
+    @SerializedName("score") val score: Int? = null,
+    @SerializedName("created_at") val createdAt: String? = null
 )
 
 data class EquipAvatarRequest(

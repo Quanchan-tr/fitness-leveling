@@ -76,16 +76,37 @@ interface ApiService {
         @Body request: CreateRoutineRequest
     ): Response<ApiResponse<WorkoutRoutineDto>>
 
+    @GET("routines/{id}")
+    suspend fun getRoutineDetail(
+        @Path("id") id: String
+    ): Response<ApiResponse<WorkoutRoutineDto>>
+
+    @PUT("routines/{id}")
+    suspend fun updateRoutine(
+        @Path("id") id: String,
+        @Body request: UpdateRoutineRequest
+    ): Response<ApiResponse<WorkoutRoutineDto>>
+
     @DELETE("routines/{id}")
     suspend fun deleteRoutine(
         @Path("id") id: String
     ): Response<ApiResponse<Map<String, Any>>>
+
+    @GET("workout-logs")
+    suspend fun getWorkoutLogs(): Response<ApiResponse<List<WorkoutLogDto>>>
 
     @POST("workout-logs")
     suspend fun createWorkoutLog(
         @Header("Idempotency-Key") idempotencyKey: String,
         @Body request: CreateWorkoutLogRequest
     ): Response<ApiResponse<WorkoutLogDto>>
+
+    @POST("workout-logs/{id}/sets")
+    suspend fun addWorkoutSet(
+        @Path("id") id: String,
+        @Header("Idempotency-Key") idempotencyKey: String,
+        @Body request: AddWorkoutSetRequest
+    ): Response<ApiResponse<Any>>
 
     @POST("workout-logs/{id}/complete")
     suspend fun completeWorkoutLog(
@@ -126,6 +147,12 @@ interface ApiService {
         @Path("id") id: String
     ): Response<ApiResponse<Map<String, Any>>>
 
+    @POST("community/posts/{id}/comments")
+    suspend fun addPostComment(
+        @Path("id") id: String,
+        @Body request: AddCommentRequest
+    ): Response<ApiResponse<Any>>
+
     // ── 3D Avatar & Wardrobe ────────────────────────────────────
     @GET("avatar")
     suspend fun getAvatarConfig(): Response<ApiResponse<AvatarData>>
@@ -141,5 +168,22 @@ interface ApiService {
         @Header("Idempotency-Key") idempotencyKey: String,
         @Body request: com.fittrack.app.data.models.GenerateAiPlanRequest
     ): Response<ApiResponse<Any>>
+
+    // ── Pose Check ─────────────────────────────────────────────
+    @GET("pose-check/sessions")
+    suspend fun getPoseSessions(): Response<ApiResponse<List<PoseSessionDto>>>
+
+    @POST("pose-check/realtime/result")
+    suspend fun submitPoseRealtimeResult(
+        @Body request: PoseRealtimeResultRequest
+    ): Response<ApiResponse<PoseSessionDto>>
+
+    @Multipart
+    @POST("pose-check/upload")
+    suspend fun uploadPoseVideo(
+        @Header("Idempotency-Key") idempotencyKey: String,
+        @Part video: okhttp3.MultipartBody.Part,
+        @Part("exercise_id") exerciseId: okhttp3.RequestBody
+    ): Response<ApiResponse<PoseSessionDto>>
 }
 

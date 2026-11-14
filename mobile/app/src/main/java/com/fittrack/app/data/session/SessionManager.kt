@@ -106,7 +106,7 @@ class SessionManager(context: Context) {
         set(value) = prefs.edit().putString(KEY_USER_BIRTH_DATE, value).apply()
 
     var waterLoggedMl: Int
-        get() = prefs.getInt(KEY_WATER_ML, 1250)
+        get() = prefs.getInt(KEY_WATER_ML, 0)
         set(value) = prefs.edit().putInt(KEY_WATER_ML, value).apply()
 
     fun addWater(ml: Int): Int {

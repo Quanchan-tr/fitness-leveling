@@ -38,6 +38,16 @@ class OnboardingEquipmentActivity : AppCompatActivity() {
         }
 
         binding.btnContinue.setOnClickListener {
+            val selected = buildList {
+                if (binding.cbDumbbell.isChecked) add("dumbbell")
+                if (binding.cbBarbell.isChecked) add("barbell")
+                if (binding.cbKettlebell.isChecked) add("kettlebell")
+                if (binding.cbPullUpBar.isChecked) add("pull_up_bar")
+                if (binding.cbSquatRack.isChecked) add("squat_rack")
+                if (binding.cbFlatBench.isChecked) add("flat_bench")
+            }
+            com.fittrack.app.data.session.SessionManager.getInstance(this).obEquipment =
+                if (selected.isEmpty()) "bodyweight" else selected.joinToString(",")
             startActivity(Intent(this, OnboardingLoadingActivity::class.java))
         }
     }

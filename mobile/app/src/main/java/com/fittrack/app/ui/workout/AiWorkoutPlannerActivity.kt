@@ -124,23 +124,21 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
                     }
 
                     binding.layoutAiLoading.visibility = View.GONE
-                    binding.layoutPlanResult.visibility = View.VISIBLE
                     binding.btnGeneratePlan.isEnabled = true
 
                     if (response.isSuccessful && response.body()?.data != null) {
+                        binding.layoutPlanResult.visibility = View.VISIBLE
                         binding.tvResultSummary.text = "✓ Giáo án $selectedSplit ($selectedDays buổi/tuần, $selectedDuration phút) đã được AI trên VPS sinh thành công!"
                         Toast.makeText(this@AiWorkoutPlannerActivity, "AI Cloud đã sinh giáo án luyện tập!", Toast.LENGTH_SHORT).show()
                     } else {
-                        binding.tvResultSummary.text = "Lịch tập $selectedSplit $selectedDays buổi/tuần • Thời lượng $selectedDuration phút • Khoa học 100%"
-                        Toast.makeText(this@AiWorkoutPlannerActivity, "Đã áp dụng giáo án mẫu chuẩn khoa học!", Toast.LENGTH_SHORT).show()
+                        binding.layoutPlanResult.visibility = View.GONE
+                        Toast.makeText(this@AiWorkoutPlannerActivity, "AI không thể sinh giáo án (${response.code()}). Vui lòng thử lại.", Toast.LENGTH_LONG).show()
                     }
                 } catch (e: Exception) {
                     binding.layoutAiLoading.visibility = View.GONE
-                    binding.layoutPlanResult.visibility = View.VISIBLE
+                    binding.layoutPlanResult.visibility = View.GONE
                     binding.btnGeneratePlan.isEnabled = true
-
-                    binding.tvResultSummary.text = "Lịch tập $selectedSplit $selectedDays buổi/tuần • Thời lượng $selectedDuration phút • Khoa học 100%"
-                    Toast.makeText(this@AiWorkoutPlannerActivity, "Giáo án ngoại tuyến sẵn sàng!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AiWorkoutPlannerActivity, "Lỗi kết nối AI VPS: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -151,23 +149,28 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 try {
                     val daysList = listOf("monday", "wednesday", "friday", "saturday", "sunday", "tuesday").take(selectedDays)
-                    withContext(Dispatchers.IO) {
+                    val res = withContext(Dispatchers.IO) {
                         ApiClient.getService(this@AiWorkoutPlannerActivity).createRoutine(
                             idempotencyKey = UUID.randomUUID().toString(),
                             request = CreateRoutineRequest(
                                 title = "Giáo án AI ($selectedSplit - $selectedDays buổi)",
-                                description = "Giáo án tự động tạo bởi FitTrack AI Planner cho thời lượng $selectedDuration phút",
+                                description = "Giáo án tạo bởi FitTrack AI Planner ($selectedDuration phút)",
                                 targetSplit = selectedSplit.lowercase(),
                                 scheduleDays = daysList,
                                 isActive = true
                             )
                         )
                     }
-                    Toast.makeText(this@AiWorkoutPlannerActivity, "✓ Đã áp dụng giáo án $selectedSplit vào lịch tập trên VPS!", Toast.LENGTH_LONG).show()
-                } catch (_: Exception) {
-                    Toast.makeText(this@AiWorkoutPlannerActivity, "✓ Đã áp dụng giáo án $selectedSplit vào lịch tập!", Toast.LENGTH_LONG).show()
-                } finally {
-                    finish()
+                    if (res.isSuccessful) {
+                        Toast.makeText(this@AiWorkoutPlannerActivity, "✓ Đã lưu giáo án $selectedSplit vào lịch tập trên VPS!", Toast.LENGTH_LONG).show()
+                        finish()
+                    } else {
+                        binding.btnApplySchedule.isEnabled = true
+                        Toast.makeText(this@AiWorkoutPlannerActivity, "Lỗi lưu giáo án (${res.code()})", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    binding.btnApplySchedule.isEnabled = true
+                    Toast.makeText(this@AiWorkoutPlannerActivity, "Lỗi kết nối máy chủ: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
                 }
             }
         }

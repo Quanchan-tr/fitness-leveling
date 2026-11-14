@@ -19,6 +19,20 @@ class CreateRoutineActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreateRoutineBinding
     private lateinit var session: SessionManager
+    private val selectedExerciseNames = mutableListOf<String>()
+
+    private val exercisePickerLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val names = result.data?.getStringArrayListExtra("SELECTED_EXERCISE_NAMES").orEmpty()
+            if (names.isNotEmpty()) {
+                selectedExerciseNames.clear()
+                selectedExerciseNames.addAll(names)
+                Toast.makeText(this, "Đã chọn ${names.size} bài tập: ${names.joinToString(", ")}", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +46,7 @@ class CreateRoutineActivity : AppCompatActivity() {
         }
 
         binding.btnAddExercise.setOnClickListener {
-            startActivity(Intent(this, ExercisePickerModalActivity::class.java))
+            exercisePickerLauncher.launch(Intent(this, ExercisePickerModalActivity::class.java))
         }
 
         binding.btnSaveRoutine.setOnClickListener {
@@ -59,7 +73,11 @@ class CreateRoutineActivity : AppCompatActivity() {
                         idempotencyKey = UUID.randomUUID().toString(),
                         request = CreateRoutineRequest(
                             title = title,
-                            description = "Giáo án luyện tập tùy biến trên FitTrack Mobile",
+                            description = if (selectedExerciseNames.isNotEmpty()) {
+                                "Bài tập: ${selectedExerciseNames.joinToString(", ")}"
+                            } else {
+                                "Giáo án luyện tập tùy biến trên FitTrack Mobile"
+                            },
                             targetSplit = "custom",
                             scheduleDays = listOf("monday", "wednesday", "friday"),
                             isActive = true

@@ -44,11 +44,15 @@ class UserProfileActivity : AppCompatActivity() {
 
     private fun bindUserData() {
         binding.tvProfileName.text = session.userName
+        binding.btnBadgesLinkLv.text = "Cấp ${session.userLevel}"
         binding.btnBadgesLinkStreak.text = "🔥 ${session.userStreak} ngày streak"
     }
 
     private fun fetchFreshProfile() {
-        if (!session.isLoggedIn) return
+        if (!session.isLoggedIn) {
+            android.widget.Toast.makeText(this, "Vui lòng đăng nhập để xem hồ sơ", android.widget.Toast.LENGTH_SHORT).show()
+            return
+        }
 
         lifecycleScope.launch {
             try {
@@ -57,11 +61,22 @@ class UserProfileActivity : AppCompatActivity() {
                 }
                 if (response.isSuccessful && response.body()?.data != null) {
                     val profile = response.body()!!.data!!
-                    session.userName = profile.name
+                    val gamification = profile.gamification
+                    session.saveUserSession(
+                        token = session.authToken.orEmpty(),
+                        id = profile.id,
+                        name = profile.name,
+                        email = profile.email,
+                        level = gamification?.level ?: session.userLevel,
+                        xp = gamification?.xp ?: session.userXp,
+                        streak = gamification?.currentStreak ?: session.userStreak
+                    )
                     bindUserData()
+                } else {
+                    android.widget.Toast.makeText(this@UserProfileActivity, "Không thể tải hồ sơ (${response.code()})", android.widget.Toast.LENGTH_SHORT).show()
                 }
-            } catch (_: Exception) {
-                // Offline fallback
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(this@UserProfileActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", android.widget.Toast.LENGTH_SHORT).show()
             }
         }
     }

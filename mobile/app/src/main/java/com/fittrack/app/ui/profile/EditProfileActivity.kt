@@ -61,9 +61,11 @@ class EditProfileActivity : AppCompatActivity() {
                     user.birthDate?.let { binding.etBirthday.setText(it) }
                     user.gender?.let { binding.etGender.setText(it) }
                     user.goal?.let { binding.etGoal.setText(it) }
+                } else {
+                    Toast.makeText(this@EditProfileActivity, "Không thể tải hồ sơ (${response.code()})", Toast.LENGTH_SHORT).show()
                 }
-            } catch (_: Exception) {
-                // Keep default offline data
+            } catch (e: Exception) {
+                Toast.makeText(this@EditProfileActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -101,16 +103,17 @@ class EditProfileActivity : AppCompatActivity() {
                         ApiClient.getService(this@EditProfileActivity).updateProfile(req)
                     }
                     if (res.isSuccessful) {
-                        Toast.makeText(this@EditProfileActivity, "✓ Cập nhật hồ sơ thành công!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@EditProfileActivity, "✓ Cập nhật hồ sơ lên VPS thành công!", Toast.LENGTH_SHORT).show()
+                        finish()
+                    } else {
+                        Toast.makeText(this@EditProfileActivity, "Cập nhật thất bại (${res.code()})", Toast.LENGTH_SHORT).show()
                     }
-                } catch (_: Exception) {
-                    // Non-blocking sync
+                } catch (e: Exception) {
+                    Toast.makeText(this@EditProfileActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
                 }
-                finish()
             }
         } else {
-            Toast.makeText(this, "✓ Đã lưu cài đặt!", Toast.LENGTH_SHORT).show()
-            finish()
+            Toast.makeText(this, "Vui lòng đăng nhập để cập nhật hồ sơ", Toast.LENGTH_SHORT).show()
         }
     }
 }

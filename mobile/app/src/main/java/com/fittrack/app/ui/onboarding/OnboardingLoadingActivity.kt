@@ -35,7 +35,7 @@ class OnboardingLoadingActivity : AppCompatActivity() {
         if (session.isLoggedIn) {
             lifecycleScope.launch {
                 try {
-                    withContext(Dispatchers.IO) {
+                    val res = withContext(Dispatchers.IO) {
                         ApiClient.getService(this@OnboardingLoadingActivity).updateProfile(
                             UpdateProfileRequest(
                                 name = session.userName,
@@ -47,17 +47,31 @@ class OnboardingLoadingActivity : AppCompatActivity() {
                             )
                         )
                     }
-                } catch (_: Exception) {
-                    // Best effort sync
+                    if (!res.isSuccessful) {
+                        android.widget.Toast.makeText(
+                            this@OnboardingLoadingActivity,
+                            "Không thể đồng bộ hồ sơ lên máy chủ (${res.code()})",
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } catch (e: Exception) {
+                    android.widget.Toast.makeText(
+                        this@OnboardingLoadingActivity,
+                        "Lỗi kết nối máy chủ: ${e.localizedMessage}",
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
                 }
+                navigateToDashboard()
             }
+        } else {
+            binding.root.postDelayed({ navigateToDashboard() }, 800)
         }
+    }
 
-        binding.root.postDelayed({
-            val intent = Intent(this, DashboardActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
-        }, 1500)
+    private fun navigateToDashboard() {
+        val intent = Intent(this, DashboardActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 }

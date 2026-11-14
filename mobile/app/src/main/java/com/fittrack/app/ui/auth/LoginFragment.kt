@@ -68,17 +68,10 @@ class LoginFragment : Fragment() {
     }
 
     private fun handleLogin() {
-        var email = binding.edtEmail.text?.toString()?.trim().orEmpty()
-        var password = binding.edtPassword.text?.toString()?.trim().orEmpty()
+        val email = binding.edtEmail.text?.toString()?.trim().orEmpty()
+        val password = binding.edtPassword.text?.toString()?.trim().orEmpty()
 
-        // Fallback to demo account if fields are left blank
-        if (email.isBlank() && password.isBlank()) {
-            email = "demo@fitnessleveling.test"
-            password = "password123"
-            binding.edtEmail.setText(email)
-            binding.edtPassword.setText(password)
-            Toast.makeText(requireContext(), "⚡ Tự động điền tài khoản Demo Lv.50", Toast.LENGTH_SHORT).show()
-        } else if (email.isBlank() || password.isBlank()) {
+        if (email.isBlank() || password.isBlank()) {
             Toast.makeText(requireContext(), "Vui lòng nhập đầy đủ Email và Mật khẩu", Toast.LENGTH_SHORT).show()
             return
         }

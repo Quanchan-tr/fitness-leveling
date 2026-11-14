@@ -20,16 +20,32 @@ class OnboardingWeightActivity : AppCompatActivity() {
         session = SessionManager.getInstance(this)
         currentWeight = session.obWeight
 
-        binding.tvWeightValue.text = currentWeight.toInt().toString()
+        var useLbs = false
+        val updateDisplay = {
+            binding.tvWeightValue.text = if (useLbs) {
+                (currentWeight * 2.20462f).toInt().toString()
+            } else {
+                currentWeight.toInt().toString()
+            }
+        }
+        updateDisplay()
+
+        binding.btnUnitKg.setOnClickListener {
+            useLbs = false
+            updateDisplay()
+        }
+        binding.btnUnitLbs.setOnClickListener {
+            useLbs = true
+            updateDisplay()
+        }
 
         binding.btnBack.setOnClickListener {
             finish()
         }
 
         binding.layoutWeightDisplay.setOnClickListener {
-            // Quick step increment for intuitive UX
             currentWeight = if (currentWeight >= 120f) 50f else currentWeight + 2f
-            binding.tvWeightValue.text = currentWeight.toInt().toString()
+            updateDisplay()
             session.obWeight = currentWeight
         }
 

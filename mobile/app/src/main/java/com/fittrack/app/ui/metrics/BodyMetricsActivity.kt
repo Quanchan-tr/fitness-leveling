@@ -51,59 +51,77 @@ class BodyMetricsActivity : AppCompatActivity() {
         fetchMetricsFromBackend()
     }
 
+    private var loadedCalories: Int = 0
+    private var loadedProtein: Double = 0.0
+    private var loadedCarbs: Double = 0.0
+    private var loadedFat: Double = 0.0
+
     private fun fetchMetricsFromBackend() {
-        if (!session.isLoggedIn) return
+        if (!session.isLoggedIn) {
+            Toast.makeText(this, "Vui lòng đăng nhập để xem chỉ số cơ thể", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         val api = ApiClient.getService(this)
         lifecycleScope.launch {
             // 1. Đồng bộ Body Metrics từ API
             try {
                 val res = withContext(Dispatchers.IO) { api.getBodyMetrics() }
-                if (res.isSuccessful && res.body()?.data?.isNotEmpty() == true) {
-                    val latest = res.body()!!.data!!.first()
-                    binding.tvMetricWeightVal.text = String.format(Locale.US, "%.1f kg", latest.weightKg)
+                if (res.isSuccessful) {
+                    val list = res.body()?.data.orEmpty()
+                    if (list.isNotEmpty()) {
+                        val latest = list.first()
+                        binding.tvMetricWeightVal.text = String.format(Locale.US, "%.1f kg", latest.weightKg)
 
-                    val heightM = (latest.heightCm?.takeIf { it > 50.0 } ?: 175.0) / 100.0
-                    val bmi = latest.weightKg / (heightM * heightM)
-                    binding.tvMetricBmiVal.text = String.format(Locale.US, "%.1f", bmi)
-                    binding.tvMetricBmiDesc.text = when {
-                        bmi < 18.5 -> "Gầy"
-                        bmi in 18.5..24.9 -> "Chuẩn"
-                        else -> "Thừa cân"
-                    }
+                        val heightM = (latest.heightCm?.takeIf { it > 50.0 } ?: session.userHeight.toDouble()) / 100.0
+                        val bmi = latest.weightKg / (heightM * heightM)
+                        binding.tvMetricBmiVal.text = String.format(Locale.US, "%.1f", bmi)
+                        binding.tvMetricBmiDesc.text = when {
+                            bmi < 18.5 -> "Gầy"
+                            bmi in 18.5..24.9 -> "Chuẩn"
+                            else -> "Thừa cân"
+                        }
 
-                    latest.bodyFatPct?.let { fat ->
-                        binding.tvMetricFatVal.text = String.format(Locale.US, "%.1f%%", fat)
+                        binding.tvMetricFatVal.text = latest.bodyFatPct?.let {
+                            String.format(Locale.US, "%.1f%%", it)
+                        } ?: "--"
+                    } else {
+                        binding.tvMetricWeightVal.text = "-- kg"
+                        binding.tvMetricBmiVal.text = "--"
+                        binding.tvMetricBmiDesc.text = "Chưa có"
+                        binding.tvMetricFatVal.text = "--"
                     }
+                } else {
+                    Toast.makeText(this@BodyMetricsActivity, "Lỗi tải chỉ số (${res.code()})", Toast.LENGTH_SHORT).show()
                 }
-            } catch (_: Exception) {
-                // Giữ nguyên giao diện offline
+            } catch (e: Exception) {
+                Toast.makeText(this@BodyMetricsActivity, "Lỗi kết nối chỉ số: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
 
             // 2. Đồng bộ Nutrition Logs từ API
             try {
                 val nutRes = withContext(Dispatchers.IO) { api.getNutritionLogs() }
-                if (nutRes.isSuccessful && nutRes.body()?.data?.isNotEmpty() == true) {
-                    val logs = nutRes.body()!!.data!!
-                    val totalCalories = logs.sumOf { it.calories }
-                    val totalProtein = logs.sumOf { it.proteinGrams }
-                    val totalCarbs = logs.sumOf { it.carbsGrams }
-                    val totalFat = logs.sumOf { it.fatGrams }
+                if (nutRes.isSuccessful) {
+                    val logs = nutRes.body()?.data.orEmpty()
+                    loadedCalories = logs.sumOf { it.calories }
+                    loadedProtein = logs.sumOf { it.proteinGrams }
+                    loadedCarbs = logs.sumOf { it.carbsGrams }
+                    loadedFat = logs.sumOf { it.fatGrams }
 
-                    if (totalCalories > 0) {
-                        binding.tvCalorieGoal.text = "$totalCalories kcal"
-                        binding.tvProteinMacro.text = String.format(Locale.US, "Đạm: %.0fg", totalProtein)
-                        binding.pbProtein.progress = minOf(totalProtein.toInt(), binding.pbProtein.max)
+                    binding.tvCalorieGoal.text = "$loadedCalories kcal"
+                    binding.tvProteinMacro.text = String.format(Locale.US, "Đạm: %.0fg", loadedProtein)
+                    binding.pbProtein.progress = minOf(loadedProtein.toInt(), binding.pbProtein.max)
 
-                        binding.tvCarbMacro.text = String.format(Locale.US, "Carb: %.0fg", totalCarbs)
-                        binding.pbCarb.progress = minOf(totalCarbs.toInt(), binding.pbCarb.max)
+                    binding.tvCarbMacro.text = String.format(Locale.US, "Carb: %.0fg", loadedCarbs)
+                    binding.pbCarb.progress = minOf(loadedCarbs.toInt(), binding.pbCarb.max)
 
-                        binding.tvFatMacro.text = String.format(Locale.US, "Fat: %.0fg", totalFat)
-                        binding.pbFat.progress = minOf(totalFat.toInt(), binding.pbFat.max)
-                    }
+                    binding.tvFatMacro.text = String.format(Locale.US, "Fat: %.0fg", loadedFat)
+                    binding.pbFat.progress = minOf(loadedFat.toInt(), binding.pbFat.max)
+                } else {
+                    Toast.makeText(this@BodyMetricsActivity, "Lỗi tải dinh dưỡng (${nutRes.code()})", Toast.LENGTH_SHORT).show()
                 }
-            } catch (_: Exception) {
-                // Giữ nguyên giao diện offline
+            } catch (e: Exception) {
+                Toast.makeText(this@BodyMetricsActivity, "Lỗi kết nối dinh dưỡng: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -164,26 +182,20 @@ class BodyMetricsActivity : AppCompatActivity() {
                 }
                 binding.tvPortionPercent.text = "$progress% ($statusText)"
 
-                val cal = (1850 * ratio).toInt()
+                val cal = (loadedCalories * ratio).toInt()
                 binding.tvCalorieGoal.text = "$cal kcal"
 
-                val proteinTarget = (160 * ratio).toInt()
-                val proteinCurrent = (135 * ratio).toInt()
-                binding.tvProteinMacro.text = "Đạm (Protein): $proteinCurrent / ${proteinTarget}g"
-                binding.pbProtein.max = proteinTarget
-                binding.pbProtein.progress = proteinCurrent
+                val proteinScaled = (loadedProtein * ratio).toInt()
+                binding.tvProteinMacro.text = "Đạm (Protein): ${proteinScaled}g"
+                binding.pbProtein.progress = minOf(proteinScaled, binding.pbProtein.max)
 
-                val carbTarget = (240 * ratio).toInt()
-                val carbCurrent = (180 * ratio).toInt()
-                binding.tvCarbMacro.text = "Tinh bột (Carb): $carbCurrent / ${carbTarget}g"
-                binding.pbCarb.max = carbTarget
-                binding.pbCarb.progress = carbCurrent
+                val carbScaled = (loadedCarbs * ratio).toInt()
+                binding.tvCarbMacro.text = "Tinh bột (Carb): ${carbScaled}g"
+                binding.pbCarb.progress = minOf(carbScaled, binding.pbCarb.max)
 
-                val fatTarget = (65 * ratio).toInt()
-                val fatCurrent = (48 * ratio).toInt()
-                binding.tvFatMacro.text = "Chất béo (Fat): $fatCurrent / ${fatTarget}g"
-                binding.pbFat.max = fatTarget
-                binding.pbFat.progress = fatCurrent
+                val fatScaled = (loadedFat * ratio).toInt()
+                binding.tvFatMacro.text = "Chất béo (Fat): ${fatScaled}g"
+                binding.pbFat.progress = minOf(fatScaled, binding.pbFat.max)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}

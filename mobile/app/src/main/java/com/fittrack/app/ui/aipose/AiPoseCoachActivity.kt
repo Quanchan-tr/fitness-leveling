@@ -2,10 +2,17 @@ package com.fittrack.app.ui.aipose
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityAiPoseCoachBinding
 import com.fittrack.app.ui.BottomNavTab
 import com.fittrack.app.ui.setupBottomNav
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class AiPoseCoachActivity : AppCompatActivity() {
 
@@ -18,6 +25,34 @@ class AiPoseCoachActivity : AppCompatActivity() {
 
         setupInteractions()
         setupBottomNav()
+        fetchPoseSessions()
+    }
+
+    private fun fetchPoseSessions() {
+        val session = SessionManager.getInstance(this)
+        if (!session.isLoggedIn) return
+
+        lifecycleScope.launch {
+            try {
+                val res = withContext(Dispatchers.IO) {
+                    ApiClient.getService(this@AiPoseCoachActivity).getPoseSessions()
+                }
+                if (res.isSuccessful) {
+                    val count = res.body()?.data?.size ?: 0
+                    Toast.makeText(
+                        this@AiPoseCoachActivity,
+                        "Đã đồng bộ $count phiên AI Pose Check từ VPS",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this@AiPoseCoachActivity,
+                    "Không thể tải lịch sử AI Pose: ${e.localizedMessage}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 
     private fun setupInteractions() {

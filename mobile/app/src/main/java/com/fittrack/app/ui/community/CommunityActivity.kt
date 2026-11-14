@@ -25,12 +25,12 @@ class CommunityActivity : AppCompatActivity() {
     private lateinit var session: SessionManager
 
     private var post1Id: String? = null
-    private var isLiked1 = true
-    private var likeCount1 = 48
+    private var isLiked1 = false
+    private var likeCount1 = 0
 
     private var post2Id: String? = null
     private var isLiked2 = false
-    private var likeCount2 = 35
+    private var likeCount2 = 0
 
     private var attachedMediaType: String? = null // null, "IMAGE", or "VIDEO"
 
@@ -54,59 +54,62 @@ class CommunityActivity : AppCompatActivity() {
     }
 
     private fun fetchCommunityFeed() {
-        if (!session.isLoggedIn) return
+        if (!session.isLoggedIn) {
+            Toast.makeText(this, "Vui lòng đăng nhập để xem bảng tin cộng đồng", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         lifecycleScope.launch {
             try {
                 val response = withContext(Dispatchers.IO) {
                     ApiClient.getService(this@CommunityActivity).getCommunityPosts()
                 }
-                if (response.isSuccessful && response.body()?.data?.isNotEmpty() == true) {
-                    val posts = response.body()!!.data!!
-
-                    if (posts.isNotEmpty()) {
-                        val p1 = posts[0]
-                        post1Id = p1.id
-                        binding.tvPost1Author.text = p1.userName ?: "Thợ săn cao cấp"
-                        binding.tvPost1Content.text = p1.content
-                        likeCount1 = p1.likesCount
-                        isLiked1 = p1.isLiked
-                        binding.tvLikeCount1.text = likeCount1.toString()
+                if (response.isSuccessful) {
+                    val posts = response.body()?.data.orEmpty()
+                    if (posts.isEmpty()) {
+                        binding.tvPost1Author.text = "Chưa có bài viết"
+                        binding.tvPost1Content.text = "Hãy là người đầu tiên chia sẻ thành tích tập luyện!"
+                        binding.tvLikeCount1.text = "0"
+                        binding.tvPost2Author.text = ""
+                        binding.tvPost2Content.text = ""
+                        binding.tvLikeCount2.text = "0"
+                        return@launch
                     }
+
+                    val p1 = posts[0]
+                    post1Id = p1.id
+                    binding.tvPost1Author.text = p1.userName ?: "Thành viên FitTrack"
+                    binding.tvPost1Content.text = p1.content
+                    likeCount1 = p1.likesCount
+                    isLiked1 = p1.isLiked
+                    binding.tvLikeCount1.text = likeCount1.toString()
 
                     if (posts.size > 1) {
                         val p2 = posts[1]
                         post2Id = p2.id
-                        binding.tvPost2Author.text = p2.userName ?: "Chiến binh Fitness"
+                        binding.tvPost2Author.text = p2.userName ?: "Thành viên FitTrack"
                         binding.tvPost2Content.text = p2.content
                         likeCount2 = p2.likesCount
                         isLiked2 = p2.isLiked
                         binding.tvLikeCount2.text = likeCount2.toString()
                     }
+                } else {
+                    Toast.makeText(this@CommunityActivity, "Không thể tải bảng tin (${response.code()})", Toast.LENGTH_SHORT).show()
                 }
-            } catch (_: Exception) {
-                // Keep default offline feed
+            } catch (e: Exception) {
+                Toast.makeText(this@CommunityActivity, "Lỗi kết nối máy chủ: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun setupComposerInteractions() {
-        // Attach photo action
+        // Attach photo/video disabled until real multipart media upload is supported
         binding.btnAttachPhoto.setOnClickListener {
-            attachedMediaType = "IMAGE"
-            binding.layoutMediaPreview.visibility = View.VISIBLE
-            binding.layoutPreviewImage.visibility = View.VISIBLE
-            binding.layoutPreviewVideo.visibility = View.GONE
-            Toast.makeText(this, "📷 Đã chọn ảnh thành tích buổi tập!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Tính năng tải ảnh từ thiết bị đang được phát triển. Vui lòng đăng bài văn bản.", Toast.LENGTH_SHORT).show()
         }
 
-        // Attach video action
         binding.btnAttachVideo.setOnClickListener {
-            attachedMediaType = "VIDEO"
-            binding.layoutMediaPreview.visibility = View.VISIBLE
-            binding.layoutPreviewVideo.visibility = View.VISIBLE
-            binding.layoutPreviewImage.visibility = View.GONE
-            Toast.makeText(this, "🎥 Đã đính kèm video Squat Form Check (45s)!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Tính năng tải video từ thiết bị đang được phát triển. Vui lòng đăng bài văn bản.", Toast.LENGTH_SHORT).show()
         }
 
         // Remove media buttons
@@ -125,73 +128,62 @@ class CommunityActivity : AppCompatActivity() {
         // Submit new post
         binding.btnSubmitPost.setOnClickListener {
             val content = binding.etCreatePost.text.toString().trim()
-            if (content.isEmpty() && attachedMediaType == null) {
-                Toast.makeText(this, "Vui lòng nhập nội dung hoặc đính kèm ảnh/video", Toast.LENGTH_SHORT).show()
+            if (content.isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập nội dung bài viết", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (!session.isLoggedIn) {
+                Toast.makeText(this, "Vui lòng đăng nhập để đăng bài", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val finalContent = if (content.isNotEmpty()) content else "Vừa hoàn thành buổi tập với thành tích mới!"
-
-            // Sync with VPS Backend API
-            if (session.isLoggedIn) {
-                val api = ApiClient.getService(this)
-                val mediaUrl = when (attachedMediaType) {
-                    "IMAGE" -> "https://images.unsplash.com/photo-1517838277536-f5f99be501cd"
-                    "VIDEO" -> "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-                    else -> null
-                }
-                lifecycleScope.launch {
-                    try {
-                        withContext(Dispatchers.IO) {
-                            api.createCommunityPost(
-                                idempotencyKey = UUID.randomUUID().toString(),
-                                request = CreatePostRequest(content = finalContent, mediaUrl = mediaUrl)
-                            )
-                        }
-                    } catch (_: Exception) {
-                        // Non-blocking sync
+            binding.btnSubmitPost.isEnabled = false
+            val api = ApiClient.getService(this)
+            lifecycleScope.launch {
+                try {
+                    val res = withContext(Dispatchers.IO) {
+                        api.createCommunityPost(
+                            idempotencyKey = UUID.randomUUID().toString(),
+                            request = CreatePostRequest(content = content, mediaUrl = null)
+                        )
                     }
+                    binding.btnSubmitPost.isEnabled = true
+                    if (res.isSuccessful && res.body()?.data != null) {
+                        binding.cardNewlyCreatedPost.visibility = View.VISIBLE
+                        binding.tvNewPostContent.text = res.body()!!.data!!.content
+                        binding.cardNewPostMedia.visibility = View.GONE
+                        binding.etCreatePost.text.clear()
+                        attachedMediaType = null
+                        Toast.makeText(this@CommunityActivity, "✓ Đã đăng bài lên cộng đồng!", Toast.LENGTH_SHORT).show()
+                        fetchCommunityFeed()
+                    } else {
+                        Toast.makeText(this@CommunityActivity, "Không thể đăng bài (${res.code()})", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    binding.btnSubmitPost.isEnabled = true
+                    Toast.makeText(this@CommunityActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
                 }
             }
-
-            // Display newly created post card
-            binding.cardNewlyCreatedPost.visibility = View.VISIBLE
-            binding.tvNewPostContent.text = finalContent
-
-            if (attachedMediaType == "IMAGE") {
-                binding.cardNewPostMedia.visibility = View.VISIBLE
-                binding.tvNewPostMediaBadge.text = "📷 Ảnh thành tích buổi tập (Đính kèm)"
-                binding.ivNewPostPlay.visibility = View.GONE
-            } else if (attachedMediaType == "VIDEO") {
-                binding.cardNewPostMedia.visibility = View.VISIBLE
-                binding.tvNewPostMediaBadge.text = "🎥 Video Squat Form Check AI 98% (0:45s)"
-                binding.ivNewPostPlay.visibility = View.VISIBLE
-            } else {
-                binding.cardNewPostMedia.visibility = View.GONE
-            }
-
-            // Reset composer
-            binding.etCreatePost.text.clear()
-            attachedMediaType = null
-            binding.layoutMediaPreview.visibility = View.GONE
-            binding.layoutPreviewImage.visibility = View.GONE
-            binding.layoutPreviewVideo.visibility = View.GONE
-
-            Toast.makeText(this, "✓ Đã đăng bài viết lên Bang hội VPS thành công!", Toast.LENGTH_SHORT).show()
-        }
-
-        // Play video clicks
-        binding.btnPlayPreviewVideo.setOnClickListener {
-            Toast.makeText(this, "▶ Đang phát video kiểm tra form 45s...", Toast.LENGTH_SHORT).show()
-        }
-        binding.cardPost2Video.setOnClickListener {
-            Toast.makeText(this, "▶ Đang mở video Meal Prep & Lịch tập...", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun setupFeedInteractions() {
+        binding.btnHeaderAction.setOnClickListener {
+            binding.etCreatePost.requestFocus()
+        }
+
         binding.btnSaveRoutine.setOnClickListener {
-            Toast.makeText(this, getString(R.string.community_toast_routine_saved), Toast.LENGTH_SHORT).show()
+            startActivity(android.content.Intent(this, com.fittrack.app.ui.workout.WorkoutsActivity::class.java))
+        }
+
+        binding.btnCommentPost1.setOnClickListener { showCommentDialog(post1Id) }
+        binding.btnCommentPost2.setOnClickListener { showCommentDialog(post2Id) }
+
+        binding.btnSharePost1.setOnClickListener {
+            sharePostContent(binding.tvPost1Content.text.toString())
+        }
+        binding.btnSharePost2.setOnClickListener {
+            sharePostContent(binding.tvPost2Content.text.toString())
         }
 
         binding.btnLikePost1.setOnClickListener {
@@ -231,6 +223,52 @@ class CommunityActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun sharePostContent(content: String) {
+        if (content.isBlank()) return
+        val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(android.content.Intent.EXTRA_TEXT, "$content — FitTrack AI")
+        }
+        startActivity(android.content.Intent.createChooser(shareIntent, "Chia sẻ bài viết"))
+    }
+
+    private fun showCommentDialog(postId: String?) {
+        if (postId.isNullOrBlank()) {
+            Toast.makeText(this, "Chưa có bài viết để bình luận", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val input = android.widget.EditText(this).apply {
+            hint = "Nhập bình luận của bạn..."
+        }
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Bình luận")
+            .setView(input)
+            .setPositiveButton("Gửi") { _, _ ->
+                val text = input.text.toString().trim()
+                if (text.isEmpty()) return@setPositiveButton
+                lifecycleScope.launch {
+                    try {
+                        val res = withContext(Dispatchers.IO) {
+                            ApiClient.getService(this@CommunityActivity).addPostComment(
+                                postId,
+                                com.fittrack.app.data.models.AddCommentRequest(text)
+                            )
+                        }
+                        if (res.isSuccessful) {
+                            Toast.makeText(this@CommunityActivity, "✓ Đã gửi bình luận!", Toast.LENGTH_SHORT).show()
+                            fetchCommunityFeed()
+                        } else {
+                            Toast.makeText(this@CommunityActivity, "Lỗi gửi bình luận (${res.code()})", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: Exception) {
+                        Toast.makeText(this@CommunityActivity, "Lỗi kết nối: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
     }
 
     private fun setupBottomNav() {

@@ -3,8 +3,6 @@ package com.fittrack.app.ui.aipose
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -12,8 +10,15 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.fittrack.app.R
+import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.models.PoseRealtimeResultRequest
+import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityAiPoseActiveSessionBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -25,8 +30,7 @@ class AiPoseActiveSessionActivity : AppCompatActivity() {
     private lateinit var cameraExecutor: ExecutorService
 
     private var repCount = 0
-    private val handler = Handler(Looper.getMainLooper())
-    private var isSessionActive = true
+    private var exerciseId: String? = null
 
     private val requestCameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -48,10 +52,11 @@ class AiPoseActiveSessionActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         cameraExecutor = Executors.newSingleThreadExecutor()
+        exerciseId = intent.getStringExtra("EXERCISE_ID")
 
         setupListeners()
         checkAndStartCamera()
-        startPoseSessionLoop()
+        initLivePoseSessionUi()
     }
 
     private fun checkAndStartCamera() {
@@ -89,8 +94,7 @@ class AiPoseActiveSessionActivity : AppCompatActivity() {
         }
 
         binding.btnFinishAiPose.setOnClickListener {
-            Toast.makeText(this, "✓ Hoàn tất buổi tập với AI Coach! +$repCount Reps hoàn hảo.", Toast.LENGTH_SHORT).show()
-            finish()
+            submitPoseSessionResult()
         }
 
         binding.btnFlipCamera.setOnClickListener {
@@ -113,38 +117,66 @@ class AiPoseActiveSessionActivity : AppCompatActivity() {
         }
     }
 
-    private fun startPoseSessionLoop() {
-        val runnable = object : Runnable {
-            override fun run() {
-                if (!isSessionActive) return
-                repCount++
-                val angle = 85 + (repCount % 15)
-                val hipAngle = 78 + (repCount % 12)
+    private fun initLivePoseSessionUi() {
+        binding.tvRepCount.text = "0"
+        binding.tvAngleIndicator.text = "Camera trực tiếp"
+        binding.tvHipIndicator.text = "Sẵn sàng ghi nhận"
+        binding.tvFormStatus.text = "ĐANG THEO DÕI"
+        binding.tvAngleGuidance.text = "Giữ toàn thân trong khung hình. Bấm Hoàn tất để lưu kết quả lên VPS."
 
-                binding.tvRepCount.text = "$repCount"
-                binding.tvAngleIndicator.text = "Góc đầu gối: $angle°"
-                binding.tvHipIndicator.text = "Góc hông: $hipAngle°"
-
-                if (angle in 85..95) {
-                    binding.tvFormStatus.text = "✓ FORM CHUẨN (98%)"
-                    binding.tvFormStatus.setBackgroundColor(0xFF166534.toInt())
-                    binding.tvAngleGuidance.text = "Độ sâu Squat lý tưởng! Tiếp tục duy trì nhịp thở."
-                } else {
-                    binding.tvFormStatus.text = "HẠ THẤP HÔNG THÊM 5°"
-                    binding.tvFormStatus.setBackgroundColor(0xFFB45309.toInt())
-                    binding.tvAngleGuidance.text = "Gập gối sâu hơn để kích hoạt toàn bộ cơ đùi trước."
-                }
-
-                handler.postDelayed(this, 3000)
+        val session = SessionManager.getInstance(this)
+        if (exerciseId.isNullOrBlank() && session.isLoggedIn) {
+            lifecycleScope.launch {
+                try {
+                    val res = withContext(Dispatchers.IO) {
+                        ApiClient.getService(this@AiPoseActiveSessionActivity).getExercises(perPage = 1)
+                    }
+                    if (res.isSuccessful) {
+                        exerciseId = res.body()?.data?.firstOrNull()?.id
+                    }
+                } catch (_: Exception) { }
             }
         }
-        handler.postDelayed(runnable, 2000)
+    }
+
+    private fun submitPoseSessionResult() {
+        val session = SessionManager.getInstance(this)
+        val exId = exerciseId
+        if (!session.isLoggedIn || exId.isNullOrBlank()) {
+            Toast.makeText(this, "Cần đăng nhập và chọn bài tập để lưu kết quả lên VPS", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
+        binding.btnFinishAiPose.isEnabled = false
+        lifecycleScope.launch {
+            try {
+                val res = withContext(Dispatchers.IO) {
+                    ApiClient.getService(this@AiPoseActiveSessionActivity).submitPoseRealtimeResult(
+                        PoseRealtimeResultRequest(
+                            exerciseId = exId,
+                            repCount = repCount,
+                            score = 0,
+                            feedbackJson = mapOf("source" to "android_camera_preview")
+                        )
+                    )
+                }
+                if (res.isSuccessful) {
+                    Toast.makeText(this@AiPoseActiveSessionActivity, "✓ Đã lưu phiên AI Pose Check lên VPS!", Toast.LENGTH_SHORT).show()
+                    finish()
+                } else {
+                    binding.btnFinishAiPose.isEnabled = true
+                    Toast.makeText(this@AiPoseActiveSessionActivity, "Lỗi lưu kết quả (${res.code()})", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                binding.btnFinishAiPose.isEnabled = true
+                Toast.makeText(this@AiPoseActiveSessionActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        isSessionActive = false
-        handler.removeCallbacksAndMessages(null)
         cameraExecutor.shutdown()
     }
 }
