@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bg_top_header_bar"
         android:paddingStart="@dimen/screen_padding_horizontal"
-        android:paddingTop="44dp"
+        android:paddingTop="12dp"
         android:paddingEnd="@dimen/screen_padding_horizontal"
         android:paddingBottom="14dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -58,7 +58,7 @@
             android:paddingTop="6dp"
             android:paddingEnd="12dp"
             android:paddingBottom="6dp"
-            android:text="@string/btn_create_routine"
+            android:text="+ Tạo lịch tập"
             android:textColor="@color/white"
             android:textSize="12sp"
             android:textStyle="bold"
@@ -67,49 +67,50 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Sub-tab Segmented Bar (Workouts & Exercise Library) -->
+    <!-- Sub-tab Segmented Bar (Unified 50/50 Tab Bar: Lịch tập & Thư viện bài tập) -->
     <LinearLayout
         android:id="@+id/layout_sub_tabs_workout"
         android:layout_width="0dp"
-        android:layout_height="48dp"
+        android:layout_height="52dp"
         android:background="@drawable/bg_top_header_bar"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="@dimen/screen_padding_horizontal"
         android:paddingEnd="@dimen/screen_padding_horizontal"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_header">
 
         <TextView
             android:id="@+id/tab_my_routines"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
             android:background="@drawable/bg_subtab_pill_active"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:text="Lịch tập của tôi"
+            android:text="Lịch tập"
             android:textColor="@color/white"
-            android:textSize="12sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tab_exercise_catalog"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_marginStart="10dp"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
             android:background="@drawable/bg_subtab_pill_inactive"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
             android:text="Thư viện bài tập"
-            android:textColor="@color/text_dark"
-            android:textSize="12sp" />
+            android:textColor="@color/subtab_pill_inactive_text"
+            android:textSize="13sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Scrollable Routines Content -->
@@ -151,332 +152,413 @@
                         android:id="@+id/tv_schedule_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/workouts_weekly_schedule_title"
+                        android:text="Lịch biểu tuần"
                         android:textColor="@color/text_dark"
-                        android:textSize="13sp"
+                        android:textSize="14sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/workouts_status_legend"
-                        android:textColor="@color/text_slate_light"
-                        android:textSize="9sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <!-- Week Days Row -->
-                <LinearLayout
+                <!-- Week Days Horizontal Scrollable Cards -->
+                <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+                    android:layout_marginTop="12dp"
+                    android:fillViewport="false"
+                    android:overScrollMode="never"
+                    android:scrollbars="none">
 
-                    <!-- T2 -->
                     <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="84dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_card_selectable"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="2dp">
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/day_mon"
-                            android:textColor="@color/text_dark"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
+                        <!-- T2 -->
+                        <LinearLayout
+                            android:id="@+id/card_day_t2"
+                            android:layout_width="122dp"
+                            android:layout_height="116dp"
+                            android:background="@drawable/bg_card_selectable"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:orientation="vertical"
+                            android:padding="10dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="28/09"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="8sp" />
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="@string/muscle_chest_short"
-                            android:textColor="@color/live_green"
-                            android:textSize="9sp"
-                            android:textStyle="bold" />
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Thứ 2"
+                                    android:textColor="@color/text_dark"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Bench • Dips"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="7sp" />
+                                <TextView
+                                    android:id="@+id/badge_day_t2"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_badge_streak"
+                                    android:paddingStart="5dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="5dp"
+                                    android:paddingBottom="2dp"
+                                    android:text="Hôm nay"
+                                    android:textColor="@color/badge_streak_text"
+                                    android:textSize="8.5sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tv_day_t2_routine"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_marginTop="6dp"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:maxLines="3"
+                                android:text="Push Day: Ngực &amp; Tay sau"
+                                android:textColor="@color/primary"
+                                android:textSize="11.5sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- T3 -->
+                        <LinearLayout
+                            android:id="@+id/card_day_t3"
+                            android:layout_width="122dp"
+                            android:layout_height="116dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_card_selectable"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Thứ 3"
+                                    android:textColor="@color/text_dark"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/badge_day_t3"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_tag_chip"
+                                    android:paddingStart="5dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="5dp"
+                                    android:paddingBottom="2dp"
+                                    android:text="Ngày mai"
+                                    android:textColor="@color/text_slate"
+                                    android:textSize="8.5sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tv_day_t3_routine"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_marginTop="6dp"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:maxLines="3"
+                                android:text="Pull Day: Lưng xô &amp; Tay trước"
+                                android:textColor="@color/primary_blue"
+                                android:textSize="11.5sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- T4 -->
+                        <LinearLayout
+                            android:id="@+id/card_day_t4"
+                            android:layout_width="122dp"
+                            android:layout_height="116dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_card_selectable"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Thứ 4"
+                                    android:textColor="@color/text_dark"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/badge_day_t4"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_tag_chip"
+                                    android:paddingStart="5dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="5dp"
+                                    android:paddingBottom="2dp"
+                                    android:text="Nghỉ"
+                                    android:textColor="@color/text_slate_light"
+                                    android:textSize="8.5sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tv_day_t4_routine"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_marginTop="6dp"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:maxLines="3"
+                                android:text="Nghỉ ngơi &amp; Phục hồi"
+                                android:textColor="@color/text_slate"
+                                android:textSize="11.5sp" />
+                        </LinearLayout>
+
+                        <!-- T5 -->
+                        <LinearLayout
+                            android:id="@+id/card_day_t5"
+                            android:layout_width="122dp"
+                            android:layout_height="116dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_card_selectable"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Thứ 5"
+                                    android:textColor="@color/text_dark"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/badge_day_t5"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_tag_chip"
+                                    android:paddingStart="5dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="5dp"
+                                    android:paddingBottom="2dp"
+                                    android:text="Legs"
+                                    android:textColor="@color/live_green"
+                                    android:textSize="8.5sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tv_day_t5_routine"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_marginTop="6dp"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:maxLines="3"
+                                android:text="Legs Day: Cơ đùi &amp; Mông"
+                                android:textColor="@color/live_green"
+                                android:textSize="11.5sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- T6 -->
+                        <LinearLayout
+                            android:id="@+id/card_day_t6"
+                            android:layout_width="122dp"
+                            android:layout_height="116dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_card_selectable"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Thứ 6"
+                                    android:textColor="@color/text_dark"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/badge_day_t6"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_tag_chip"
+                                    android:paddingStart="5dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="5dp"
+                                    android:paddingBottom="2dp"
+                                    android:text="Upper"
+                                    android:textColor="@color/primary_blue"
+                                    android:textSize="8.5sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tv_day_t6_routine"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_marginTop="6dp"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:maxLines="3"
+                                android:text="Upper Body: Thân trên"
+                                android:textColor="@color/primary_blue"
+                                android:textSize="11.5sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- T7 -->
+                        <LinearLayout
+                            android:id="@+id/card_day_t7"
+                            android:layout_width="122dp"
+                            android:layout_height="116dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_card_selectable"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Thứ 7"
+                                    android:textColor="@color/text_dark"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/badge_day_t7"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_tag_chip"
+                                    android:paddingStart="5dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="5dp"
+                                    android:paddingBottom="2dp"
+                                    android:text="Cardio"
+                                    android:textColor="@color/badge_streak_text"
+                                    android:textSize="8.5sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tv_day_t7_routine"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_marginTop="6dp"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:maxLines="3"
+                                android:text="Cardio &amp; Bụng HIIT"
+                                android:textColor="@color/badge_streak_text"
+                                android:textSize="11.5sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- CN -->
+                        <LinearLayout
+                            android:id="@+id/card_day_cn"
+                            android:layout_width="122dp"
+                            android:layout_height="116dp"
+                            android:layout_marginStart="8dp"
+                            android:background="@drawable/bg_card_selectable"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:orientation="vertical"
+                            android:padding="10dp">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Chủ Nhật"
+                                    android:textColor="@color/text_dark"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/badge_day_cn"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/bg_tag_chip"
+                                    android:paddingStart="5dp"
+                                    android:paddingTop="2dp"
+                                    android:paddingEnd="5dp"
+                                    android:paddingBottom="2dp"
+                                    android:text="Nghỉ"
+                                    android:textColor="@color/text_slate_light"
+                                    android:textSize="8.5sp" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/tv_day_cn_routine"
+                                android:layout_width="match_parent"
+                                android:layout_height="0dp"
+                                android:layout_marginTop="6dp"
+                                android:layout_weight="1"
+                                android:ellipsize="end"
+                                android:maxLines="3"
+                                android:text="Nghỉ ngơi &amp; Phục hồi"
+                                android:textColor="@color/text_slate"
+                                android:textSize="11.5sp" />
+                        </LinearLayout>
                     </LinearLayout>
-
-                    <!-- T3 -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="84dp"
-                        android:layout_marginStart="3dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_card_selectable"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="2dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/day_tue"
-                            android:textColor="@color/text_dark"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="29/09"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="8sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="@string/muscle_back_short"
-                            android:textColor="@color/live_green"
-                            android:textSize="9sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Deadlift • Pull"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="7sp" />
-                    </LinearLayout>
-
-                    <!-- T4 -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="84dp"
-                        android:layout_marginStart="3dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_card_selectable"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="2dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/day_wed"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="10sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="30/09"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="8sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="@string/status_rest"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="9sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Cardio • Stretch"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="7sp" />
-                    </LinearLayout>
-
-                    <!-- T5 -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="84dp"
-                        android:layout_marginStart="3dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_card_selectable"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="2dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/day_thu"
-                            android:textColor="@color/text_dark"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="01/10"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="8sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="@string/muscle_legs_short"
-                            android:textColor="@color/primary"
-                            android:textSize="9sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Squat • Leg Press"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="7sp" />
-                    </LinearLayout>
-
-                    <!-- T6 -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="84dp"
-                        android:layout_marginStart="3dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_card_selectable"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="2dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/day_fri"
-                            android:textColor="@color/text_dark"
-                            android:textSize="10sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="02/10"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="8sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="@string/muscle_shoulders_short"
-                            android:textColor="@color/primary"
-                            android:textSize="9sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Shoulder Press"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="7sp" />
-                    </LinearLayout>
-
-                    <!-- T7 -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="84dp"
-                        android:layout_marginStart="3dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_card_selectable"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="2dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/day_sat"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="10sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="03/10"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="8sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="@string/status_rest"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="9sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Đi bộ 10k"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="7sp" />
-                    </LinearLayout>
-
-                    <!-- CN -->
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="84dp"
-                        android:layout_marginStart="3dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_card_selectable"
-                        android:gravity="center"
-                        android:orientation="vertical"
-                        android:padding="2dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/day_sun"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="10sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="04/10"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="8sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Ngực Cắt"
-                            android:textColor="@color/badge_streak_text"
-                            android:textSize="8sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="Bench • Fly"
-                            android:textColor="@color/text_slate_light"
-                            android:textSize="7sp" />
-                    </LinearLayout>
-                </LinearLayout>
+                </HorizontalScrollView>
 
                 <!-- Today Scheduled Routine Card within Calendar -->
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -670,7 +752,7 @@
                         android:id="@+id/btn_routine_push_more"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:background="@drawable/bg_icon_container_white"
+                        android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
                         android:focusable="true"
                         android:padding="6dp"
@@ -678,14 +760,14 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/ic_more_vert"
-                        app:tint="@color/text_slate" />
+                        app:tint="@color/icon_tint" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="⚡ 3 bài tập  •  10 sets  •  ⏱ 45 phút  •  ⏳ Nghỉ 90s"
+                    android:text="3 bài tập  •  10 hiệp  •  45 phút"
                     android:textColor="@color/text_slate"
                     android:textSize="11sp" />
 
@@ -701,7 +783,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="1. Barbell Bench Press (Đẩy ngực đòn)  —  4 sets × 8 reps"
+                        android:text="• Barbell Bench Press (Đẩy ngực đòn)  —  4 sets × 8 reps"
                         android:textColor="@color/text_dark"
                         android:textSize="11sp" />
 
@@ -709,7 +791,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="2. Incline Dumbbell Press (Ngực trên)  —  3 sets × 10 reps"
+                        android:text="• Incline Dumbbell Press (Ngực trên)  —  3 sets × 10 reps"
                         android:textColor="@color/text_dark"
                         android:textSize="11sp" />
 
@@ -717,7 +799,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="3. Dips xà kép (Tay sau &amp; Ngực dưới)  —  3 sets × 12 reps"
+                        android:text="• Dips xà kép (Tay sau &amp; Ngực dưới)  —  3 sets × 12 reps"
                         android:textColor="@color/text_dark"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -763,7 +845,7 @@
                         android:id="@+id/btn_routine_pull_more"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:background="@drawable/bg_icon_container_white"
+                        android:background="?attr/selectableItemBackgroundBorderless"
                         android:clickable="true"
                         android:focusable="true"
                         android:padding="6dp"
@@ -771,7 +853,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/ic_more_vert"
-                        app:tint="@color/text_slate" />
+                        app:tint="@color/icon_tint" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <TextView
@@ -794,7 +876,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="1. Conventional Deadlift (Kéo đòn)  —  3 sets × 6 reps"
+                        android:text="• Conventional Deadlift (Kéo đòn)  —  3 sets × 6 reps"
                         android:textColor="@color/text_dark"
                         android:textSize="11sp" />
 
@@ -802,7 +884,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="2. Lat Pulldown (Kéo xô máy cáp)  —  3 sets × 10 reps"
+                        android:text="• Lat Pulldown (Kéo xô máy cáp)  —  3 sets × 10 reps"
                         android:textColor="@color/text_dark"
                         android:textSize="11sp" />
 
@@ -810,7 +892,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="3. Barbell Biceps Curl (Cuốn tay trước)  —  2 sets × 12 reps"
+                        android:text="• Barbell Biceps Curl (Cuốn tay trước)  —  2 sets × 12 reps"
                         android:textColor="@color/text_dark"
                         android:textSize="11sp" />
                 </LinearLayout>
@@ -985,7 +1067,7 @@
                         android:paddingStart="12dp"
                         android:paddingEnd="12dp"
                         android:text="Ngực"
-                        android:textColor="@color/text_dark"
+                        android:textColor="@color/subtab_pill_inactive_text"
                         android:textSize="11sp" />
 
                     <TextView
@@ -997,7 +1079,7 @@
                         android:paddingStart="12dp"
                         android:paddingEnd="12dp"
                         android:text="Lưng xô"
-                        android:textColor="@color/text_dark"
+                        android:textColor="@color/subtab_pill_inactive_text"
                         android:textSize="11sp" />
 
                     <TextView
@@ -1009,7 +1091,7 @@
                         android:paddingStart="12dp"
                         android:paddingEnd="12dp"
                         android:text="Chân đùi"
-                        android:textColor="@color/text_dark"
+                        android:textColor="@color/subtab_pill_inactive_text"
                         android:textSize="11sp" />
 
                     <TextView
@@ -1021,7 +1103,7 @@
                         android:paddingStart="12dp"
                         android:paddingEnd="12dp"
                         android:text="Vai"
-                        android:textColor="@color/text_dark"
+                        android:textColor="@color/subtab_pill_inactive_text"
                         android:textSize="11sp" />
 
                     <TextView
@@ -1033,10 +1115,21 @@
                         android:paddingStart="12dp"
                         android:paddingEnd="12dp"
                         android:text="Tay trước / sau"
-                        android:textColor="@color/text_dark"
+                        android:textColor="@color/subtab_pill_inactive_text"
                         android:textSize="11sp" />
                 </LinearLayout>
             </HorizontalScrollView>
+
+            <!-- Add Custom Exercise Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_add_custom_exercise"
+                style="@style/Widget.FitTrack.PrimaryButton"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="12dp"
+                android:text="➕ Thêm bài tập mới vào thư viện"
+                android:textSize="12.5sp"
+                app:cornerRadius="10dp" />
 
             <!-- Dynamic Exercise Catalog List Container -->
             <LinearLayout

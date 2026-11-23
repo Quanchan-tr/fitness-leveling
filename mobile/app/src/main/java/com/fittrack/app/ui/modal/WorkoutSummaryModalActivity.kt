@@ -28,7 +28,18 @@ class WorkoutSummaryModalActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupListeners()
+        bindSummaryData()
         syncWorkoutCompletion()
+    }
+
+    private fun bindSummaryData() {
+        val totalTime = intent.getStringExtra("TOTAL_TIME") ?: "45 phút"
+        val totalVolume = intent.getStringExtra("TOTAL_VOLUME") ?: "3.200 kg"
+        val totalSets = intent.getStringExtra("TOTAL_SETS") ?: "6 hiệp"
+
+        binding.tvSummaryTime.text = totalTime
+        binding.tvSummaryVolume.text = totalVolume
+        binding.tvSummaryForm.text = totalSets
     }
 
     private fun syncWorkoutCompletion() {

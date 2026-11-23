@@ -110,3 +110,4 @@ coverage/
 scratch/
 *.tsbuildinfo
 .agents/
+mobile-reviews/

@@ -504,7 +504,7 @@
     <string name="dashboard_enter_workout_banner">Vào buổi tập ngay  ➔</string>
     <string name="dashboard_hint_rest">💡 Gợi ý: Nghỉ 90s giữa các hiệp nặng</string>
     <string name="dashboard_energy_title">🔥 Năng lượng &amp; Calo</string>
-    <string name="dashboard_energy_val">1,800 kcal</string>
+    <string name="dashboard_energy_val">0 kcal</string>
     <string name="dashboard_energy_target">Mục tiêu 2,400 (Còn 600)</string>
     <string name="dashboard_water_title">💧 Nước uống &amp; Vận động</string>
     <string name="dashboard_water_val">0.0L / 2.0L (0%)</string>
@@ -527,12 +527,12 @@
     <string name="workouts_collection_title">Thư mục bài tập</string>
     <string name="workouts_collection_sub">4 lịch tập • 3 thư mục</string>
     <string name="workouts_drag_to_cal">⠿ Kéo vào lịch</string>
-    <string name="workouts_view_routine_detail_action">🔍 Xem chi tiết lịch tập &amp; kỹ thuật tập ➔</string>
+    <string name="workouts_view_routine_detail_action">Xem chi tiết lịch tập &amp; kỹ thuật tập ➔</string>
     <string name="workouts_routine_pull_title">Lưng Xô &amp; Bắp Tay Trước</string>
-    <string name="workouts_routine_pull_stats">⚡ 3 bài tập  •  8 sets  •  ⏱ 40 phút  •  ⏳ Nghỉ 90s</string>
-    <string name="workouts_routine_pull_ex1">1. Conventional Deadlift (Kéo đòn)\n3 sets × 6 reps</string>
-    <string name="workouts_routine_pull_ex2">2. Lat Pulldown (Kéo xô máy cáp)\n3 sets × 10 reps</string>
-    <string name="workouts_routine_pull_ex3">3. Barbell Biceps Curl (Cuốn tay trước)\n2 sets × 12 reps</string>
+    <string name="workouts_routine_pull_stats">3 bài tập  •  8 hiệp  •  40 phút</string>
+    <string name="workouts_routine_pull_ex1">Conventional Deadlift (Kéo đòn)\n3 sets × 6 reps</string>
+    <string name="workouts_routine_pull_ex2">Lat Pulldown (Kéo xô máy cáp)\n3 sets × 10 reps</string>
+    <string name="workouts_routine_pull_ex3">Barbell Biceps Curl (Cuốn tay trước)\n2 sets × 12 reps</string>
     <string name="workouts_ai_pose_banner_title">AI Pose Coach • Sửa form &amp; Đếm rep Camera</string>
     <string name="workouts_ai_pose_banner_desc">Kiểm tra kỹ thuật tự động 99% chuẩn trước buổi tập</string>
     <string name="workouts_ai_pose_banner_cta">Mở ➔</string>
@@ -566,6 +566,7 @@
     <string name="nutrition_combos_preset_title">Gợi ý combo món chuẩn macro:</string>
     <string name="nutrition_combo_1">Combo Tăng Cơ Chuẩn: Ức gà 200g + Khoai lang 150g</string>
     <string name="nutrition_combo_2">Combo Eat Clean: Salad cá ngừ + Bánh mì đen</string>
+    <string name="nutrition_combo_3">Combo Giảm Mỡ Tối Đa: Cá hồi nướng 160g + Salad mè</string>
 
     <!-- Community -->
     <string name="community_post_2_user">Minh Anh  [Lv. 8] • 1 giờ trước</string>
@@ -606,17 +607,17 @@
 
     <!-- Routine Detail Figma Extras -->
     <string name="btn_back_to_workouts">‹ Luyện tập</string>
-    <string name="btn_start_workout_figma">🚀 Bắt đầu buổi tập ngay ➔</string>
+    <string name="btn_start_workout_figma">Bắt đầu buổi tập ngay ➔</string>
     <string name="routine_ex_list_figma">Danh sách bài tập (5 bài):</string>
-    <string name="routine_ex1_f_title">1. Nằm đẩy tạ đòn</string>
+    <string name="routine_ex1_f_title">Nằm đẩy tạ đòn</string>
     <string name="routine_ex1_f_desc">4 sets x 8-10 reps • 70-80 kg</string>
-    <string name="routine_ex2_f_title">2. Đẩy ngực trên với tạ đơn</string>
+    <string name="routine_ex2_f_title">Đẩy ngực trên với tạ đơn</string>
     <string name="routine_ex2_f_desc">3 sets x 10-12 reps • 24 kg/tay</string>
-    <string name="routine_ex3_f_title">3. Ép ngực cáp</string>
+    <string name="routine_ex3_f_title">Ép ngực cáp</string>
     <string name="routine_ex3_f_desc">3 sets x 12-15 reps • 15 kg/bên</string>
-    <string name="routine_ex4_f_title">4. Kéo cáp tay sau</string>
+    <string name="routine_ex4_f_title">Kéo cáp tay sau</string>
     <string name="routine_ex4_f_desc">4 sets x 12 reps • 25 kg</string>
-    <string name="routine_ex5_f_title">5. Xà kép tay sau &amp; ngực dưới</string>
+    <string name="routine_ex5_f_title">Xà kép tay sau &amp; ngực dưới</string>
     <string name="routine_ex5_f_desc">3 sets x max reps • Trọng lượng cơ thể</string>
 
     <!-- AI Pose Active Session Extras -->

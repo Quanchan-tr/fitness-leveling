@@ -14,105 +14,70 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bg_top_header_bar"
         android:paddingStart="@dimen/screen_padding_horizontal"
-        android:paddingTop="44dp"
+        android:paddingTop="14dp"
         android:paddingEnd="@dimen/screen_padding_horizontal"
-        android:paddingBottom="14dp"
+        android:paddingBottom="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_log_metrics"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/tv_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/metrics_title"
-                android:textColor="@color/text_dark"
-                android:textSize="19sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="@string/metrics_subtitle"
-                android:textColor="@color/text_slate"
-                android:textSize="11sp" />
-        </LinearLayout>
-
         <TextView
-            android:id="@+id/btn_log_metrics"
+            android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_primary_button"
-            android:clickable="true"
-            android:focusable="true"
-            android:paddingStart="14dp"
-            android:paddingTop="7dp"
-            android:paddingEnd="14dp"
-            android:paddingBottom="7dp"
-            android:text="@string/btn_log_metrics"
-            android:textColor="@color/white"
-            android:textSize="12sp"
+            android:text="@string/metrics_title"
+            android:textColor="@color/text_dark"
+            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Sub-tab Segmented Bar (Unified Tab Bar) -->
+    <!-- Sub-tab Segmented Bar (Unified 50/50 Split Tab Bar) -->
     <LinearLayout
         android:id="@+id/layout_sub_tabs"
         android:layout_width="0dp"
-        android:layout_height="48dp"
+        android:layout_height="44dp"
         android:background="@drawable/bg_top_header_bar"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingStart="@dimen/screen_padding_horizontal"
         android:paddingEnd="@dimen/screen_padding_horizontal"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layout_header">
 
         <TextView
             android:id="@+id/tab_body_metrics"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="1"
             android:background="@drawable/bg_subtab_pill_active"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
             android:text="@string/tab_body_metrics"
             android:textColor="@color/white"
-            android:textSize="12sp"
+            android:textSize="13sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/btn_to_nutrition"
-            android:layout_width="wrap_content"
-            android:layout_height="32dp"
-            android:layout_marginStart="10dp"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
             android:background="@drawable/bg_subtab_pill_inactive"
             android:clickable="true"
             android:focusable="true"
             android:gravity="center"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
             android:text="@string/tab_nutrition_tab"
-            android:textColor="@color/text_dark"
-            android:textSize="12sp" />
+            android:textColor="@color/subtab_pill_inactive_text"
+            android:textSize="13sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Scrollable Body Metrics Content -->
@@ -541,102 +506,11 @@
             android:paddingEnd="@dimen/screen_padding_horizontal"
             android:paddingBottom="24dp">
 
-            <!-- Portion Multiplier Slider Card (Interactive) -->
-            <LinearLayout
-                android:id="@+id/card_portion_slider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_card_white"
-                android:elevation="0dp"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Thanh trượt điều chỉnh khẩu phần"
-                        android:textColor="@color/text_dark"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tv_portion_percent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_tag_chip"
-                        android:paddingStart="8dp"
-                        android:paddingTop="3dp"
-                        android:paddingEnd="8dp"
-                        android:paddingBottom="3dp"
-                        android:text="100% (Chuẩn)"
-                        android:textColor="@color/primary"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="Kéo thanh trượt để tự động tính toán lại mức Calo và Macro phù hợp"
-                    android:textColor="@color/text_slate"
-                    android:textSize="11sp" />
-
-                <SeekBar
-                    android:id="@+id/slider_portion"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:max="150"
-                    android:min="50"
-                    android:progress="100"
-                    android:progressTint="@color/primary"
-                    android:thumbTint="@color/primary" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="50% (Ít calo)"
-                        android:textColor="@color/text_slate_light"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="100% (Mục tiêu)"
-                        android:textColor="@color/text_slate"
-                        android:textSize="10sp" />
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:gravity="end"
-                        android:text="150% (Xả cơ)"
-                        android:textColor="@color/text_slate_light"
-                        android:textSize="10sp" />
-                </LinearLayout>
-            </LinearLayout>
-
             <!-- Calorie & Macros Target Card -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="0dp"
                 android:background="@drawable/bg_card_white"
                 android:elevation="0dp"
                 android:orientation="vertical"
@@ -729,12 +603,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:layout_marginBottom="4dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/btn_add_meal"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="42dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_primary_button"
                         android:clickable="true"
@@ -748,15 +625,15 @@
                     <TextView
                         android:id="@+id/btn_create_combo"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="12dp"
+                        android:layout_height="42dp"
+                        android:layout_marginStart="10dp"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_card_selectable"
+                        android:background="@drawable/bg_outline_button"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
                         android:text="@string/btn_create_combo"
-                        android:textColor="@color/text_dark"
+                        android:textColor="@color/primary"
                         android:textSize="12sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -776,140 +653,170 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/nutrition_meals_today_title"
+                    android:text="🍽 BỮA ĂN ĐÃ NẠP HÔM NAY"
                     android:textColor="@color/text_dark"
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
-                <!-- Meal 1 -->
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <!-- Container: Breakfast -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="BỮA SÁNG"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/ll_container_breakfast"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/item_meal_breakfast_1"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/nutrition_meal_1_name"
-                        android:textColor="@color/text_dark"
-                        android:textSize="13sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_card_selectable"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="10dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/nutrition_meal_1_macro"
-                        android:textColor="@color/primary"
-                        android:textSize="11sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <TextView
+                            android:id="@+id/tv_breakfast_name"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="Trứng luộc 2 quả + Bánh mì đen"
+                            android:textColor="@color/text_dark"
+                            android:textSize="12.5sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/tv_breakfast_macro"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                <View
+                        <TextView
+                            android:id="@+id/tv_breakfast_macro"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="310 kcal • 18g P"
+                            android:textColor="@color/primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
+
+                <!-- Container: Lunch -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="BỮA TRƯA"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/ll_container_lunch"
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:background="@color/border_subtle" />
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                <!-- Meal 2 -->
-                <androidx.constraintlayout.widget.ConstraintLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/item_meal_lunch_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_card_selectable"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="10dp">
+
+                        <TextView
+                            android:id="@+id/tv_lunch_name"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="Ức gà 200g + Cơm gạo lứt 150g"
+                            android:textColor="@color/text_dark"
+                            android:textSize="12.5sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/tv_lunch_macro"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tv_lunch_macro"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="520 kcal • 48g P"
+                            android:textColor="@color/primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
+
+                <!-- Container: Dinner -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="BỮA TỐI"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/ll_container_dinner"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/item_meal_dinner_1"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/nutrition_meal_2_name"
-                        android:textColor="@color/text_dark"
-                        android:textSize="13sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginTop="6dp"
+                        android:background="@drawable/bg_card_selectable"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="10dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/nutrition_meal_2_macro"
-                        android:textColor="@color/primary"
-                        android:textSize="11sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <TextView
+                            android:id="@+id/tv_dinner_name"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:text="Cá hồi áp chảo 150g + Khoai lang luộc"
+                            android:textColor="@color/text_dark"
+                            android:textSize="12.5sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toStartOf="@+id/tv_dinner_macro"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:background="@color/border_subtle" />
+                        <TextView
+                            android:id="@+id/tv_dinner_macro"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="460 kcal • 38g P"
+                            android:textColor="@color/primary"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
 
-                <!-- Meal 3 -->
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/nutrition_meal_3_name"
-                        android:textColor="@color/text_dark"
-                        android:textSize="13sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/nutrition_meal_3_macro"
-                        android:textColor="@color/primary"
-                        android:textSize="11sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:background="@color/border_subtle" />
-
-                <!-- Meal 4 -->
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/nutrition_meal_4_name"
-                        android:textColor="@color/text_dark"
-                        android:textSize="13sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/nutrition_meal_4_macro"
-                        android:textColor="@color/primary"
-                        android:textSize="11sp"
-                        android:textStyle="bold"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
 
             <!-- Card: Preset Combos -->
@@ -932,24 +839,92 @@
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/btn_combo_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/bg_tag_chip"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:padding="10dp"
                     android:text="@string/nutrition_combo_1"
-                    android:textColor="@color/text_slate"
+                    android:textColor="@color/text_dark"
                     android:textSize="11sp" />
 
                 <TextView
+                    android:id="@+id/btn_combo_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:background="@drawable/bg_tag_chip"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:padding="10dp"
                     android:text="@string/nutrition_combo_2"
-                    android:textColor="@color/text_slate"
+                    android:textColor="@color/text_dark"
                     android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/btn_combo_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="10dp"
+                    android:text="@string/nutrition_combo_3"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
+            <!-- Card: Nutrition Calories History -->
+            <LinearLayout
+                android:id="@+id/card_nutrition_history"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_card_white"
+                android:elevation="0dp"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="📜 LỊCH SỬ CALO NẠP VÀO"
+                        android:textColor="@color/text_dark"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btn_view_history_detail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_outline_button"
+                        android:paddingStart="10dp"
+                        android:paddingTop="4dp"
+                        android:paddingEnd="10dp"
+                        android:paddingBottom="4dp"
+                        android:text="Chi tiết 🔍"
+                        android:textColor="@color/primary"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_nutrition_history_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical" />
             </LinearLayout>
 
         </LinearLayout>

@@ -70,7 +70,7 @@
                 android:id="@+id/iv_exercise_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#F8FAFC"
+                android:background="@color/surface_secondary"
                 android:contentDescription="@string/cd_workout"
                 android:scaleType="fitCenter"
                 app:srcCompat="@drawable/ic_dumbbell_solid" />

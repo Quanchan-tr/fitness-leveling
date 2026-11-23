@@ -3,7 +3,9 @@ package com.fittrack.app.ui.routine
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.fittrack.app.data.models.ExerciseDto
 import com.fittrack.app.databinding.ActivityRoutineDetailBinding
+import com.fittrack.app.ui.modal.ExerciseDetailBottomSheet
 import com.fittrack.app.ui.workout.ActiveWorkoutActivity
 
 class RoutineDetailActivity : AppCompatActivity() {
@@ -18,86 +20,159 @@ class RoutineDetailActivity : AppCompatActivity() {
         val routineTitle = intent.getStringExtra("ROUTINE_TITLE")
         if (!routineTitle.isNullOrBlank()) {
             binding.tvRoutineName.text = routineTitle
+            binding.tvTitle.text = routineTitle
         }
 
         binding.btnBack.setOnClickListener {
             finish()
         }
 
-        val startWorkout = { name: String, target: String, imgUrl: String, steps: ArrayList<String> ->
+        binding.btnShare.setOnClickListener {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Tùy chọn lịch tập")
+                .setItems(
+                    arrayOf(
+                        "✏️ Đổi tên lịch tập",
+                        "➕ Thêm bài tập vào lịch",
+                        "⭐ Đặt làm lịch tập mặc định hôm nay",
+                        "📤 Chia sẻ lịch tập"
+                    )
+                ) { _, which ->
+                    when (which) {
+                        0 -> {
+                            val input = android.widget.EditText(this).apply {
+                                setText(binding.tvRoutineName.text)
+                            }
+                            androidx.appcompat.app.AlertDialog.Builder(this)
+                                .setTitle("Đổi tên lịch tập")
+                                .setView(input)
+                                .setPositiveButton("Lưu") { _, _ ->
+                                    val newName = input.text.toString().trim()
+                                    if (newName.isNotBlank()) {
+                                        binding.tvRoutineName.text = newName
+                                        binding.tvTitle.text = newName
+                                    }
+                                }
+                                .setNegativeButton("Hủy", null)
+                                .show()
+                        }
+                        1 -> {
+                            android.widget.Toast.makeText(this, "Đã mở danh mục để thêm bài tập mới", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                        2 -> {
+                            android.widget.Toast.makeText(this, "✓ Đã đặt làm lịch tập mặc định hôm nay!", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                        3 -> {
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, "Xem lịch tập ${binding.tvRoutineName.text} của tôi trên FitTrack AI!")
+                                type = "text/plain"
+                            }
+                            startActivity(Intent.createChooser(sendIntent, "Chia sẻ lịch tập"))
+                        }
+                    }
+                }
+                .setNegativeButton("Đóng", null)
+                .show()
+        }
+
+        val startWorkout = { startIndex: Int ->
             val intent = Intent(this, ActiveWorkoutActivity::class.java).apply {
                 putExtra("ROUTINE_TITLE", binding.tvRoutineName.text.toString())
-                putExtra("EXERCISE_NAME", name)
-                putExtra("EXERCISE_TARGET", target)
-                putExtra("EXERCISE_IMAGE", imgUrl)
-                putStringArrayListExtra("EXERCISE_STEPS", steps)
+                putExtra("START_EXERCISE_INDEX", startIndex)
             }
             startActivity(intent)
         }
 
         // Exercise 1: Barbell Bench Press
-        val ex1Steps = arrayListOf(
-            "Nằm phẳng trên ghế tập, hai chân đặt chắc chắn trên sàn, mắt nhìn thẳng lên thanh đòn.",
-            "Cầm thanh đòn rộng hơn vai một chút, nhấc tạ ra khỏi giá và giữ thăng bằng trên ngực.",
-            "Hít sâu, từ từ hạ thanh đòn có kiểm soát xuống chạm nhẹ vào phần giữa ngực.",
-            "Thở ra dứt khoát, dùng lực cơ ngực đẩy thanh đòn về vị trí ban đầu và siết chặt cơ ở đỉnh."
+        val ex1Dto = ExerciseDto(
+            id = "0025",
+            name = "Nằm đẩy tạ đòn (Bench Press)",
+            category = "chest",
+            bodyPart = "Cơ ngực",
+            targetMuscle = "Cơ ngực giữa",
+            equipment = "Thanh đòn & Ghế phẳng",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp",
+            description = "Nằm phẳng trên ghế tập, hai chân đặt chắc chắn trên sàn, mắt nhìn thẳng lên thanh đòn.\nCầm thanh đòn rộng hơn vai một chút, nhấc tạ ra khỏi giá và giữ thăng bằng trên ngực.\nHít sâu, từ từ hạ thanh đòn có kiểm soát xuống chạm nhẹ vào phần giữa ngực.\nThở ra dứt khoát, dùng lực cơ ngực đẩy thanh đòn về vị trí ban đầu và siết chặt cơ ở đỉnh."
         )
-        val ex1Img = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp"
 
         // Exercise 2: Incline Dumbbell Press
-        val ex2Steps = arrayListOf(
-            "Chỉnh ghế dốc góc 30-45 độ, hai tay cầm tạ đơn đặt trên đùi rồi dùng gối trợ lực hất lên ngang vai.",
-            "Ưỡn ngực, mở rộng lồng ngực và hạ tạ có kiểm soát sao cho cẳng tay luôn vuông góc sàn.",
-            "Thở ra và đẩy hai quả tạ hướng lên theo hình vòng cung nhẹ, tránh chạm tạ vào nhau làm mất áp lực cơ."
+        val ex2Dto = ExerciseDto(
+            id = "0314",
+            name = "Đẩy ngực trên với tạ đơn",
+            category = "chest",
+            bodyPart = "Cơ ngực",
+            targetMuscle = "Cơ ngực trên & Vai trước",
+            equipment = "Tạ đơn & Ghế dốc",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0314-ns0SIbU.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0314-ns0SIbU.webp",
+            description = "Chỉnh ghế dốc góc 30-45 độ, hai tay cầm tạ đơn đặt trên đùi rồi dùng gối trợ lực hất lên ngang vai.\nƯỡn ngực, mở rộng lồng ngực và hạ tạ có kiểm soát sao cho cẳng tay luôn vuông góc sàn.\nThở ra và đẩy hai quả tạ hướng lên theo hình vòng cung nhẹ, tránh chạm tạ vào nhau làm mất áp lực cơ."
         )
-        val ex2Img = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0314-ns0SIbU.webp"
 
         // Exercise 3: Cable Fly
-        val ex3Steps = arrayListOf(
-            "Đứng giữa giàn cáp kép, hai tay nắm tay cầm, một chân bước lên trước để tạo thế đứng vững.",
-            "Hơi khuỵu khuỷu tay cố định, thở ra và ép hai cánh tay về phía trước ngực như đang ôm thân cây.",
-            "Giữ điểm ép căng nhất 1 giây, hít vào rồi từ từ mở rộng cánh tay về lại vị trí bắt đầu."
+        val ex3Dto = ExerciseDto(
+            id = "1262",
+            name = "Ép ngực cáp (Cable Fly)",
+            category = "chest",
+            bodyPart = "Cơ ngực",
+            targetMuscle = "Cơ ngực trong & viền ngực",
+            equipment = "Máy kéo cáp đôi",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/1262-w4dLzSx.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/1262-w4dLzSx.webp",
+            description = "Đứng giữa giàn cáp kép, hai tay nắm tay cầm, một chân bước lên trước để tạo thế đứng vững.\nHơi khuỵu khuỷu tay cố định, thở ra và ép hai cánh tay về phía trước ngực như đang ôm thân cây.\nGiữ điểm ép căng nhất 1 giây, hít vào rồi từ từ mở rộng cánh tay về lại vị trí bắt đầu."
         )
-        val ex3Img = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/1262-w4dLzSx.webp"
 
         // Exercise 4: Triceps Pushdown
-        val ex4Steps = arrayListOf(
-            "Đứng thẳng trước máy kéo cáp, hai tay nắm tay cầm ngang ngực, ép chặt khuỷu tay vào sát hai bên mạn sườn.",
-            "Thở ra, ghì cánh tay duỗi thẳng xuống phía dưới cho đến khi cơ tay sau căng hết cỡ.",
-            "Hít vào và từ từ đưa cẳng tay nâng lên góc 90 độ mà không di chuyển khuỷu tay."
+        val ex4Dto = ExerciseDto(
+            id = "0172",
+            name = "Kéo cáp tay sau (Triceps Pushdown)",
+            category = "arms",
+            bodyPart = "Bắp tay sau",
+            targetMuscle = "Cơ tay sau (Triceps)",
+            equipment = "Dây thừng kéo cáp",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0172-1PK5Uo3.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0172-1PK5Uo3.webp",
+            description = "Đứng thẳng trước máy kéo cáp, hai tay nắm tay cầm ngang ngực, ép chặt khuỷu tay vào sát hai bên mạn sườn.\nThở ra, ghì cánh tay duỗi thẳng xuống phía dưới cho đến khi cơ tay sau căng hết cỡ.\nHít vào và từ từ đưa cẳng tay nâng lên góc 90 độ mà không di chuyển khuỷu tay."
         )
-        val ex4Img = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0172-1PK5Uo3.webp"
 
         // Exercise 5: Dips
-        val ex5Steps = arrayListOf(
-            "Nhảy lên thanh xà kép, duỗi thẳng tay, siết cơ bụng và hơi nghiêng phần thân trên về phía trước.",
-            "Hít sâu, từ từ gập khuỷu tay hạ thấp người xuống cho đến khi cánh tay đạt góc 90 độ.",
-            "Thở ra, dồn lực ngực dưới và tay sau đẩy mạnh toàn bộ cơ thể trở lại vị trí ban đầu."
+        val ex5Dto = ExerciseDto(
+            id = "0009",
+            name = "Xà kép tay sau & ngực dưới (Dips)",
+            category = "chest",
+            bodyPart = "Ngực dưới & Tay sau",
+            targetMuscle = "Ngực dưới & Tay sau",
+            equipment = "Xà kép",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0009-PAgTVaK.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0009-PAgTVaK.webp",
+            description = "Nhảy lên thanh xà kép, duỗi thẳng tay, siết cơ bụng và hơi nghiêng phần thân trên về phía trước.\nHít sâu, từ từ gập khuỷu tay hạ thấp người xuống cho đến khi cánh tay đạt góc 90 độ.\nThở ra, dồn lực ngực dưới và tay sau đẩy mạnh toàn bộ cơ thể trở lại vị trí ban đầu."
         )
-        val ex5Img = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0009-PAgTVaK.webp"
 
+        // Main CTA: Start whole workout from exercise 0
         binding.btnStartWorkoutNow.setOnClickListener {
-            startWorkout("1. Nằm đẩy tạ đòn", "Cơ ngực (Ngực giữa)", ex1Img, ex1Steps)
+            startWorkout(0)
         }
 
+        // Clicking each card opens that exercise's detail bottom sheet, from which the user can start training that exercise
         binding.cardExercise1.setOnClickListener {
-            startWorkout("1. Nằm đẩy tạ đòn", "Cơ ngực (Ngực giữa)", ex1Img, ex1Steps)
+            ExerciseDetailBottomSheet.newInstance(ex1Dto, 0).show(supportFragmentManager, "ex_detail_1")
         }
 
         binding.cardExercise2.setOnClickListener {
-            startWorkout("2. Đẩy ngực trên với tạ đơn", "Cơ ngực trên", ex2Img, ex2Steps)
+            ExerciseDetailBottomSheet.newInstance(ex2Dto, 1).show(supportFragmentManager, "ex_detail_2")
         }
 
         binding.cardExercise3.setOnClickListener {
-            startWorkout("3. Ép ngực cáp", "Cơ ngực trong & viền ngực", ex3Img, ex3Steps)
+            ExerciseDetailBottomSheet.newInstance(ex3Dto, 2).show(supportFragmentManager, "ex_detail_3")
         }
 
         binding.cardExercise4.setOnClickListener {
-            startWorkout("4. Kéo cáp tay sau", "Cơ tay sau (Triceps)", ex4Img, ex4Steps)
+            ExerciseDetailBottomSheet.newInstance(ex4Dto, 3).show(supportFragmentManager, "ex_detail_4")
         }
 
         binding.cardExercise5.setOnClickListener {
-            startWorkout("5. Xà kép tay sau & ngực dưới", "Ngực dưới & Tay sau", ex5Img, ex5Steps)
+            ExerciseDetailBottomSheet.newInstance(ex5Dto, 4).show(supportFragmentManager, "ex_detail_5")
         }
     }
 }

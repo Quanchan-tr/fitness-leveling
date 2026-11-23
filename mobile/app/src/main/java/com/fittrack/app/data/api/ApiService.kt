@@ -150,7 +150,7 @@ interface ApiService {
         @Body request: EquipAvatarRequest
     ): Response<ApiResponse<AvatarConfigDto>>
 
-    // ── AI Workout & Meal Planner ──────────────────────────────
+    // ── AI Workout Planner ──────────────────────────────
     @POST("ai/exercise-plan")
     suspend fun generateExercisePlan(
         @Header("Idempotency-Key") idempotencyKey: String,

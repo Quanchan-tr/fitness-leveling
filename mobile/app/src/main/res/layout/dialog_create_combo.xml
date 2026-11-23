@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_modal_card_white"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🍱 Tạo combo dinh dưỡng mới"
+        android:textColor="@color/text_dark"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Chọn món từ dataset hoặc tự nhập tay món ăn của bạn"
+        android:textColor="@color/text_slate"
+        android:textSize="11.5sp" />
+
+    <!-- Mode Switcher Tabs -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_tag_chip"
+        android:orientation="horizontal"
+        android:padding="3dp">
+
+        <TextView
+            android:id="@+id/tab_mode_dataset"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_subtab_pill_active"
+            android:gravity="center"
+            android:text="Chọn từ dataset"
+            android:textColor="@color/white"
+            android:textSize="11.5sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tab_mode_manual"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_subtab_pill_inactive"
+            android:gravity="center"
+            android:text="Tự nhập"
+            android:textColor="@color/subtab_pill_inactive_text"
+            android:textSize="11.5sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Name input (Shared) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Tên combo:"
+        android:textColor="@color/text_dark"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/et_new_combo_name"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_tag_chip"
+        android:hint="Ví dụ: Bữa trưa Eat-clean Tăng cơ"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:singleLine="true"
+        android:textColor="@color/text_dark"
+        android:textColorHint="@color/text_slate_light"
+        android:textSize="12.5sp" />
+
+    <!-- Mode 1: Dataset Ingredients Selection List -->
+    <LinearLayout
+        android:id="@+id/layout_dataset_selection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tích chọn nguyên liệu từ thực đơn mẫu:"
+            android:textColor="@color/text_dark"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="170dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_card_selectable"
+            android:padding="8dp">
+
+            <LinearLayout
+                android:id="@+id/ll_dataset_items"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <CheckBox
+                    android:id="@+id/cb_item_chicken"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="🍗 Ức gà áp chảo (100g • 165 kcal • 31g Đạm)"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11.5sp" />
+
+                <CheckBox
+                    android:id="@+id/cb_item_egg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="🥚 Trứng gà luộc (1 quả • 78 kcal • 6g Đạm)"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11.5sp" />
+
+                <CheckBox
+                    android:id="@+id/cb_item_brown_rice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="🍚 Cơm gạo lứt (150g • 165 kcal • 35g Carb)"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11.5sp" />
+
+                <CheckBox
+                    android:id="@+id/cb_item_beef"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🥩 Thịt bò nạc xào (150g • 250 kcal • 39g Đạm • 10g Béo)"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11.5sp" />
+
+                <CheckBox
+                    android:id="@+id/cb_item_sweet_potato"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🍠 Khoai lang luộc (150g • 130 kcal • 30g Carb)"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11.5sp" />
+
+                <CheckBox
+                    android:id="@+id/cb_item_avocado"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🥑 Quả bơ sáp (50g • 80 kcal • 7g Béo)"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11.5sp" />
+
+                <CheckBox
+                    android:id="@+id/cb_item_banana"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🍌 Chuối tiêu (1 quả • 105 kcal • 27g Carb)"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11.5sp" />
+
+                <CheckBox
+                    android:id="@+id/cb_item_whey"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🥛 Whey Protein Isolate (1 muỗng • 120 kcal • 25g Đạm)"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11.5sp" />
+
+                <CheckBox
+                    android:id="@+id/cb_item_veggies"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="🥦 Bông cải xanh luộc (150g • 50 kcal • 3g Đạm • 8g Carb)"
+                    android:textColor="@color/text_dark"
+                    android:textSize="11.5sp" />
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+    </LinearLayout>
+
+    <!-- Mode 2: Manual Ingredients & Macros Input -->
+    <LinearLayout
+        android:id="@+id/layout_manual_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thành phần món ăn:"
+            android:textColor="@color/text_dark"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/et_new_combo_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/bg_tag_chip"
+            android:gravity="top|start"
+            android:hint="200g ức gà, 150g cơm lứt, 1 quả trứng..."
+            android:minLines="2"
+            android:padding="10dp"
+            android:textColor="@color/text_dark"
+            android:textColorHint="@color/text_slate_light"
+            android:textSize="12.5sp" />
+
+        <!-- Macros Row: Calo, Protein, Carbs, Fat -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚡ Calo"
+                    android:textColor="@color/text_slate"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_new_combo_cal"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:gravity="center"
+                    android:hint="550"
+                    android:inputType="number"
+                    android:textColor="@color/text_dark"
+                    android:textColorHint="@color/text_slate_light"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🍗 Đạm (g)"
+                    android:textColor="@color/text_slate"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_new_combo_protein"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:gravity="center"
+                    android:hint="45"
+                    android:inputType="number"
+                    android:textColor="@color/text_dark"
+                    android:textColorHint="@color/text_slate_light"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🍚 Carb (g)"
+                    android:textColor="@color/text_slate"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_new_combo_carb"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:gravity="center"
+                    android:hint="50"
+                    android:inputType="number"
+                    android:textColor="@color/text_dark"
+                    android:textColorHint="@color/text_slate_light"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🥑 Béo (g)"
+                    android:textColor="@color/text_slate"
+                    android:textSize="10.5sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/et_new_combo_fat"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_tag_chip"
+                    android:gravity="center"
+                    android:hint="12"
+                    android:inputType="number"
+                    android:textColor="@color/text_dark"
+                    android:textColorHint="@color/text_slate_light"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Computed Summary Banner -->
+    <TextView
+        android:id="@+id/tv_combo_calculated_summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@color/error_bg"
+        android:padding="10dp"
+        android:text="⚡ Tổng combo: 458 kcal • 40g Đạm • 43g Carb • 9g Béo"
+        android:textColor="@color/primary"
+        android:textSize="11.5sp"
+        android:textStyle="bold" />
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_create_combo_cancel"
+            style="@style/Widget.FitTrack.Button.Secondary"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/segment_bg"
+            android:text="Hủy"
+            android:textColor="@color/text_dark"
+            android:textSize="13sp"
+            app:cornerRadius="10dp"
+            app:strokeColor="@color/transparent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_create_combo_save"
+            style="@style/Widget.FitTrack.PrimaryButton"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1.6"
+            android:text="Lưu combo"
+            android:textSize="13sp"
+            app:cornerRadius="10dp" />
+    </LinearLayout>
+
+</LinearLayout>

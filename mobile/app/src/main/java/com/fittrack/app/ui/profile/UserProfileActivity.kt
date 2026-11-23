@@ -2,8 +2,11 @@ package com.fittrack.app.ui.profile
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.lifecycleScope
 import com.fittrack.app.R
 import com.fittrack.app.data.api.ApiClient
@@ -12,7 +15,9 @@ import com.fittrack.app.databinding.ActivityUserProfileBinding
 import com.fittrack.app.ui.BottomNavTab
 import com.fittrack.app.ui.settings.SettingsActivity
 import com.fittrack.app.ui.setupBottomNav
+import com.fittrack.app.util.WindowInsetsHelper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -29,16 +34,23 @@ class UserProfileActivity : AppCompatActivity() {
     private var volumeBars: List<Pair<String, Float>> = (1..12).map { Pair("T$it", 0f) }
     private var selectedChartMode = 0 // 0: Duration, 1: Reps, 2: Volume
 
+    private var isPost3Loaded = false
+    private var isPost4Loaded = false
+    private var isLoadingMore = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityUserProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        WindowInsetsHelper.applySystemInsets(this, binding.root, binding.layoutHeader, binding.bottomNavigation.root)
 
         session = SessionManager.getInstance(this)
 
         bindUserData()
         setupInteractions()
         setupChartTabs()
+        setupLazyFeedScrolling()
         setupBottomNav()
 
         fetchFreshProfile()
@@ -54,6 +66,10 @@ class UserProfileActivity : AppCompatActivity() {
     private fun bindUserData() {
         binding.tvProfileName.text = session.userName
         binding.btnBadgesLinkStreak.text = "🔥 ${session.userStreak} ngày streak"
+        binding.tvPostsCounter.text = "2 bài viết"
+        binding.tvWorkoutsCount.text = session.userTotalWorkouts.toString()
+        binding.tvFollowersCount.text = session.userFollowersCount.toString()
+        binding.tvFollowingCount.text = session.userFollowingCount.toString()
     }
 
     private fun fetchFreshProfile() {
@@ -86,6 +102,8 @@ class UserProfileActivity : AppCompatActivity() {
 
                 if (res.isSuccessful && res.body()?.data != null) {
                     val logs = res.body()!!.data!!
+                    session.userTotalWorkouts = logs.size
+                    binding.tvWorkoutsCount.text = logs.size.toString()
                     val now = System.currentTimeMillis()
                     val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
@@ -95,25 +113,27 @@ class UserProfileActivity : AppCompatActivity() {
 
                     for (log in logs) {
                         val logDate: Date = try {
-                            sdf.parse(log.logDate) ?: Date()
+                            sdf.parse(log.logDate) ?: Date(now)
                         } catch (_: Exception) {
-                            Date()
+                            Date(now)
                         }
-                        val diffDays = ((now - logDate.time) / (1000L * 60 * 60 * 24)).toInt()
-                        val weekOffset = diffDays / 7
-                        if (weekOffset in 0..11) {
-                            val bucketIdx = 11 - weekOffset
-                            log.sets?.forEach { s ->
-                                durBuckets[bucketIdx] += (s.durationSec ?: 60) / 60f
-                                repsBuckets[bucketIdx] += s.reps.toFloat()
-                                volBuckets[bucketIdx] += ((s.weightKg ?: 0.0) * s.reps).toFloat()
-                            }
+
+                        val diffDays = ((now - logDate.time) / (1000 * 60 * 60 * 24)).toInt()
+                        val weekIndex = 11 - (diffDays / 7)
+                        if (weekIndex in 0..11) {
+                            val totalReps = log.sets?.sumOf { it.reps } ?: 0
+                            val totalVol = log.sets?.sumOf { (it.weightKg ?: 0.0) * it.reps } ?: 0.0
+                            val totalDur = (log.sets?.sumOf { it.durationSec ?: 0 } ?: 0) / 60
+
+                            durBuckets[weekIndex] += (if (totalDur > 0) totalDur else 45).toFloat()
+                            repsBuckets[weekIndex] += totalReps.toFloat()
+                            volBuckets[weekIndex] += totalVol.toFloat()
                         }
                     }
 
-                    durationBars = (1..12).map { Pair("T$it", durBuckets[it - 1]) }
-                    repsBars = (1..12).map { Pair("T$it", repsBuckets[it - 1]) }
-                    volumeBars = (1..12).map { Pair("T$it", volBuckets[it - 1]) }
+                    durationBars = (0..11).map { Pair("T${it + 1}", durBuckets[it]) }
+                    repsBars = (0..11).map { Pair("T${it + 1}", repsBuckets[it]) }
+                    volumeBars = (0..11).map { Pair("T${it + 1}", volBuckets[it]) }
 
                     refreshChartDisplay()
                 }
@@ -145,6 +165,51 @@ class UserProfileActivity : AppCompatActivity() {
         }
         binding.btnBadgesLinkLv.setOnClickListener { openBadges() }
         binding.btnBadgesLinkStreak.setOnClickListener { openBadges() }
+
+        binding.userPostItem1.setOnClickListener {
+            Toast.makeText(this, "Bài viết: Kỷ lục Bench Press 100kg • 48 lượt thích", Toast.LENGTH_SHORT).show()
+        }
+        binding.userPostItem2.setOnClickListener {
+            Toast.makeText(this, "Bài viết: Meal Prep tuần này • 32 lượt thích", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setupLazyFeedScrolling() {
+        binding.scrollProfile.setOnScrollChangeListener(
+            NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, _ ->
+                val childHeight = v.getChildAt(0).measuredHeight
+                val viewHeight = v.measuredHeight
+                val threshold = childHeight - viewHeight - 350
+
+                if (scrollY >= threshold && !isLoadingMore) {
+                    if (!isPost3Loaded) {
+                        isLoadingMore = true
+                        binding.pbPostsLoading.visibility = View.VISIBLE
+                        lifecycleScope.launch {
+                            delay(450)
+                            binding.pbPostsLoading.visibility = View.GONE
+                            binding.userPostItem3.visibility = View.VISIBLE
+                            isPost3Loaded = true
+                            isLoadingMore = false
+                            binding.tvPostsCounter.text = "3 bài viết"
+                            Toast.makeText(this@UserProfileActivity, "✓ Đã tải thêm bài viết (Form Check Squat 140kg)", Toast.LENGTH_SHORT).show()
+                        }
+                    } else if (!isPost4Loaded) {
+                        isLoadingMore = true
+                        binding.pbPostsLoading.visibility = View.VISIBLE
+                        lifecycleScope.launch {
+                            delay(450)
+                            binding.pbPostsLoading.visibility = View.GONE
+                            binding.userPostItem4.visibility = View.VISIBLE
+                            isPost4Loaded = true
+                            isLoadingMore = false
+                            binding.tvPostsCounter.text = "4 bài viết (Đã tải hết)"
+                            Toast.makeText(this@UserProfileActivity, "✓ Đã tải thêm bài viết (Cột mốc 30 ngày Streak)", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        )
     }
 
     private fun setupChartTabs() {

@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +23,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 import java.util.UUID
 
 class LogMealModalActivity : AppCompatActivity() {
@@ -32,6 +34,7 @@ class LogMealModalActivity : AppCompatActivity() {
     private val selectedFoodIds = mutableSetOf<String>()
 
     private var currentCategory = "ALL"
+    private var currentMealType = "lunch" // breakfast, lunch, dinner, snack
     private var searchJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,12 +44,63 @@ class LogMealModalActivity : AppCompatActivity() {
 
         foodRepository = FoodRepository.getInstance(this)
 
+        initDefaultMealType()
         setupListeners()
+        setupMealTypeChips()
         setupCategoryChips()
         setupSearchInput()
 
-        // Initial load of foods from dataset
         loadFoodResults("", currentCategory)
+    }
+
+    private fun initDefaultMealType() {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        currentMealType = when (hour) {
+            in 5..10 -> "breakfast"
+            in 11..14 -> "lunch"
+            in 15..17 -> "snack"
+            in 18..21 -> "dinner"
+            else -> "snack"
+        }
+        updateMealTypeChipStyles()
+    }
+
+    private fun setupMealTypeChips() {
+        binding.chipMealBreakfast.setOnClickListener {
+            currentMealType = "breakfast"
+            updateMealTypeChipStyles()
+        }
+        binding.chipMealLunch.setOnClickListener {
+            currentMealType = "lunch"
+            updateMealTypeChipStyles()
+        }
+        binding.chipMealDinner.setOnClickListener {
+            currentMealType = "dinner"
+            updateMealTypeChipStyles()
+        }
+        binding.chipMealSnack.setOnClickListener {
+            currentMealType = "snack"
+            updateMealTypeChipStyles()
+        }
+    }
+
+    private fun updateMealTypeChipStyles() {
+        val chips = listOf(
+            binding.chipMealBreakfast to "breakfast",
+            binding.chipMealLunch to "lunch",
+            binding.chipMealDinner to "dinner",
+            binding.chipMealSnack to "snack"
+        )
+
+        chips.forEach { (view, type) ->
+            if (type == currentMealType) {
+                view.background = ContextCompat.getDrawable(this, R.drawable.bg_modal_chip_orange)
+                view.setTextColor(ContextCompat.getColor(this, R.color.primary))
+            } else {
+                view.background = ContextCompat.getDrawable(this, R.drawable.bg_modal_food_item)
+                view.setTextColor(ContextCompat.getColor(this, R.color.modal_chip_gray_text))
+            }
+        }
     }
 
     private fun setupListeners() {
@@ -66,7 +120,7 @@ class LogMealModalActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 searchJob?.cancel()
                 searchJob = lifecycleScope.launch {
-                    delay(200) // Debounce typing
+                    delay(200)
                     loadFoodResults(s?.toString().orEmpty(), currentCategory)
                 }
             }
@@ -128,9 +182,9 @@ class LogMealModalActivity : AppCompatActivity() {
         for (food in foods) {
             val rowBinding = ItemModalFoodRowBinding.inflate(layoutInflater, binding.layoutFoodResults, false)
 
-            val isRaw = food.itemType.equals("RAW", ignoreCase = true)
+            val isRaw = food.itemType.equals("RAW", ignoreCase = true) || food.id.startsWith("raw_")
             val typeTag = if (isRaw) "[RAW]" else "[Món]"
-            val serving = food.servingSize ?: food.baseServing ?: "100g"
+            val serving = food.servingSize ?: food.baseServing ?: if (isRaw) "100g" else "1 suất"
             rowBinding.tvFoodName.text = "$typeTag ${food.name} ($serving)"
 
             val macroText = "${food.calories} kcal • P: ${food.protein}g • C: ${food.carbs}g • F: ${food.fat}g"
@@ -149,34 +203,115 @@ class LogMealModalActivity : AppCompatActivity() {
 
             rowBinding.btnAddFood.setOnClickListener {
                 if (!selectedFoodIds.contains(food.id)) {
-                    selectedFoodIds.add(food.id)
-                    val todayDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
-                    selectedMeals.add(
-                        CreateNutritionLogRequest(
-                            logDate = todayDate,
-                            mealType = "lunch",
-                            foodName = food.name,
-                            calories = food.calories,
-                            proteinGrams = food.protein,
-                            carbsGrams = food.carbs,
-                            fatGrams = food.fat
+                    showPortionDialog(food, isRaw) { multiplier, portionDesc ->
+                        selectedFoodIds.add(food.id)
+                        val todayDate = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+                        val cal = (food.calories * multiplier).toInt()
+                        val p = food.protein * multiplier
+                        val c = food.carbs * multiplier
+                        val f = food.fat * multiplier
+
+                        selectedMeals.add(
+                            CreateNutritionLogRequest(
+                                logDate = todayDate,
+                                mealType = currentMealType,
+                                foodName = "${food.name} ($portionDesc)",
+                                calories = cal,
+                                proteinGrams = p,
+                                carbsGrams = c,
+                                fatGrams = f
+                            )
                         )
-                    )
 
-                    rowBinding.btnAddFood.text = getString(R.string.modal_meal_btn_added)
-                    rowBinding.btnAddFood.background = ContextCompat.getDrawable(this, R.drawable.bg_modal_food_item)
-                    rowBinding.btnAddFood.setTextColor(ContextCompat.getColor(this, R.color.modal_chip_gray_text))
+                        rowBinding.btnAddFood.text = getString(R.string.modal_meal_btn_added)
+                        rowBinding.btnAddFood.background = ContextCompat.getDrawable(this, R.drawable.bg_modal_food_item)
+                        rowBinding.btnAddFood.setTextColor(ContextCompat.getColor(this, R.color.modal_chip_gray_text))
 
-                    Toast.makeText(
-                        this,
-                        getString(R.string.toast_meal_selected, food.name),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        Toast.makeText(
+                            this,
+                            "Đã thêm $portionDesc ${food.name} vào bữa $currentMealType!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
 
             binding.layoutFoodResults.addView(rowBinding.root)
         }
+    }
+
+    private fun showPortionDialog(
+        food: FoodItemDto,
+        isRaw: Boolean,
+        onSelected: (multiplier: Double, portionDesc: String) -> Unit
+    ) {
+        val mealLabel = when (currentMealType) {
+            "breakfast" -> "Bữa sáng"
+            "lunch" -> "Bữa trưa"
+            "dinner" -> "Bữa tối"
+            else -> "Bữa phụ"
+        }
+
+        val dialogView = layoutInflater.inflate(R.layout.dialog_meal_portion_edit, null, false)
+        val tvName = dialogView.findViewById<TextView>(R.id.tv_edit_food_name)
+        val tvMeal = dialogView.findViewById<TextView>(R.id.tv_edit_meal_label)
+        val tvMacros = dialogView.findViewById<TextView>(R.id.tv_edit_macros)
+        val tvPortionPercent = dialogView.findViewById<TextView>(R.id.tv_edit_portion_percent)
+        val slider = dialogView.findViewById<android.widget.SeekBar>(R.id.slider_edit_portion)
+        val btnCancel = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_edit_cancel)
+        val btnSave = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btn_edit_save)
+
+        tvName.text = food.name
+        tvMeal.text = "Ghi nhận vào: $mealLabel"
+        btnSave.text = "Thêm vào nhật ký"
+
+        var currentRatio = 1.0
+
+        fun updateDisplay(ratio: Double) {
+            currentRatio = ratio
+            val cal = (food.calories * ratio).toInt()
+            val p = String.format(java.util.Locale.US, "%.1f", food.protein * ratio)
+            val c = String.format(java.util.Locale.US, "%.1f", food.carbs * ratio)
+            val f = String.format(java.util.Locale.US, "%.1f", food.fat * ratio)
+            val percent = (ratio * 100).toInt()
+
+            val desc = if (isRaw) {
+                "${(ratio * 100).toInt()}g"
+            } else {
+                "$percent%"
+            }
+
+            tvPortionPercent.text = "$desc (${if (percent < 100) "Ít hơn" else if (percent == 100) "Tiêu chuẩn" else "Nhiều hơn"})"
+            tvMacros.text = "⚡ $cal kcal  •  🍗 ${p}g Đạm  •  🍚 ${c}g Carb  •  🥑 ${f}g Béo"
+        }
+
+        slider.max = 200
+        slider.progress = 100
+        updateDisplay(1.0)
+
+        slider.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
+                val ratio = progress.coerceAtLeast(40) / 100.0
+                updateDisplay(ratio)
+            }
+            override fun onStartTrackingTouch(seekBar: android.widget.SeekBar?) {}
+            override fun onStopTrackingTouch(seekBar: android.widget.SeekBar?) {}
+        })
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
+        btnCancel.setOnClickListener { dialog.dismiss() }
+        btnSave.setOnClickListener {
+            val desc = if (isRaw) "${(currentRatio * 100).toInt()}g" else "${(currentRatio * 100).toInt()}%"
+            onSelected(currentRatio, desc)
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun handleConfirmAddMeal() {
@@ -199,11 +334,12 @@ class LogMealModalActivity : AppCompatActivity() {
                         }
                     }
                 } catch (_: Exception) {
-                    // Non-blocking sync
+                    // Handled gracefully
                 }
             }
         }
 
+        setResult(RESULT_OK)
         Toast.makeText(
             this,
             "✓ Đã ghi nhận ${selectedMeals.size} món ăn vào nhật ký dinh dưỡng!",

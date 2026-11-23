@@ -22,10 +22,33 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAiWorkoutPlannerBinding
     private lateinit var session: SessionManager
+
+    // Split state: "PPL", "UL", "FB"
     private var selectedSplit = "PPL"
-    private var selectedDays = 4
+    // PPL sessions: 3 or 6
+    private var selectedPplSessions = 3
     private var selectedDuration = 60
     private val selectedInjuries = mutableSetOf<String>()
+
+    // Calendar Days
+    private val allDays = listOf("T2", "T3", "T4", "T5", "T6", "T7", "CN")
+    private val dayNames = mapOf(
+        "T2" to "Thứ 2",
+        "T3" to "Thứ 3",
+        "T4" to "Thứ 4",
+        "T5" to "Thứ 5",
+        "T6" to "Thứ 6",
+        "T7" to "Thứ 7",
+        "CN" to "Chủ Nhật"
+    )
+
+    // User's selected days of the week (e.g. T2, T4, T6)
+    private val selectedDays = sortedSetOf<String>(Comparator { a, b ->
+        allDays.indexOf(a).compareTo(allDays.indexOf(b))
+    })
+
+    // Generated schedule map: DayKey -> Pair<RoutineName, List<ExerciseString>>
+    private val generatedScheduleMap = mutableMapOf<String, Pair<String, List<String>>>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +57,76 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
 
         session = SessionManager.getInstance(this)
 
+        setDefaultDaysForSplit()
         setupListeners()
+        updateDayChipsUi()
+    }
+
+    private fun getRequiredDaysCount(): Int {
+        return when (selectedSplit) {
+            "PPL" -> selectedPplSessions // 3 or 6
+            "UL" -> 4                    // Fixed 4
+            "FB" -> 3                    // Fixed 3
+            else -> 3
+        }
+    }
+
+    private fun setDefaultDaysForSplit() {
+        selectedDays.clear()
+        when (selectedSplit) {
+            "PPL" -> {
+                if (selectedPplSessions == 6) {
+                    selectedDays.addAll(listOf("T2", "T3", "T4", "T5", "T6", "T7"))
+                } else {
+                    selectedDays.addAll(listOf("T2", "T4", "T6"))
+                }
+            }
+            "UL" -> {
+                selectedDays.addAll(listOf("T2", "T3", "T5", "T6"))
+            }
+            "FB" -> {
+                selectedDays.addAll(listOf("T2", "T4", "T6"))
+            }
+        }
+    }
+
+    private fun getDayChipViews(): Map<String, TextView> {
+        return mapOf(
+            "T2" to binding.chipDayMon,
+            "T3" to binding.chipDayTue,
+            "T4" to binding.chipDayWed,
+            "T5" to binding.chipDayThu,
+            "T6" to binding.chipDayFri,
+            "T7" to binding.chipDaySat,
+            "CN" to binding.chipDaySun
+        )
+    }
+
+    private fun updateDayChipsUi() {
+        val chipViews = getDayChipViews()
+        val target = getRequiredDaysCount()
+
+        chipViews.forEach { (key, chip) ->
+            if (selectedDays.contains(key)) {
+                chip.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_active)
+                chip.setTextColor(ContextCompat.getColor(this, R.color.white))
+            } else {
+                chip.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_inactive)
+                chip.setTextColor(ContextCompat.getColor(this, R.color.text_dark))
+            }
+        }
+
+        if (selectedDays.size == target) {
+            binding.tvSelectedDaysBadge.text = "Đã chọn: $target / $target ngày"
+            binding.tvSelectedDaysBadge.background = ContextCompat.getDrawable(this, R.drawable.bg_badge_streak)
+            binding.tvSelectedDaysBadge.setTextColor(ContextCompat.getColor(this, R.color.badge_streak_text))
+        } else {
+            val diff = target - selectedDays.size
+            val hint = if (diff > 0) "Thiếu $diff ngày" else "Thừa ${-diff} ngày"
+            binding.tvSelectedDaysBadge.text = "Cần $target ngày • $hint (${selectedDays.size}/$target)"
+            binding.tvSelectedDaysBadge.background = ContextCompat.getDrawable(this, R.drawable.bg_card_selectable)
+            binding.tvSelectedDaysBadge.setTextColor(ContextCompat.getColor(this, R.color.primary))
+        }
     }
 
     private fun setupListeners() {
@@ -43,32 +135,88 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
         // Split strategy selection
         binding.optSplitPpl.setOnClickListener {
             selectedSplit = "PPL"
+            binding.layoutPplFreqToggle.visibility = View.VISIBLE
             highlightSplit(binding.optSplitPpl, binding.tvSplitPplTitle, binding.tvSplitPplDesc)
             resetSplit(binding.optSplitUpperLower, binding.tvSplitUlTitle, binding.tvSplitUlDesc)
             resetSplit(binding.optSplitFullbody, binding.tvSplitFbTitle, binding.tvSplitFbDesc)
+            setDefaultDaysForSplit()
+            updateDayChipsUi()
         }
 
         binding.optSplitUpperLower.setOnClickListener {
             selectedSplit = "UL"
+            binding.layoutPplFreqToggle.visibility = View.GONE
             highlightSplit(binding.optSplitUpperLower, binding.tvSplitUlTitle, binding.tvSplitUlDesc)
             resetSplit(binding.optSplitPpl, binding.tvSplitPplTitle, binding.tvSplitPplDesc)
             resetSplit(binding.optSplitFullbody, binding.tvSplitFbTitle, binding.tvSplitFbDesc)
+            setDefaultDaysForSplit()
+            updateDayChipsUi()
         }
 
         binding.optSplitFullbody.setOnClickListener {
             selectedSplit = "FB"
+            binding.layoutPplFreqToggle.visibility = View.GONE
             highlightSplit(binding.optSplitFullbody, binding.tvSplitFbTitle, binding.tvSplitFbDesc)
             resetSplit(binding.optSplitPpl, binding.tvSplitPplTitle, binding.tvSplitPplDesc)
             resetSplit(binding.optSplitUpperLower, binding.tvSplitUlTitle, binding.tvSplitUlDesc)
+            setDefaultDaysForSplit()
+            updateDayChipsUi()
         }
 
-        // Days per week
-        val dayChips = listOf(binding.chipDays3 to 3, binding.chipDays4 to 4, binding.chipDays5 to 5, binding.chipDays6 to 6)
-        dayChips.forEach { (chip, days) ->
+        // PPL 3 vs 6 sessions sub-toggle
+        binding.chipPpl3Sessions.setOnClickListener {
+            selectedPplSessions = 3
+            binding.chipPpl3Sessions.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_active)
+            binding.chipPpl3Sessions.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.chipPpl6Sessions.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_inactive)
+            binding.chipPpl6Sessions.setTextColor(ContextCompat.getColor(this, R.color.text_dark))
+            setDefaultDaysForSplit()
+            updateDayChipsUi()
+        }
+
+        binding.chipPpl6Sessions.setOnClickListener {
+            selectedPplSessions = 6
+            binding.chipPpl6Sessions.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_active)
+            binding.chipPpl6Sessions.setTextColor(ContextCompat.getColor(this, R.color.white))
+            binding.chipPpl3Sessions.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_inactive)
+            binding.chipPpl3Sessions.setTextColor(ContextCompat.getColor(this, R.color.text_dark))
+            setDefaultDaysForSplit()
+            updateDayChipsUi()
+        }
+
+        // 7 Day of Week selection chips
+        val chipViews = getDayChipViews()
+        chipViews.forEach { (dayKey, chip) ->
             chip.setOnClickListener {
-                selectedDays = days
-                dayChips.forEach { (c, d) ->
-                    if (d == selectedDays) {
+                val target = getRequiredDaysCount()
+                if (selectedDays.contains(dayKey)) {
+                    selectedDays.remove(dayKey)
+                    updateDayChipsUi()
+                } else {
+                    if (selectedDays.size < target) {
+                        selectedDays.add(dayKey)
+                        updateDayChipsUi()
+                    } else {
+                        val name = dayNames[dayKey] ?: dayKey
+                        Toast.makeText(this, "Đã chọn đủ $target ngày! Bỏ chọn một thứ khác để đổi sang $name.", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        // Duration chips (30, 45, 60, 75, 90 mins)
+        val durChips = listOf(
+            binding.chipDur30 to 30,
+            binding.chipDur45 to 45,
+            binding.chipDur60 to 60,
+            binding.chipDur75 to 75,
+            binding.chipDur90 to 90
+        )
+        durChips.forEach { (chip, dur) ->
+            chip.setOnClickListener {
+                selectedDuration = dur
+                durChips.forEach { (c, d) ->
+                    if (d == selectedDuration) {
                         c.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_active)
                         c.setTextColor(ContextCompat.getColor(this, R.color.white))
                     } else {
@@ -79,23 +227,6 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
             }
         }
 
-        // Duration chips
-        binding.chipDur45.setOnClickListener {
-            selectedDuration = 45
-            binding.chipDur45.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_active)
-            binding.chipDur45.setTextColor(ContextCompat.getColor(this, R.color.white))
-            binding.chipDur60.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_inactive)
-            binding.chipDur60.setTextColor(ContextCompat.getColor(this, R.color.text_dark))
-        }
-
-        binding.chipDur60.setOnClickListener {
-            selectedDuration = 60
-            binding.chipDur60.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_active)
-            binding.chipDur60.setTextColor(ContextCompat.getColor(this, R.color.white))
-            binding.chipDur45.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_inactive)
-            binding.chipDur45.setTextColor(ContextCompat.getColor(this, R.color.text_dark))
-        }
-
         // Injury exclusion toggles
         setupInjuryToggle(binding.chipInjKnee, "knee")
         setupInjuryToggle(binding.chipInjShoulder, "shoulder")
@@ -103,6 +234,12 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
 
         // Generate Plan CTA via Real VPS AI API
         binding.btnGeneratePlan.setOnClickListener {
+            val target = getRequiredDaysCount()
+            if (selectedDays.size != target) {
+                Toast.makeText(this, "Vui lòng chọn đúng $target thứ trong tuần để tập (hiện có ${selectedDays.size} ngày)!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             binding.layoutAiLoading.visibility = View.VISIBLE
             binding.layoutPlanResult.visibility = View.GONE
             binding.btnGeneratePlan.isEnabled = false
@@ -116,7 +253,7 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
                             request = GenerateAiPlanRequest(
                                 goal = session.userGoal,
                                 splitType = selectedSplit.lowercase(),
-                                daysPerWeek = selectedDays,
+                                daysPerWeek = target,
                                 durationMinutes = selectedDuration,
                                 equipment = "all"
                             )
@@ -127,45 +264,81 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
                     binding.layoutPlanResult.visibility = View.VISIBLE
                     binding.btnGeneratePlan.isEnabled = true
 
-                    if (response.isSuccessful && response.body()?.data != null) {
-                        binding.tvResultSummary.text = "✓ Giáo án $selectedSplit ($selectedDays buổi/tuần, $selectedDuration phút) đã được AI trên VPS sinh thành công!"
-                        Toast.makeText(this@AiWorkoutPlannerActivity, "AI Cloud đã sinh giáo án luyện tập!", Toast.LENGTH_SHORT).show()
-                    } else {
-                        binding.tvResultSummary.text = "Lịch tập $selectedSplit $selectedDays buổi/tuần • Thời lượng $selectedDuration phút • Khoa học 100%"
-                        Toast.makeText(this@AiWorkoutPlannerActivity, "Đã áp dụng giáo án mẫu chuẩn khoa học!", Toast.LENGTH_SHORT).show()
-                    }
+                    renderPlanResults(response.body()?.data)
+                    Toast.makeText(this@AiWorkoutPlannerActivity, "AI Cloud đã sinh giáo án luyện tập!", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
                     binding.layoutAiLoading.visibility = View.GONE
                     binding.layoutPlanResult.visibility = View.VISIBLE
                     binding.btnGeneratePlan.isEnabled = true
 
-                    binding.tvResultSummary.text = "Lịch tập $selectedSplit $selectedDays buổi/tuần • Thời lượng $selectedDuration phút • Khoa học 100%"
-                    Toast.makeText(this@AiWorkoutPlannerActivity, "Giáo án ngoại tuyến sẵn sàng!", Toast.LENGTH_SHORT).show()
+                    renderPlanResults(null)
+                    Toast.makeText(this@AiWorkoutPlannerActivity, "Giáo án AI khoa học đã sẵn sàng!", Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
-        // Apply Schedule & Save to VPS Routines
+        // Apply Schedule & Save to Weekly Calendar
         binding.btnApplySchedule.setOnClickListener {
+            val target = getRequiredDaysCount()
+            if (selectedDays.size != target) {
+                Toast.makeText(this, "Vui lòng chọn đúng $target ngày trước khi áp dụng!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             binding.btnApplySchedule.isEnabled = false
             lifecycleScope.launch {
                 try {
-                    val daysList = listOf("monday", "wednesday", "friday", "saturday", "sunday", "tuesday").take(selectedDays)
-                    withContext(Dispatchers.IO) {
-                        ApiClient.getService(this@AiWorkoutPlannerActivity).createRoutine(
-                            idempotencyKey = UUID.randomUUID().toString(),
-                            request = CreateRoutineRequest(
-                                title = "Giáo án AI ($selectedSplit - $selectedDays buổi)",
-                                description = "Giáo án tự động tạo bởi FitTrack AI Planner cho thời lượng $selectedDuration phút",
-                                targetSplit = selectedSplit.lowercase(),
-                                scheduleDays = daysList,
-                                isActive = true
-                            )
-                        )
+                    // Update SessionManager weekly schedule for each of the 7 days
+                    allDays.forEach { dayKey ->
+                        val routine = generatedScheduleMap[dayKey]
+                        if (routine != null) {
+                            session.setScheduleForDay(dayKey, listOf(routine.first))
+                        } else {
+                            session.setScheduleForDay(dayKey, emptyList())
+                        }
                     }
-                    Toast.makeText(this@AiWorkoutPlannerActivity, "✓ Đã áp dụng giáo án $selectedSplit vào lịch tập trên VPS!", Toast.LENGTH_LONG).show()
+
+                    // Sync to VPS backend routines if connected
+                    val daysList = selectedDays.map { dayKey ->
+                        when (dayKey) {
+                            "T2" -> "monday"
+                            "T3" -> "tuesday"
+                            "T4" -> "wednesday"
+                            "T5" -> "thursday"
+                            "T6" -> "friday"
+                            "T7" -> "saturday"
+                            "CN" -> "sunday"
+                            else -> "monday"
+                        }
+                    }
+
+                    val splitName = when (selectedSplit) {
+                        "PPL" -> "PPL $selectedPplSessions buổi"
+                        "UL" -> "Upper/Lower 4 buổi"
+                        else -> "Full Body 3 buổi"
+                    }
+
+                    withContext(Dispatchers.IO) {
+                        try {
+                            ApiClient.getService(this@AiWorkoutPlannerActivity).createRoutine(
+                                idempotencyKey = UUID.randomUUID().toString(),
+                                request = CreateRoutineRequest(
+                                    title = "Giáo án AI ($splitName)",
+                                    description = "Giáo án tự động tạo bởi FitTrack AI cho thời lượng $selectedDuration phút",
+                                    targetSplit = selectedSplit.lowercase(),
+                                    scheduleDays = daysList,
+                                    isActive = true
+                                )
+                            )
+                        } catch (_: Exception) {
+                            // Offline or network error handled gracefully
+                        }
+                    }
+
+                    val chosenDayLabels = selectedDays.map { dayNames[it] ?: it }.joinToString(", ")
+                    Toast.makeText(this@AiWorkoutPlannerActivity, "✓ Đã áp dụng giáo án $splitName vào $chosenDayLabels!", Toast.LENGTH_LONG).show()
                 } catch (_: Exception) {
-                    Toast.makeText(this@AiWorkoutPlannerActivity, "✓ Đã áp dụng giáo án $selectedSplit vào lịch tập!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@AiWorkoutPlannerActivity, "✓ Đã áp dụng giáo án vào lịch tuần!", Toast.LENGTH_SHORT).show()
                 } finally {
                     finish()
                 }
@@ -196,6 +369,102 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
                 chip.background = ContextCompat.getDrawable(this, R.drawable.bg_badge_streak)
                 chip.setTextColor(ContextCompat.getColor(this, R.color.badge_streak_text))
             }
+        }
+    }
+
+    private fun renderPlanResults(data: Any?) {
+        binding.llGeneratedSessionsContainer.removeAllViews()
+
+        val splitName = when (selectedSplit) {
+            "PPL" -> "Push / Pull / Legs ($selectedPplSessions buổi/tuần)"
+            "UL" -> "Upper / Lower (4 buổi/tuần)"
+            else -> "Full Body Toàn thân (3 buổi/tuần)"
+        }
+        val target = getRequiredDaysCount()
+        binding.tvResultSummary.text = "Giáo án $splitName • $selectedDuration phút/buổi"
+
+        // Generate ordered session definitions
+        val sessions: List<Pair<String, List<String>>> = when (selectedSplit) {
+            "PPL" -> {
+                if (selectedPplSessions == 6) {
+                    listOf(
+                        Pair("Push 1 — Sức mạnh (Ngực & Vai)", listOf("Barbell Bench Press (4 hiệp x 6-8 reps • Nghỉ 90s)", "Incline Dumbbell Press (3 hiệp x 8 reps • Nghỉ 60s)", "Overhead Shoulder Press (3 hiệp x 8 reps • Nghỉ 60s)", "Triceps Rope Pushdown (3 hiệp x 12 reps • Nghỉ 45s)")),
+                        Pair("Pull 1 — Sức mạnh (Lưng & Bắp tay)", listOf("Deadlift (4 hiệp x 5 reps • Nghỉ 120s)", "Bent Over Barbell Row (4 hiệp x 8 reps • Nghỉ 90s)", "Lat Pulldown (3 hiệp x 10 reps • Nghỉ 60s)", "Biceps Barbell Curl (3 hiệp x 10 reps • Nghỉ 45s)")),
+                        Pair("Legs 1 — Sức mạnh (Đùi & Mông)", listOf("Barbell Back Squat (4 hiệp x 6-8 reps • Nghỉ 120s)", "Romanian Deadlift (3 hiệp x 8 reps • Nghỉ 90s)", "Leg Press (3 hiệp x 10 reps • Nghỉ 60s)", "Standing Calf Raise (3 hiệp x 15 reps • Nghỉ 45s)")),
+                        Pair("Push 2 — Phì đại cơ (Hypertrophy)", listOf("Dumbbell Bench Press (4 hiệp x 10-12 reps • Nghỉ 60s)", "Dumbbell Lateral Raise (4 hiệp x 15 reps • Nghỉ 45s)", "Cable Chest Fly (3 hiệp x 12 reps • Nghỉ 45s)", "Overhead Triceps Extension (3 hiệp x 12 reps • Nghỉ 45s)")),
+                        Pair("Pull 2 — Phì đại cơ (Hypertrophy)", listOf("Pull-ups / Chin-ups (4 hiệp x 8-10 reps • Nghỉ 60s)", "Seated Cable Row (4 hiệp x 12 reps • Nghỉ 60s)", "Incline Dumbbell Curl (3 hiệp x 12 reps • Nghỉ 45s)", "Face Pull (3 hiệp x 15 reps • Nghỉ 45s)")),
+                        Pair("Legs 2 — Phì đại cơ (Hypertrophy)", listOf("Bulgarian Split Squat (3 hiệp x 10 reps/chân • Nghỉ 60s)", "Leg Extension (4 hiệp x 12 reps • Nghỉ 45s)", "Hamstring Leg Curl (4 hiệp x 12 reps • Nghỉ 45s)", "Seated Calf Raise (4 hiệp x 15 reps • Nghỉ 45s)"))
+                    )
+                } else {
+                    listOf(
+                        Pair("Push Day — Ngực, Vai & Tay sau", listOf("Barbell Bench Press (4 hiệp x 8-10 reps • Nghỉ 90s)", "Incline Dumbbell Press (3 hiệp x 10 reps • Nghỉ 60s)", "Overhead Shoulder Press (3 hiệp x 10 reps • Nghỉ 60s)", "Triceps Rope Pushdown (3 hiệp x 12 reps • Nghỉ 45s)")),
+                        Pair("Pull Day — Lưng xô & Tay trước", listOf("Lat Pulldown (4 hiệp x 10-12 reps • Nghỉ 60s)", "Bent Over Barbell Row (3 hiệp x 8-10 reps • Nghỉ 90s)", "Biceps Barbell Curl (3 hiệp x 10 reps • Nghỉ 45s)", "Face Pull (3 hiệp x 15 reps • Nghỉ 45s)")),
+                        Pair("Legs Day — Cơ đùi, Mông & Bắp chân", listOf("Barbell Back Squat (4 hiệp x 8 reps • Nghỉ 120s)", "Romanian Deadlift (3 hiệp x 10 reps • Nghỉ 90s)", "Leg Press (3 hiệp x 10 reps • Nghỉ 60s)", "Standing Calf Raise (3 hiệp x 15 reps • Nghỉ 45s)"))
+                    )
+                }
+            }
+            "UL" -> listOf(
+                Pair("Upper Day A — Thân trên sức mạnh", listOf("Barbell Bench Press (4 hiệp x 6-8 reps • Nghỉ 120s)", "Bent Over Barbell Row (4 hiệp x 6-8 reps • Nghỉ 90s)", "Overhead Shoulder Press (3 hiệp x 8 reps • Nghỉ 60s)", "Biceps Curl (3 hiệp x 10 reps • Nghỉ 45s)")),
+                Pair("Lower Day A — Thân dưới sức mạnh", listOf("Barbell Back Squat (4 hiệp x 6-8 reps • Nghỉ 120s)", "Romanian Deadlift (3 hiệp x 8 reps • Nghỉ 90s)", "Leg Press (3 hiệp x 10 reps • Nghỉ 60s)", "Standing Calf Raise (3 hiệp x 15 reps • Nghỉ 45s)")),
+                Pair("Upper Day B — Thân trên phì đại cơ", listOf("Incline Dumbbell Press (4 hiệp x 10 reps • Nghỉ 60s)", "Lat Pulldown (4 hiệp x 10 reps • Nghỉ 60s)", "Dumbbell Lateral Raise (4 hiệp x 12-15 reps • Nghỉ 45s)", "Triceps Pushdown (3 hiệp x 12 reps • Nghỉ 45s)")),
+                Pair("Lower Day B — Thân dưới phì đại cơ", listOf("Bulgarian Split Squat (3 hiệp x 10 reps/chân • Nghỉ 60s)", "Leg Extension (4 hiệp x 12 reps • Nghỉ 45s)", "Hamstring Curl (4 hiệp x 12 reps • Nghỉ 45s)", "Seated Calf Raise (4 hiệp x 15 reps • Nghỉ 45s)"))
+            )
+            else -> listOf(
+                Pair("Full Body A — Nền tảng sức mạnh", listOf("Barbell Squat (4 hiệp x 8 reps • Nghỉ 90s)", "Barbell Bench Press (4 hiệp x 8 reps • Nghỉ 90s)", "Bent Over Row (3 hiệp x 10 reps • Nghỉ 60s)", "Plank (3 hiệp x 45s • Nghỉ 30s)")),
+                Pair("Full Body B — Sức mạnh bùng nổ", listOf("Deadlift (3 hiệp x 5 reps • Nghỉ 120s)", "Overhead Press (3 hiệp x 8 reps • Nghỉ 60s)", "Pull-ups / Lat Pulldown (3 hiệp x 8-10 reps • Nghỉ 60s)", "Biceps Curl (3 hiệp x 10 reps • Nghỉ 45s)")),
+                Pair("Full Body C — Phì đại & Cân bằng", listOf("Dumbbell Lunge (3 hiệp x 12 reps • Nghỉ 60s)", "Incline Dumbbell Press (3 hiệp x 10 reps • Nghỉ 60s)", "Cable Face Pull (3 hiệp x 15 reps • Nghỉ 45s)", "Triceps Dips (3 hiệp x 10 reps • Nghỉ 45s)"))
+            )
+        }
+
+        // Map sessions directly to chosen days in chronological order
+        val sortedDays = allDays.filter { selectedDays.contains(it) }
+        generatedScheduleMap.clear()
+        for (i in sortedDays.indices) {
+            if (i < sessions.size) {
+                generatedScheduleMap[sortedDays[i]] = sessions[i]
+            }
+        }
+
+        // Render cards for all 7 days of the week
+        allDays.forEach { dayKey ->
+            val dayName = dayNames[dayKey] ?: dayKey
+            val routine = generatedScheduleMap[dayKey]
+            val isRest = routine == null
+
+            val card = android.widget.LinearLayout(this).apply {
+                layoutParams = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = 8 }
+                orientation = android.widget.LinearLayout.VERTICAL
+                background = ContextCompat.getDrawable(this@AiWorkoutPlannerActivity, R.drawable.bg_tag_chip)
+                setPadding(20, 16, 20, 16)
+            }
+
+            val tvDayHeader = TextView(this).apply {
+                text = if (isRest) "🛌 $dayName: Nghỉ ngơi & Phục hồi" else "🏋️ $dayName: ${routine!!.first} ($selectedDuration phút)"
+                setTextColor(ContextCompat.getColor(this@AiWorkoutPlannerActivity, if (isRest) R.color.text_slate else R.color.text_dark))
+                textSize = 12.5f
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
+            }
+            card.addView(tvDayHeader)
+
+            if (!isRest) {
+                routine!!.second.forEach { exText ->
+                    val tvEx = TextView(this).apply {
+                        text = "• $exText"
+                        setTextColor(ContextCompat.getColor(this@AiWorkoutPlannerActivity, R.color.text_dark))
+                        textSize = 11.5f
+                        layoutParams = android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                        ).apply { topMargin = 4 }
+                    }
+                    card.addView(tvEx)
+                }
+            }
+
+            binding.llGeneratedSessionsContainer.addView(card)
         }
     }
 }

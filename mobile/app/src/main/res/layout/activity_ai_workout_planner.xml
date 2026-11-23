@@ -87,7 +87,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="1. Phương pháp phân chia (Training Split)"
+                    android:text="Phương pháp phân chia lịch tập"
                     android:textColor="@color/text_dark"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -118,9 +118,48 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="3–6 buổi/tuần • Tăng cơ toàn diện"
+                        android:text="Linh hoạt 3 hoặc 6 buổi/tuần • Phù hợp phát triển cơ bắp"
                         android:textColor="#E2E8F0"
                         android:textSize="10.5sp" />
+                </LinearLayout>
+
+                <!-- PPL Session Count Sub-toggle (3 vs 6 sessions) -->
+                <LinearLayout
+                    android:id="@+id/layout_ppl_freq_toggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/chip_ppl_3_sessions"
+                        android:layout_width="0dp"
+                        android:layout_height="32dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_subtab_pill_active"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="3 buổi / tuần"
+                        android:textColor="@color/white"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/chip_ppl_6_sessions"
+                        android:layout_width="0dp"
+                        android:layout_height="32dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_subtab_pill_inactive"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="6 buổi / tuần"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -148,7 +187,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="4 buổi/tuần • Sức mạnh cân bằng"
+                        android:text="Cố định 4 buổi/tuần • Sức mạnh cân bằng"
                         android:textColor="@color/text_slate"
                         android:textSize="10.5sp" />
                 </LinearLayout>
@@ -178,7 +217,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="3 buổi/tuần • Tiết kiệm thời gian"
+                        android:text="Cố định 3 buổi/tuần • Tiết kiệm thời gian"
                         android:textColor="@color/text_slate"
                         android:textSize="10.5sp" />
                 </LinearLayout>
@@ -188,7 +227,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="12dp"
                 android:background="@drawable/bg_card_white"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -196,87 +235,155 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="2. Số buổi tập &amp; Thời lượng mỗi buổi"
+                    android:text="Tần suất &amp; Thời lượng tập"
                     android:textColor="@color/text_dark"
                     android:textSize="13sp"
                     android:textStyle="bold" />
 
-                <!-- Days selection -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Số ngày tập mỗi tuần:"
-                    android:textColor="@color/text_slate"
-                    android:textSize="11sp" />
-
+                <!-- Day of week picker (T2, T3, T4, T5, T6, T7, CN) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/chip_days_3"
                         android:layout_width="0dp"
-                        android:layout_height="34dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:background="@drawable/bg_subtab_pill_inactive"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:gravity="center"
-                        android:text="3 ngày"
-                        android:textColor="@color/text_dark"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
+                        android:text="Chọn thứ trong tuần để tập:"
+                        android:textColor="@color/text_slate"
+                        android:textSize="11sp" />
 
                     <TextView
-                        android:id="@+id/chip_days_4"
+                        android:id="@+id/tv_selected_days_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_badge_streak"
+                        android:paddingStart="8dp"
+                        android:paddingTop="2dp"
+                        android:paddingEnd="8dp"
+                        android:paddingBottom="2dp"
+                        android:text="Đã chọn: 3 / 3 ngày"
+                        android:textColor="@color/badge_streak_text"
+                        android:textSize="10.5sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_days_of_week"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/chip_day_mon"
                         android:layout_width="0dp"
-                        android:layout_height="34dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_height="36dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_subtab_pill_active"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="4 ngày"
+                        android:text="T2"
                         android:textColor="@color/white"
-                        android:textSize="11sp"
+                        android:textSize="11.5sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/chip_days_5"
+                        android:id="@+id/chip_day_tue"
                         android:layout_width="0dp"
-                        android:layout_height="34dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_subtab_pill_inactive"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="5 ngày"
+                        android:text="T3"
                         android:textColor="@color/text_dark"
-                        android:textSize="11sp"
+                        android:textSize="11.5sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/chip_days_6"
+                        android:id="@+id/chip_day_wed"
                         android:layout_width="0dp"
-                        android:layout_height="34dp"
-                        android:layout_marginStart="8dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_subtab_pill_active"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="T4"
+                        android:textColor="@color/white"
+                        android:textSize="11.5sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/chip_day_thu"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="4dp"
                         android:layout_weight="1"
                         android:background="@drawable/bg_subtab_pill_inactive"
                         android:clickable="true"
                         android:focusable="true"
                         android:gravity="center"
-                        android:text="6 ngày"
+                        android:text="T5"
                         android:textColor="@color/text_dark"
-                        android:textSize="11sp"
+                        android:textSize="11.5sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/chip_day_fri"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_subtab_pill_active"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="T6"
+                        android:textColor="@color/white"
+                        android:textSize="11.5sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/chip_day_sat"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_subtab_pill_inactive"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="T7"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11.5sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/chip_day_sun"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_subtab_pill_inactive"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="CN"
+                        android:textColor="@color/text_dark"
+                        android:textSize="11.5sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <!-- Duration selection -->
+                <!-- Duration selection (30, 45, 60, 75, 90 mins) -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -285,48 +392,105 @@
                     android:textColor="@color/text_slate"
                     android:textSize="11sp" />
 
-                <LinearLayout
+                <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
-                    android:orientation="horizontal">
+                    android:overScrollMode="never"
+                    android:scrollbars="none">
 
-                    <TextView
-                        android:id="@+id/chip_dur_45"
-                        android:layout_width="0dp"
-                        android:layout_height="34dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_subtab_pill_inactive"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:gravity="center"
-                        android:text="⏱ 45 phút"
-                        android:textColor="@color/text_dark"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/chip_dur_60"
-                        android:layout_width="0dp"
-                        android:layout_height="34dp"
-                        android:layout_marginStart="10dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_subtab_pill_active"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:gravity="center"
-                        android:text="⏱ 60 phút (Chuẩn)"
-                        android:textColor="@color/white"
-                        android:textSize="11sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/chip_dur_30"
+                            android:layout_width="wrap_content"
+                            android:layout_height="34dp"
+                            android:background="@drawable/bg_subtab_pill_inactive"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:text="⏱ 30 phút"
+                            android:textColor="@color/text_dark"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/chip_dur_45"
+                            android:layout_width="wrap_content"
+                            android:layout_height="34dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_subtab_pill_inactive"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:text="⏱ 45 phút"
+                            android:textColor="@color/text_dark"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/chip_dur_60"
+                            android:layout_width="wrap_content"
+                            android:layout_height="34dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_subtab_pill_active"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:text="⏱ 60 phút"
+                            android:textColor="@color/white"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/chip_dur_75"
+                            android:layout_width="wrap_content"
+                            android:layout_height="34dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_subtab_pill_inactive"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:text="⏱ 75 phút"
+                            android:textColor="@color/text_dark"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/chip_dur_90"
+                            android:layout_width="wrap_content"
+                            android:layout_height="34dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_subtab_pill_inactive"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:text="⏱ 90 phút"
+                            android:textColor="@color/text_dark"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </HorizontalScrollView>
             </LinearLayout>
 
             <!-- Card 3: Injury Exclusion -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="12dp"
                 android:background="@drawable/bg_card_white"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -334,7 +498,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3. Vùng nhạy cảm / chấn thương"
+                    android:text="Chấn thương"
                     android:textColor="@color/text_dark"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -481,72 +645,13 @@
                     android:textSize="11.5sp"
                     android:textStyle="bold" />
 
-                <!-- Weekly Sessions Breakdown -->
+                <!-- Dynamic Weekly Sessions & Exercises Breakdown Container -->
                 <LinearLayout
+                    android:id="@+id/ll_generated_sessions_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_tag_chip"
-                        android:padding="8dp"
-                        android:text="• Thứ 2: Push Day (Ngực &amp; Tay Sau) — 3 bài • 45 phút"
-                        android:textColor="@color/text_dark"
-                        android:textSize="11sp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:background="@drawable/bg_tag_chip"
-                        android:padding="8dp"
-                        android:text="• Thứ 3: Pull Day (Lưng Xô &amp; Tay Trước) — 3 bài • 45 phút"
-                        android:textColor="@color/text_dark"
-                        android:textSize="11sp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:background="@drawable/bg_tag_chip"
-                        android:padding="8dp"
-                        android:text="• Thứ 4: Nghỉ phục hồi cơ bắp &amp; Giãn cơ"
-                        android:textColor="@color/text_slate"
-                        android:textSize="11sp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:background="@drawable/bg_tag_chip"
-                        android:padding="8dp"
-                        android:text="• Thứ 5: Legs &amp; Core Day (Chân &amp; Bụng) — 4 bài • 50 phút"
-                        android:textColor="@color/text_dark"
-                        android:textSize="11sp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:background="@drawable/bg_tag_chip"
-                        android:padding="8dp"
-                        android:text="• Thứ 6: Upper Hypertrophy (Ngực, Lưng, Vai) — 4 bài • 50 phút"
-                        android:textColor="@color/text_dark"
-                        android:textSize="11sp" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:background="@drawable/bg_tag_chip"
-                        android:padding="8dp"
-                        android:text="• Thứ 7 &amp; CN: Đi bộ nhẹ nhàng &amp; Nghỉ ngơi hoàn toàn"
-                        android:textColor="@color/text_slate"
-                        android:textSize="11sp" />
-                </LinearLayout>
+                    android:orientation="vertical" />
 
                 <!-- Apply Button -->
                 <com.google.android.material.button.MaterialButton
@@ -555,7 +660,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="46dp"
                     android:layout_marginTop="16dp"
-                    android:text="✓ Áp dụng vào lịch tập tuần này"
+                    android:text="✓ Áp dụng vào lịch tập của tôi"
                     android:textSize="13sp"
                     app:cornerRadius="12dp" />
             </LinearLayout>

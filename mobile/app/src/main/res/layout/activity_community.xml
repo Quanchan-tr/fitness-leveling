@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/bg_top_header_bar"
         android:paddingStart="@dimen/screen_padding_horizontal"
-        android:paddingTop="44dp"
+        android:paddingTop="12dp"
         android:paddingEnd="@dimen/screen_padding_horizontal"
         android:paddingBottom="14dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,6 +22,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
+            android:id="@+id/layout_header_titles"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
@@ -47,6 +48,43 @@
                 android:text="@string/community_subtitle"
                 android:textColor="@color/text_slate"
                 android:textSize="11sp" />
+        </LinearLayout>
+
+        <!-- Search Bar Inside Header (Expandable) -->
+        <LinearLayout
+            android:id="@+id/layout_header_search"
+            android:layout_width="0dp"
+            android:layout_height="38dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_tag_chip"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_header_action"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:contentDescription="@string/community_title"
+                app:srcCompat="@drawable/ic_search"
+                app:tint="@color/text_slate" />
+
+            <EditText
+                android:id="@+id/et_search_community"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:background="@null"
+                android:hint="Tìm bài viết, nhóm cơ, bạn bè..."
+                android:singleLine="true"
+                android:textColor="@color/text_dark"
+                android:textColorHint="@color/text_slate_light"
+                android:textSize="12sp" />
         </LinearLayout>
 
         <ImageView
@@ -80,16 +118,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="@dimen/screen_padding_horizontal"
             android:paddingTop="14dp"
-            android:paddingEnd="@dimen/screen_padding_horizontal"
             android:paddingBottom="24dp">
 
-            <!-- Category / Muscle Filter Chips -->
+        <!-- Category / Muscle Filter Chips -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:clipToPadding="false"
                 android:overScrollMode="never"
+                android:paddingStart="@dimen/screen_padding_horizontal"
+                android:paddingEnd="@dimen/screen_padding_horizontal"
                 android:scrollbars="none">
 
                 <LinearLayout
@@ -169,8 +208,7 @@
                 android:id="@+id/card_create_post"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_card_white"
+                android:background="@drawable/bg_post_composer_flat"
                 android:elevation="0dp"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -202,15 +240,8 @@
                             android:layout_height="wrap_content"
                             android:text="Tạo bài viết mới"
                             android:textColor="@color/text_dark"
-                            android:textSize="13.5sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Chia sẻ thành tích, giáo án hoặc video kiểm tra form"
-                            android:textColor="@color/text_slate"
-                            android:textSize="10.5sp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -245,7 +276,7 @@
                         android:id="@+id/layout_preview_image"
                         android:layout_width="match_parent"
                         android:layout_height="120dp"
-                        android:background="@drawable/bg_card_selectable"
+                        android:background="@drawable/bg_media_sharp"
                         android:visibility="gone">
 
                         <ImageView
@@ -253,7 +284,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/bg_card_dark" />
+                            android:src="@drawable/bg_media_sharp" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -342,93 +373,157 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </LinearLayout>
 
-                <!-- Composer Action Bar -->
+                <!-- Composer Attachment Buttons Row -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:overScrollMode="never"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <!-- Attach Photo Button -->
+                        <LinearLayout
+                            android:id="@+id/btn_attach_photo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:background="@drawable/bg_tag_chip"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:contentDescription="@string/cd_workout"
+                                app:srcCompat="@drawable/ic_image_solid"
+                                app:tint="@color/primary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                android:text="Ảnh"
+                                android:textColor="@color/text_dark"
+                                android:textSize="11.5sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Attach Video Button -->
+                        <LinearLayout
+                            android:id="@+id/btn_attach_video"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_tag_chip"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:contentDescription="@string/cd_workout"
+                                app:srcCompat="@drawable/ic_video_solid"
+                                app:tint="@color/primary_blue" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                android:text="Video"
+                                android:textColor="@color/text_dark"
+                                android:textSize="11.5sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Attach Workout Button -->
+                        <LinearLayout
+                            android:id="@+id/btn_attach_workout"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_tag_chip"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:contentDescription="@string/cd_workout"
+                                app:srcCompat="@drawable/ic_dumbbell_solid"
+                                app:tint="@color/primary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                android:text="Buổi tập"
+                                android:textColor="@color/text_dark"
+                                android:textSize="11.5sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Attach Meal Button -->
+                        <LinearLayout
+                            android:id="@+id/btn_attach_meal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_tag_chip"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="🥗"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="5dp"
+                                android:text="Bữa ăn"
+                                android:textColor="@color/text_dark"
+                                android:textSize="11.5sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- Dedicated Submit Button Row (Aligned to Right) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:gravity="center_vertical"
+                    android:gravity="end"
                     android:orientation="horizontal">
 
-                    <!-- Attach Photo Button -->
-                    <LinearLayout
-                        android:id="@+id/btn_attach_photo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_tag_chip"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:gravity="center"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp">
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:contentDescription="@string/cd_workout"
-                            app:srcCompat="@drawable/ic_image_solid"
-                            app:tint="@color/primary" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:text="Ảnh"
-                            android:textColor="@color/text_dark"
-                            android:textSize="11.5sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- Attach Video Button -->
-                    <LinearLayout
-                        android:id="@+id/btn_attach_video"
-                        android:layout_width="wrap_content"
-                        android:layout_height="32dp"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_tag_chip"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:gravity="center"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp">
-
-                        <ImageView
-                            android:layout_width="16dp"
-                            android:layout_height="16dp"
-                            android:contentDescription="@string/cd_workout"
-                            app:srcCompat="@drawable/ic_video_solid"
-                            app:tint="@color/primary_blue" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="6dp"
-                            android:text="Video"
-                            android:textColor="@color/text_dark"
-                            android:textSize="11.5sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="1dp"
-                        android:layout_weight="1" />
-
-                    <!-- Submit Button -->
-                    <TextView
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_submit_post"
+                        style="@style/Widget.FitTrack.PrimaryButton"
                         android:layout_width="wrap_content"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_primary_button"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:gravity="center"
-                        android:paddingStart="14dp"
-                        android:paddingEnd="14dp"
+                        android:layout_height="38dp"
+                        android:paddingStart="22dp"
+                        android:paddingEnd="22dp"
                         android:text="Đăng bài"
-                        android:textColor="@color/white"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                        android:textSize="12.5sp"
+                        app:cornerRadius="8dp" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -437,17 +532,20 @@
                 android:id="@+id/card_newly_created_post"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_card_white"
+                android:layout_marginTop="10dp"
+                android:background="@color/surface"
                 android:orientation="vertical"
-                android:padding="16dp"
+                android:padding="0dp"
                 android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp">
 
                     <ImageView
                         android:layout_width="38dp"
@@ -509,8 +607,10 @@
                     android:id="@+id/tv_new_post_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="10dp"
                     android:lineSpacingExtra="3dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
                     android:text="Vừa hoàn thành buổi tập hôm nay! Đã ghi lại form và video bài tập kèm theo."
                     android:textColor="@color/text_dark"
                     android:textSize="13sp" />
@@ -519,9 +619,9 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/card_new_post_media"
                     android:layout_width="match_parent"
-                    android:layout_height="140dp"
+                    android:layout_height="260dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_card_dark">
+                    android:background="@drawable/bg_media_sharp">
 
                     <ImageView
                         android:id="@+id/iv_new_post_play"
@@ -557,15 +657,18 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginBottom="8dp"
                     android:background="@color/border_card" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -621,18 +724,21 @@
                 android:id="@+id/card_post_1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_card_white"
+                android:layout_marginTop="10dp"
+                android:background="@color/surface"
                 android:elevation="0dp"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="0dp">
 
                 <!-- Author Header -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp">
 
                     <ImageView
                         android:layout_width="38dp"
@@ -695,8 +801,10 @@
                     android:id="@+id/tv_post1_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="8dp"
                     android:lineSpacingExtra="3dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
                     android:text="@string/community_post_content"
                     android:textColor="@color/text_dark"
                     android:textSize="13sp" />
@@ -706,7 +814,9 @@
                     android:id="@+id/card_attached_routine"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="8dp"
                     android:background="@drawable/bg_card_selectable"
                     android:orientation="vertical"
                     android:padding="12dp">
@@ -759,19 +869,19 @@
                         android:textSize="11sp" />
                 </LinearLayout>
 
-                <!-- Attached Workout Photo Card -->
+                <!-- Attached Workout Photo Card (Instagram Full Width) -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/card_post1_image"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
+                    android:layout_height="260dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_card_selectable">
+                    android:background="@drawable/bg_media_sharp">
 
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/bg_card_dark" />
+                        android:src="@drawable/bg_media_sharp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -803,7 +913,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp">
 
                     <LinearLayout
                         android:id="@+id/btn_like_post_1"
@@ -895,23 +1008,244 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:background="@color/divider" />
+
+            <!-- ================= SUGGESTED USERS (INSTAGRAM CAROUSEL) ================= -->
+            <LinearLayout
+                android:id="@+id/card_suggested_users"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/screen_padding_horizontal"
+                android:layout_marginEnd="@dimen/screen_padding_horizontal"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_card_white"
+                android:orientation="vertical"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Gợi ý người bạn có thể biết"
+                        android:textColor="@color/text_dark"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btn_see_all_suggestions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Xem tất cả"
+                        android:textColor="@color/primary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:overScrollMode="never"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+
+                        <!-- User Card 1 -->
+                        <LinearLayout
+                            android:layout_width="140dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="4dp"
+                            android:background="@drawable/bg_tag_chip"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_avatar_circle_border"
+                                android:padding="8dp"
+                                app:srcCompat="@drawable/ic_user_solid"
+                                app:tint="@color/primary" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:text="Huy Hoàng"
+                                android:textColor="@color/text_dark"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="1dp"
+                                android:text="Lv. 15 • Powerlifter"
+                                android:textColor="@color/text_slate"
+                                android:textSize="9.5sp" />
+
+                            <TextView
+                                android:id="@+id/btn_follow_user_1"
+                                android:layout_width="match_parent"
+                                android:layout_height="28dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/bg_primary_button"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center"
+                                android:text="Theo dõi"
+                                android:textColor="@color/white"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- User Card 2 -->
+                        <LinearLayout
+                            android:layout_width="140dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="4dp"
+                            android:background="@drawable/bg_tag_chip"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_avatar_circle_border"
+                                android:padding="8dp"
+                                app:srcCompat="@drawable/ic_user_solid"
+                                app:tint="@color/primary_blue" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:text="Thanh Vân"
+                                android:textColor="@color/text_dark"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="1dp"
+                                android:text="Lv. 9 • Calisthenics"
+                                android:textColor="@color/text_slate"
+                                android:textSize="9.5sp" />
+
+                            <TextView
+                                android:id="@+id/btn_follow_user_2"
+                                android:layout_width="match_parent"
+                                android:layout_height="28dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/bg_primary_button"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center"
+                                android:text="Theo dõi"
+                                android:textColor="@color/white"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- User Card 3 -->
+                        <LinearLayout
+                            android:layout_width="140dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="4dp"
+                            android:background="@drawable/bg_tag_chip"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_avatar_circle_border"
+                                android:padding="8dp"
+                                app:srcCompat="@drawable/ic_user_solid"
+                                app:tint="@color/badge_streak_text" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:ellipsize="end"
+                                android:maxLines="1"
+                                android:text="Đức Thắng"
+                                android:textColor="@color/text_dark"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="1dp"
+                                android:text="Lv. 18 • HLV Thể hình"
+                                android:textColor="@color/text_slate"
+                                android:textSize="9.5sp" />
+
+                            <TextView
+                                android:id="@+id/btn_follow_user_3"
+                                android:layout_width="match_parent"
+                                android:layout_height="28dp"
+                                android:layout_marginTop="10dp"
+                                android:background="@drawable/bg_primary_button"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:gravity="center"
+                                android:text="Theo dõi"
+                                android:textColor="@color/white"
+                                android:textSize="11sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
+
             <!-- ================= FEED POST 2 ================= -->
             <LinearLayout
                 android:id="@+id/card_post_2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:background="@drawable/bg_card_white"
+                android:layout_marginTop="10dp"
+                android:background="@color/surface"
                 android:elevation="0dp"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="0dp">
 
                 <!-- Author Header -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingTop="12dp"
+                    android:paddingEnd="16dp">
 
                     <ImageView
                         android:layout_width="38dp"
@@ -974,8 +1308,10 @@
                     android:id="@+id/tv_post2_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="10dp"
                     android:lineSpacingExtra="3dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
                     android:text="@string/community_post_2_content"
                     android:textColor="@color/text_dark"
                     android:textSize="13sp" />
@@ -984,7 +1320,9 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginTop="10dp"
                     android:background="@drawable/bg_card_selectable"
                     android:orientation="vertical"
                     android:padding="12dp">
@@ -1006,19 +1344,19 @@
                         android:textSize="11sp" />
                 </LinearLayout>
 
-                <!-- Attached Video Player Box -->
+                <!-- Attached Video Player Box (Instagram Full Width) -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/card_post2_video"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
+                    android:layout_height="260dp"
                     android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_card_dark">
+                    android:background="@drawable/bg_media_sharp">
 
                     <ImageView
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:background="@drawable/bg_modal_circle_primary"
-                        android:padding="12dp"
+                        android:padding="13dp"
                         android:contentDescription="@string/cd_workout"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -1029,7 +1367,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_margin="8dp"
+                        android:layout_margin="10dp"
                         android:background="@drawable/bg_tag_chip"
                         android:paddingStart="8dp"
                         android:paddingTop="3dp"
@@ -1037,7 +1375,7 @@
                         android:paddingBottom="3dp"
                         android:text="🎥 Video Meal Prep &amp; Lịch Tập Siết Mỡ (0:30s)"
                         android:textColor="@color/white"
-                        android:textSize="10sp"
+                        android:textSize="10.5sp"
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
@@ -1056,7 +1394,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="12dp">
 
                     <LinearLayout
                         android:id="@+id/btn_like_post_2"
@@ -1106,6 +1447,7 @@
                             app:tint="@color/text_slate" />
 
                         <TextView
+                            android:id="@+id/tv_comment_count_2"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="6dp"
@@ -1146,6 +1488,11 @@
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:background="@color/divider" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

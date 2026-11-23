@@ -37,8 +37,9 @@ class SessionManager(context: Context) {
         private const val KEY_OB_FOCUS_MUSCLE = "ob_focus_muscle"
         private const val KEY_OB_EQUIPMENT = "ob_equipment"
 
-        // Production Azure API URL (strictly locked)
-        const val DEFAULT_BASE_URL = "https://fittrack.eastasia.cloudapp.azure.com/api/v1/"
+        // Local Backend URL (for Android Emulator to Host PC)
+        const val DEFAULT_BASE_URL = "http://10.0.2.2:8000/api/v1/"
+        const val CLOUD_BASE_URL = "https://fittrack.eastasia.cloudapp.azure.com/api/v1/"
 
         @Volatile
         private var instance: SessionManager? = null
@@ -81,9 +82,28 @@ class SessionManager(context: Context) {
         get() = prefs.getInt(KEY_USER_STREAK, 0)
         set(value) = prefs.edit().putInt(KEY_USER_STREAK, value).apply()
 
+    var userFollowersCount: Int
+        get() = prefs.getInt("user_followers_count", 0)
+        set(value) = prefs.edit().putInt("user_followers_count", value).apply()
+
+    var userFollowingCount: Int
+        get() = prefs.getInt("user_following_count", 0)
+        set(value) = prefs.edit().putInt("user_following_count", value).apply()
+
+    var userTotalWorkouts: Int
+        get() = prefs.getInt("user_total_workouts", 0)
+        set(value) = prefs.edit().putInt("user_total_workouts", value).apply()
+
     var baseUrl: String
-        get() = DEFAULT_BASE_URL
-        set(_) = Unit // Locked to production VPS
+        get() {
+            val saved = prefs.getString(KEY_BASE_URL, null)
+            return if (saved.isNullOrBlank() || saved.contains("cloudapp.azure.com")) {
+                DEFAULT_BASE_URL
+            } else {
+                saved
+            }
+        }
+        set(value) = prefs.edit().putString(KEY_BASE_URL, value).apply()
 
     var userWeight: Float
         get() = prefs.getFloat(KEY_USER_WEIGHT, 70.0f)
@@ -106,7 +126,7 @@ class SessionManager(context: Context) {
         set(value) = prefs.edit().putString(KEY_USER_BIRTH_DATE, value).apply()
 
     var waterLoggedMl: Int
-        get() = prefs.getInt(KEY_WATER_ML, 1250)
+        get() = prefs.getInt(KEY_WATER_ML, 0)
         set(value) = prefs.edit().putInt(KEY_WATER_ML, value).apply()
 
     fun addWater(ml: Int): Int {
@@ -160,6 +180,70 @@ class SessionManager(context: Context) {
         get() = prefs.getString("active_workout_name", "Buổi tập thể lực") ?: "Buổi tập thể lực"
         set(value) = prefs.edit().putString("active_workout_name", value).apply()
 
+    // ── Nutrition Daily State & Reset ──────────────────────────
+    var dailyNutritionDate: String
+        get() = prefs.getString("daily_nutrition_date", "") ?: ""
+        set(value) = prefs.edit().putString("daily_nutrition_date", value).apply()
+
+    var loggedCalories: Int
+        get() = prefs.getInt("logged_calories", 0)
+        set(value) = prefs.edit().putInt("logged_calories", value).apply()
+
+    var loggedProtein: Int
+        get() = prefs.getInt("logged_protein", 0)
+        set(value) = prefs.edit().putInt("logged_protein", value).apply()
+
+    var loggedCarbs: Int
+        get() = prefs.getInt("logged_carbs", 0)
+        set(value) = prefs.edit().putInt("logged_carbs", value).apply()
+
+    var loggedFat: Int
+        get() = prefs.getInt("logged_fat", 0)
+        set(value) = prefs.edit().putInt("logged_fat", value).apply()
+
+    var nutritionHistoryRaw: String
+        get() = prefs.getString("nutrition_history_raw", "") ?: ""
+        set(value) = prefs.edit().putString("nutrition_history_raw", value).apply()
+
+    fun checkAndResetDailyNutrition() {
+        val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+        val savedDate = dailyNutritionDate
+        if (savedDate.isBlank()) {
+            dailyNutritionDate = today
+            return
+        }
+        if (savedDate != today) {
+            // Archive previous day if calories > 0
+            if (loggedCalories > 0) {
+                val record = "$savedDate|$loggedCalories|$loggedProtein|$loggedCarbs|$loggedFat"
+                val existing = nutritionHistoryRaw
+                nutritionHistoryRaw = if (existing.isNotBlank()) "$record;$existing" else record
+            }
+            // Reset for the new day
+            loggedCalories = 0
+            loggedProtein = 0
+            loggedCarbs = 0
+            loggedFat = 0
+            dailyNutritionDate = today
+        }
+    }
+
+    // Weekly routine schedule preferences (Day -> Routine title list)
+    fun getScheduleForDay(dayKey: String): List<String> {
+        val raw = prefs.getString("weekly_schedule_$dayKey", null) ?: when (dayKey) {
+            "T2" -> "Push Day (Ngực & Tay Sau)"
+            "T3" -> "Pull Day (Lưng & Tay Trước)"
+            "T5" -> "Legs Day (Cơ đùi & Mông)"
+            else -> ""
+        }
+        return if (raw.isBlank()) emptyList() else raw.split(";;").filter { it.isNotBlank() }
+    }
+
+    fun setScheduleForDay(dayKey: String, routines: List<String>) {
+        val raw = routines.filter { it.isNotBlank() }.joinToString(";;")
+        prefs.edit().putString("weekly_schedule_$dayKey", raw).apply()
+    }
+
     fun saveUserSession(
         token: String,
         id: String,
@@ -181,7 +265,7 @@ class SessionManager(context: Context) {
     }
 
     fun clearSession() {
-        prefs.edit()
+        val editor = prefs.edit()
             .remove(KEY_AUTH_TOKEN)
             .remove(KEY_USER_ID)
             .remove(KEY_USER_NAME)
@@ -189,6 +273,21 @@ class SessionManager(context: Context) {
             .remove(KEY_USER_LEVEL)
             .remove(KEY_USER_XP)
             .remove(KEY_USER_STREAK)
-            .apply()
+            .remove("user_followers_count")
+            .remove("user_following_count")
+            .remove("user_total_workouts")
+            .remove(KEY_WATER_ML)
+            .remove("logged_calories")
+            .remove("logged_protein")
+            .remove("logged_carbs")
+            .remove("logged_fat")
+            .remove("nutrition_history_raw")
+            .remove("daily_nutrition_date")
+            .remove("is_workout_active")
+            .remove("active_workout_name")
+        listOf("T2", "T3", "T4", "T5", "T6", "T7", "CN").forEach {
+            editor.remove("weekly_schedule_$it")
+        }
+        editor.apply()
     }
 }

@@ -116,7 +116,9 @@ class ExerciseDetailBottomSheet : BottomSheetDialogFragment() {
         }
 
         binding.btnStartExerciseNow.setOnClickListener {
+            val startIndex = arguments?.getInt("START_EXERCISE_INDEX", 0) ?: 0
             val intent = Intent(requireContext(), ActiveWorkoutActivity::class.java).apply {
+                putExtra("START_EXERCISE_INDEX", startIndex)
                 putExtra("EXERCISE_NAME", exercise?.name ?: "Bài tập thể hình")
                 putExtra("EXERCISE_IMAGE", exercise?.gifUrl ?: exercise?.thumbnailUrl.orEmpty())
                 putExtra("EXERCISE_TARGET", exercise?.targetMuscle ?: exercise?.bodyPart.orEmpty())
@@ -134,9 +136,12 @@ class ExerciseDetailBottomSheet : BottomSheetDialogFragment() {
     }
 
     companion object {
-        fun newInstance(exercise: ExerciseDto): ExerciseDetailBottomSheet {
+        fun newInstance(exercise: ExerciseDto, startIndex: Int = 0): ExerciseDetailBottomSheet {
             return ExerciseDetailBottomSheet().apply {
                 this.exercise = exercise
+                arguments = Bundle().apply {
+                    putInt("START_EXERCISE_INDEX", startIndex)
+                }
             }
         }
     }

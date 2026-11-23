@@ -7,14 +7,14 @@
     android:background="@color/bg_screen_gray"
     tools:context=".ui.settings.SettingsActivity">
 
-    <!-- Top App Bar (Partitioned) -->
+    <!-- Top App Bar -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_header"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_top_header_bar"
         android:paddingStart="@dimen/screen_padding_horizontal"
-        android:paddingTop="44dp"
+        android:paddingTop="12dp"
         android:paddingEnd="@dimen/screen_padding_horizontal"
         android:paddingBottom="14dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,11 +35,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                app:srcCompat="@drawable/ic_back"
+                app:tint="@color/text_dark" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_btn_back"
-                android:textColor="@color/primary"
+                android:layout_marginStart="4dp"
+                android:text="Quay lại"
+                android:textColor="@color/text_dark"
                 android:textSize="14sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -48,9 +55,9 @@
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/settings_screen_title"
+            android:text="Cài đặt &amp; Tài khoản"
             android:textColor="@color/text_dark"
-            android:textSize="18sp"
+            android:textSize="17sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -61,10 +68,11 @@
             android:id="@+id/btn_more"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="•••"
+            android:text="API"
             android:textColor="@color/primary"
-            android:textSize="18sp"
+            android:textSize="13sp"
             android:textStyle="bold"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -90,13 +98,74 @@
             android:paddingEnd="@dimen/screen_padding_horizontal"
             android:paddingBottom="36dp">
 
-            <!-- Section 1: AI Training -->
+            <!-- Real User Profile Summary Card -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_white"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/iv_avatar"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_avatar_circle_border"
+                    android:padding="10dp"
+                    app:srcCompat="@drawable/ic_user_solid"
+                    app:tint="@color/primary" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_user_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Demo Hunter"
+                        android:textColor="@color/text_dark"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_user_email"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="demo@fitnessleveling.test"
+                        android:textColor="@color/text_slate"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_user_level"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="3dp"
+                        android:background="@drawable/bg_badge_level"
+                        android:paddingStart="6dp"
+                        android:paddingTop="1dp"
+                        android:paddingEnd="6dp"
+                        android:paddingBottom="1dp"
+                        android:text="Level 1 • Thợ săn sơ cấp"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Section 1: Security & Account -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_section_training"
+                android:layout_marginTop="20dp"
+                android:text="BẢO MẬT &amp; TÀI KHOẢN"
                 android:textColor="@color/text_muted"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -106,7 +175,41 @@
                 android:background="@drawable/bg_card_white"
                 android:orientation="vertical">
 
-                <!-- Voice Coach Switch -->
+                <!-- Change Password -->
+                <LinearLayout
+                    android:id="@+id/row_change_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Đổi mật khẩu"
+                        android:textColor="@color/text_dark"
+                        android:textSize="14sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cập nhật"
+                        android:textColor="@color/primary"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#F1F5F9" />
+
+                <!-- 2FA -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -118,86 +221,26 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/settings_voice_coach"
+                        android:text="Xác thực 2 yếu tố (2FA)"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp" />
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
-                        android:id="@+id/switch_voice_coach"
+                        android:id="@+id/switch_2fa"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="true" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#F1F5F9" />
-
-                <!-- Weight Unit -->
-                <LinearLayout
-                    android:id="@+id/row_weight_unit"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/settings_weight_unit"
-                        android:textColor="@color/text_dark"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_weight_unit_val"
-                        android:textColor="@color/text_muted"
-                        android:textSize="14sp" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#F1F5F9" />
-
-                <!-- Rest Time -->
-                <LinearLayout
-                    android:id="@+id/row_rest_time"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/settings_rest_time"
-                        android:textColor="@color/text_dark"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/settings_rest_time_val"
-                        android:textColor="@color/text_muted"
-                        android:textSize="14sp" />
+                        android:checked="false" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Section 2: General Settings -->
+            <!-- Section 2: App Preferences -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:text="@string/settings_general"
+                android:layout_marginTop="20dp"
+                android:text="TÙY CHỌN ỨNG DỤNG"
                 android:textColor="@color/text_muted"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textStyle="bold" />
 
             <LinearLayout
@@ -207,6 +250,7 @@
                 android:background="@drawable/bg_card_white"
                 android:orientation="vertical">
 
+                <!-- Notifications -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -218,7 +262,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/settings_notifications"
+                        android:text="Thông báo nhắc nhở tập luyện"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp" />
 
@@ -234,8 +278,8 @@
                     android:layout_height="1dp"
                     android:background="#F1F5F9" />
 
+                <!-- Dark Mode -->
                 <LinearLayout
-                    android:id="@+id/row_health_sync"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
@@ -246,30 +290,15 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="@string/settings_watch_sync"
+                        android:text="Chế độ nền tối (Dark Gym)"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp" />
 
-                    <LinearLayout
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_dark_mode"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="14dp"
-                            android:layout_height="14dp"
-                            android:layout_marginEnd="4dp"
-                            app:srcCompat="@drawable/ic_check_solid"
-                            app:tint="#10B981" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/settings_health_connected"
-                            android:textColor="#10B981"
-                            android:textSize="14sp" />
-                    </LinearLayout>
+                        android:checked="false" />
                 </LinearLayout>
 
                 <View
@@ -277,10 +306,14 @@
                     android:layout_height="1dp"
                     android:background="#F1F5F9" />
 
+                <!-- Language -->
                 <LinearLayout
                     android:id="@+id/row_language"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
                     android:padding="16dp">
@@ -289,14 +322,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Ngôn ngữ"
+                        android:text="Ngôn ngữ ứng dụng"
                         android:textColor="@color/text_dark"
                         android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/settings_country_vn"
+                        android:text="Tiếng Việt (Mặc định)"
                         android:textColor="@color/text_muted"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -308,8 +341,8 @@
                 style="@style/Widget.FitTrack.Button.Secondary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:text="@string/btn_logout"
+                android:layout_marginTop="28dp"
+                android:text="Đăng xuất tài khoản"
                 android:textColor="#EF4444" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

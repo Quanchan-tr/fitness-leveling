@@ -21,6 +21,7 @@ import com.fittrack.app.ui.profile.UserProfileActivity
 import com.fittrack.app.ui.routine.RoutineDetailActivity
 import com.fittrack.app.ui.setupBottomNav
 import com.fittrack.app.ui.workout.ActiveWorkoutActivity
+import com.fittrack.app.util.WindowInsetsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -53,6 +54,8 @@ class DashboardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        WindowInsetsHelper.applySystemInsets(this, binding.root, binding.layoutHeader, binding.bottomNavigation.root)
 
         session = SessionManager.getInstance(this)
 
@@ -92,6 +95,16 @@ class DashboardActivity : AppCompatActivity() {
         binding.progressLevelXp.progress = currentXp
 
         bindHydration()
+        bindNutritionEnergy()
+    }
+
+    private fun bindNutritionEnergy() {
+        session.checkAndResetDailyNutrition()
+        val cals = session.loggedCalories
+        val targetCals = 2200
+        binding.tvEnergyVal.text = "$cals kcal"
+        binding.pbEnergy.max = targetCals
+        binding.pbEnergy.progress = minOf(cals, targetCals)
     }
 
     private fun bindHydration() {
@@ -174,6 +187,7 @@ class DashboardActivity : AppCompatActivity() {
                     val logs = nutRes.body()!!.data!!
                     val totalCalories = logs.sumOf { it.calories }
                     if (totalCalories > 0) {
+                        session.loggedCalories = totalCalories
                         binding.tvEnergyVal.text = "$totalCalories kcal"
                         binding.pbEnergy.progress = minOf(totalCalories, binding.pbEnergy.max)
                     }
@@ -232,6 +246,22 @@ class DashboardActivity : AppCompatActivity() {
 
         binding.flCharacterFrame.setOnClickListener {
             startActivity(Intent(this, CharacterViewerActivity::class.java))
+        }
+
+        binding.btnNotification.setOnClickListener {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("🔔 Thông báo hệ thống")
+                .setItems(
+                    arrayOf(
+                        "🔥 Chuỗi luyện tập: Bạn đang có ${session.userStreak} ngày liên tiếp!",
+                        "💧 Nhắc nhở: Đã nạp ${session.waterLoggedMl}ml / 2500ml nước.",
+                        "⚡ Buổi tập hôm nay: Lịch tập Ngực & Tay sau đã sẵn sàng.",
+                        "🎯 Nhiệm vụ: Đừng quên nhận thưởng XP nhiệm vụ hàng ngày!"
+                    ),
+                    null
+                )
+                .setPositiveButton("Đã đọc", null)
+                .show()
         }
 
         binding.btnExpandCharacter.setOnClickListener {

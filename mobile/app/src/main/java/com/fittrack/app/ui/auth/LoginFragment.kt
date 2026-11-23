@@ -51,6 +51,12 @@ class LoginFragment : Fragment() {
         if (session.userEmail.isNotBlank()) {
             binding.edtEmail.setText(session.userEmail)
         }
+
+        // Long click header to change Server Base URL for emulator / local testing
+        binding.tvTitle.setOnLongClickListener {
+            showServerConfigDialog()
+            true
+        }
     }
 
     private fun setupNavigation() {
@@ -65,6 +71,33 @@ class LoginFragment : Fragment() {
         binding.tvSignUpPrompt.setOnClickListener {
             findNavController().navigate(R.id.action_loginFragment_to_signUpFragment)
         }
+    }
+
+    private fun showServerConfigDialog() {
+        val session = SessionManager.getInstance(requireContext())
+        val input = EditText(requireContext()).apply {
+            setText(session.baseUrl)
+            setSelection(text.length)
+            hint = "http://10.0.2.2:8000/api/v1/"
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("⚙️ Cấu hình API Base URL")
+            .setMessage("Mặc định VPS Cloud: ${SessionManager.DEFAULT_BASE_URL}\n\nNếu test trên máy ảo với Laravel backend cục bộ, nhập:\nhttp://10.0.2.2:8000/api/v1/")
+            .setView(input)
+            .setPositiveButton("Lưu") { _, _ ->
+                val newUrl = input.text.toString().trim()
+                if (newUrl.isNotBlank()) {
+                    session.baseUrl = if (newUrl.endsWith("/")) newUrl else "$newUrl/"
+                    Toast.makeText(requireContext(), "Đã cập nhật API Base URL!", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNeutralButton("Reset về Cloud") { _, _ ->
+                session.baseUrl = SessionManager.DEFAULT_BASE_URL
+                Toast.makeText(requireContext(), "Đã đặt lại VPS Cloud mặc định", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
     }
 
     private fun handleLogin() {
@@ -146,13 +179,17 @@ class LoginFragment : Fragment() {
                     binding.btnLogin.text = originalText
                 }
             } catch (e: IOException) {
-                Toast.makeText(
-                    requireContext(),
-                    "Không thể kết nối đến máy chủ FitTrack VPS Cloud. Vui lòng kiểm tra lại kết nối mạng.",
-                    Toast.LENGTH_LONG
-                ).show()
                 binding.btnLogin.isEnabled = true
                 binding.btnLogin.text = originalText
+
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Không thể kết nối máy chủ Backend")
+                    .setMessage("Không thể kết nối đến máy chủ tại: ${session.baseUrl}\n\nVui lòng kiểm tra Docker hoặc đổi Base URL.")
+                    .setPositiveButton("⚙️ Đổi Base URL") { _, _ ->
+                        showServerConfigDialog()
+                    }
+                    .setNegativeButton("Đóng", null)
+                    .show()
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Đã xảy ra lỗi: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
                 binding.btnLogin.isEnabled = true

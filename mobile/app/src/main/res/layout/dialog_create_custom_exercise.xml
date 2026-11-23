@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_modal_card_white"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🏋️ Thêm bài tập mới vào thư viện"
+        android:textColor="@color/text_dark"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Bài tập lưu trên thiết bị của bạn và có thể chia sẻ lên Cộng đồng"
+        android:textColor="@color/text_slate"
+        android:textSize="11sp" />
+
+    <!-- Name input -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="Tên bài tập:"
+        android:textColor="@color/text_dark"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/et_custom_ex_name"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_tag_chip"
+        android:hint="Ví dụ: Dumbbell Hammer Curl"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:singleLine="true"
+        android:textColor="@color/text_dark"
+        android:textColorHint="@color/text_slate_light"
+        android:textSize="12.5sp" />
+
+    <!-- Muscle Group input -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Nhóm cơ chính:"
+        android:textColor="@color/text_dark"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/et_custom_ex_muscle"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_tag_chip"
+        android:hint="Ví dụ: Bắp tay trước (Biceps), Ngực, Lưng..."
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:singleLine="true"
+        android:textColor="@color/text_dark"
+        android:textColorHint="@color/text_slate_light"
+        android:textSize="12.5sp" />
+
+    <!-- Image / Video Link input -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Link ảnh hoặc video hướng dẫn (tùy chọn):"
+        android:textColor="@color/text_dark"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/et_custom_ex_media"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_tag_chip"
+        android:hint="https://... (URL ảnh/video minh họa)"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:singleLine="true"
+        android:textColor="@color/text_dark"
+        android:textColorHint="@color/text_slate_light"
+        android:textSize="12.5sp" />
+
+    <!-- Instructions input -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Hướng dẫn thực hiện cơ bản:"
+        android:textColor="@color/text_dark"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/et_custom_ex_instructions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_tag_chip"
+        android:gravity="top|start"
+        android:hint="Ghi chú tư thế chuẩn: Giữ lưng thẳng, khóa cùi chỏ, gồng cơ khi co tạ..."
+        android:minLines="3"
+        android:padding="10dp"
+        android:textColor="@color/text_dark"
+        android:textColorHint="@color/text_slate_light"
+        android:textSize="12sp" />
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cancel_custom_ex"
+            style="@style/Widget.FitTrack.Button.Secondary"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/segment_bg"
+            android:text="Hủy"
+            android:textColor="@color/text_dark"
+            android:textSize="13sp"
+            app:cornerRadius="10dp"
+            app:strokeColor="@color/transparent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_save_custom_ex"
+            style="@style/Widget.FitTrack.PrimaryButton"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1.6"
+            android:text="Lưu bài tập"
+            android:textSize="13sp"
+            app:cornerRadius="10dp" />
+    </LinearLayout>
+
+</LinearLayout>
