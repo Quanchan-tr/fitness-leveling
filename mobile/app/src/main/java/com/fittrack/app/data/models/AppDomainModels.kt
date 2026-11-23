@@ -33,6 +33,7 @@ data class CreateRoutineRequest(
     @SerializedName("description") val description: String? = null,
     @SerializedName("target_split") val targetSplit: String? = "full_body",
     @SerializedName("schedule_days") val scheduleDays: List<String> = listOf("monday", "wednesday", "friday"),
+    @SerializedName("routine_data") val routineData: Map<String, Any>? = null,
     @SerializedName("is_active") val isActive: Boolean = true
 )
 
@@ -107,9 +108,7 @@ data class CreateBodyMetricRequest(
 
 // ── AI Planner ──────────────────────────────────────────────
 data class GenerateAiPlanRequest(
-    @SerializedName("fitness_goal") val fitnessGoal: String = "hypertrophy",
     @SerializedName("goal") val goal: String = "gain_muscle",
-    @SerializedName("split") val split: String = "PPL",
     @SerializedName("split_type") val splitType: String = "auto",
     @SerializedName("days_per_week") val daysPerWeek: Int = 4,
     @SerializedName("duration_minutes") val durationMinutes: Int = 60,

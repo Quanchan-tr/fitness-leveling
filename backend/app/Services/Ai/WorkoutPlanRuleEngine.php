@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services\Ai;
 
-use App\Models\Exercise;
 use App\Models\User;
 
 class WorkoutPlanRuleEngine
@@ -32,7 +31,7 @@ class WorkoutPlanRuleEngine
 
         // 2. Map day schedule (7 days from Monday to Sunday)
         $weekDays = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
-        $dayAllocations = $this->allocateSplitDays($split, $daysCount, $options['target_days'] ?? null);
+        $dayAllocations = $this->allocateSplitDays($split, $daysCount);
 
         // 3. Populate exercises for each day
         $sessions = [];
@@ -124,7 +123,7 @@ class WorkoutPlanRuleEngine
         };
     }
 
-    private function allocateSplitDays(string $split, int $daysCount, ?array $userPreferredDays = null): array
+    private function allocateSplitDays(string $split, int $daysCount): array
     {
         $allocations = [];
 
@@ -173,12 +172,6 @@ class WorkoutPlanRuleEngine
 
     private function selectExercisesForFocus(string $focusKey, string $goal, string $equipment, int $duration): array
     {
-        $reps = match ($goal) {
-            'gain_muscle' => '8-12 reps',
-            'lose_weight' => '12-15 reps',
-            default => '10-12 reps',
-        };
-
         $sets = $duration >= 60 ? 4 : 3;
 
         $exerciseTemplates = [

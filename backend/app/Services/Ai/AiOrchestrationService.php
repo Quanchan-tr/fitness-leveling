@@ -71,7 +71,7 @@ class AiOrchestrationService
         $baseUrl = rtrim((string) config('ai.base_url', 'https://api.openai.com/v1'), '/');
         $model = (string) config('ai.model', 'gpt-4o-mini');
 
-        if ($apiKey === '' || str_starts_with($apiKey, 'sk-proj-YOUR_API_KEY') || str_starts_with($apiKey, 'YOUR_')) {
+        if ($apiKey === '') {
             return $this->fallbackAndRecord($user, $mergedOptions, $context, $idempotencyKey, $startTime, 'AI_KEY_NOT_CONFIGURED', $autoSave);
         }
 

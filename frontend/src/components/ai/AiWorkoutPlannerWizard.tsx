@@ -120,6 +120,7 @@ export const AiWorkoutPlannerWizard: React.FC = () => {
           target_days: isCustomDaysActive ? customDays : null,
         }),
         useIdempotency: true,
+        timeoutMs: 30000,
       });
 
       if (result?.data?.sessions && Array.isArray(result.data.sessions) && result.data.sessions.length >= 7) {

@@ -26,6 +26,7 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
     private var selectedDays = 4
     private var selectedDuration = 60
     private val selectedInjuries = mutableSetOf<String>()
+    private var lastGeneratedPlan: Map<String, Any>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,15 +111,22 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 try {
                     val api = ApiClient.getService(this@AiWorkoutPlannerActivity)
+                    val resolvedGoal = if (session.userGoal in listOf("gain_muscle", "lose_weight", "maintain")) {
+                        session.userGoal
+                    } else {
+                        session.obGoal
+                    }
                     val response = withContext(Dispatchers.IO) {
                         api.generateExercisePlan(
                             idempotencyKey = UUID.randomUUID().toString(),
                             request = GenerateAiPlanRequest(
-                                goal = session.userGoal,
-                                splitType = selectedSplit.lowercase(),
+                                goal = resolvedGoal,
+                                splitType = mappedSplitType(),
                                 daysPerWeek = selectedDays,
                                 durationMinutes = selectedDuration,
-                                equipment = "all"
+                                equipment = session.obEquipment,
+                                injuries = selectedInjuries.toList(),
+                                experience = session.obExperience
                             )
                         )
                     }
@@ -127,14 +135,25 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
                     binding.btnGeneratePlan.isEnabled = true
 
                     if (response.isSuccessful && response.body()?.data != null) {
+                        @Suppress("UNCHECKED_CAST")
+                        lastGeneratedPlan = response.body()?.data as? Map<String, Any>
+                        val planTitle = lastGeneratedPlan?.get("plan_name")?.toString()
+                            ?: "Giáo án $selectedSplit ($selectedDays buổi/tuần, $selectedDuration phút)"
+                        val rationale = lastGeneratedPlan?.get("rationale")?.toString()
                         binding.layoutPlanResult.visibility = View.VISIBLE
-                        binding.tvResultSummary.text = "✓ Giáo án $selectedSplit ($selectedDays buổi/tuần, $selectedDuration phút) đã được AI trên VPS sinh thành công!"
+                        binding.tvResultSummary.text = if (!rationale.isNullOrBlank()) {
+                            "✓ $planTitle\n$rationale"
+                        } else {
+                            "✓ $planTitle đã được AI sinh thành công!"
+                        }
                         Toast.makeText(this@AiWorkoutPlannerActivity, "AI Cloud đã sinh giáo án luyện tập!", Toast.LENGTH_SHORT).show()
                     } else {
+                        lastGeneratedPlan = null
                         binding.layoutPlanResult.visibility = View.GONE
                         Toast.makeText(this@AiWorkoutPlannerActivity, "AI không thể sinh giáo án (${response.code()}). Vui lòng thử lại.", Toast.LENGTH_LONG).show()
                     }
                 } catch (e: Exception) {
+                    lastGeneratedPlan = null
                     binding.layoutAiLoading.visibility = View.GONE
                     binding.layoutPlanResult.visibility = View.GONE
                     binding.btnGeneratePlan.isEnabled = true
@@ -148,15 +167,20 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
             binding.btnApplySchedule.isEnabled = false
             lifecycleScope.launch {
                 try {
-                    val daysList = listOf("monday", "wednesday", "friday", "saturday", "sunday", "tuesday").take(selectedDays)
+                    val daysList = extractScheduleDays(lastGeneratedPlan)
+                    val title = lastGeneratedPlan?.get("plan_name")?.toString()
+                        ?: "Giáo án AI ($selectedSplit - $selectedDays buổi)"
+                    val description = lastGeneratedPlan?.get("rationale")?.toString()
+                        ?: "Giáo án tạo bởi FitTrack AI Planner ($selectedDuration phút)"
                     val res = withContext(Dispatchers.IO) {
                         ApiClient.getService(this@AiWorkoutPlannerActivity).createRoutine(
                             idempotencyKey = UUID.randomUUID().toString(),
                             request = CreateRoutineRequest(
-                                title = "Giáo án AI ($selectedSplit - $selectedDays buổi)",
-                                description = "Giáo án tạo bởi FitTrack AI Planner ($selectedDuration phút)",
-                                targetSplit = selectedSplit.lowercase(),
+                                title = title,
+                                description = description,
+                                targetSplit = mappedSplitType(),
                                 scheduleDays = daysList,
+                                routineData = lastGeneratedPlan,
                                 isActive = true
                             )
                         )
@@ -173,6 +197,35 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
                     Toast.makeText(this@AiWorkoutPlannerActivity, "Lỗi kết nối máy chủ: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
                 }
             }
+        }
+    }
+
+    private fun mappedSplitType(): String = when (selectedSplit) {
+        "PPL" -> "ppl"
+        "UL" -> "upper_lower"
+        "FB" -> "full_body"
+        else -> "auto"
+    }
+
+    private fun extractScheduleDays(plan: Map<String, Any>?): List<String> {
+        val dayMap = mapOf(
+            "thứ 2" to "monday", "monday" to "monday",
+            "thứ 3" to "tuesday", "tuesday" to "tuesday",
+            "thứ 4" to "wednesday", "wednesday" to "wednesday",
+            "thứ 5" to "thursday", "thursday" to "thursday",
+            "thứ 6" to "friday", "friday" to "friday",
+            "thứ 7" to "saturday", "saturday" to "saturday",
+            "chủ nhật" to "sunday", "sunday" to "sunday"
+        )
+        val sessions = plan?.get("sessions") as? List<*>
+        val parsedDays = sessions?.mapNotNull { entry ->
+            val sessionMap = entry as? Map<*, *> ?: return@mapNotNull null
+            if (sessionMap["is_rest"] == true) return@mapNotNull null
+            dayMap[sessionMap["day_of_week"]?.toString()?.trim()?.lowercase()]
+        }?.distinct().orEmpty()
+
+        return parsedDays.ifEmpty {
+            listOf("monday", "wednesday", "friday", "saturday", "sunday", "tuesday").take(selectedDays)
         }
     }
 
