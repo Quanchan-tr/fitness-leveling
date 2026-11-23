@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.models.GenerateAiPlanRequest
 import com.fittrack.app.data.models.UpdateProfileRequest
 import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityOnboardingLoadingBinding
@@ -12,6 +13,7 @@ import com.fittrack.app.ui.dashboard.DashboardActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.UUID
 
 class OnboardingLoadingActivity : AppCompatActivity() {
 
@@ -35,6 +37,13 @@ class OnboardingLoadingActivity : AppCompatActivity() {
         if (session.isLoggedIn) {
             lifecycleScope.launch {
                 try {
+                    val workoutPreferences = mapOf(
+                        "experience" to session.obExperience,
+                        "days_per_week" to session.obFrequency,
+                        "duration_minutes" to session.obWorkoutTime,
+                        "equipment" to session.obEquipment,
+                        "focus_muscles" to listOf(session.obFocusMuscle)
+                    )
                     val res = withContext(Dispatchers.IO) {
                         ApiClient.getService(this@OnboardingLoadingActivity).updateProfile(
                             UpdateProfileRequest(
@@ -43,7 +52,8 @@ class OnboardingLoadingActivity : AppCompatActivity() {
                                 heightCm = session.obHeight.toDouble(),
                                 goal = session.obGoal,
                                 gender = session.obGender,
-                                birthDate = session.obBirthDate
+                                birthDate = session.obBirthDate,
+                                workoutPreferences = workoutPreferences
                             )
                         )
                     }
@@ -53,6 +63,26 @@ class OnboardingLoadingActivity : AppCompatActivity() {
                             "Không thể đồng bộ hồ sơ lên máy chủ (${res.code()})",
                             android.widget.Toast.LENGTH_SHORT
                         ).show()
+                    } else {
+                        try {
+                            withContext(Dispatchers.IO) {
+                                ApiClient.getService(this@OnboardingLoadingActivity).generateExercisePlan(
+                                    idempotencyKey = UUID.randomUUID().toString(),
+                                    request = GenerateAiPlanRequest(
+                                        goal = session.obGoal,
+                                        splitType = "auto",
+                                        daysPerWeek = session.obFrequency,
+                                        durationMinutes = session.obWorkoutTime,
+                                        equipment = session.obEquipment,
+                                        experience = session.obExperience,
+                                        focusMuscles = listOf(session.obFocusMuscle),
+                                        autoSave = true
+                                    )
+                                )
+                            }
+                        } catch (_: Exception) {
+                            // Non-blocking: user can still regenerate plan inside AI Coach
+                        }
                     }
                 } catch (e: Exception) {
                     android.widget.Toast.makeText(

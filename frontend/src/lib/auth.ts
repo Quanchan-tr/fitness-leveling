@@ -295,7 +295,17 @@ export const authService = {
           goal: goalMap[profile.fitnessGoal] || 'maintain',
           activity_level: activityMap[profile.dailyActivityLevel] || 'moderate',
           birth_date: birthDate,
+          workout_preferences: {
+            experience: profile.trainingExperience,
+          },
         }),
+      });
+
+      await apiRequest('/ai/exercise-plan', {
+        method: 'POST',
+        body: JSON.stringify({ auto_save: true }),
+        useIdempotency: true,
+        timeoutMs: 30000,
       });
     } catch (e) {
       console.warn('Could not sync profile to backend immediately, saving locally', e);

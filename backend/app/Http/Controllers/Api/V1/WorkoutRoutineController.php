@@ -30,6 +30,7 @@ class WorkoutRoutineController extends Controller
             'description' => 'nullable|string',
             'target_split' => 'nullable|string|max:50',
             'schedule_days' => 'required|array',
+            'routine_data' => 'nullable|array',
             'is_active' => 'nullable|boolean',
         ]);
 
@@ -39,6 +40,7 @@ class WorkoutRoutineController extends Controller
             'description' => $validated['description'] ?? null,
             'target_split' => $validated['target_split'] ?? 'full_body',
             'schedule_days' => $validated['schedule_days'],
+            'routine_data' => $validated['routine_data'] ?? null,
             'is_active' => $validated['is_active'] ?? true,
         ]);
 
@@ -69,6 +71,7 @@ class WorkoutRoutineController extends Controller
             'description' => 'nullable|string',
             'target_split' => 'nullable|string|max:50',
             'schedule_days' => 'sometimes|required|array',
+            'routine_data' => 'nullable|array',
             'is_active' => 'nullable|boolean',
         ]);
 

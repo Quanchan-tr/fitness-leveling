@@ -20,11 +20,13 @@ class WorkoutRoutine extends Model
         'description',
         'target_split',
         'schedule_days',
+        'routine_data',
         'is_active',
     ];
 
     protected $casts = [
         'schedule_days' => 'array',
+        'routine_data' => 'array',
         'is_active' => 'boolean',
     ];
 

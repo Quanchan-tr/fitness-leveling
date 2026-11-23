@@ -49,6 +49,7 @@ class OnboardingWorkoutTimeActivity : AppCompatActivity() {
         }
 
         binding.btnContinue.setOnClickListener {
+            com.fittrack.app.data.session.SessionManager.getInstance(this).obWorkoutTime = selectedMinutes
             startActivity(Intent(this, OnboardingFocusMuscleActivity::class.java))
         }
     }

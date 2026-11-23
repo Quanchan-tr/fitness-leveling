@@ -114,7 +114,10 @@ data class GenerateAiPlanRequest(
     @SerializedName("days_per_week") val daysPerWeek: Int = 4,
     @SerializedName("duration_minutes") val durationMinutes: Int = 60,
     @SerializedName("equipment") val equipment: String = "all",
-    @SerializedName("injuries") val injuries: List<String> = emptyList()
+    @SerializedName("injuries") val injuries: List<String> = emptyList(),
+    @SerializedName("experience") val experience: String? = null,
+    @SerializedName("focus_muscles") val focusMuscles: List<String>? = null,
+    @SerializedName("auto_save") val autoSave: Boolean = false
 )
 
 // ── Community ───────────────────────────────────────────────

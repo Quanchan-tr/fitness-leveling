@@ -118,6 +118,7 @@ data class UpdateProfileRequest(
     @SerializedName("height_cm") val heightCm: Double? = null,
     @SerializedName("goal") val goal: String? = null,
     @SerializedName("gender") val gender: String? = null,
-    @SerializedName("birth_date") val birthDate: String? = null
+    @SerializedName("birth_date") val birthDate: String? = null,
+    @SerializedName("workout_preferences") val workoutPreferences: Map<String, Any>? = null
 )
 

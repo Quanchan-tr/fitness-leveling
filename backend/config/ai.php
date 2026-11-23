@@ -3,9 +3,8 @@
 declare(strict_types=1);
 
 return [
-    'provider' => env('AI_PROVIDER', 'gemini'),
-    'api_key' => env('AI_API_KEY'),
-    'model' => env('AI_MODEL', 'gemini-3.5-flash-lite'),
-    'timeout' => (int) env('AI_TIMEOUT_SECONDS', 15),
-    'max_retries' => (int) env('AI_MAX_RETRIES', 1),
+    'base_url' => rtrim((string) env('LLM_BASE_URL', 'https://api.openai.com/v1'), '/'),
+    'api_key' => env('LLM_API_KEY', env('AI_API_KEY')),
+    'model' => env('LLM_MODEL_NAME', env('AI_MODEL', 'gpt-4o-mini')),
+    'timeout' => (int) env('AI_TIMEOUT_SECONDS', 25),
 ];

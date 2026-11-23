@@ -34,6 +34,7 @@ class SessionManager(context: Context) {
         private const val KEY_OB_GOAL = "ob_goal"
         private const val KEY_OB_EXPERIENCE = "ob_experience"
         private const val KEY_OB_FREQUENCY = "ob_frequency"
+        private const val KEY_OB_WORKOUT_TIME = "ob_workout_time"
         private const val KEY_OB_FOCUS_MUSCLE = "ob_focus_muscle"
         private const val KEY_OB_EQUIPMENT = "ob_equipment"
 
@@ -143,6 +144,10 @@ class SessionManager(context: Context) {
     var obFrequency: Int
         get() = prefs.getInt(KEY_OB_FREQUENCY, 4)
         set(value) = prefs.edit().putInt(KEY_OB_FREQUENCY, value).apply()
+
+    var obWorkoutTime: Int
+        get() = prefs.getInt(KEY_OB_WORKOUT_TIME, 60)
+        set(value) = prefs.edit().putInt(KEY_OB_WORKOUT_TIME, value).apply()
 
     var obFocusMuscle: String
         get() = prefs.getString(KEY_OB_FOCUS_MUSCLE, "chest") ?: "chest"
