@@ -10,7 +10,7 @@
             <gradient
                 android:angle="270"
                 android:startColor="@color/header_accent_glow"
-                android:endColor="@color/white"
+                android:endColor="@color/surface"
                 android:type="linear" />
         </shape>
     </item>

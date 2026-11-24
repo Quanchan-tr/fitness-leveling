@@ -4,7 +4,7 @@
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Flame, Eye, EyeOff, ArrowRight, AlertCircle, Zap, ShieldCheck } from 'lucide-react';
+import { Flame, Eye, EyeOff, ArrowRight, AlertCircle, Zap } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginFormState {
@@ -46,7 +46,6 @@ function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDemoLoading, setIsDemoLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [captchaChecked, setCaptchaChecked] = useState(true);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -62,11 +61,6 @@ function LoginForm() {
     const errors = validate(form);
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
-      return;
-    }
-
-    if (!captchaChecked) {
-      setServerError('Vui lòng xác nhận bạn không phải là người máy.');
       return;
     }
 
@@ -221,23 +215,6 @@ function LoginForm() {
               {fieldErrors.password && (
                 <p className="mt-1.5 text-xs text-rose-600">{fieldErrors.password}</p>
               )}
-            </div>
-
-            {/* Captcha Verification Widget */}
-            <div className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/80">
-              <label className="flex items-center gap-2.5 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={captchaChecked}
-                  onChange={(e) => setCaptchaChecked(e.target.checked)}
-                  className="w-4 h-4 rounded text-[#FF5722] focus:ring-[#FF5722] border-slate-300 cursor-pointer accent-[#FF5722]"
-                />
-                <span className="text-xs font-semibold text-slate-700">Tôi không phải là người máy (Captcha)</span>
-              </label>
-              <div className="flex items-center gap-1 text-slate-400">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span className="text-[10px] font-medium text-slate-500">Bảo mật</span>
-              </div>
             </div>
 
             {/* Submit button */}

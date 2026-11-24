@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand Primary Colors (FitTrack Core Brand - Modern Minimal Dark) -->
+    <color name="primary">#FF5722</color>
+    <color name="primary_variant">#FF7A00</color>
+    <color name="primary_light">#2A1E1A</color>
+    <color name="primary_soft">#201714</color>
+    <color name="primary_blue">#3B82F6</color>
+    <color name="primary_blue_dark">#2563EB</color>
+    <color name="primary_blue_soft">#1E293B</color>
+    <color name="on_primary">#FFFFFF</color>
+
+    <!-- Dark Mode Surfaces & Backgrounds -->
+    <color name="background">#121212</color>
+    <color name="surface">#1E1E1E</color>
+    <color name="bg_screen_gray">#121212</color>
+    <color name="surface_secondary">#242424</color>
+    <color name="surface_tertiary">#2C2C2C</color>
+    <color name="circle_button_bg">#242424</color>
+
+    <!-- Navigation System Tokens (Dark) -->
+    <color name="nav_active">#FF5722</color>
+    <color name="nav_inactive">#8E8E93</color>
+    <color name="nav_border_top">#2C2C2C</color>
+
+    <!-- Typography / Text Colors (Dark) -->
+    <color name="text_primary">#F8FAFC</color>
+    <color name="text_dark">#F8FAFC</color>
+    <color name="text_secondary">#94A3B8</color>
+    <color name="text_slate">#94A3B8</color>
+    <color name="text_muted">#64748B</color>
+    <color name="text_slate_light">#94A3B8</color>
+    <color name="slate_200">#2C2C2C</color>
+    <color name="text_placeholder">#64748B</color>
+    <color name="text_link">#60A5FA</color>
+
+    <!-- Borders & Dividers (Dark) -->
+    <color name="border_card">#2C2C2C</color>
+    <color name="border_default">#2C2C2C</color>
+    <color name="border_subtle">#1E1E1E</color>
+    <color name="border_gray">#2C2C2C</color>
+    <color name="border_focused">#FF5722</color>
+    <color name="divider">#2C2C2C</color>
+
+    <!-- State & Feedback Tokens (Dark) -->
+    <color name="success">#22C55E</color>
+    <color name="success_bg">#14291D</color>
+    <color name="error">#F87171</color>
+    <color name="error_bg">#2E1414</color>
+    <color name="warning">#FB923C</color>
+    <color name="warning_bg">#2E1B10</color>
+    <color name="info">#3B82F6</color>
+    <color name="info_bg">#132438</color>
+    <color name="checkbox_checked">#FF5722</color>
+
+    <!-- Badges & Indicators (Dark) -->
+    <color name="badge_bg">#242424</color>
+    <color name="badge_streak_bg">#2D1C14</color>
+    <color name="badge_streak_text">#FF7A00</color>
+    <color name="badge_streak_gradient_start">#FF5722</color>
+    <color name="badge_streak_gradient_end">#FF8A65</color>
+    <color name="card_selected_bg">#2A1E1A</color>
+    <color name="segment_bg">#242424</color>
+
+    <!-- Fitness Vital Accents (Dark) -->
+    <color name="gradient_cta_start">#FF5722</color>
+    <color name="gradient_cta_end">#FF3D00</color>
+    <color name="header_accent_glow">#201714</color>
+    <color name="card_vitals_water_bg">#0C2538</color>
+    <color name="card_vitals_water_text">#38BDF8</color>
+    <color name="card_vitals_sleep_bg">#241433</color>
+    <color name="card_vitals_sleep_text">#C084FC</color>
+    <color name="card_vitals_steps_bg">#122818</color>
+    <color name="card_vitals_steps_text">#4ADE80</color>
+    <color name="rpg_str_bg">#2E1414</color>
+    <color name="rpg_str_text">#F87171</color>
+    <color name="rpg_end_bg">#122818</color>
+    <color name="rpg_end_text">#4ADE80</color>
+    <color name="rpg_agi_bg">#132438</color>
+    <color name="rpg_agi_text">#60A5FA</color>
+    <color name="gold_badge">#FBBF24</color>
+    <color name="gold_badge_bg">#2E2310</color>
+    <color name="blue_badge_bg">#132438</color>
+    <color name="blue_badge_text">#60A5FA</color>
+    <color name="segment_selected_bg">#2E2E32</color>
+    <color name="indicator_bg">#2C2C2C</color>
+    <color name="indicator_active">#FF5722</color>
+    <color name="live_dark">#1E1E1E</color>
+    <color name="live_green">#22C55E</color>
+
+    <!-- Modal & Popup Color Tokens (Dark) -->
+    <color name="modal_overlay">#AA000000</color>
+    <color name="modal_quest_green_bg">#14291D</color>
+    <color name="modal_quest_badge_bg">#1B3B2B</color>
+    <color name="modal_quest_badge_text">#4ADE80</color>
+    <color name="modal_level_up_bg">#2E2310</color>
+    <color name="modal_level_up_title">#FBBF24</color>
+    <color name="modal_level_up_text">#F59E0B</color>
+    <color name="modal_stats_bg">#132438</color>
+    <color name="modal_dark_card">#1E1E1E</color>
+    <color name="modal_dark_item">#242424</color>
+    <color name="modal_dark_button">#2C2C2C</color>
+    <color name="modal_dark_text_muted">#8E8E93</color>
+    <color name="modal_chip_orange_light">#2A1E1A</color>
+    <color name="modal_chip_gray_text">#94A3B8</color>
+
+    <!-- Skeleton Shimmer Tokens (Dark) -->
+    <color name="skeleton_base">#242424</color>
+    <color name="skeleton_highlight">#333333</color>
+
+    <!-- Common (Dark) -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="icon_tint">#F8FAFC</color>
+    <color name="transparent">#00000000</color>
+
+    <!-- Subtab Pill Tokens (Dark) -->
+    <color name="subtab_pill_inactive_bg">#242424</color>
+    <color name="subtab_pill_inactive_text">#F8FAFC</color>
+</resources>

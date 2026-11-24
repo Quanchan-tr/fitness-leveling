@@ -14,15 +14,18 @@ import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityDashboardBinding
 import com.fittrack.app.ui.BottomNavTab
 import com.fittrack.app.ui.character.CharacterViewerActivity
+import com.fittrack.app.ui.metrics.BodyMetricsActivity
 import com.fittrack.app.ui.modal.DailyQuestsModalActivity
 import com.fittrack.app.ui.modal.WardrobeModalActivity
 import com.fittrack.app.ui.profile.UserProfileActivity
 import com.fittrack.app.ui.routine.RoutineDetailActivity
 import com.fittrack.app.ui.setupBottomNav
 import com.fittrack.app.ui.workout.ActiveWorkoutActivity
+import com.fittrack.app.util.WindowInsetsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class DashboardActivity : AppCompatActivity() {
 
@@ -52,6 +55,8 @@ class DashboardActivity : AppCompatActivity() {
         binding = ActivityDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        WindowInsetsHelper.applySystemInsets(this, binding.root, binding.layoutHeader, binding.bottomNavigation.root)
+
         session = SessionManager.getInstance(this)
 
         setup3DCharacter()
@@ -65,11 +70,18 @@ class DashboardActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         bindCachedUserData()
+        checkFloatingWorkoutBar()
         fetchFreshDataFromBackend()
     }
 
-    private var activeRoutineId: String? = null
-    private var activeRoutineTitle: String? = null
+    private fun checkFloatingWorkoutBar() {
+        if (session.isWorkoutActive) {
+            binding.layoutFloatingWorkout.visibility = View.VISIBLE
+            binding.tvFloatingWorkoutSubtitle.text = session.activeWorkoutName
+        } else {
+            binding.layoutFloatingWorkout.visibility = View.GONE
+        }
+    }
 
     private fun bindCachedUserData() {
         binding.tvUserName.text = session.userName
@@ -81,13 +93,31 @@ class DashboardActivity : AppCompatActivity() {
         binding.tvXpProgress.text = "XP: $currentXp / $maxXp"
         binding.progressLevelXp.max = maxXp
         binding.progressLevelXp.progress = currentXp
+
+        bindHydration()
+        bindNutritionEnergy()
+    }
+
+    private fun bindNutritionEnergy() {
+        session.checkAndResetDailyNutrition()
+        val cals = session.loggedCalories
+        val targetCals = 2200
+        binding.tvEnergyVal.text = "$cals kcal"
+        binding.pbEnergy.max = targetCals
+        binding.pbEnergy.progress = minOf(cals, targetCals)
+    }
+
+    private fun bindHydration() {
+        val currentWater = session.waterLoggedMl
+        val targetWater = 2500
+        val waterLiters = currentWater / 1000f
+        binding.tvWaterVal.text = String.format(Locale.US, "%.1fL / %.1fL", waterLiters, targetWater / 1000f)
+        binding.pbWater.max = targetWater
+        binding.pbWater.progress = minOf(currentWater, targetWater)
     }
 
     private fun fetchFreshDataFromBackend() {
-        if (!session.isLoggedIn) {
-            Toast.makeText(this, "Vui lòng đăng nhập để đồng bộ dữ liệu", Toast.LENGTH_SHORT).show()
-            return
-        }
+        if (!session.isLoggedIn) return
 
         val apiService = ApiClient.getService(this)
 
@@ -114,66 +144,65 @@ class DashboardActivity : AppCompatActivity() {
                     )
 
                     bindCachedUserData()
-                } else {
-                    Toast.makeText(this@DashboardActivity, "Lỗi tải hồ sơ (${profileRes.code()})", Toast.LENGTH_SHORT).show()
                 }
-            } catch (e: Exception) {
-                Toast.makeText(this@DashboardActivity, "Không thể kết nối máy chủ: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            } catch (_: Exception) {
+                // Offline fallback - cached data remains displayed
             }
 
             // 2. Fetch Active Workout Routines
             try {
                 val routinesRes = withContext(Dispatchers.IO) { apiService.getRoutines() }
-                if (routinesRes.isSuccessful) {
-                    val routines = routinesRes.body()?.data.orEmpty()
-                    if (routines.isNotEmpty()) {
-                        val firstRoutine = routines.first()
-                        activeRoutineId = firstRoutine.id
-                        activeRoutineTitle = firstRoutine.title
-                        binding.tvWorkoutName.text = firstRoutine.title
-                    } else {
-                        activeRoutineId = null
-                        activeRoutineTitle = null
-                        binding.tvWorkoutName.text = "Chưa có giáo án tập luyện"
-                    }
-                } else {
-                    binding.tvWorkoutName.text = "Không tải được giáo án"
+                if (routinesRes.isSuccessful && routinesRes.body()?.data?.isNotEmpty() == true) {
+                    val firstRoutine = routinesRes.body()!!.data!!.first()
+                    binding.tvWorkoutName.text = firstRoutine.title
                 }
             } catch (_: Exception) {
-                binding.tvWorkoutName.text = "Lỗi kết nối giáo án"
+                // Keep default layout text
             }
 
             // 3. Sync 3D Avatar Customization
             try {
                 val avatarRes = withContext(Dispatchers.IO) { apiService.getAvatarConfig() }
-                val data = avatarRes.body()?.data
-                if (avatarRes.isSuccessful && data != null) {
-                    val equipped = data.equipped
-                    val cfg = data.config
-                    val shirtColor = equipped["TOP"]?.colorHex ?: mapItemToHex(cfg?.equippedShirt, "#FF5722")
-                    val pantsColor = equipped["BOTTOM"]?.colorHex ?: mapItemToHex(cfg?.equippedPants, "#1E293B")
-                    val headColor = equipped["HEADWEAR"]?.colorHex
-                        ?: if (cfg?.equippedHead == "head_none" || cfg?.equippedHead.isNullOrBlank()) "none" else "#F59E0B"
-                    val shoeColor = equipped["SHOES"]?.colorHex ?: mapItemToHex(cfg?.equippedShoes, "#FF5722")
-                    val hairColor = equipped["HAIR"]?.colorHex ?: "#2D1E18"
-                    val specialItem = equipped["SPECIAL"]
-                    val special = if (specialItem != null) {
-                        if (specialItem.name.contains("Cánh", ignoreCase = true)) "wings" else "blink"
-                    } else if (cfg?.equippedAura != "aura_none" && !cfg?.equippedAura.isNullOrBlank()) {
-                        "aura"
-                    } else {
-                        "none"
-                    }
-                    val specialColor = specialItem?.colorHex ?: "#3B82F6"
+                if (avatarRes.isSuccessful && avatarRes.body()?.data?.config != null) {
+                    val cfg = avatarRes.body()!!.data!!.config!!
+                    val shirtColor = mapItemToHex(cfg.equippedShirt, "#FF5722")
+                    val pantsColor = mapItemToHex(cfg.equippedPants, "#1E293B")
+                    val headColor = if (cfg.equippedHead == "head_none" || cfg.equippedHead.isNullOrBlank()) "none" else "#F59E0B"
+                    val shoeColor = mapItemToHex(cfg.equippedShoes, "#FF5722")
+                    val special = if (cfg.equippedAura != "aura_none" && !cfg.equippedAura.isNullOrBlank()) "aura" else "none"
 
                     binding.webview3dCharacter.evaluateJavascript(
-                        "setOutfit('$shirtColor', '$pantsColor', '$headColor', '$shoeColor', '$hairColor', '$special', '$specialColor')",
+                        "setOutfit('$shirtColor', '$pantsColor', '$headColor', '$shoeColor', '#2D1E18', '$special', '#3B82F6')",
                         null
                     )
                 }
             } catch (_: Exception) {
-                // Avatar sync failed; keep default WebView render
+                // Keep current 3D avatar state
             }
+
+            // 4. Fetch Nutrition Logs for Real Energy & Calo
+            try {
+                val nutRes = withContext(Dispatchers.IO) { apiService.getNutritionLogs() }
+                if (nutRes.isSuccessful && nutRes.body()?.data != null) {
+                    val logs = nutRes.body()!!.data!!
+                    val totalCalories = logs.sumOf { it.calories }
+                    if (totalCalories > 0) {
+                        session.loggedCalories = totalCalories
+                        binding.tvEnergyVal.text = "$totalCalories kcal"
+                        binding.pbEnergy.progress = minOf(totalCalories, binding.pbEnergy.max)
+                    }
+                }
+            } catch (_: Exception) {}
+
+            // 5. Fetch Body Metrics for Weight Trend Chart
+            try {
+                val metricsRes = withContext(Dispatchers.IO) { apiService.getBodyMetrics() }
+                if (metricsRes.isSuccessful && metricsRes.body()?.data?.isNotEmpty() == true) {
+                    val list = metricsRes.body()!!.data!!.reversed()
+                    val points = list.map { Pair(it.logDate?.takeLast(5) ?: "Gần đây", it.weightKg.toFloat()) }
+                    binding.chartWeightTrendHome.setData(points)
+                }
+            } catch (_: Exception) {}
         }
     }
 
@@ -219,6 +248,22 @@ class DashboardActivity : AppCompatActivity() {
             startActivity(Intent(this, CharacterViewerActivity::class.java))
         }
 
+        binding.btnNotification.setOnClickListener {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("🔔 Thông báo hệ thống")
+                .setItems(
+                    arrayOf(
+                        "🔥 Chuỗi luyện tập: Bạn đang có ${session.userStreak} ngày liên tiếp!",
+                        "💧 Nhắc nhở: Đã nạp ${session.waterLoggedMl}ml / 2500ml nước.",
+                        "⚡ Buổi tập hôm nay: Lịch tập Ngực & Tay sau đã sẵn sàng.",
+                        "🎯 Nhiệm vụ: Đừng quên nhận thưởng XP nhiệm vụ hàng ngày!"
+                    ),
+                    null
+                )
+                .setPositiveButton("Đã đọc", null)
+                .show()
+        }
+
         binding.btnExpandCharacter.setOnClickListener {
             startActivity(Intent(this, CharacterViewerActivity::class.java))
         }
@@ -227,25 +272,15 @@ class DashboardActivity : AppCompatActivity() {
             wardrobeLauncher.launch(Intent(this, WardrobeModalActivity::class.java))
         }
 
-        val openTodayRoutine = {
-            if (activeRoutineId != null) {
-                startActivity(Intent(this, RoutineDetailActivity::class.java).apply {
-                    putExtra("ROUTINE_ID", activeRoutineId)
-                    putExtra("ROUTINE_TITLE", activeRoutineTitle)
-                })
-            } else {
-                startActivity(Intent(this, com.fittrack.app.ui.workout.WorkoutsActivity::class.java))
-            }
+        binding.btnEnterWorkoutNow.setOnClickListener {
+            startActivity(Intent(this, RoutineDetailActivity::class.java))
         }
 
-        binding.btnEnterWorkoutNow.setOnClickListener { openTodayRoutine() }
-        binding.cardTodayWorkout.setOnClickListener { openTodayRoutine() }
+        binding.cardTodayWorkout.setOnClickListener {
+            startActivity(Intent(this, RoutineDetailActivity::class.java))
+        }
 
         binding.btnOpenDailyQuests.setOnClickListener {
-            startActivity(Intent(this, DailyQuestsModalActivity::class.java))
-        }
-
-        binding.btnNotification.setOnClickListener {
             startActivity(Intent(this, DailyQuestsModalActivity::class.java))
         }
 
@@ -257,9 +292,27 @@ class DashboardActivity : AppCompatActivity() {
             startActivity(Intent(this, ActiveWorkoutActivity::class.java))
         }
 
-        // Hydration widget has no backend endpoint yet — hide unbacked local-only buttons
-        binding.btnAddWater250.visibility = android.view.View.GONE
-        binding.btnAddWater500.visibility = android.view.View.GONE
+        binding.btnCloseFloatingWorkout.setOnClickListener {
+            session.isWorkoutActive = false
+            binding.layoutFloatingWorkout.visibility = View.GONE
+        }
+
+        binding.cardWeightTrendHome.setOnClickListener {
+            startActivity(Intent(this, BodyMetricsActivity::class.java))
+        }
+
+        // Hydration quick logging
+        binding.btnAddWater250.setOnClickListener {
+            val total = session.addWater(250)
+            bindHydration()
+            Toast.makeText(this, "💧 +250ml nước đã nạp! Tổng hôm nay: ${total}ml / 2500ml", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.btnAddWater500.setOnClickListener {
+            val total = session.addWater(500)
+            bindHydration()
+            Toast.makeText(this, "💧 +500ml nước đã nạp! Tổng hôm nay: ${total}ml / 2500ml", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun setupBottomNav() {

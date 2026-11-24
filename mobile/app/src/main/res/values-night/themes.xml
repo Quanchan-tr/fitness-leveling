@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Application Theme (Dark Mode) -->
+    <style name="Theme.FitTrack" parent="Theme.MaterialComponents.NoActionBar">
+        <!-- Brand Colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/primary</item>
+        <item name="colorSecondaryVariant">@color/primary_variant</item>
+        <item name="colorOnSecondary">@color/on_primary</item>
+
+        <!-- Status Bar & Navigation Bar -->
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/background</item>
+
+        <!-- Background -->
+        <item name="android:windowBackground">@color/bg_screen_gray</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="android:colorBackground">@color/background</item>
+
+        <!-- Dialog Themes (Dark Surface) -->
+        <item name="alertDialogTheme">@style/ThemeOverlay.FitTrack.Dialog.Alert</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.FitTrack.Dialog.Alert</item>
+
+        <!-- CheckBox Component Style -->
+        <item name="checkboxStyle">@style/Widget.FitTrack.CheckBox</item>
+    </style>
+
+    <!-- Standard Dialog Theme (Dark Mode) -->
+    <style name="ThemeOverlay.FitTrack.Dialog.Alert" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorSurface">@color/surface</item>
+        <item name="android:colorBackground">@color/surface</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+    </style>
+
+    <!-- Modal Activity Theme (Dark Mode) -->
+    <style name="Theme.FitTrack.Modal" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Dialog</item>
+        <item name="android:statusBarColor">#99000000</item>
+        <item name="android:navigationBarColor">#99000000</item>
+    </style>
+</resources>

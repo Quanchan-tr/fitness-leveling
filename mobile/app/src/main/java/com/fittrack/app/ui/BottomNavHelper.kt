@@ -1,10 +1,15 @@
 package com.fittrack.app.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Typeface
+import android.os.Build
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import com.fittrack.app.R
 import com.fittrack.app.databinding.LayoutBottomNavBinding
 import com.fittrack.app.ui.community.CommunityActivity
@@ -25,6 +30,14 @@ fun LayoutBottomNavBinding.setupBottomNav(
     activity: AppCompatActivity,
     activeTab: BottomNavTab
 ) {
+    // Dynamic Inset Protection: Automatically pad bottom navigation above Android gesture / 3-button bar
+    val initialBottomPadding = root.paddingBottom
+    ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+        val navInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
+        view.updatePadding(bottom = initialBottomPadding + navInsets.bottom)
+        insets
+    }
+
     val activeColor = ContextCompat.getColor(activity, R.color.nav_active)
     val inactiveColor = ContextCompat.getColor(activity, R.color.nav_inactive)
 
@@ -53,7 +66,13 @@ fun LayoutBottomNavBinding.setupBottomNav(
             flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
         }
         activity.startActivity(intent)
-        activity.overridePendingTransition(0, 0)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            activity.overrideActivityTransition(Activity.OVERRIDE_TRANSITION_OPEN, 0, 0)
+            activity.overrideActivityTransition(Activity.OVERRIDE_TRANSITION_CLOSE, 0, 0)
+        } else {
+            @Suppress("DEPRECATION")
+            activity.overridePendingTransition(0, 0)
+        }
         activity.finish()
     }
 

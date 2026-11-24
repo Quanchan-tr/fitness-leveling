@@ -58,6 +58,7 @@ interface ApiService {
     suspend fun getExercises(
         @Query("per_page") perPage: Int = 100,
         @Query("category") category: String? = null,
+        @Query("q") q: String? = null,
         @Query("search") search: String? = null
     ): Response<ApiResponse<List<ExerciseDto>>>
 
@@ -76,24 +77,15 @@ interface ApiService {
         @Body request: CreateRoutineRequest
     ): Response<ApiResponse<WorkoutRoutineDto>>
 
-    @GET("routines/{id}")
-    suspend fun getRoutineDetail(
-        @Path("id") id: String
-    ): Response<ApiResponse<WorkoutRoutineDto>>
-
-    @PUT("routines/{id}")
-    suspend fun updateRoutine(
-        @Path("id") id: String,
-        @Body request: UpdateRoutineRequest
-    ): Response<ApiResponse<WorkoutRoutineDto>>
-
     @DELETE("routines/{id}")
     suspend fun deleteRoutine(
         @Path("id") id: String
     ): Response<ApiResponse<Map<String, Any>>>
 
     @GET("workout-logs")
-    suspend fun getWorkoutLogs(): Response<ApiResponse<List<WorkoutLogDto>>>
+    suspend fun getWorkoutLogs(
+        @Query("per_page") perPage: Int = 100
+    ): Response<ApiResponse<List<WorkoutLogDto>>>
 
     @POST("workout-logs")
     suspend fun createWorkoutLog(
@@ -101,19 +93,21 @@ interface ApiService {
         @Body request: CreateWorkoutLogRequest
     ): Response<ApiResponse<WorkoutLogDto>>
 
-    @POST("workout-logs/{id}/sets")
-    suspend fun addWorkoutSet(
-        @Path("id") id: String,
-        @Header("Idempotency-Key") idempotencyKey: String,
-        @Body request: AddWorkoutSetRequest
-    ): Response<ApiResponse<Any>>
-
     @POST("workout-logs/{id}/complete")
     suspend fun completeWorkoutLog(
         @Path("id") id: String
     ): Response<ApiResponse<WorkoutLogDto>>
 
     // ── Nutrition ───────────────────────────────────────────────
+    @GET("foods")
+    suspend fun getFoods(
+        @Query("per_page") perPage: Int = 50,
+        @Query("page") page: Int = 1,
+        @Query("category") category: String? = null,
+        @Query("item_type") itemType: String? = null,
+        @Query("q") query: String? = null
+    ): Response<ApiResponse<List<FoodItemDto>>>
+
     @GET("nutrition-logs")
     suspend fun getNutritionLogs(): Response<ApiResponse<List<NutritionLogDto>>>
 
@@ -147,12 +141,6 @@ interface ApiService {
         @Path("id") id: String
     ): Response<ApiResponse<Map<String, Any>>>
 
-    @POST("community/posts/{id}/comments")
-    suspend fun addPostComment(
-        @Path("id") id: String,
-        @Body request: AddCommentRequest
-    ): Response<ApiResponse<Any>>
-
     // ── 3D Avatar & Wardrobe ────────────────────────────────────
     @GET("avatar")
     suspend fun getAvatarConfig(): Response<ApiResponse<AvatarData>>
@@ -162,7 +150,7 @@ interface ApiService {
         @Body request: EquipAvatarRequest
     ): Response<ApiResponse<AvatarConfigDto>>
 
-    // ── AI Workout & Meal Planner ──────────────────────────────
+    // ── AI Workout Planner ──────────────────────────────
     @POST("ai/exercise-plan")
     suspend fun generateExercisePlan(
         @Header("Idempotency-Key") idempotencyKey: String,

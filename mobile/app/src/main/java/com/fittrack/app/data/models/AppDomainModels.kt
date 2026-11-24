@@ -1,5 +1,6 @@
 package com.fittrack.app.data.models
 
+import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
 
 // ── Exercises ───────────────────────────────────────────────
@@ -13,8 +14,40 @@ data class ExerciseDto(
     @SerializedName("gif_url") val gifUrl: String? = null,
     @SerializedName("thumbnail_url") val thumbnailUrl: String? = null,
     @SerializedName("has_ai_check") val hasAiCheck: Boolean = false,
-    @SerializedName("description") val description: String? = null
-)
+    @SerializedName("description") val description: String? = null,
+    @SerializedName("instructions") val rawInstructions: JsonElement? = null
+) {
+    val instructions: List<String>
+        get() {
+            if (rawInstructions == null || rawInstructions.isJsonNull) {
+                return splitDescriptionToSteps(description)
+            }
+            if (rawInstructions.isJsonArray) {
+                return rawInstructions.asJsonArray.mapNotNull { if (it.isJsonPrimitive) it.asString else null }
+            }
+            if (rawInstructions.isJsonObject) {
+                val obj = rawInstructions.asJsonObject
+                val text = when {
+                    obj.has("vi") && obj.get("vi").isJsonPrimitive -> obj.get("vi").asString
+                    obj.has("en") && obj.get("en").isJsonPrimitive -> obj.get("en").asString
+                    else -> obj.entrySet().firstOrNull()?.value?.let { if (it.isJsonPrimitive) it.asString else null }
+                }
+                return splitDescriptionToSteps(text ?: description)
+            }
+            if (rawInstructions.isJsonPrimitive) {
+                return splitDescriptionToSteps(rawInstructions.asString)
+            }
+            return splitDescriptionToSteps(description)
+        }
+
+    private fun splitDescriptionToSteps(text: String?): List<String> {
+        if (text.isNullOrBlank()) return emptyList()
+        val steps = text.split(Regex("(?<=[.!?])\\s+"))
+            .map { it.trim() }
+            .filter { it.length > 5 }
+        return if (steps.isNotEmpty()) steps else listOf(text.trim())
+    }
+}
 
 // ── Workout Routines & Logs ─────────────────────────────────
 data class WorkoutRoutineDto(
@@ -33,16 +66,7 @@ data class CreateRoutineRequest(
     @SerializedName("description") val description: String? = null,
     @SerializedName("target_split") val targetSplit: String? = "full_body",
     @SerializedName("schedule_days") val scheduleDays: List<String> = listOf("monday", "wednesday", "friday"),
-    @SerializedName("routine_data") val routineData: Map<String, Any>? = null,
     @SerializedName("is_active") val isActive: Boolean = true
-)
-
-data class UpdateRoutineRequest(
-    @SerializedName("title") val title: String? = null,
-    @SerializedName("description") val description: String? = null,
-    @SerializedName("target_split") val targetSplit: String? = null,
-    @SerializedName("schedule_days") val scheduleDays: List<String>? = null,
-    @SerializedName("is_active") val isActive: Boolean? = null
 )
 
 data class CreateWorkoutLogRequest(
@@ -50,22 +74,23 @@ data class CreateWorkoutLogRequest(
     @SerializedName("notes") val notes: String? = null
 )
 
-data class AddWorkoutSetRequest(
-    @SerializedName("exercise_id") val exerciseId: String,
-    @SerializedName("set_number") val setNumber: Int,
-    @SerializedName("reps") val reps: Int,
-    @SerializedName("weight_kg") val weightKg: Double = 0.0
-)
-
 data class WorkoutLogDto(
     @SerializedName("id") val id: String,
     @SerializedName("user_id") val userId: String,
     @SerializedName("log_date") val logDate: String,
     @SerializedName("status") val status: String? = null,
-    @SerializedName("duration_minutes") val durationMinutes: Int = 0,
-    @SerializedName("total_volume_kg") val totalVolumeKg: Double = 0.0,
     @SerializedName("total_xp_earned") val totalXpEarned: Int = 0,
-    @SerializedName("notes") val notes: String? = null
+    @SerializedName("sets") val sets: List<WorkoutLogSetDto>? = null
+)
+
+data class WorkoutLogSetDto(
+    @SerializedName("id") val id: String? = null,
+    @SerializedName("workout_log_id") val workoutLogId: String? = null,
+    @SerializedName("exercise_id") val exerciseId: String? = null,
+    @SerializedName("set_number") val setNumber: Int = 1,
+    @SerializedName("reps") val reps: Int = 0,
+    @SerializedName("weight_kg") val weightKg: Double? = 0.0,
+    @SerializedName("duration_sec") val durationSec: Int? = 0
 )
 
 // ── Nutrition Logs ──────────────────────────────────────────
@@ -90,6 +115,25 @@ data class CreateNutritionLogRequest(
     @SerializedName("fat_g") val fatGrams: Double = 0.0
 )
 
+data class FoodItemDto(
+    @SerializedName("id") val id: String,
+    @SerializedName("name") val name: String,
+    @SerializedName("category") val category: String,
+    @SerializedName("item_type") val itemType: String? = "DISH",
+    @SerializedName("base_serving") val baseServing: String? = null,
+    @SerializedName("serving_size") val servingSize: String? = null,
+    @SerializedName("serving_weight_g") val servingWeightG: Double? = 100.0,
+    @SerializedName("base_calories") val baseCalories: Int = 0,
+    @SerializedName("calories") val calories: Int = 0,
+    @SerializedName("protein") val protein: Double = 0.0,
+    @SerializedName("carbs") val carbs: Double = 0.0,
+    @SerializedName("fat") val fat: Double = 0.0,
+    @SerializedName("fiber") val fiber: Double? = 0.0,
+    @SerializedName("description") val description: String? = null,
+    @SerializedName("tags") val tags: List<String>? = null,
+    @SerializedName("name_en") val nameEn: String? = null
+)
+
 // ── Body Metrics ────────────────────────────────────────────
 data class BodyMetricDto(
     @SerializedName("id") val id: String,
@@ -108,14 +152,16 @@ data class CreateBodyMetricRequest(
 
 // ── AI Planner ──────────────────────────────────────────────
 data class GenerateAiPlanRequest(
+    @SerializedName("fitness_goal") val fitnessGoal: String = "hypertrophy",
     @SerializedName("goal") val goal: String = "gain_muscle",
+    @SerializedName("split") val split: String = "PPL",
     @SerializedName("split_type") val splitType: String = "auto",
     @SerializedName("days_per_week") val daysPerWeek: Int = 4,
     @SerializedName("duration_minutes") val durationMinutes: Int = 60,
     @SerializedName("equipment") val equipment: String = "all",
     @SerializedName("injuries") val injuries: List<String> = emptyList(),
     @SerializedName("experience") val experience: String? = null,
-    @SerializedName("focus_muscles") val focusMuscles: List<String>? = null,
+    @SerializedName("focus_muscles") val focusMuscles: List<String> = emptyList(),
     @SerializedName("auto_save") val autoSave: Boolean = false
 )
 
@@ -135,10 +181,6 @@ data class CommunityPostDto(
 data class CreatePostRequest(
     @SerializedName("content") val content: String,
     @SerializedName("media_url") val mediaUrl: String? = null
-)
-
-data class AddCommentRequest(
-    @SerializedName("content") val content: String
 )
 
 // ── 3D Avatar & Wardrobe ────────────────────────────────────
@@ -166,7 +208,7 @@ data class AvatarItemDto(
     @SerializedName("id") val id: String,
     @SerializedName("slot") val slot: String,
     @SerializedName("name") val name: String,
-    @SerializedName("rarity") val rarity: String = "COMMON",
+    @SerializedName("rarity") val rarity: String = "common",
     @SerializedName("model_id") val modelId: String? = null,
     @SerializedName("color_hex") val colorHex: String? = null,
     @SerializedName("unlock_level") val unlockLevel: Int = 0,

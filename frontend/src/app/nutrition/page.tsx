@@ -98,16 +98,17 @@ export default function NutritionPage() {
     const matchingFood = vietnameseFoods.find((f) => f.id === item.foodId) || {
       id: item.foodId,
       name: item.name,
-      category: 'Món ăn',
-      base_serving: '1 khẩu phần',
+      category: item.foodId?.startsWith('raw_') ? 'Nguyên liệu thô' : 'Món ăn',
+      item_type: item.foodId?.startsWith('raw_') ? ('RAW' as const) : ('DISH' as const),
+      base_serving: item.foodId?.startsWith('raw_') ? '100g' : '1 khẩu phần',
       base_calories: Math.round(item.calories / (item.multiplier || 1)),
       base_macros: {
         protein: Math.round(item.macros.protein / (item.multiplier || 1)),
         carbs: Math.round(item.macros.carbs / (item.multiplier || 1)),
         fat: Math.round(item.macros.fat / (item.multiplier || 1)),
       },
-      min_multiplier: 0.5,
-      max_multiplier: 1.5,
+      min_multiplier: item.foodId?.startsWith('raw_') ? 0.2 : 0.5,
+      max_multiplier: item.foodId?.startsWith('raw_') ? 5.0 : 2.5,
     };
 
     setSelectedFoodForPortion(matchingFood);

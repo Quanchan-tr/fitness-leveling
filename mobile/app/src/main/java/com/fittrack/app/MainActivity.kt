@@ -24,6 +24,9 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Enforce Light Mode on Login screen when not authenticated
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO)
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }

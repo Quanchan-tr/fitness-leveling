@@ -113,4 +113,8 @@
     <color name="black">#000000</color>
     <color name="icon_tint">#0F172A</color>
     <color name="transparent">#00000000</color>
+
+    <!-- Subtab Pill Tokens -->
+    <color name="subtab_pill_inactive_bg">#FFFFFF</color>
+    <color name="subtab_pill_inactive_text">#0F172A</color>
 </resources>

@@ -17,9 +17,24 @@
 
         <!-- Background -->
         <item name="android:windowBackground">@color/bg_screen_gray</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="android:colorBackground">@color/background</item>
+
+        <!-- Dialog Themes -->
+        <item name="alertDialogTheme">@style/ThemeOverlay.FitTrack.Dialog.Alert</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.FitTrack.Dialog.Alert</item>
 
         <!-- CheckBox Component Style -->
         <item name="checkboxStyle">@style/Widget.FitTrack.CheckBox</item>
+    </style>
+
+    <!-- Standard Dialog Theme -->
+    <style name="ThemeOverlay.FitTrack.Dialog.Alert" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="colorSurface">@color/surface</item>
+        <item name="android:colorBackground">@color/surface</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
     </style>
 
     <!-- Custom CheckBox Widget Style -->

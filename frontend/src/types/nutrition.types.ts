@@ -6,6 +6,8 @@ export interface MacroNutrients {
   fat: number;     // in grams
 }
 
+export type FoodItemType = 'DISH' | 'RAW';
+
 export interface FoodItem {
   id: string;
   name: string;
@@ -17,6 +19,15 @@ export interface FoodItem {
   max_multiplier: number;
   description?: string;
   tags?: string[];
+  item_type?: FoodItemType;
+  serving_size?: string;
+  serving_weight_g?: number;
+  calories?: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  fiber?: number;
+  name_en?: string;
 }
 
 export interface FoodLogItem {

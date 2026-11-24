@@ -15,7 +15,7 @@
         android:background="@drawable/bg_top_header_bar"
         android:elevation="0dp"
         android:paddingStart="@dimen/screen_padding_horizontal"
-        android:paddingTop="44dp"
+        android:paddingTop="12dp"
         android:paddingEnd="@dimen/screen_padding_horizontal"
         android:paddingBottom="14dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -45,30 +45,15 @@
                 app:srcCompat="@drawable/ic_user_solid"
                 app:tint="@color/primary" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/tv_app_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/tv_app_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/dashboard_app_title"
-                    android:textColor="@color/text_dark"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:letterSpacing="0.04"
-                    android:text="@string/dashboard_command_center"
-                    android:textColor="@color/primary"
-                    android:textSize="9.5sp"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                android:text="@string/dashboard_app_title"
+                android:textColor="@color/text_dark"
+                android:textSize="18sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <!-- Right Header Actions (Streak + Notification) -->
@@ -130,23 +115,6 @@
             android:paddingTop="16dp"
             android:paddingEnd="@dimen/screen_padding_horizontal"
             android:paddingBottom="24dp">
-
-            <!-- Top Action Banner: Vào buổi tập ngay -->
-            <!-- Top Action Banner: Vào buổi tập ngay (Vibrant Gradient CTA) -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_enter_workout_now"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/bg_gradient_workout_cta"
-                app:backgroundTint="@null"
-                android:text="⚡ VÀO BUỔI TẬP HÔM NAY"
-                android:textColor="@color/white"
-                android:textAllCaps="false"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:cornerRadius="@dimen/radius_button"
-                app:elevation="2dp" />
 
             <!-- Card 1: Avatar RPG Card (Modern SaaS Surface) -->
             <LinearLayout
@@ -269,11 +237,11 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="bottom|end"
                         android:layout_margin="10dp"
-                        android:background="@drawable/bg_badge_streak"
-                        android:paddingStart="10dp"
-                        android:paddingTop="4dp"
-                        android:paddingEnd="10dp"
-                        android:paddingBottom="4dp"
+                        android:background="@drawable/bg_primary_button"
+                        android:paddingStart="12dp"
+                        android:paddingTop="5dp"
+                        android:paddingEnd="12dp"
+                        android:paddingBottom="5dp"
                         android:text="⛶ Toàn màn hình"
                         android:textColor="@color/white"
                         android:textSize="10sp"
@@ -315,12 +283,28 @@
                         android:layout_marginTop="6dp"
                         android:max="1000"
                         android:progress="640"
-                        android:progressDrawable="@drawable/bg_primary_button"
+                        android:progressTint="@color/primary"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/tv_xp_progress" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
+
+            <!-- Action Button: Vào buổi tập ngay (Placing below Avatar card) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_enter_workout_now"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_gradient_workout_cta"
+                app:backgroundTint="@null"
+                android:text="Vào buổi tập ngay"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:cornerRadius="@dimen/radius_button"
+                app:elevation="2dp" />
 
             <!-- Card 2: Today's Workout Focus Card -->
             <LinearLayout
@@ -525,37 +509,20 @@
                             android:textSize="11sp" />
                     </LinearLayout>
                 </LinearLayout>
-
-                <!-- Tip Hint Box (Pastel Light Background) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_card_selectable"
-                    android:padding="12dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/dashboard_hint_rest"
-                        android:textColor="@color/text_slate"
-                        android:textSize="11sp" />
-                </LinearLayout>
-
             </LinearLayout>
 
-            <!-- Card 3 & 4: Energy & Water Side-by-Side Row (2-Column Grid) -->
+            <!-- Card 3 & 4: Energy & Water Side-by-Side Row (Equal Height Matched Columns) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
+                android:baselineAligned="false"
                 android:orientation="horizontal">
 
                 <!-- Left: Energy & Calo Card -->
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@drawable/bg_card_white"
                     android:elevation="0dp"
@@ -565,43 +532,46 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/dashboard_energy_title"
-                        android:textColor="@color/badge_streak_text"
+                        android:text="DINH DƯỠNG ĐÃ NẠP"
+                        android:textColor="@color/primary"
                         android:textSize="11sp"
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_energy_val"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@string/dashboard_energy_val"
+                        android:text="0 kcal"
                         android:textColor="@color/text_dark"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:text="@string/dashboard_energy_target"
-                        android:textColor="@color/text_slate_light"
-                        android:textSize="10sp" />
-
                     <ProgressBar
+                        android:id="@+id/pb_energy"
                         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="6dp"
                         android:layout_marginTop="8dp"
-                        android:max="2400"
-                        android:progress="1800"
-                        android:progressDrawable="@drawable/bg_primary_button" />
+                        android:max="2200"
+                        android:progress="0"
+                        android:progressTint="@color/primary" />
+
+                    <TextView
+                        android:id="@+id/tv_energy_target"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Mục tiêu: 2.200 kcal"
+                        android:textColor="@color/text_slate_light"
+                        android:textSize="10sp" />
                 </LinearLayout>
 
                 <!-- Right: Water & Activity Card -->
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="10dp"
                     android:layout_weight="1"
                     android:background="@drawable/bg_card_white"
                     android:elevation="0dp"
@@ -617,6 +587,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_water_val"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -626,12 +597,13 @@
                         android:textStyle="bold" />
 
                     <ProgressBar
+                        android:id="@+id/pb_water"
                         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                         android:layout_width="match_parent"
                         android:layout_height="6dp"
                         android:layout_marginTop="8dp"
-                        android:max="100"
-                        android:progress="90" />
+                        android:max="2500"
+                        android:progress="2100" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -671,13 +643,13 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Card 5: Daily Quests Sticky Entry Banner (Soft Pastel Warning Surface) -->
+            <!-- Card 5: Daily Quests Sticky Entry Banner -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/btn_open_daily_quests"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/bg_badge_streak"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_card_white"
                 android:clickable="true"
                 android:elevation="0dp"
                 android:focusable="true"
@@ -688,7 +660,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="🎯"
-                    android:textSize="16sp"
+                    android:textSize="18sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -696,11 +668,11 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:text="@string/dashboard_daily_quest_banner"
-                    android:textColor="@color/badge_streak_text"
-                    android:textSize="12sp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="Nhiệm vụ hàng ngày"
+                    android:textColor="@color/text_dark"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/tv_quest_action"
@@ -711,8 +683,13 @@
                     android:id="@+id/tv_quest_action"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/dashboard_daily_quest_action"
-                    android:textColor="@color/primary"
+                    android:background="@drawable/bg_primary_button"
+                    android:paddingStart="14dp"
+                    android:paddingTop="6dp"
+                    android:paddingEnd="14dp"
+                    android:paddingBottom="6dp"
+                    android:text="Xem"
+                    android:textColor="@color/white"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -720,10 +697,44 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <!-- Card 6: Real Weight Trend Chart Card (Synced with Metrics Tab) -->
+            <LinearLayout
+                android:id="@+id/card_weight_trend_home"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_card_white"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📈 XU HƯỚNG CÂN NẶNG"
+                    android:textColor="@color/text_dark"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <com.fittrack.app.ui.views.WeightTrendChartView
+                    android:id="@+id/chart_weight_trend_home"
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:layout_marginTop="10dp" />
+
+                <TextView
+                    android:id="@+id/tv_weight_trend_note"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Dữ liệu cân nặng đồng bộ thời gian thực từ tab Chỉ số"
+                    android:textColor="@color/text_slate"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Floating Active Workout Bar (Live Mini Player) -->
+    <!-- Floating Active Workout Bar (Live Mini Player - Hidden by default unless workout is active) -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_floating_workout"
         android:layout_width="0dp"
@@ -738,6 +749,7 @@
         android:focusable="true"
         android:paddingStart="14dp"
         android:paddingEnd="14dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -759,28 +771,45 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="8dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tv_floating_continue"
+            app:layout_constraintEnd_toStartOf="@+id/btn_close_floating_workout"
             app:layout_constraintStart_toEndOf="@+id/iv_floating_pulse"
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
+                android:id="@+id/tv_floating_workout_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Buổi tập đang diễn ra • 24:15"
+                android:text="Buổi tập đang diễn ra"
                 android:textColor="@color/white"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/tv_floating_workout_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Ngực &amp; Tay Sau Cắt Nét"
+                android:text="Nhấn để tiếp tục tập"
                 android:textColor="@color/primary_light"
                 android:textSize="10.5sp" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/btn_close_floating_workout"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="6dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:gravity="center"
+            android:text="✕"
+            android:textColor="#94A3B8"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/tv_floating_continue"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tv_floating_continue"

@@ -255,12 +255,24 @@ export const authService = {
     // Reserved for future email SMTP verification trigger
   },
 
-  async requestPasswordReset(_email: string): Promise<void> {
-    // Reserved for future password reset trigger
+  async requestPasswordReset(email: string): Promise<void> {
+    await apiRequest('/auth/forgot-password', {
+      method: 'POST',
+      requiresAuth: false,
+      body: JSON.stringify({ email }),
+    });
   },
 
-  async resetPassword(_email: string, _newPassword: string): Promise<void> {
-    // Reserved for future password reset update
+  async resetPassword(email: string, newPassword: string, otp: string = ''): Promise<void> {
+    await apiRequest('/auth/reset-password', {
+      method: 'POST',
+      requiresAuth: false,
+      body: JSON.stringify({
+        email,
+        otp,
+        password: newPassword,
+      }),
+    });
   },
 
   /** Save fitness onboarding profile and sync with PUT /api/v1/auth/profile */
