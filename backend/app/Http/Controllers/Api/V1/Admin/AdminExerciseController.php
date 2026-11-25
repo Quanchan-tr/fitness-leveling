@@ -41,11 +41,19 @@ class AdminExerciseController extends Controller
             $query->whereRaw('LOWER(name) LIKE ?', [$term]);
         }
 
-        $paginator = $query
-            ->with('creator:id,name,email')
-            ->withCount(['reports as pending_reports_count' => fn ($sub) => $sub->where('status', 'pending')])
-            ->orderByDesc('updated_at')
-            ->paginate($perPage);
+        $sort = trim((string) $request->query('sort', 'updated_desc'));
+
+        $query->with('creator:id,name,email')
+            ->withCount(['reports as pending_reports_count' => fn ($sub) => $sub->where('status', 'pending')]);
+
+        match ($sort) {
+            'name_asc' => $query->orderBy('name'),
+            'name_desc' => $query->orderByDesc('name'),
+            'reports_desc' => $query->orderByDesc('pending_reports_count')->orderByDesc('updated_at'),
+            default => $query->orderByDesc('updated_at'),
+        };
+
+        $paginator = $query->paginate($perPage);
 
         return response()->json([
             'data' => $paginator->items(),
@@ -136,7 +144,15 @@ class AdminExerciseController extends Controller
             $query->where('status', $status);
         }
 
-        $paginator = $query->orderByDesc('created_at')->paginate($perPage);
+        $sort = trim((string) $request->query('sort', 'newest'));
+
+        match ($sort) {
+            'oldest' => $query->orderBy('created_at'),
+            'reason_asc' => $query->orderBy('reason')->orderByDesc('created_at'),
+            default => $query->orderByDesc('created_at'),
+        };
+
+        $paginator = $query->paginate($perPage);
 
         return response()->json([
             'data' => $paginator->items(),

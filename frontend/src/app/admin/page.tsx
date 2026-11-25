@@ -12,6 +12,7 @@ import {
   RefreshCw,
   ShieldAlert,
   Users,
+  Utensils,
 } from 'lucide-react';
 import {
   adminApi,
@@ -90,12 +91,20 @@ export default function AdminStatsPage() {
     return Math.max(1, ...list.map((e) => e.sets_count));
   }, [stats]);
 
+  const totalTopExerciseSets = useMemo(() => {
+    const list = stats?.top_exercises ?? [];
+    return Math.max(
+      1,
+      list.reduce((sum, e) => sum + e.sets_count, 0)
+    );
+  }, [stats]);
+
   if (loading && !stats) {
     return (
       <div className="space-y-6">
         <div className="h-10 w-64 bg-[#E5E7EB] rounded-lg animate-pulse" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="h-32 bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl animate-pulse" />
           ))}
         </div>
@@ -172,8 +181,8 @@ export default function AdminStatsPage() {
         </div>
       </div>
 
-      {/* Section 1: 4 Core KPI Cards */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      {/* Section 1: 5 Balanced Core KPI Cards */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-5">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#6B7280]">
@@ -181,17 +190,17 @@ export default function AdminStatsPage() {
             </span>
             <Users className="w-4 h-4 text-[#2563EB]" />
           </div>
-          <div className="mt-2 text-3xl font-bold text-[#111111] tabular-nums">
+          <div className="mt-2 text-3xl font-bold text-[#111111] font-mono tabular-nums">
             {formatNumber(kpis.total_users)}
           </div>
-          <div className="mt-2 text-xs text-[#6B7280] flex flex-wrap items-center gap-x-2 gap-y-1">
+          <div className="mt-2 text-xs text-[#6B7280] flex flex-wrap items-center gap-x-2 gap-y-1 font-mono tabular-nums">
             <span className="font-semibold text-[#10B981]">+{formatNumber(kpis.new_users)} mới</span>
             <span>•</span>
             <span>{formatNumber(kpis.active_users)} hoạt động</span>
             {kpis.banned_users > 0 && (
               <>
                 <span>•</span>
-                <span className="text-rose-600 font-medium">{kpis.banned_users} bị khóa</span>
+                <span className="text-rose-600 font-medium">{kpis.banned_users} khóa</span>
               </>
             )}
           </div>
@@ -200,16 +209,30 @@ export default function AdminStatsPage() {
         <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-5">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#6B7280]">
-              Buổi tập &amp; Ăn uống
+              Buổi tập
             </span>
             <Activity className="w-4 h-4 text-[#2563EB]" />
           </div>
-          <div className="mt-2 text-3xl font-bold text-[#111111] tabular-nums">
+          <div className="mt-2 text-3xl font-bold text-[#111111] font-mono tabular-nums">
             {formatNumber(kpis.workouts_in_range)}
           </div>
-          <div className="mt-2 text-xs text-[#6B7280]">
-            Tổng <span className="font-semibold text-[#111111]">{formatNumber(kpis.total_workouts)}</span> buổi tập •{' '}
-            <span className="font-semibold text-[#111111]">{formatNumber(kpis.nutrition_logs_in_range)}</span> bữa ăn
+          <div className="mt-2 text-xs text-[#6B7280] font-mono tabular-nums">
+            Tổng <span className="font-semibold text-[#111111]">{formatNumber(kpis.total_workouts)}</span> buổi tập
+          </div>
+        </div>
+
+        <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-5">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#6B7280]">
+              Bữa ăn
+            </span>
+            <Utensils className="w-4 h-4 text-[#2563EB]" />
+          </div>
+          <div className="mt-2 text-3xl font-bold text-[#111111] font-mono tabular-nums">
+            {formatNumber(kpis.nutrition_logs_in_range)}
+          </div>
+          <div className="mt-2 text-xs text-[#6B7280] font-mono tabular-nums">
+            Tổng <span className="font-semibold text-[#111111]">{formatNumber(kpis.total_nutrition_logs ?? kpis.nutrition_logs_in_range)}</span> bữa ăn
           </div>
         </div>
 
@@ -220,12 +243,12 @@ export default function AdminStatsPage() {
             </span>
             <Dumbbell className="w-4 h-4 text-[#2563EB]" />
           </div>
-          <div className="mt-2 text-3xl font-bold text-[#111111] tabular-nums">
+          <div className="mt-2 text-3xl font-bold text-[#111111] font-mono tabular-nums">
             {formatNumber(kpis.total_exercises)}
           </div>
-          <div className="mt-2 text-xs text-[#6B7280]">
-            Bài tập hoạt động • <span className="font-semibold text-[#111111]">{formatNumber(kpis.total_foods)}</span> món ăn •{' '}
-            <span className="font-semibold text-[#111111]">{formatNumber(kpis.community_posts_in_range)}</span> bài đăng
+          <div className="mt-2 text-xs text-[#6B7280] font-mono tabular-nums">
+            <span className="font-semibold text-[#111111]">{formatNumber(kpis.total_foods)}</span> món ăn •{' '}
+            <span className="font-semibold text-[#111111]">{formatNumber(kpis.community_posts_in_range)}</span> bài
           </div>
         </div>
 
@@ -239,12 +262,12 @@ export default function AdminStatsPage() {
             </span>
             <ShieldAlert className={`w-4 h-4 ${pendingTotal > 0 ? 'text-amber-600' : 'text-[#10B981]'}`} />
           </div>
-          <div className="mt-2 text-3xl font-bold text-[#111111] tabular-nums">
+          <div className="mt-2 text-3xl font-bold text-[#111111] font-mono tabular-nums">
             {formatNumber(pendingTotal)}
           </div>
           <div className="mt-2 text-xs text-[#6B7280] flex items-center justify-between">
-            <span>
-              {kpis.pending_exercises_count} bài tập • {kpis.pending_reports_count} báo cáo
+            <span className="font-mono tabular-nums">
+              {kpis.pending_exercises_count} bài • {kpis.pending_reports_count} báo cáo
             </span>
             <span className="inline-flex items-center gap-1 font-semibold text-[#2563EB]">
               <span>Xử lý</span>
@@ -272,49 +295,49 @@ export default function AdminStatsPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 pt-5">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 pt-5 divide-y sm:divide-y-0 sm:divide-x divide-[#E5E7EB]">
+            <div className="pb-3 sm:pb-0 sm:pr-4">
               <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#6B7280]">
                 Số lần dùng
               </div>
-              <div className="mt-1 text-2xl font-bold text-[#111111] tabular-nums">
+              <div className="mt-1 text-2xl font-bold text-[#111111] font-mono tabular-nums">
                 {formatNumber(aiPlan.total_uses)}
               </div>
-              <div className="mt-1 text-xs text-[#6B7280] tabular-nums">
+              <div className="mt-1 text-xs text-[#6B7280] font-mono tabular-nums">
                 Tổng: {formatNumber(aiPlan.all_time_uses)}
               </div>
-              <div className="mt-1 text-[11px] text-[#6B7280] tabular-nums">
+              <div className="mt-1 text-[11px] text-[#6B7280] font-mono tabular-nums">
                 LLM: <span className="font-semibold text-[#10B981]">{aiPlan.llm_calls}</span> • Fallback: {aiPlan.fallback_calls}
               </div>
             </div>
 
-            <div>
+            <div className="py-3 sm:py-0 sm:px-4">
               <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#6B7280]">
                 Token đã dùng
               </div>
-              <div className="mt-1 text-2xl font-bold text-[#111111] tabular-nums">
+              <div className="mt-1 text-2xl font-bold text-[#111111] font-mono tabular-nums">
                 {formatNumber(aiPlan.total_tokens)}
               </div>
-              <div className="mt-1 text-xs text-[#6B7280] tabular-nums">
+              <div className="mt-1 text-xs text-[#6B7280] font-mono tabular-nums">
                 Tổng: {formatNumber(aiPlan.all_time_tokens)}
               </div>
-              <div className="mt-1 text-[11px] text-[#6B7280] tabular-nums">
+              <div className="mt-1 text-[11px] text-[#6B7280] font-mono tabular-nums">
                 In: {formatNumber(aiPlan.prompt_tokens)} • Out: {formatNumber(aiPlan.completion_tokens)}
               </div>
             </div>
 
-            <div>
+            <div className="pt-3 sm:pt-0 sm:pl-4">
               <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#6B7280]">
                 Phản hồi TB
               </div>
-              <div className="mt-1 text-2xl font-bold text-[#111111] tabular-nums">
+              <div className="mt-1 text-2xl font-bold text-[#111111] font-mono tabular-nums">
                 {formatNumber(aiPlan.avg_llm_latency_ms)} ms
               </div>
               <div className="mt-1 text-xs text-[#6B7280] tabular-nums">
                 API chính
               </div>
-              <div className="mt-1 text-[11px] text-[#6B7280] tabular-nums">
-                Trung bình chung: {formatNumber(aiPlan.avg_latency_ms)} ms
+              <div className="mt-1 text-[11px] text-[#6B7280] font-mono tabular-nums">
+                TB chung: {formatNumber(aiPlan.avg_latency_ms)} ms
               </div>
             </div>
           </div>
@@ -336,39 +359,39 @@ export default function AdminStatsPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 pt-5">
-            <div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 pt-5 divide-y sm:divide-y-0 sm:divide-x divide-[#E5E7EB]">
+            <div className="pb-3 sm:pb-0 sm:pr-4">
               <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#6B7280]">
                 Số lần dùng
               </div>
-              <div className="mt-1 text-2xl font-bold text-[#111111] tabular-nums">
+              <div className="mt-1 text-2xl font-bold text-[#111111] font-mono tabular-nums">
                 {formatNumber(aiPose.total_uses)}
               </div>
-              <div className="mt-1 text-xs text-[#6B7280] tabular-nums">
+              <div className="mt-1 text-xs text-[#6B7280] font-mono tabular-nums">
                 Tổng: {formatNumber(aiPose.all_time_uses)}
               </div>
             </div>
 
-            <div>
+            <div className="py-3 sm:py-0 sm:px-4">
               <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#6B7280]">
                 Phân loại luồng
               </div>
-              <div className="mt-1 text-sm font-bold text-[#111111] tabular-nums">
+              <div className="mt-1 text-sm font-bold text-[#111111] font-mono tabular-nums">
                 Upload: {formatNumber(aiPose.video_upload_uses)}
               </div>
-              <div className="mt-1 text-sm font-semibold text-[#2563EB] tabular-nums">
+              <div className="mt-1 text-sm font-semibold text-[#2563EB] font-mono tabular-nums">
                 Realtime: {formatNumber(aiPose.realtime_uses)}
               </div>
             </div>
 
-            <div>
+            <div className="pt-3 sm:pt-0 sm:pl-4">
               <div className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#6B7280]">
                 Trạng thái &amp; Điểm
               </div>
-              <div className="mt-1 text-2xl font-bold text-[#10B981] tabular-nums">
+              <div className="mt-1 text-2xl font-bold text-[#10B981] font-mono tabular-nums">
                 {aiPose.avg_score}/100
               </div>
-              <div className="mt-1 text-[11px] text-[#6B7280] tabular-nums">
+              <div className="mt-1 text-[11px] text-[#6B7280] font-mono tabular-nums">
                 Xong: {aiPose.completed_uses} • Lỗi: {aiPose.failed_uses}
               </div>
             </div>
@@ -542,49 +565,63 @@ export default function AdminStatsPage() {
           )}
         </div>
 
-        {/* Top 5 Popular Exercises */}
-        <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-6">
-          <h3 className="text-base font-bold text-[#111111] mb-4">Top 5 Bài tập phổ biến</h3>
+        {/* Top 5 Popular Exercises — Horizontal Bar Chart */}
+        <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-6 flex flex-col justify-between">
+          <div>
+            <h3 className="text-base font-bold text-[#111111] mb-4">Top 5 Bài tập phổ biến</h3>
 
-          {stats!.top_exercises.length === 0 ? (
-            <div className="py-12 text-center text-sm text-[#6B7280]">
-              Chưa có hiệp tập nào trong kỳ này.
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {stats!.top_exercises.map((ex, idx) => {
-                const pct = Math.round((ex.sets_count / maxExerciseSets) * 100);
-                return (
-                  <div key={ex.id} className="space-y-1.5">
-                    <div className="flex items-center justify-between gap-2 text-xs">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <span className="w-5 h-5 rounded-md bg-[#F8FAFC] border border-[#E5E7EB] text-[#111111] font-bold flex items-center justify-center shrink-0 tabular-nums">
-                          {idx + 1}
-                        </span>
-                        <span className="font-semibold text-[#111111] truncate">
-                          {ex.name}
+            {stats!.top_exercises.length === 0 ? (
+              <div className="py-12 text-center text-sm text-[#6B7280]">
+                Chưa có hiệp tập nào trong kỳ này.
+              </div>
+            ) : (
+              <div className="relative space-y-3.5">
+                {stats!.top_exercises.map((ex, idx) => {
+                  const barWidthPct = Math.max(6, Math.round((ex.sets_count / maxExerciseSets) * 100));
+                  const sharePct = Math.round((ex.sets_count / totalTopExerciseSets) * 100);
+                  return (
+                    <div key={ex.id} className="space-y-1">
+                      <div className="flex items-center justify-between gap-2 text-xs">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="text-[11px] font-mono font-bold text-[#6B7280] w-4 shrink-0 tabular-nums">
+                            {idx + 1}.
+                          </span>
+                          <span className="font-semibold text-[#111111] truncate" title={ex.name}>
+                            {ex.name}
+                          </span>
+                          {ex.muscle_group && (
+                            <span className="text-[10px] font-semibold uppercase tracking-[0.04em] px-1.5 py-0.5 rounded bg-[#EFF6FF] text-[#2563EB] shrink-0">
+                              {ex.muscle_group}
+                            </span>
+                          )}
+                        </div>
+                        <span className="font-mono font-bold text-[#2563EB] shrink-0 tabular-nums">
+                          {formatNumber(ex.sets_count)}{' '}
+                          <span className="text-[10px] font-medium text-[#6B7280]">({sharePct}%)</span>
                         </span>
                       </div>
-                      <span className="font-bold text-[#2563EB] shrink-0 tabular-nums">
-                        {formatNumber(ex.sets_count)} sets
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-[#F8FAFC] border border-[#E5E7EB] rounded-full overflow-hidden">
+                      <div className="relative h-5 w-full bg-[#F8FAFC] border border-[#E5E7EB] rounded-md overflow-hidden">
+                        {/* Vertical chart gridlines */}
+                        <div className="absolute inset-y-0 left-1/4 border-l border-dashed border-[#E5E7EB] pointer-events-none" />
+                        <div className="absolute inset-y-0 left-1/2 border-l border-dashed border-[#E5E7EB] pointer-events-none" />
+                        <div className="absolute inset-y-0 left-3/4 border-l border-dashed border-[#E5E7EB] pointer-events-none" />
                         <div
-                          className="h-full bg-[#2563EB] rounded-full"
-                          style={{ width: `${pct}%` }}
+                          className="relative h-full bg-[#2563EB] rounded-r-md transition-all duration-300"
+                          style={{ width: `${barWidthPct}%` }}
                         />
                       </div>
-                      {ex.muscle_group && (
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.05em] px-1.5 py-0.5 rounded bg-[#EFF6FF] text-[#2563EB] shrink-0">
-                          {ex.muscle_group}
-                        </span>
-                      )}
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {stats!.top_exercises.length > 0 && (
+            <div className="mt-4 pt-2 border-t border-[#E5E7EB] flex items-center justify-between text-[10px] font-mono text-[#6B7280] tabular-nums">
+              <span>0</span>
+              <span>{formatNumber(Math.round(maxExerciseSets / 2))}</span>
+              <span>{formatNumber(maxExerciseSets)} sets</span>
             </div>
           )}
         </div>

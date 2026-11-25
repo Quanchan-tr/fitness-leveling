@@ -51,6 +51,7 @@ export default function AdminFoodsPage() {
   const [searchInput, setSearchInput] = useState('');
   const [debouncedQ, setDebouncedQ] = useState('');
   const [itemType, setItemType] = useState('ALL');
+  const [sort, setSort] = useState('updated_desc');
   const [showTrashed, setShowTrashed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,6 +79,7 @@ export default function AdminFoodsPage() {
         q: debouncedQ || undefined,
         item_type: itemType,
         trashed: showTrashed ? 'only' : undefined,
+        sort,
         page,
         per_page: 20,
       });
@@ -88,7 +90,7 @@ export default function AdminFoodsPage() {
     } finally {
       setLoading(false);
     }
-  }, [debouncedQ, itemType, showTrashed, page]);
+  }, [debouncedQ, itemType, showTrashed, sort, page]);
 
   useEffect(() => {
     loadFoods();
@@ -240,6 +242,22 @@ export default function AdminFoodsPage() {
             <option value="ALL">Tất cả loại</option>
             <option value="DISH">Món chế biến (DISH)</option>
             <option value="RAW">Nguyên liệu (RAW)</option>
+          </select>
+
+          <select
+            value={sort}
+            aria-label="Sắp xếp món ăn"
+            onChange={(e) => {
+              setSort(e.target.value);
+              setPage(1);
+            }}
+            className="px-3 py-2 rounded-lg bg-[#F8FAFC] border border-[#E5E7EB] text-xs font-medium text-[#111111] focus:outline-none focus:border-[#2563EB]"
+          >
+            <option value="updated_desc">Sắp xếp: Mới cập nhật</option>
+            <option value="calories_desc">Sắp xếp: Calo cao → thấp</option>
+            <option value="calories_asc">Sắp xếp: Calo thấp → cao</option>
+            <option value="protein_desc">Sắp xếp: Protein cao nhất</option>
+            <option value="name_asc">Sắp xếp: Tên A–Z</option>
           </select>
 
           <div className="relative">

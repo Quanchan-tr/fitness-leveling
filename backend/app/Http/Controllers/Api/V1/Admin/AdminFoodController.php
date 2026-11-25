@@ -37,7 +37,17 @@ class AdminFoodController extends Controller
             }
         }
 
-        $paginator = $query->orderByDesc('updated_at')->paginate($perPage);
+        $sort = trim((string) $request->query('sort', 'updated_desc'));
+
+        match ($sort) {
+            'calories_desc' => $query->orderByDesc('calories')->orderByDesc('updated_at'),
+            'calories_asc' => $query->orderBy('calories')->orderByDesc('updated_at'),
+            'protein_desc' => $query->orderByDesc('protein')->orderByDesc('updated_at'),
+            'name_asc' => $query->orderBy('name'),
+            default => $query->orderByDesc('updated_at'),
+        };
+
+        $paginator = $query->paginate($perPage);
         $items = collect($paginator->items())->map(fn (Food $food) => $food->toApiArray())->values()->all();
 
         return response()->json([

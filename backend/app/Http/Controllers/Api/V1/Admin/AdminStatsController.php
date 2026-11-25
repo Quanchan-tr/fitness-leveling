@@ -47,6 +47,7 @@ class AdminStatsController extends Controller
             'banned_users' => User::whereNotNull('banned_at')->count(),
             'total_workouts' => WorkoutLog::count(),
             'workouts_in_range' => WorkoutLog::where('created_at', '>=', $since)->count(),
+            'total_nutrition_logs' => NutritionLog::count(),
             'nutrition_logs_in_range' => NutritionLog::where('created_at', '>=', $since)->count(),
             'total_exercises' => Exercise::where('status', 'active')->count(),
             'total_foods' => Food::count(),

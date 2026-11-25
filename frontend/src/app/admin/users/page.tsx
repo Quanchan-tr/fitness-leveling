@@ -58,6 +58,7 @@ export default function AdminUsersPage() {
   });
   const [statusFilter, setStatusFilter] = useState<UserStatusFilter>('all');
   const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [sort, setSort] = useState<string>('newest');
   const [searchInput, setSearchInput] = useState('');
   const [debouncedQ, setDebouncedQ] = useState('');
   const [page, setPage] = useState(1);
@@ -86,6 +87,7 @@ export default function AdminUsersPage() {
         q: debouncedQ || undefined,
         role: roleFilter !== 'all' ? roleFilter : undefined,
         status: statusFilter,
+        sort,
         page,
         per_page: 20,
       });
@@ -96,7 +98,7 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [debouncedQ, roleFilter, statusFilter, page]);
+  }, [debouncedQ, roleFilter, statusFilter, sort, page]);
 
   useEffect(() => {
     loadUsers();
@@ -240,6 +242,21 @@ export default function AdminUsersPage() {
             <option value="all">Tất cả quyền</option>
             <option value="user">User</option>
             <option value="admin">Admin</option>
+          </select>
+
+          <select
+            value={sort}
+            aria-label="Sắp xếp người dùng"
+            onChange={(e) => {
+              setSort(e.target.value);
+              setPage(1);
+            }}
+            className="px-3 py-2 rounded-lg bg-[#F8FAFC] border border-[#E5E7EB] text-xs font-medium text-[#111111] focus:outline-none focus:border-[#2563EB]"
+          >
+            <option value="newest">Sắp xếp: Mới nhất</option>
+            <option value="oldest">Sắp xếp: Cũ nhất</option>
+            <option value="workouts_desc">Sắp xếp: Tập nhiều nhất</option>
+            <option value="name_asc">Sắp xếp: Tên A–Z</option>
           </select>
 
           <div className="relative">

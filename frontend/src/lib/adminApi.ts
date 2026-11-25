@@ -37,6 +37,7 @@ export interface AdminStatsData {
     banned_users: number;
     total_workouts: number;
     workouts_in_range: number;
+    total_nutrition_logs?: number;
     nutrition_logs_in_range: number;
     total_exercises: number;
     total_foods: number;
@@ -212,7 +213,7 @@ export const adminApi = {
   },
 
   // Users
-  getUsers(params: { q?: string; role?: string; status?: string; page?: number; per_page?: number }) {
+  getUsers(params: { q?: string; role?: string; status?: string; sort?: string; page?: number; per_page?: number }) {
     return apiRequest<PaginatedAdminResponse<AdminUser>>(`/admin/users${buildQuery(params)}`, {
       timeoutMs: 8000,
     });
@@ -254,7 +255,7 @@ export const adminApi = {
   },
 
   // Exercises & Reports
-  getExercises(params: { q?: string; category?: string; status?: string; trashed?: string; page?: number; per_page?: number }) {
+  getExercises(params: { q?: string; category?: string; status?: string; trashed?: string; sort?: string; page?: number; per_page?: number }) {
     return apiRequest<PaginatedAdminResponse<AdminExercise>>(`/admin/exercises${buildQuery(params)}`, {
       timeoutMs: 8000,
     });
@@ -285,7 +286,7 @@ export const adminApi = {
       timeoutMs: 8000,
     });
   },
-  getExerciseReports(params: { status?: string; page?: number; per_page?: number }) {
+  getExerciseReports(params: { status?: string; sort?: string; page?: number; per_page?: number }) {
     return apiRequest<PaginatedAdminResponse<AdminExerciseReport>>(`/admin/exercise-reports${buildQuery(params)}`, {
       timeoutMs: 8000,
     });
@@ -299,7 +300,7 @@ export const adminApi = {
   },
 
   // Foods
-  getFoods(params: { q?: string; category?: string; item_type?: string; trashed?: string; page?: number; per_page?: number }) {
+  getFoods(params: { q?: string; category?: string; item_type?: string; trashed?: string; sort?: string; page?: number; per_page?: number }) {
     return apiRequest<PaginatedAdminResponse<AdminFood>>(`/admin/foods${buildQuery(params)}`, {
       timeoutMs: 8000,
     });
@@ -332,7 +333,7 @@ export const adminApi = {
   },
 
   // Community
-  getCommunityPosts(params: { q?: string; trashed?: string; page?: number; per_page?: number }) {
+  getCommunityPosts(params: { q?: string; trashed?: string; sort?: string; page?: number; per_page?: number }) {
     return apiRequest<PaginatedAdminResponse<AdminCommunityPost>>(`/admin/community/posts${buildQuery(params)}`, {
       timeoutMs: 8000,
     });
@@ -349,7 +350,7 @@ export const adminApi = {
       timeoutMs: 8000,
     });
   },
-  getCommunityComments(params: { q?: string; post_id?: string; trashed?: string; page?: number; per_page?: number }) {
+  getCommunityComments(params: { q?: string; post_id?: string; trashed?: string; sort?: string; page?: number; per_page?: number }) {
     return apiRequest<PaginatedAdminResponse<AdminCommunityComment>>(`/admin/community/comments${buildQuery(params)}`, {
       timeoutMs: 8000,
     });

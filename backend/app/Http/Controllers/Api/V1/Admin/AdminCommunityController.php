@@ -32,10 +32,18 @@ class AdminCommunityController extends Controller
             });
         }
 
-        $paginator = $query
-            ->with('user:id,name,email,avatar_url')
-            ->orderByDesc('created_at')
-            ->paginate($perPage);
+        $sort = trim((string) $request->query('sort', 'newest'));
+
+        $query->with('user:id,name,email,avatar_url');
+
+        match ($sort) {
+            'oldest' => $query->orderBy('created_at'),
+            'likes_desc' => $query->orderByDesc('likes_count')->orderByDesc('created_at'),
+            'comments_desc' => $query->orderByDesc('comments_count')->orderByDesc('created_at'),
+            default => $query->orderByDesc('created_at'),
+        };
+
+        $paginator = $query->paginate($perPage);
 
         return response()->json([
             'data' => $paginator->items(),
@@ -95,13 +103,19 @@ class AdminCommunityController extends Controller
             });
         }
 
-        $paginator = $query
-            ->with([
-                'user:id,name,email',
-                'post' => fn ($pq) => $pq->withTrashed()->select('id', 'content', 'deleted_at'),
-            ])
-            ->orderByDesc('created_at')
-            ->paginate($perPage);
+        $sort = trim((string) $request->query('sort', 'newest'));
+
+        $query->with([
+            'user:id,name,email',
+            'post' => fn ($pq) => $pq->withTrashed()->select('id', 'content', 'deleted_at'),
+        ]);
+
+        match ($sort) {
+            'oldest' => $query->orderBy('created_at'),
+            default => $query->orderByDesc('created_at'),
+        };
+
+        $paginator = $query->paginate($perPage);
 
         return response()->json([
             'data' => $paginator->items(),

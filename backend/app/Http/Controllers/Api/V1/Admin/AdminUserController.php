@@ -39,10 +39,18 @@ class AdminUserController extends Controller
             });
         }
 
-        $paginator = $query
-            ->withCount(['workoutLogs', 'nutritionLogs', 'communityPosts', 'poseCheckSessions'])
-            ->orderByDesc('created_at')
-            ->paginate($perPage);
+        $sort = trim((string) $request->query('sort', 'newest'));
+
+        $query->withCount(['workoutLogs', 'nutritionLogs', 'communityPosts', 'poseCheckSessions']);
+
+        match ($sort) {
+            'oldest' => $query->orderBy('created_at'),
+            'workouts_desc' => $query->orderByDesc('workout_logs_count')->orderByDesc('created_at'),
+            'name_asc' => $query->orderBy('name'),
+            default => $query->orderByDesc('created_at'),
+        };
+
+        $paginator = $query->paginate($perPage);
 
         return response()->json([
             'data' => $paginator->items(),

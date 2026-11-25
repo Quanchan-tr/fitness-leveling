@@ -25,6 +25,8 @@ export default function AdminCommunityPage() {
   const [page, setPage] = useState(1);
   const [searchInput, setSearchInput] = useState('');
   const [debouncedQ, setDebouncedQ] = useState('');
+  const [postSort, setPostSort] = useState('newest');
+  const [commentSort, setCommentSort] = useState('newest');
   const [showTrashed, setShowTrashed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,11 +50,11 @@ export default function AdminCommunityPage() {
         per_page: 20,
       };
       if (tab === 'posts') {
-        const res = await adminApi.getCommunityPosts(params);
+        const res = await adminApi.getCommunityPosts({ ...params, sort: postSort });
         setPosts(res.data);
         setMeta(res.meta);
       } else {
-        const res = await adminApi.getCommunityComments(params);
+        const res = await adminApi.getCommunityComments({ ...params, sort: commentSort });
         setComments(res.data);
         setMeta(res.meta);
       }
@@ -61,7 +63,7 @@ export default function AdminCommunityPage() {
     } finally {
       setLoading(false);
     }
-  }, [tab, debouncedQ, showTrashed, page]);
+  }, [tab, debouncedQ, showTrashed, postSort, commentSort, page]);
 
   useEffect(() => {
     loadItems();
@@ -175,15 +177,47 @@ export default function AdminCommunityPage() {
           </button>
         </div>
 
-        <div className="relative">
-          <Search className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Tìm nội dung hoặc tác giả..."
-            className="w-full sm:w-72 pl-9 pr-3 py-2 rounded-lg bg-[#F8FAFC] border border-[#E5E7EB] text-xs text-[#111111] placeholder:text-[#6B7280] focus:outline-none focus:border-[#2563EB]"
-          />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+          {tab === 'posts' ? (
+            <select
+              value={postSort}
+              aria-label="Sắp xếp bài viết"
+              onChange={(e) => {
+                setPostSort(e.target.value);
+                setPage(1);
+              }}
+              className="px-3 py-2 rounded-lg bg-[#F8FAFC] border border-[#E5E7EB] text-xs font-medium text-[#111111] focus:outline-none focus:border-[#2563EB]"
+            >
+              <option value="newest">Sắp xếp: Mới nhất</option>
+              <option value="oldest">Sắp xếp: Cũ nhất</option>
+              <option value="likes_desc">Sắp xếp: Nhiều thích nhất</option>
+              <option value="comments_desc">Sắp xếp: Nhiều bình luận nhất</option>
+            </select>
+          ) : (
+            <select
+              value={commentSort}
+              aria-label="Sắp xếp bình luận"
+              onChange={(e) => {
+                setCommentSort(e.target.value);
+                setPage(1);
+              }}
+              className="px-3 py-2 rounded-lg bg-[#F8FAFC] border border-[#E5E7EB] text-xs font-medium text-[#111111] focus:outline-none focus:border-[#2563EB]"
+            >
+              <option value="newest">Sắp xếp: Mới nhất</option>
+              <option value="oldest">Sắp xếp: Cũ nhất</option>
+            </select>
+          )}
+
+          <div className="relative">
+            <Search className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Tìm nội dung hoặc tác giả..."
+              className="w-full sm:w-72 pl-9 pr-3 py-2 rounded-lg bg-[#F8FAFC] border border-[#E5E7EB] text-xs text-[#111111] placeholder:text-[#6B7280] focus:outline-none focus:border-[#2563EB]"
+            />
+          </div>
         </div>
       </div>
 

@@ -74,6 +74,7 @@ export default function AdminExercisesPage() {
   const [searchInput, setSearchInput] = useState('');
   const [debouncedQ, setDebouncedQ] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [exSort, setExSort] = useState('updated_desc');
   const [showTrashed, setShowTrashed] = useState(false);
 
   // Reports state
@@ -86,6 +87,7 @@ export default function AdminExercisesPage() {
   });
   const [repPage, setRepPage] = useState(1);
   const [reportStatus, setReportStatus] = useState('pending');
+  const [repSort, setRepSort] = useState('newest');
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -113,6 +115,7 @@ export default function AdminExercisesPage() {
       if (activeTab === 'reports') {
         const res = await adminApi.getExerciseReports({
           status: reportStatus,
+          sort: repSort,
           page: repPage,
           per_page: 20,
         });
@@ -125,6 +128,7 @@ export default function AdminExercisesPage() {
             activeTab === 'catalog' && categoryFilter !== 'all' ? categoryFilter : undefined,
           status: activeTab === 'pending' ? 'under_review' : 'all',
           trashed: activeTab === 'catalog' && showTrashed ? 'only' : undefined,
+          sort: exSort,
           page: exPage,
           per_page: 20,
         });
@@ -136,7 +140,7 @@ export default function AdminExercisesPage() {
     } finally {
       setLoading(false);
     }
-  }, [activeTab, debouncedQ, categoryFilter, showTrashed, exPage, reportStatus, repPage]);
+  }, [activeTab, debouncedQ, categoryFilter, showTrashed, exSort, exPage, reportStatus, repSort, repPage]);
 
   useEffect(() => {
     loadData();
@@ -351,6 +355,21 @@ export default function AdminExercisesPage() {
               <option value="core">Core (Bụng)</option>
             </select>
 
+            <select
+              value={exSort}
+              aria-label="Sắp xếp bài tập"
+              onChange={(e) => {
+                setExSort(e.target.value);
+                setExPage(1);
+              }}
+              className="px-3 py-2 rounded-lg bg-[#F8FAFC] border border-[#E5E7EB] text-xs font-medium text-[#111111] focus:outline-none focus:border-[#2563EB]"
+            >
+              <option value="updated_desc">Sắp xếp: Mới cập nhật</option>
+              <option value="name_asc">Sắp xếp: Tên A–Z</option>
+              <option value="name_desc">Sắp xếp: Tên Z–A</option>
+              <option value="reports_desc">Sắp xếp: Nhiều báo cáo</option>
+            </select>
+
             <div className="relative">
               <Search className="w-4 h-4 text-[#6B7280] absolute left-3 top-1/2 -translate-y-1/2" />
               <input
@@ -365,31 +384,66 @@ export default function AdminExercisesPage() {
         </div>
       )}
 
+      {/* Pending Sort */}
+      {activeTab === 'pending' && (
+        <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-4 flex items-center justify-end">
+          <select
+            value={exSort}
+            aria-label="Sắp xếp bài chờ duyệt"
+            onChange={(e) => {
+              setExSort(e.target.value);
+              setExPage(1);
+            }}
+            className="px-3 py-2 rounded-lg bg-[#F8FAFC] border border-[#E5E7EB] text-xs font-medium text-[#111111] focus:outline-none focus:border-[#2563EB]"
+          >
+            <option value="updated_desc">Sắp xếp: Mới gửi nhất</option>
+            <option value="name_asc">Sắp xếp: Tên A–Z</option>
+            <option value="name_desc">Sắp xếp: Tên Z–A</option>
+          </select>
+        </div>
+      )}
+
       {/* Reports Filter */}
       {activeTab === 'reports' && (
-        <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-4 flex flex-wrap gap-2">
-          {[
-            { value: 'pending', label: 'Chờ xử lý' },
-            { value: 'resolved', label: 'Đã ẩn bài' },
-            { value: 'dismissed', label: 'Đã bỏ qua' },
-            { value: 'all', label: 'Tất cả' },
-          ].map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => {
-                setReportStatus(opt.value);
-                setRepPage(1);
-              }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
-                reportStatus === opt.value
-                  ? 'bg-[#EFF6FF] text-[#2563EB]'
-                  : 'text-[#6B7280] hover:bg-[#F8FAFC]'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
+        <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex flex-wrap gap-2">
+            {[
+              { value: 'pending', label: 'Chờ xử lý' },
+              { value: 'resolved', label: 'Đã ẩn bài' },
+              { value: 'dismissed', label: 'Đã bỏ qua' },
+              { value: 'all', label: 'Tất cả' },
+            ].map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => {
+                  setReportStatus(opt.value);
+                  setRepPage(1);
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer ${
+                  reportStatus === opt.value
+                    ? 'bg-[#EFF6FF] text-[#2563EB]'
+                    : 'text-[#6B7280] hover:bg-[#F8FAFC]'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          <select
+            value={repSort}
+            aria-label="Sắp xếp báo cáo lỗi"
+            onChange={(e) => {
+              setRepSort(e.target.value);
+              setRepPage(1);
+            }}
+            className="px-3 py-2 rounded-lg bg-[#F8FAFC] border border-[#E5E7EB] text-xs font-medium text-[#111111] focus:outline-none focus:border-[#2563EB]"
+          >
+            <option value="newest">Sắp xếp: Mới nhất</option>
+            <option value="oldest">Sắp xếp: Cũ nhất</option>
+            <option value="reason_asc">Sắp xếp: Theo lý do</option>
+          </select>
         </div>
       )}
 
