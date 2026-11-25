@@ -4,12 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { WebStudioMockup } from './WebStudioMockup';
 
-interface HeroProps {
-  onDemoClick?: () => void;
-  isDemoLoading?: boolean;
-}
-
-export const Hero: React.FC<HeroProps> = ({ onDemoClick, isDemoLoading = false }) => {
+export const Hero: React.FC = () => {
   return (
     <section id="hero" className="relative overflow-hidden bg-white pt-8 pb-16 md:pt-14 md:pb-24 border-b border-slate-200">
       {/* Background Subtle Ambience with soft warm glow */}
@@ -55,22 +50,6 @@ export const Hero: React.FC<HeroProps> = ({ onDemoClick, isDemoLoading = false }
               >
                 <span>Đăng nhập</span>
               </Link>
-
-              {onDemoClick && (
-                <button
-                  type="button"
-                  onClick={onDemoClick}
-                  disabled={isDemoLoading}
-                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full bg-slate-100 hover:bg-slate-200 text-[#0F172A] font-bold text-sm transition-all duration-200 hover:scale-105 active:scale-95 border border-slate-300 cursor-pointer disabled:opacity-60"
-                >
-                  {isDemoLoading ? (
-                    <span className="w-4 h-4 border-2 border-slate-400 border-t-[#FF5722] rounded-full animate-spin" />
-                  ) : (
-                    <span className="text-[#FF5722]">⚡</span>
-                  )}
-                  <span>Dùng thử Demo</span>
-                </button>
-              )}
             </div>
           </div>
 

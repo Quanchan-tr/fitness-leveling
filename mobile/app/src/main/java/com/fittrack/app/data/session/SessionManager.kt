@@ -39,9 +39,9 @@ class SessionManager(context: Context) {
         private const val KEY_OB_FOCUS_MUSCLE = "ob_focus_muscle"
         private const val KEY_OB_EQUIPMENT = "ob_equipment"
 
-        // Local Backend URL (for Android Emulator to Host PC)
-        const val DEFAULT_BASE_URL = "http://10.0.2.2:8000/api/v1/"
-        const val CLOUD_BASE_URL = "https://fittrack.eastasia.cloudapp.azure.com/api/v1/"
+        // Production VPS Base URL
+        const val CLOUD_BASE_URL = "https://myfittrack.io.vn/api/v1/"
+        const val DEFAULT_BASE_URL = CLOUD_BASE_URL
 
         @Volatile
         private var instance: SessionManager? = null
@@ -106,7 +106,13 @@ class SessionManager(context: Context) {
     var baseUrl: String
         get() {
             val saved = prefs.getString(KEY_BASE_URL, null)
-            return if (saved.isNullOrBlank() || saved.contains("cloudapp.azure.com")) {
+            return if (
+                saved.isNullOrBlank() ||
+                saved.contains("10.0.2.2") ||
+                saved.contains("localhost") ||
+                saved.contains("127.0.0.1") ||
+                saved.contains("cloudapp.azure.com")
+            ) {
                 DEFAULT_BASE_URL
             } else {
                 saved

@@ -24,16 +24,14 @@ interface AuthContextValue {
   login: (payload: LoginPayload) => Promise<AuthUser>;
   /** Register a new account and navigate to the verification screen. */
   register: (payload: RegisterPayload) => Promise<AuthUser>;
-  /** Confirm email verification (mock). */
-  verifyEmail: () => Promise<void>;
+  /** Confirm email verification with 6-digit OTP code. */
+  verifyEmail: (code: string) => Promise<void>;
   /** Resend verification email. */
   resendVerificationEmail: () => Promise<void>;
   /** Save fitness onboarding data and mark onboarding complete. */
   saveFitnessProfile: (profile: FitnessProfile) => Promise<void>;
   /** Sign out and clear all state. */
   signOut: () => Promise<void>;
-  /** One-click demo login to immediately preview the full dashboard. */
-  loginDemo: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -73,8 +71,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return newUser;
   }, []);
 
-  const verifyEmail = useCallback(async (): Promise<void> => {
-    const updatedUser = await authService.verifyEmail();
+  const verifyEmail = useCallback(async (code: string): Promise<void> => {
+    const updatedUser = await authService.verifyEmail(code);
     setUser(updatedUser);
   }, []);
 
@@ -95,11 +93,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setFitnessProfile(null);
   }, []);
 
-  const loginDemo = useCallback(async (): Promise<void> => {
-    const demoUser = await authService.loginDemo();
-    setUser(demoUser);
-  }, []);
-
   return (
     <AuthContext.Provider
       value={{
@@ -112,7 +105,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         resendVerificationEmail,
         saveFitnessProfile,
         signOut,
-        loginDemo,
       }}
     >
       {children}

@@ -4,8 +4,9 @@
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Flame, Eye, EyeOff, ArrowRight, AlertCircle, Zap } from 'lucide-react';
+import { Flame, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { FitnessLevelingApiException } from '@/lib/api';
 
 interface LoginFormState {
   email: string;
@@ -34,7 +35,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isSessionExpired = searchParams.get('reason') === 'session_expired';
-  const { login, loginDemo } = useAuth();
+  const { login } = useAuth();
   const [isSlowNetwork, setIsSlowNetwork] = useState(false);
 
   const [form, setForm] = useState<LoginFormState>({
@@ -44,7 +45,6 @@ function LoginForm() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,24 +77,29 @@ function LoginForm() {
       });
       router.push('/dashboard');
     } catch (err) {
+      if (err instanceof FitnessLevelingApiException && err.code === 'EMAIL_NOT_VERIFIED') {
+        if (typeof window !== 'undefined') {
+          const email = form.email.trim().toLowerCase();
+          localStorage.setItem(
+            'fitnessleveling_auth_user',
+            JSON.stringify({
+              id: '',
+              email,
+              displayName: email.split('@')[0],
+              isEmailVerified: false,
+              hasCompletedOnboarding: false,
+              createdAt: new Date().toISOString(),
+            })
+          );
+        }
+        router.push('/auth/verify');
+        return;
+      }
       setServerError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
     } finally {
       clearTimeout(slowTimer);
       setIsSubmitting(false);
       setIsSlowNetwork(false);
-    }
-  };
-
-  const handleDemoLogin = async () => {
-    setIsDemoLoading(true);
-    setServerError(null);
-    try {
-      await loginDemo();
-      router.push('/dashboard');
-    } catch (err) {
-      setServerError(err instanceof Error ? err.message : 'Không thể đăng nhập demo.');
-    } finally {
-      setIsDemoLoading(false);
     }
   };
 
@@ -226,7 +231,7 @@ function LoginForm() {
 
             <button
               type="submit"
-              disabled={!isValid || isSubmitting || isDemoLoading}
+              disabled={!isValid || isSubmitting}
               className="mt-2 w-full h-12 rounded-xl bg-slate-900 text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-slate-800 active:scale-[0.99] transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-md shadow-slate-900/10"
             >
               {isSubmitting ? (
@@ -242,33 +247,6 @@ function LoginForm() {
               )}
             </button>
           </form>
-
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-slate-200" />
-            <span className="text-xs text-slate-400 font-medium">hoặc</span>
-            <div className="flex-1 h-px bg-slate-200" />
-          </div>
-
-          {/* Quick Demo Login */}
-          <button
-            type="button"
-            onClick={handleDemoLogin}
-            disabled={isDemoLoading || isSubmitting}
-            className="w-full h-11 rounded-xl border border-orange-200 bg-orange-50/70 text-sm font-bold text-[#FF5722] flex items-center justify-center gap-2 hover:bg-orange-100 hover:border-orange-300 transition-all cursor-pointer shadow-2xs"
-          >
-            {isDemoLoading ? (
-              <span className="flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-orange-500/30 border-t-[#FF5722] rounded-full animate-spin" />
-                Đang kích hoạt Demo…
-              </span>
-            ) : (
-              <span className="flex items-center gap-2">
-                <Zap className="w-4 h-4 fill-orange-500 text-orange-500" />
-                Đăng nhập nhanh tài khoản Demo
-              </span>
-            )}
-          </button>
 
           {/* Footer links */}
           <div className="mt-6 text-center space-y-2">

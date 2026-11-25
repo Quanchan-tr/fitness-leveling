@@ -5,15 +5,15 @@ services:
       context: .
       dockerfile: frontend/Dockerfile
       args:
-        - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000/api/v1}
-        - NEXT_PUBLIC_POSE_WS_URL=${NEXT_PUBLIC_POSE_WS_URL:-ws://localhost:8001}
+        - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-https://myfittrack.io.vn/api/v1}
+        - NEXT_PUBLIC_POSE_WS_URL=${NEXT_PUBLIC_POSE_WS_URL:-wss://myfittrack.io.vn}
     container_name: fitnessleveling-frontend
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
-      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8000/api/v1}
-      - NEXT_PUBLIC_POSE_WS_URL=${NEXT_PUBLIC_POSE_WS_URL:-ws://localhost:8001}
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-https://myfittrack.io.vn/api/v1}
+      - NEXT_PUBLIC_POSE_WS_URL=${NEXT_PUBLIC_POSE_WS_URL:-wss://myfittrack.io.vn}
     depends_on:
       - backend
 

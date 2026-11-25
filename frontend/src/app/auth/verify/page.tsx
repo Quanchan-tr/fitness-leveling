@@ -13,6 +13,7 @@ export default function VerifyPage() {
   const router = useRouter();
   const { user, verifyEmail, resendVerificationEmail, signOut } = useAuth();
 
+  const [otpCode, setOtpCode] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
@@ -47,13 +48,17 @@ export default function VerifyPage() {
   }, [resendCooldown]);
 
   const handleVerify = async () => {
+    const cleanCode = otpCode.trim();
+    if (!/^\d{6}$/.test(cleanCode)) {
+      setVerifyError('Vui lòng nhập đầy đủ mã xác thực gồm 6 chữ số.');
+      return;
+    }
     setIsVerifying(true);
     setVerifyError(null);
     try {
-      await verifyEmail();
-      // The useEffect above will redirect once user.isEmailVerified flips to true
+      await verifyEmail(cleanCode);
     } catch (err) {
-      setVerifyError(err instanceof Error ? err.message : 'Có lỗi xảy ra. Vui lòng thử lại.');
+      setVerifyError(err instanceof Error ? err.message : 'Mã xác thực không hợp lệ hoặc đã hết hạn.');
     } finally {
       setIsVerifying(false);
     }
@@ -111,9 +116,8 @@ export default function VerifyPage() {
             {user.email}
           </p>
 
-          <p className="text-slate-500 text-sm leading-relaxed mb-8">
-            Vui lòng kiểm tra hộp thư đến (và thư mục Spam) để tìm email xác nhận.
-            Sau khi nhấn vào liên kết trong email, quay lại đây và nhấn nút bên dưới.
+          <p className="text-slate-500 text-sm leading-relaxed mb-6">
+            Vui lòng kiểm tra hộp thư đến (hoặc Spam) để lấy mã xác thực 6 chữ số và nhập vào bên dưới.
           </p>
 
           {/* Error */}
@@ -123,30 +127,41 @@ export default function VerifyPage() {
             </div>
           )}
 
-          {/* Demo note */}
-          <div className="mb-6 p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-left">
-            <p className="text-xs font-bold text-amber-800 mb-1">Chế độ Demo</p>
-            <p className="text-xs text-amber-700 leading-relaxed">
-              Đây là phiên bản demo — không có email thực được gửi.
-              Nhấn <span className="font-semibold">&ldquo;Đã xác nhận email&rdquo;</span> để tiếp tục.
-            </p>
+          {/* 6-digit OTP Input */}
+          <div className="mb-4 text-left">
+            <label htmlFor="otp-code" className="block text-xs font-bold uppercase tracking-wide text-slate-700 mb-1.5">
+              Mã xác thực (6 chữ số)
+            </label>
+            <input
+              id="otp-code"
+              type="text"
+              inputMode="numeric"
+              maxLength={6}
+              value={otpCode}
+              onChange={(e) => {
+                setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6));
+                if (verifyError) setVerifyError(null);
+              }}
+              placeholder="000000"
+              className="w-full h-12 px-4 rounded-xl border border-slate-200 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 text-center text-lg font-bold tracking-[0.35em] text-slate-900 outline-none bg-white"
+            />
           </div>
 
           {/* Primary CTA */}
           <button
             onClick={handleVerify}
-            disabled={isVerifying}
+            disabled={isVerifying || otpCode.length !== 6}
             className="w-full h-12 rounded-xl bg-slate-900 text-white font-bold text-sm flex items-center justify-center gap-2 hover:bg-slate-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mb-3"
           >
             {isVerifying ? (
               <>
                 <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Đang xác nhận…
+                Đang xác thực…
               </>
             ) : (
               <>
                 <CheckCircle2 className="w-4 h-4" />
-                Đã xác nhận email
+                Xác nhận email
               </>
             )}
           </button>
@@ -188,10 +203,10 @@ export default function VerifyPage() {
           </button>
           <div className="w-px h-3 bg-slate-300" />
           <Link
-            href="/dashboard"
+            href="/auth/login"
             className="text-xs text-slate-500 hover:text-slate-900 font-semibold transition-colors"
           >
-            Vào demo
+            Về trang đăng nhập
           </Link>
         </div>
       </div>

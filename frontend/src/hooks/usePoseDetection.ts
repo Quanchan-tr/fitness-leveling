@@ -957,7 +957,13 @@ export function usePoseDetection({ exercise, onRepCompleted, onVideoEnded }: Use
       console.warn('[usePoseDetection] MediaPipe WASM unavailable, enabling WebSocket fallback:', err);
       isWsFallbackRef.current = true;
       try {
-        const wsBase = process.env.NEXT_PUBLIC_POSE_WS_URL || (typeof window !== 'undefined' ? `ws://${window.location.hostname}:8001` : 'ws://localhost:8001');
+        const configuredWs = (process.env.NEXT_PUBLIC_POSE_WS_URL || '').trim().replace(/\/+$/, '');
+        const wsBase =
+          configuredWs && !configuredWs.includes('localhost') && !configuredWs.includes('127.0.0.1')
+            ? configuredWs
+            : typeof window !== 'undefined' && window.location.protocol === 'https:'
+              ? `wss://${window.location.host}`
+              : 'wss://myfittrack.io.vn';
         const wsUrl = `${wsBase}/ws/pose-stream/${exercise}`;
         const ws = new WebSocket(wsUrl);
         ws.onopen = () => {

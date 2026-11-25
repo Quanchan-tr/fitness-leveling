@@ -47,7 +47,7 @@ class SettingsActivity : AppCompatActivity() {
         val level = session.userLevel
 
         binding.tvUserName.text = if (!name.isNullOrBlank()) name else "Người dùng FitTrack"
-        binding.tvUserEmail.text = if (!email.isNullOrBlank()) email else "demo@fitnessleveling.test"
+        binding.tvUserEmail.text = email
         binding.tvUserLevel.text = "Level $level • Thợ săn ${if (level >= 10) "B-Rank" else "Sơ cấp"}"
     }
 

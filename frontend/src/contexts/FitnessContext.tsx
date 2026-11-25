@@ -661,11 +661,6 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         goal: (user.goal as any) || prev.goal,
       }));
 
-      // In demo mode, state is stored locally; avoid spamming offline backend
-      if (user.id.startsWith('demo-')) {
-        return;
-      }
-
       // 1. Sync recent body metrics for weight history
       apiRequest<{ data: Array<{ log_date: string; weight_kg: number }> }>('/body-metrics?per_page=7')
         .then((res) => {
@@ -717,7 +712,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
           }
         })
         .catch(() => {
-          // If offline or demo mock token fails, recalculate from local storage
+          // If offline, recalculate from local storage
           const todayNutrition = calculateTodayNutritionFromStorage();
           setVitals((prev) => ({
             ...prev,

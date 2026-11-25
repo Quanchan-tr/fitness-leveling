@@ -323,21 +323,6 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px bg-slate-200" />
-            <span className="text-xs text-slate-400 font-medium">hoặc</span>
-            <div className="flex-1 h-px bg-slate-200" />
-          </div>
-
-          {/* Demo shortcut */}
-          <Link
-            href="/"
-            className="w-full h-11 rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-700 flex items-center justify-center gap-2 hover:bg-slate-50 hover:border-slate-300 transition-all"
-          >
-            Vào demo không cần đăng ký
-          </Link>
-
           <p className="text-center text-xs text-slate-400 mt-6">
             Đã có tài khoản?{' '}
             <Link href="/auth/login" className="text-slate-900 font-semibold hover:underline underline-offset-2">

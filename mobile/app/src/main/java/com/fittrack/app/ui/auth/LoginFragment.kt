@@ -78,12 +78,12 @@ class LoginFragment : Fragment() {
         val input = EditText(requireContext()).apply {
             setText(session.baseUrl)
             setSelection(text.length)
-            hint = "http://10.0.2.2:8000/api/v1/"
+            hint = SessionManager.DEFAULT_BASE_URL
         }
 
         AlertDialog.Builder(requireContext())
             .setTitle("⚙️ Cấu hình API Base URL")
-            .setMessage("Mặc định VPS Cloud: ${SessionManager.DEFAULT_BASE_URL}\n\nNếu test trên máy ảo với Laravel backend cục bộ, nhập:\nhttp://10.0.2.2:8000/api/v1/")
+            .setMessage("Máy chủ Production mặc định:\n${SessionManager.DEFAULT_BASE_URL}")
             .setView(input)
             .setPositiveButton("Lưu") { _, _ ->
                 val newUrl = input.text.toString().trim()
@@ -92,9 +92,9 @@ class LoginFragment : Fragment() {
                     Toast.makeText(requireContext(), "Đã cập nhật API Base URL!", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNeutralButton("Reset về Cloud") { _, _ ->
+            .setNeutralButton("Khôi phục mặc định") { _, _ ->
                 session.baseUrl = SessionManager.DEFAULT_BASE_URL
-                Toast.makeText(requireContext(), "Đã đặt lại VPS Cloud mặc định", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Đã đặt lại VPS mặc định", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Hủy", null)
             .show()

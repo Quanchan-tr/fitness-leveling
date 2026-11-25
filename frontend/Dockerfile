@@ -13,12 +13,13 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY packages /packages
 COPY frontend /app
+RUN rm -f .env.local
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
-ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api/v1
+ARG NEXT_PUBLIC_API_BASE_URL=https://myfittrack.io.vn/api/v1
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
-ARG NEXT_PUBLIC_POSE_WS_URL=ws://localhost:8001
+ARG NEXT_PUBLIC_POSE_WS_URL=wss://myfittrack.io.vn
 ENV NEXT_PUBLIC_POSE_WS_URL=$NEXT_PUBLIC_POSE_WS_URL
 RUN npm run build
 

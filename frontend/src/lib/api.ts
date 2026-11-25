@@ -3,7 +3,18 @@ import { vietnameseFoods } from '@/data/vietnameseFoods';
 import { FoodItem } from '@/types/nutrition.types';
 import { PaginatedExercisesResponse } from '@/types/workout.types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
+function resolveApiBaseUrl(): string {
+  const configured = (process.env.NEXT_PUBLIC_API_BASE_URL || '').trim().replace(/\/+$/, '');
+  if (configured && !configured.includes('localhost') && !configured.includes('127.0.0.1')) {
+    return configured;
+  }
+  if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+    return `${window.location.origin}/api/v1`;
+  }
+  return configured || 'https://myfittrack.io.vn/api/v1';
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 export interface ApiError {
   code: string;
@@ -66,7 +77,7 @@ export async function apiRequest<T>(
 
   const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
 
-  const timeoutMs = options.timeoutMs ?? 2500;
+  const timeoutMs = options.timeoutMs ?? 15000;
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -94,12 +105,16 @@ export async function apiRequest<T>(
 
     return data as T;
   } catch (err) {
+    clearTimeout(timeoutId);
     if (err instanceof FitnessLevelingApiException) {
       throw err;
     }
-    throw new FitnessLevelingApiException(500, {
-      code: 'NETWORK_ERROR',
-      message: (err as Error).message || 'Unable to communicate with the server.',
+    const isAbort = (err as Error)?.name === 'AbortError';
+    throw new FitnessLevelingApiException(isAbort ? 408 : 500, {
+      code: isAbort ? 'REQUEST_TIMEOUT' : 'NETWORK_ERROR',
+      message: isAbort
+        ? 'Kết nối quá thời gian chờ. Vui lòng thử lại.'
+        : (err as Error).message || 'Unable to communicate with the server.',
     });
   }
 }

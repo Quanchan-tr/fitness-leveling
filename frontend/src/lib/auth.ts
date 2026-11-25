@@ -103,7 +103,10 @@ interface BackendUser {
 interface AuthResponse {
   data: {
     user: BackendUser;
-    token: string;
+    token?: string;
+    requires_email_verification?: boolean;
+    email?: string;
+    message?: string;
   };
 }
 
@@ -154,7 +157,7 @@ function _mapBackendUserToAuthUser(u: BackendUser): AuthUser {
     email: u.email,
     displayName: u.name || u.email.split('@')[0],
     role: u.role === 'admin' ? 'admin' : 'user',
-    isEmailVerified: true, // Authenticated users can access dashboard directly without re-verification loop
+    isEmailVerified: Boolean(u.email_verified_at),
     hasCompletedOnboarding: hasOnboarded,
     createdAt: u.created_at || new Date().toISOString(),
     avatarUrl: u.avatar_url || undefined,
@@ -207,6 +210,7 @@ export const authService = {
     const res = await apiRequest<AuthResponse>('/auth/register', {
       method: 'POST',
       requiresAuth: false,
+      timeoutMs: 15000,
       body: JSON.stringify({
         name: payload.displayName || payload.email.split('@')[0],
         email: payload.email,
@@ -215,7 +219,7 @@ export const authService = {
     });
 
     const user = _mapBackendUserToAuthUser(res.data.user);
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && res.data.token) {
       localStorage.setItem(STORAGE_KEYS.token, res.data.token);
     }
     _saveToStorage(STORAGE_KEYS.user, user);
@@ -228,6 +232,7 @@ export const authService = {
     const res = await apiRequest<AuthResponse>('/auth/login', {
       method: 'POST',
       requiresAuth: false,
+      timeoutMs: 15000,
       body: JSON.stringify({
         email: payload.email,
         password: payload.password,
@@ -235,7 +240,7 @@ export const authService = {
     });
 
     const user = _mapBackendUserToAuthUser(res.data.user);
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && res.data.token) {
       localStorage.setItem(STORAGE_KEYS.token, res.data.token);
     }
     _saveToStorage(STORAGE_KEYS.user, user);
@@ -243,36 +248,73 @@ export const authService = {
     return user;
   },
 
-  /** Mark email as verified */
-  async verifyEmail(): Promise<AuthUser> {
+  /** Verify email with 6-digit OTP via POST /api/v1/auth/verify-email */
+  async verifyEmail(code: string): Promise<AuthUser> {
     const user = _readFromStorage<AuthUser>(STORAGE_KEYS.user);
-    if (!user) throw new Error('Phiên đăng nhập không hợp lệ.');
+    if (!user) throw new Error('Phiên xác thực không hợp lệ. Vui lòng đăng ký lại.');
 
-    const verified: AuthUser = { ...user, isEmailVerified: true };
-    _saveToStorage(STORAGE_KEYS.user, verified);
-    return verified;
+    const res = await apiRequest<AuthResponse>('/auth/verify-email', {
+      method: 'POST',
+      requiresAuth: false,
+      timeoutMs: 15000,
+      body: JSON.stringify({
+        email: user.email,
+        code: code.trim(),
+      }),
+    });
+
+    const verifiedUser = _mapBackendUserToAuthUser({
+      ...res.data.user,
+      email_verified_at: res.data.user.email_verified_at || new Date().toISOString(),
+    });
+    if (typeof window !== 'undefined' && res.data.token) {
+      localStorage.setItem(STORAGE_KEYS.token, res.data.token);
+    }
+    _saveToStorage(STORAGE_KEYS.user, verifiedUser);
+    return verifiedUser;
   },
 
   async resendVerificationEmail(): Promise<void> {
-    // Reserved for future email SMTP verification trigger
+    const user = _readFromStorage<AuthUser>(STORAGE_KEYS.user);
+    if (!user?.email) throw new Error('Không tìm thấy email cần xác thực.');
+
+    await apiRequest('/auth/resend-verification', {
+      method: 'POST',
+      requiresAuth: false,
+      timeoutMs: 15000,
+      body: JSON.stringify({ email: user.email }),
+    });
   },
 
   async requestPasswordReset(email: string): Promise<void> {
     await apiRequest('/auth/forgot-password', {
       method: 'POST',
       requiresAuth: false,
+      timeoutMs: 15000,
       body: JSON.stringify({ email }),
     });
   },
 
   async resetPassword(email: string, newPassword: string, otp: string = ''): Promise<void> {
+    const verifyRes = await apiRequest<{ data: { reset_token: string } }>('/auth/verify-reset-code', {
+      method: 'POST',
+      requiresAuth: false,
+      timeoutMs: 15000,
+      body: JSON.stringify({
+        email,
+        code: otp.trim(),
+      }),
+    });
+
     await apiRequest('/auth/reset-password', {
       method: 'POST',
       requiresAuth: false,
+      timeoutMs: 15000,
       body: JSON.stringify({
         email,
-        otp,
+        reset_token: verifyRes.data.reset_token,
         password: newPassword,
+        password_confirmation: newPassword,
       }),
     });
   },
@@ -338,30 +380,6 @@ export const authService = {
     _saveToStorage(STORAGE_KEYS.fitnessProfile, profile);
 
     return { user: updatedUser, fitnessProfile: profile };
-  },
-
-  /** One-click demo login: authenticates against real seeded database account */
-  async loginDemo(): Promise<AuthUser> {
-    try {
-      return await this.login({
-        email: 'demo@fitnessleveling.test',
-        password: 'password123',
-      });
-    } catch {
-      // If demo user is not yet created, register it automatically
-      try {
-        return await this.register({
-          displayName: 'Demo Hunter',
-          email: 'demo@fitnessleveling.test',
-          password: 'password123',
-        });
-      } catch {
-        return await this.login({
-          email: 'demo@fitnessleveling.test',
-          password: 'password123',
-        });
-      }
-    }
   },
 
   /** Log out and purge token */
