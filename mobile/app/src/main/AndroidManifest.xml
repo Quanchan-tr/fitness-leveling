@@ -91,6 +91,23 @@
             android:name=".ui.character.CharacterViewerActivity"
             android:exported="false" />
 
+        <!-- Admin Console Activities -->
+        <activity
+            android:name=".ui.admin.AdminDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminUsersActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminExercisesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminFoodsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.admin.AdminCommunityActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

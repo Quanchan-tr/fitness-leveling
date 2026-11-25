@@ -132,7 +132,8 @@ class LoginFragment : Fragment() {
                         email = authData.user.email,
                         level = authData.user.level,
                         xp = authData.user.xp,
-                        streak = authData.user.currentStreak
+                        streak = authData.user.currentStreak,
+                        role = authData.user.role
                     )
 
                     Toast.makeText(
@@ -157,6 +158,14 @@ class LoginFragment : Fragment() {
                             putString("email", email)
                         }
                         findNavController().navigate(R.id.action_loginFragment_to_verifyEmailFragment, bundle)
+                        binding.btnLogin.isEnabled = true
+                        binding.btnLogin.text = originalText
+                    } else if (errorBodyStr.contains("ACCOUNT_SUSPENDED")) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Tài khoản của bạn đã bị khóa bởi quản trị viên.",
+                            Toast.LENGTH_LONG
+                        ).show()
                         binding.btnLogin.isEnabled = true
                         binding.btnLogin.text = originalText
                     } else {

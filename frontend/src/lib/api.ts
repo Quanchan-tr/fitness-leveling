@@ -1,4 +1,6 @@
 import cleanExerciseDataset from '@/data/exerciseDataset.json';
+import { vietnameseFoods } from '@/data/vietnameseFoods';
+import { FoodItem } from '@/types/nutrition.types';
 import { PaginatedExercisesResponse } from '@/types/workout.types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
@@ -186,6 +188,51 @@ export async function fetchExercises(
     per_page: perPage,
     total,
   };
+}
+
+export interface FetchFoodsParams {
+  q?: string;
+  category?: string;
+  item_type?: string;
+  page?: number;
+  per_page?: number;
+}
+
+export async function fetchFoods(params?: FetchFoodsParams): Promise<FoodItem[]> {
+  const searchParams = new URLSearchParams();
+  if (params?.q) searchParams.set('q', params.q);
+  if (params?.category && params.category !== 'Tất cả') searchParams.set('category', params.category);
+  if (params?.item_type && params.item_type !== 'ALL') searchParams.set('item_type', params.item_type);
+  if (params?.page) searchParams.set('page', params.page.toString());
+  searchParams.set('per_page', (params?.per_page ?? 500).toString());
+
+  const queryString = searchParams.toString();
+  const endpoint = `/foods${queryString ? `?${queryString}` : ''}`;
+
+  try {
+    const res = await apiRequest<{ data: FoodItem[] }>(endpoint, {
+      requiresAuth: false,
+      timeoutMs: 4000,
+    });
+    if (res && Array.isArray(res.data) && res.data.length > 0) {
+      return res.data.map((item) => ({
+        ...item,
+        base_serving: item.base_serving || item.serving_size || '1 phần',
+        base_calories: item.base_calories ?? item.calories ?? 0,
+        base_macros: item.base_macros ?? {
+          protein: item.protein ?? 0,
+          carbs: item.carbs ?? 0,
+          fat: item.fat ?? 0,
+        },
+        min_multiplier: item.min_multiplier ?? 0.5,
+        max_multiplier: item.max_multiplier ?? 2.5,
+      }));
+    }
+  } catch {
+    // Fallback to bundled Vietnamese foods dataset when backend is unreachable
+  }
+
+  return vietnameseFoods;
 }
 
 

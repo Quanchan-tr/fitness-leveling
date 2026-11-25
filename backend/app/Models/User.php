@@ -35,6 +35,7 @@ class User extends Authenticatable
         'level',
         'current_streak',
         'last_active_date',
+        'banned_at',
     ];
 
     protected $hidden = [
@@ -53,7 +54,13 @@ class User extends Authenticatable
         'level' => 'integer',
         'current_streak' => 'integer',
         'last_active_date' => 'date',
+        'banned_at' => 'datetime',
     ];
+
+    public function isBanned(): bool
+    {
+        return $this->banned_at !== null;
+    }
 
     public function workoutLogs(): HasMany
     {

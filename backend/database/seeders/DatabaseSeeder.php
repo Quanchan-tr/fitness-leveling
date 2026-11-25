@@ -47,7 +47,27 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $adminEmail = strtolower(trim((string) env('ADMIN_EMAIL', 'admin@fitnessleveling.test')));
+        $adminPassword = (string) env('ADMIN_PASSWORD', 'Admin@123456');
+
+        User::updateOrCreate(
+            ['email' => $adminEmail],
+            [
+                'name' => 'FitTrack Admin',
+                'password' => Hash::make($adminPassword),
+                'role' => 'admin',
+                'goal' => 'maintain',
+                'weight_kg' => 70.0,
+                'height_cm' => 175.0,
+                'birth_date' => '1995-01-01',
+                'gender' => 'male',
+                'activity_level' => 'moderate',
+                'email_verified_at' => now(),
+            ]
+        );
+
         $this->call(ExerciseDatasetSeeder::class);
+        $this->call(FoodDatasetSeeder::class);
         $this->call(AvatarItemSeeder::class);
 
         // Unlock all avatar items for both test accounts (Level 50 Buff)

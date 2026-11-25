@@ -34,6 +34,7 @@ export interface AuthUser {
   id: string;
   email: string;
   displayName: string;
+  role?: 'user' | 'admin';
   isEmailVerified: boolean;
   hasCompletedOnboarding: boolean;
   createdAt: string;
@@ -152,6 +153,7 @@ function _mapBackendUserToAuthUser(u: BackendUser): AuthUser {
     id: u.id,
     email: u.email,
     displayName: u.name || u.email.split('@')[0],
+    role: u.role === 'admin' ? 'admin' : 'user',
     isEmailVerified: true, // Authenticated users can access dashboard directly without re-verification loop
     hasCompletedOnboarding: hasOnboarded,
     createdAt: u.created_at || new Date().toISOString(),

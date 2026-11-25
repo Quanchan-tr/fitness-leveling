@@ -19,6 +19,7 @@ import {
   User,
 } from 'lucide-react';
 import { useShell } from './ShellLayout';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavItem {
   name: string;
@@ -49,6 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const pathname = usePathname();
   const { navigatingTo, startNavigation } = useShell();
+  const { user } = useAuth();
 
   const isNavigating = Boolean(navigatingTo && navigatingTo !== pathname);
   const activeHref = isNavigating && navigatingTo ? navigatingTo : pathname;
@@ -173,6 +175,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Footer Info & System Version */}
         <div className="p-3 border-t border-slate-100 space-y-2">
+          {user?.role === 'admin' && (
+            <Link
+              href="/admin"
+              onClick={() => onCloseMobile?.()}
+              className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold bg-[#EFF6FF] text-[#2563EB] hover:bg-[#DBEAFE] border border-[#BFDBFE] transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#2563EB]" />
+                <span>Admin Console</span>
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#2563EB] text-white">
+                Admin
+              </span>
+            </Link>
+          )}
           <div className="bg-slate-50 rounded-lg p-2.5 border border-slate-200 text-left">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">

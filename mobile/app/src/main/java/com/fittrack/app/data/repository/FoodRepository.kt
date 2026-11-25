@@ -1,6 +1,7 @@
 package com.fittrack.app.data.repository
 
 import android.content.Context
+import com.fittrack.app.data.api.ApiClient
 import com.fittrack.app.data.models.FoodItemDto
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -13,8 +14,23 @@ class FoodRepository private constructor(private val context: Context) {
 
     private var cachedFoods: List<FoodItemDto>? = null
 
+    fun invalidateCache() {
+        cachedFoods = null
+    }
+
     suspend fun getFoods(): List<FoodItemDto> = withContext(Dispatchers.IO) {
         cachedFoods?.let { return@withContext it }
+
+        try {
+            val res = ApiClient.getService(context).getFoods(perPage = 500)
+            val remoteList = res.body()?.data
+            if (res.isSuccessful && !remoteList.isNullOrEmpty()) {
+                cachedFoods = remoteList
+                return@withContext remoteList
+            }
+        } catch (_: Exception) {
+            // Fall back to bundled assets dataset when offline
+        }
 
         try {
             context.assets.open("nutrition_dataset.json").use { inputStream ->

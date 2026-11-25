@@ -13,6 +13,7 @@ import com.fittrack.app.data.api.ApiClient
 import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityUserProfileBinding
 import com.fittrack.app.ui.BottomNavTab
+import com.fittrack.app.ui.admin.AdminDashboardActivity
 import com.fittrack.app.ui.settings.SettingsActivity
 import com.fittrack.app.ui.setupBottomNav
 import com.fittrack.app.util.WindowInsetsHelper
@@ -71,6 +72,7 @@ class UserProfileActivity : AppCompatActivity() {
         binding.tvWorkoutsCount.text = session.userTotalWorkouts.toString()
         binding.tvFollowersCount.text = session.userFollowersCount.toString()
         binding.tvFollowingCount.text = session.userFollowingCount.toString()
+        binding.cardAdminConsole.visibility = if (session.isAdmin) View.VISIBLE else View.GONE
     }
 
     private fun fetchFreshProfile() {
@@ -94,7 +96,8 @@ class UserProfileActivity : AppCompatActivity() {
                         email = profile.email,
                         level = gamification?.level ?: session.userLevel,
                         xp = gamification?.xp ?: session.userXp,
-                        streak = gamification?.currentStreak ?: session.userStreak
+                        streak = gamification?.currentStreak ?: session.userStreak,
+                        role = profile.role
                     )
                     bindUserData()
                 } else {
@@ -169,6 +172,10 @@ class UserProfileActivity : AppCompatActivity() {
     private fun setupInteractions() {
         binding.btnSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
+        }
+
+        binding.cardAdminConsole.setOnClickListener {
+            startActivity(Intent(this, AdminDashboardActivity::class.java))
         }
 
         binding.btnEditProfile.setOnClickListener {

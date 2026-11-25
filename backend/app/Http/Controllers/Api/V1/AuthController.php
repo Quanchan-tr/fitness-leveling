@@ -188,6 +188,15 @@ class AuthController extends Controller
             ], 401);
         }
 
+        if ($user->isBanned()) {
+            return response()->json([
+                'error' => [
+                    'code' => 'ACCOUNT_SUSPENDED',
+                    'message' => 'Tài khoản của bạn đã bị khóa bởi quản trị viên.',
+                ],
+            ], 403);
+        }
+
         if ($user->email_verified_at === null) {
             $this->generateAndSendOtp($user->email, 'email_verification', $user->name);
 

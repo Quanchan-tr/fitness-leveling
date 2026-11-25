@@ -117,4 +117,13 @@
     <!-- Subtab Pill Tokens -->
     <color name="subtab_pill_inactive_bg">#FFFFFF</color>
     <color name="subtab_pill_inactive_text">#0F172A</color>
+
+    <!-- Admin Console DESIGN.md Tokens -->
+    <color name="admin_bg">#FFFFFF</color>
+    <color name="admin_surface">#F8FAFC</color>
+    <color name="admin_text_primary">#111111</color>
+    <color name="admin_text_secondary">#6B7280</color>
+    <color name="admin_border">#E5E7EB</color>
+    <color name="admin_emerald">#10B981</color>
+    <color name="admin_emerald_bg">#ECFDF5</color>
 </resources>

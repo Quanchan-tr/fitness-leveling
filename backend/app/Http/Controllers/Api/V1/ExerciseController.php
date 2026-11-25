@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Requests\StoreExerciseRequest;
 use App\Models\Exercise;
+use App\Models\ExerciseReport;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -104,6 +105,28 @@ class ExerciseController extends Controller
 
         return response()->json([
             'data' => $exercise,
+        ], 201);
+    }
+
+    public function report(Request $request, string $id): JsonResponse
+    {
+        $exercise = Exercise::findOrFail($id);
+
+        $validated = $request->validate([
+            'reason' => 'required|string|in:incorrect_form,misleading_tags,inappropriate,spam,other',
+            'detail' => 'nullable|string|max:1000',
+        ]);
+
+        $report = ExerciseReport::create([
+            'exercise_id' => $exercise->id,
+            'reporter_id' => $request->user()->id,
+            'reason' => $validated['reason'],
+            'detail' => $validated['detail'] ?? null,
+            'status' => 'pending',
+        ]);
+
+        return response()->json([
+            'data' => $report,
         ], 201);
     }
 }

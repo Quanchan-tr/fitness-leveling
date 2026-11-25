@@ -16,6 +16,7 @@ class SessionManager(context: Context) {
         private const val KEY_USER_LEVEL = "user_level"
         private const val KEY_USER_XP = "user_xp"
         private const val KEY_USER_STREAK = "user_streak"
+        private const val KEY_USER_ROLE = "user_role"
         private const val KEY_BASE_URL = "base_url"
 
         // User Physical Metrics
@@ -82,6 +83,13 @@ class SessionManager(context: Context) {
     var userStreak: Int
         get() = prefs.getInt(KEY_USER_STREAK, 0)
         set(value) = prefs.edit().putInt(KEY_USER_STREAK, value).apply()
+
+    var userRole: String
+        get() = prefs.getString(KEY_USER_ROLE, "user") ?: "user"
+        set(value) = prefs.edit().putString(KEY_USER_ROLE, value).apply()
+
+    val isAdmin: Boolean
+        get() = userRole.equals("admin", ignoreCase = true)
 
     var userFollowersCount: Int
         get() = prefs.getInt("user_followers_count", 0)
@@ -256,9 +264,10 @@ class SessionManager(context: Context) {
         email: String,
         level: Int = 1,
         xp: Int = 0,
-        streak: Int = 0
+        streak: Int = 0,
+        role: String? = null
     ) {
-        prefs.edit()
+        val editor = prefs.edit()
             .putString(KEY_AUTH_TOKEN, token)
             .putString(KEY_USER_ID, id)
             .putString(KEY_USER_NAME, name)
@@ -266,7 +275,10 @@ class SessionManager(context: Context) {
             .putInt(KEY_USER_LEVEL, level)
             .putInt(KEY_USER_XP, xp)
             .putInt(KEY_USER_STREAK, streak)
-            .apply()
+        if (!role.isNullOrBlank()) {
+            editor.putString(KEY_USER_ROLE, role)
+        }
+        editor.apply()
     }
 
     fun clearSession() {
@@ -278,6 +290,7 @@ class SessionManager(context: Context) {
             .remove(KEY_USER_LEVEL)
             .remove(KEY_USER_XP)
             .remove(KEY_USER_STREAK)
+            .remove(KEY_USER_ROLE)
             .remove("user_followers_count")
             .remove("user_following_count")
             .remove("user_total_workouts")

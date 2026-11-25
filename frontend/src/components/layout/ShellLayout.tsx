@@ -30,7 +30,7 @@ const ShellContext = createContext<ShellContextType>({
 export const useShell = () => useContext(ShellContext);
 
 /** Routes that render their own full-screen layout without the app shell */
-const SHELL_EXCLUDED_PREFIXES = ['/auth', '/onboarding', '/landing', '/settings'];
+const SHELL_EXCLUDED_PREFIXES = ['/auth', '/onboarding', '/landing', '/settings', '/admin'];
 
 export const ShellLayout: React.FC<{ children: React.ReactNode }> = ({
   children,

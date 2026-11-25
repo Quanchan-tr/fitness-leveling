@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Api\V1\Admin\AdminCommunityController;
+use App\Http\Controllers\Api\V1\Admin\AdminExerciseController;
+use App\Http\Controllers\Api\V1\Admin\AdminFoodController;
+use App\Http\Controllers\Api\V1\Admin\AdminStatsController;
+use App\Http\Controllers\Api\V1\Admin\AdminUserController;
 use App\Http\Controllers\Api\V1\AiController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AvatarController;
@@ -13,6 +18,8 @@ use App\Http\Controllers\Api\V1\NutritionLogController;
 use App\Http\Controllers\Api\V1\PoseCheckController;
 use App\Http\Controllers\Api\V1\WorkoutLogController;
 use App\Http\Controllers\Api\V1\WorkoutRoutineController;
+use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\EnsureUserNotBanned;
 use App\Http\Middleware\IdempotencyMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -33,7 +40,7 @@ Route::prefix('v1')->group(function () {
         Route::post('verify-reset-code', [AuthController::class, 'verifyResetCode'])->middleware('throttle:6,1');
         Route::post('reset-password', [AuthController::class, 'resetPassword'])->middleware('throttle:6,1');
 
-        Route::middleware('auth:sanctum')->group(function () {
+        Route::middleware(['auth:sanctum', EnsureUserNotBanned::class])->group(function () {
             Route::get('me', [AuthController::class, 'me']);
             Route::put('profile', [AuthController::class, 'updateProfile']);
             Route::post('logout', [AuthController::class, 'logout']);
@@ -49,13 +56,14 @@ Route::prefix('v1')->group(function () {
     Route::get('foods/{id}', [FoodController::class, 'show']);
 
     // --- PROTECTED DOMAIN ROUTES ---
-    Route::middleware(['auth:sanctum'])->group(function () {
+    Route::middleware(['auth:sanctum', EnsureUserNotBanned::class])->group(function () {
         // 3D Avatar & Wardrobe Customization
         Route::get('avatar', [AvatarController::class, 'index']);
         Route::post('avatar/equip', [AvatarController::class, 'equip']);
 
-        // Exercise Contributions
+        // Exercise Contributions & Reports
         Route::post('exercises', [ExerciseController::class, 'store']);
+        Route::post('exercises/{id}/report', [ExerciseController::class, 'report']);
 
         // Workout Logs
         Route::get('workout-logs', [WorkoutLogController::class, 'index']);
@@ -103,6 +111,44 @@ Route::prefix('v1')->group(function () {
             Route::post('upload', [PoseCheckController::class, 'upload'])->middleware(IdempotencyMiddleware::class);
             Route::get('sessions', [PoseCheckController::class, 'index']);
             Route::get('sessions/{id}', [PoseCheckController::class, 'show']);
+        });
+
+        // Admin Console Endpoints
+        Route::prefix('admin')->middleware([EnsureUserIsAdmin::class])->group(function () {
+            Route::get('stats', [AdminStatsController::class, 'index']);
+
+            // Users management
+            Route::get('users', [AdminUserController::class, 'index']);
+            Route::post('users', [AdminUserController::class, 'store']);
+            Route::get('users/{id}', [AdminUserController::class, 'show']);
+            Route::put('users/{id}', [AdminUserController::class, 'update']);
+            Route::post('users/{id}/toggle-ban', [AdminUserController::class, 'toggleBan']);
+            Route::delete('users/{id}', [AdminUserController::class, 'destroy']);
+            Route::post('users/{id}/restore', [AdminUserController::class, 'restore']);
+
+            // Exercises & Reports moderation
+            Route::get('exercises', [AdminExerciseController::class, 'index']);
+            Route::post('exercises', [AdminExerciseController::class, 'store']);
+            Route::put('exercises/{id}', [AdminExerciseController::class, 'update']);
+            Route::delete('exercises/{id}', [AdminExerciseController::class, 'destroy']);
+            Route::post('exercises/{id}/restore', [AdminExerciseController::class, 'restore']);
+            Route::get('exercise-reports', [AdminExerciseController::class, 'reports']);
+            Route::patch('exercise-reports/{id}', [AdminExerciseController::class, 'resolveReport']);
+
+            // Foods catalog CRUD
+            Route::get('foods', [AdminFoodController::class, 'index']);
+            Route::post('foods', [AdminFoodController::class, 'store']);
+            Route::put('foods/{id}', [AdminFoodController::class, 'update']);
+            Route::delete('foods/{id}', [AdminFoodController::class, 'destroy']);
+            Route::post('foods/{id}/restore', [AdminFoodController::class, 'restore']);
+
+            // Community moderation
+            Route::get('community/posts', [AdminCommunityController::class, 'posts']);
+            Route::delete('community/posts/{id}', [AdminCommunityController::class, 'destroyPost']);
+            Route::post('community/posts/{id}/restore', [AdminCommunityController::class, 'restorePost']);
+            Route::get('community/comments', [AdminCommunityController::class, 'comments']);
+            Route::delete('community/comments/{id}', [AdminCommunityController::class, 'destroyComment']);
+            Route::post('community/comments/{id}/restore', [AdminCommunityController::class, 'restoreComment']);
         });
     });
 });

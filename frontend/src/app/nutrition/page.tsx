@@ -7,6 +7,7 @@ import { useFitness } from '@/contexts/FitnessContext';
 import { Utensils } from 'lucide-react';
 
 import { vietnameseFoods } from '@/data/vietnameseFoods';
+import { fetchFoods } from '@/lib/api';
 import { useFoodSearch } from '@/hooks/useFoodSearch';
 import { useFoodLog } from '@/hooks/useFoodLog';
 import { useDailyMacros } from '@/hooks/useDailyMacros';
@@ -21,6 +22,19 @@ import { ComboEditorModal } from '@/components/nutrition/ComboEditorModal';
 
 export default function NutritionPage() {
   const { updateNutrition } = useFitness();
+  const [foods, setFoods] = useState<FoodItem[]>(vietnameseFoods);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchFoods({ per_page: 500 }).then((remoteFoods) => {
+      if (!cancelled && remoteFoods.length > 0) {
+        setFoods(remoteFoods);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // 1. Food Search Hook
   const {
@@ -28,7 +42,7 @@ export default function NutritionPage() {
     setQuery,
     results: searchResults,
     clearSearch,
-  } = useFoodSearch(vietnameseFoods);
+  } = useFoodSearch(foods);
 
   // 2. Food Log Hook
   const {
@@ -45,7 +59,7 @@ export default function NutritionPage() {
     selectedLogIds,
     toggleLogSelection,
     clearSelection,
-  } = useFoodLog(vietnameseFoods);
+  } = useFoodLog(foods);
 
   // 3. Daily Macros (Derived State)
   const dailySummary = useDailyMacros(foodLog);
@@ -95,7 +109,7 @@ export default function NutritionPage() {
 
   // Open portion modal to edit existing food in daily log
   const handleStartEditFood = useCallback((item: FoodLogItem) => {
-    const matchingFood = vietnameseFoods.find((f) => f.id === item.foodId) || {
+    const matchingFood = foods.find((f) => f.id === item.foodId) || {
       id: item.foodId,
       name: item.name,
       category: item.foodId?.startsWith('raw_') ? 'Nguyên liệu thô' : 'Món ăn',
@@ -114,7 +128,7 @@ export default function NutritionPage() {
     setSelectedFoodForPortion(matchingFood);
     setEditingLogItem(item);
     setIsPortionModalOpen(true);
-  }, []);
+  }, [foods]);
 
   // Save portion (both Add and Edit)
   const handleSavePortion = useCallback(
@@ -206,7 +220,7 @@ export default function NutritionPage() {
         <div className="w-full">
           <ComboList
             combos={savedCombos}
-            availableFoods={vietnameseFoods}
+            availableFoods={foods}
             onQuickAdd={handleQuickAddCombo}
             onEditCombo={(combo) => {
               setEditingCombo(combo);
@@ -250,7 +264,7 @@ export default function NutritionPage() {
           setEditingCombo(null);
         }}
         initialCombo={editingCombo}
-        availableFoods={vietnameseFoods}
+        availableFoods={foods}
         onSave={(data) => {
           if (editingCombo) {
             updateCombo(editingCombo.id, data);

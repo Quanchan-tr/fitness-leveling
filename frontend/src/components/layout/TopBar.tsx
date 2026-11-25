@@ -21,6 +21,7 @@ import {
   ExternalLink,
   Droplets,
   MessageSquare,
+  ShieldCheck,
 } from 'lucide-react';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { FitnessUser } from '@/lib/fitnessData';
@@ -617,6 +618,16 @@ export const TopBar: React.FC<TopBarProps> = ({
                   <div className="text-[11px] text-slate-500">Cấp độ {user.level} • Chiến binh thể hình</div>
                 </div>
                 <div className="py-1">
+                  {authUser?.role === 'admin' && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                      className="w-full px-3.5 py-2 text-left text-xs font-semibold text-[#2563EB] hover:bg-[#EFF6FF] flex items-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
+                      <span>Admin Console</span>
+                    </Link>
+                  )}
                   <Link
                     href="/settings"
                     onClick={() => setIsProfileMenuOpen(false)}

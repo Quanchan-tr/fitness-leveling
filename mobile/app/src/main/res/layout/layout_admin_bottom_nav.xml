@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/admin_bottom_nav_container"
+    android:layout_width="match_parent"
+    android:layout_height="68dp"
+    android:background="@drawable/bg_bottom_nav_bar"
+    android:elevation="0dp"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="4dp"
+    android:paddingEnd="4dp">
+
+    <LinearLayout
+        android:id="@+id/nav_admin_stats"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/dot_admin_stats"
+            android:layout_width="@dimen/nav_dot_size"
+            android:layout_height="@dimen/nav_dot_size"
+            android:layout_marginBottom="3dp"
+            android:background="@drawable/bg_admin_nav_dot"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/iv_admin_stats"
+            android:layout_width="@dimen/nav_icon_size"
+            android:layout_height="@dimen/nav_icon_size"
+            android:contentDescription="Thống kê"
+            app:srcCompat="@drawable/ic_chart_line_solid"
+            app:tint="@color/admin_text_secondary" />
+
+        <TextView
+            android:id="@+id/tv_admin_stats"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:text="Thống kê"
+            android:textColor="@color/admin_text_secondary"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/nav_admin_users"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/dot_admin_users"
+            android:layout_width="@dimen/nav_dot_size"
+            android:layout_height="@dimen/nav_dot_size"
+            android:layout_marginBottom="3dp"
+            android:background="@drawable/bg_admin_nav_dot"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/iv_admin_users"
+            android:layout_width="@dimen/nav_icon_size"
+            android:layout_height="@dimen/nav_icon_size"
+            android:contentDescription="Users"
+            app:srcCompat="@drawable/ic_user_solid"
+            app:tint="@color/admin_text_secondary" />
+
+        <TextView
+            android:id="@+id/tv_admin_users"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:text="Users"
+            android:textColor="@color/admin_text_secondary"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/nav_admin_exercises"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/dot_admin_exercises"
+            android:layout_width="@dimen/nav_dot_size"
+            android:layout_height="@dimen/nav_dot_size"
+            android:layout_marginBottom="3dp"
+            android:background="@drawable/bg_admin_nav_dot"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/iv_admin_exercises"
+            android:layout_width="@dimen/nav_icon_size"
+            android:layout_height="@dimen/nav_icon_size"
+            android:contentDescription="Bài tập"
+            app:srcCompat="@drawable/ic_dumbbell_solid"
+            app:tint="@color/admin_text_secondary" />
+
+        <TextView
+            android:id="@+id/tv_admin_exercises"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:text="Bài tập"
+            android:textColor="@color/admin_text_secondary"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/nav_admin_foods"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/dot_admin_foods"
+            android:layout_width="@dimen/nav_dot_size"
+            android:layout_height="@dimen/nav_dot_size"
+            android:layout_marginBottom="3dp"
+            android:background="@drawable/bg_admin_nav_dot"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/iv_admin_foods"
+            android:layout_width="@dimen/nav_icon_size"
+            android:layout_height="@dimen/nav_icon_size"
+            android:contentDescription="Món ăn"
+            app:srcCompat="@drawable/ic_utensils_solid"
+            app:tint="@color/admin_text_secondary" />
+
+        <TextView
+            android:id="@+id/tv_admin_foods"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:text="Món ăn"
+            android:textColor="@color/admin_text_secondary"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/nav_admin_community"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <View
+            android:id="@+id/dot_admin_community"
+            android:layout_width="@dimen/nav_dot_size"
+            android:layout_height="@dimen/nav_dot_size"
+            android:layout_marginBottom="3dp"
+            android:background="@drawable/bg_admin_nav_dot"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/iv_admin_community"
+            android:layout_width="@dimen/nav_icon_size"
+            android:layout_height="@dimen/nav_icon_size"
+            android:contentDescription="Cộng đồng"
+            app:srcCompat="@drawable/ic_nav_community"
+            app:tint="@color/admin_text_secondary" />
+
+        <TextView
+            android:id="@+id/tv_admin_community"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:includeFontPadding="false"
+            android:singleLine="true"
+            android:text="Cộng đồng"
+            android:textColor="@color/admin_text_secondary"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+</LinearLayout>

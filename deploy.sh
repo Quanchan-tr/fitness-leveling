@@ -25,7 +25,6 @@ echo "🔄 [5/6] Tải lại Nginx..."
 sudo systemctl reload nginx
 
 echo "🔄 [6/6] Dọn dẹp image cũ..."
-sudo systemctl reload nginx
 docker image prune -f
 
 echo "🎉 ===> TRIỂN KHAI TỰ ĐỘNG THÀNH CÔNG (DEPLOY SUCCESSFUL) <==="

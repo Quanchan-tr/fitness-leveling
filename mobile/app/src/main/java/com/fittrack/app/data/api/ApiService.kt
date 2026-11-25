@@ -173,5 +173,155 @@ interface ApiService {
         @Part video: okhttp3.MultipartBody.Part,
         @Part("exercise_id") exerciseId: okhttp3.RequestBody
     ): Response<ApiResponse<PoseSessionDto>>
+
+    // ── Admin Console ──────────────────────────────────────────
+    @GET("admin/stats")
+    suspend fun getAdminStats(
+        @Query("range") range: String = "30d"
+    ): Response<ApiResponse<AdminStatsDto>>
+
+    @GET("admin/users")
+    suspend fun getAdminUsers(
+        @Query("q") q: String? = null,
+        @Query("role") role: String? = null,
+        @Query("status") status: String? = null,
+        @Query("page") page: Int = 1,
+        @Query("per_page") perPage: Int = 30
+    ): Response<ApiResponse<List<AdminUserDto>>>
+
+    @POST("admin/users")
+    suspend fun createAdminUser(
+        @Body request: AdminCreateUserRequest
+    ): Response<ApiResponse<AdminUserDto>>
+
+    @PUT("admin/users/{id}")
+    suspend fun updateAdminUser(
+        @Path("id") id: String,
+        @Body request: AdminUpdateUserRequest
+    ): Response<ApiResponse<AdminUserDto>>
+
+    @POST("admin/users/{id}/toggle-ban")
+    suspend fun toggleBanAdminUser(
+        @Path("id") id: String
+    ): Response<ApiResponse<AdminUserDto>>
+
+    @DELETE("admin/users/{id}")
+    suspend fun deleteAdminUser(
+        @Path("id") id: String
+    ): Response<ApiResponse<AdminDeleteResultDto>>
+
+    @POST("admin/users/{id}/restore")
+    suspend fun restoreAdminUser(
+        @Path("id") id: String
+    ): Response<ApiResponse<AdminUserDto>>
+
+    @GET("admin/exercises")
+    suspend fun getAdminExercises(
+        @Query("q") q: String? = null,
+        @Query("status") status: String? = null,
+        @Query("trashed") trashed: String? = null,
+        @Query("page") page: Int = 1,
+        @Query("per_page") perPage: Int = 30
+    ): Response<ApiResponse<List<AdminExerciseDto>>>
+
+    @POST("admin/exercises")
+    suspend fun createAdminExercise(
+        @Body request: AdminUpsertExerciseRequest
+    ): Response<ApiResponse<AdminExerciseDto>>
+
+    @PUT("admin/exercises/{id}")
+    suspend fun updateAdminExercise(
+        @Path("id") id: String,
+        @Body request: AdminUpsertExerciseRequest
+    ): Response<ApiResponse<AdminExerciseDto>>
+
+    @DELETE("admin/exercises/{id}")
+    suspend fun deleteAdminExercise(
+        @Path("id") id: String
+    ): Response<ApiResponse<AdminDeleteResultDto>>
+
+    @POST("admin/exercises/{id}/restore")
+    suspend fun restoreAdminExercise(
+        @Path("id") id: String
+    ): Response<ApiResponse<AdminExerciseDto>>
+
+    @GET("admin/exercise-reports")
+    suspend fun getAdminExerciseReports(
+        @Query("status") status: String = "pending",
+        @Query("page") page: Int = 1,
+        @Query("per_page") perPage: Int = 30
+    ): Response<ApiResponse<List<AdminExerciseReportDto>>>
+
+    @PATCH("admin/exercise-reports/{id}")
+    suspend fun resolveAdminExerciseReport(
+        @Path("id") id: String,
+        @Body request: AdminResolveReportRequest
+    ): Response<ApiResponse<AdminExerciseReportDto>>
+
+    @GET("admin/foods")
+    suspend fun getAdminFoods(
+        @Query("q") q: String? = null,
+        @Query("item_type") itemType: String? = null,
+        @Query("trashed") trashed: String? = null,
+        @Query("page") page: Int = 1,
+        @Query("per_page") perPage: Int = 30
+    ): Response<ApiResponse<List<AdminFoodDto>>>
+
+    @POST("admin/foods")
+    suspend fun createAdminFood(
+        @Body request: AdminUpsertFoodRequest
+    ): Response<ApiResponse<AdminFoodDto>>
+
+    @PUT("admin/foods/{id}")
+    suspend fun updateAdminFood(
+        @Path("id") id: String,
+        @Body request: AdminUpsertFoodRequest
+    ): Response<ApiResponse<AdminFoodDto>>
+
+    @DELETE("admin/foods/{id}")
+    suspend fun deleteAdminFood(
+        @Path("id") id: String
+    ): Response<ApiResponse<AdminDeleteResultDto>>
+
+    @POST("admin/foods/{id}/restore")
+    suspend fun restoreAdminFood(
+        @Path("id") id: String
+    ): Response<ApiResponse<AdminFoodDto>>
+
+    @GET("admin/community/posts")
+    suspend fun getAdminCommunityPosts(
+        @Query("q") q: String? = null,
+        @Query("trashed") trashed: String? = null,
+        @Query("page") page: Int = 1,
+        @Query("per_page") perPage: Int = 30
+    ): Response<ApiResponse<List<AdminCommunityPostDto>>>
+
+    @DELETE("admin/community/posts/{id}")
+    suspend fun deleteAdminCommunityPost(
+        @Path("id") id: String
+    ): Response<ApiResponse<AdminDeleteResultDto>>
+
+    @POST("admin/community/posts/{id}/restore")
+    suspend fun restoreAdminCommunityPost(
+        @Path("id") id: String
+    ): Response<ApiResponse<AdminCommunityPostDto>>
+
+    @GET("admin/community/comments")
+    suspend fun getAdminCommunityComments(
+        @Query("q") q: String? = null,
+        @Query("trashed") trashed: String? = null,
+        @Query("page") page: Int = 1,
+        @Query("per_page") perPage: Int = 30
+    ): Response<ApiResponse<List<AdminCommunityCommentDto>>>
+
+    @DELETE("admin/community/comments/{id}")
+    suspend fun deleteAdminCommunityComment(
+        @Path("id") id: String
+    ): Response<ApiResponse<AdminDeleteResultDto>>
+
+    @POST("admin/community/comments/{id}/restore")
+    suspend fun restoreAdminCommunityComment(
+        @Path("id") id: String
+    ): Response<ApiResponse<AdminCommunityCommentDto>>
 }
 

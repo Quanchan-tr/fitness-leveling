@@ -81,6 +81,20 @@
                 android:textStyle="bold" />
 
             <ImageView
+                android:id="@+id/btn_admin_console"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_admin_badge_blue"
+                android:clickable="true"
+                android:contentDescription="Admin Console"
+                android:focusable="true"
+                android:padding="8dp"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_shield_solid"
+                app:tint="@color/primary_blue" />
+
+            <ImageView
                 android:id="@+id/btn_notification"
                 android:layout_width="36dp"
                 android:layout_height="36dp"

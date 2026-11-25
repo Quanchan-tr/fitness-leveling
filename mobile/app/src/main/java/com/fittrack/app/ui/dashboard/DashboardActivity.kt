@@ -13,6 +13,7 @@ import com.fittrack.app.data.api.ApiClient
 import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityDashboardBinding
 import com.fittrack.app.ui.BottomNavTab
+import com.fittrack.app.ui.admin.AdminDashboardActivity
 import com.fittrack.app.ui.character.CharacterViewerActivity
 import com.fittrack.app.ui.metrics.BodyMetricsActivity
 import com.fittrack.app.ui.modal.DailyQuestsModalActivity
@@ -94,6 +95,8 @@ class DashboardActivity : AppCompatActivity() {
         binding.progressLevelXp.max = maxXp
         binding.progressLevelXp.progress = currentXp
 
+        binding.btnAdminConsole.visibility = if (session.isAdmin) View.VISIBLE else View.GONE
+
         bindHydration()
         bindNutritionEnergy()
     }
@@ -140,7 +143,8 @@ class DashboardActivity : AppCompatActivity() {
                         email = profile.email,
                         level = level,
                         xp = xp,
-                        streak = streak
+                        streak = streak,
+                        role = profile.role
                     )
 
                     bindCachedUserData()
@@ -238,6 +242,10 @@ class DashboardActivity : AppCompatActivity() {
     private fun setupInteractions() {
         binding.ivHeaderAvatar.setOnClickListener {
             startActivity(Intent(this, UserProfileActivity::class.java))
+        }
+
+        binding.btnAdminConsole.setOnClickListener {
+            startActivity(Intent(this, AdminDashboardActivity::class.java))
         }
 
         binding.btnRotateAvatar.setOnClickListener {

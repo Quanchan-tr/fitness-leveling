@@ -102,7 +102,17 @@ class AiOrchestrationService
             $validatedPlan = $this->validateAndNormalizePlan($parsed, $candidates);
 
             if ($validatedPlan === null) {
-                return $this->fallbackAndRecord($user, $mergedOptions, $context, $idempotencyKey, $startTime, 'LLM_SCHEMA_VALIDATION_FAILED', $autoSave);
+                return $this->fallbackAndRecord(
+                    $user,
+                    $mergedOptions,
+                    $context,
+                    $idempotencyKey,
+                    $startTime,
+                    'LLM_SCHEMA_VALIDATION_FAILED',
+                    $autoSave,
+                    $response->json('usage.prompt_tokens'),
+                    $response->json('usage.completion_tokens')
+                );
             }
 
             $latencyMs = (int) round((microtime(true) - $startTime) * 1000);
@@ -335,7 +345,9 @@ PROMPT;
         ?string $idempotencyKey,
         float $startTime,
         string $reason,
-        bool $autoSave
+        bool $autoSave,
+        ?int $promptTokens = null,
+        ?int $completionTokens = null
     ): array {
         $fallback = (new WorkoutPlanRuleEngine())->generatePlan($user, $options);
         $latencyMs = (int) round((microtime(true) - $startTime) * 1000);
@@ -346,6 +358,8 @@ PROMPT;
             'input_context_json' => $context,
             'output_json' => $fallback,
             'model_used' => 'rule-engine-hybrid',
+            'prompt_tokens' => $promptTokens,
+            'completion_tokens' => $completionTokens,
             'latency_ms' => $latencyMs,
             'status' => 'fallback_used',
             'fallback_reason' => $reason,
