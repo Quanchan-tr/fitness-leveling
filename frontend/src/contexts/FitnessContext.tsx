@@ -23,7 +23,7 @@ import {
   CommunityPost,
   CommunityComment,
   SuggestedAthlete,
-} from '@/types/fitnessleveling.types';
+} from '@/types/fittrack.types';
 import exerciseDataset from '@/data/exerciseDataset.json';
 import {
   starterFolders,
@@ -33,7 +33,7 @@ import {
 import {
   initialCommunityPosts,
   initialSuggestedAthletes,
-} from '@/data/fitnesslevelingMockData';
+} from '@/data/fittrackMockData';
 
 const defaultDatasetExercises: Exercise[] = (exerciseDataset as any[]).map((item) => ({
   id: item.id,
@@ -248,12 +248,12 @@ interface FitnessContextType {
 
 const FitnessContext = createContext<FitnessContextType | null>(null);
 
-const STORAGE_KEY_WORKOUT = 'fitnessleveling_active_workout';
-const STORAGE_KEY_ROUTINES = 'fitnessleveling_routines';
-const STORAGE_KEY_FOLDERS = 'fitnessleveling_folders';
-const STORAGE_KEY_SCHEDULE = 'fitnessleveling_schedule';
-const STORAGE_KEY_HISTORY = 'fitnessleveling_history';
-const STORAGE_KEY_VITALS = 'fitnessleveling_vitals';
+const STORAGE_KEY_WORKOUT = 'fittrack_active_workout';
+const STORAGE_KEY_ROUTINES = 'fittrack_routines';
+const STORAGE_KEY_FOLDERS = 'fittrack_folders';
+const STORAGE_KEY_SCHEDULE = 'fittrack_schedule';
+const STORAGE_KEY_HISTORY = 'fittrack_history';
+const STORAGE_KEY_VITALS = 'fittrack_vitals';
 
 function getSavedStorage(key: string, fallbackKey: string): string | null {
   if (typeof window === 'undefined') return null;
@@ -263,9 +263,7 @@ function getSavedStorage(key: string, fallbackKey: string): string | null {
 function calculateTodayNutritionFromStorage(): VitalsState['nutrition'] {
   if (typeof window !== 'undefined') {
     try {
-      const raw =
-        localStorage.getItem('fitnessleveling_food_log_v1') ||
-        localStorage.getItem('fittrack_food_log_v1');
+      const raw = localStorage.getItem('fittrack_food_log_v1');
       if (raw) {
         const items = JSON.parse(raw);
         if (Array.isArray(items)) {
@@ -641,10 +639,10 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     };
 
     if (typeof window !== 'undefined') {
-      window.addEventListener('fitnessleveling:food-log-updated', handleFoodLogSync);
+      window.addEventListener('fittrack:food-log-updated', handleFoodLogSync);
       window.addEventListener('storage', handleFoodLogSync);
       return () => {
-        window.removeEventListener('fitnessleveling:food-log-updated', handleFoodLogSync);
+        window.removeEventListener('fittrack:food-log-updated', handleFoodLogSync);
         window.removeEventListener('storage', handleFoodLogSync);
       };
     }
@@ -771,7 +769,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
               likesCount: p.likes_count || 0,
               isLiked: Boolean(p.is_liked),
               comments: [],
-              tags: ['FITNESSLEVELING'],
+              tags: ['FITTRACK'],
             }));
             setPosts((prev) => {
               const serverIds = new Set(serverPosts.map((sp) => sp.id));
@@ -1621,7 +1619,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         likesCount: 0,
         isLiked: false,
         hasPoseCheck: postData.hasPoseCheck || false,
-        tags: postData.tags || ['FITNESSLEVELING', 'LUYỆN TẬP'],
+        tags: postData.tags || ['FITTRACK', 'LUYỆN TẬP'],
         comments: [],
       };
 
@@ -1717,11 +1715,11 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (updated.avatar && typeof window !== 'undefined') {
         try {
           localStorage.setItem('fittrack_profile_avatar', updated.avatar);
-          const savedUser = localStorage.getItem('fitnessleveling_user');
+          const savedUser = localStorage.getItem('fittrack_auth_user');
           if (savedUser) {
             const parsed = JSON.parse(savedUser);
             parsed.avatarUrl = updated.avatar;
-            localStorage.setItem('fitnessleveling_user', JSON.stringify(parsed));
+            localStorage.setItem('fittrack_auth_user', JSON.stringify(parsed));
           }
         } catch (e) {
           console.error(e);

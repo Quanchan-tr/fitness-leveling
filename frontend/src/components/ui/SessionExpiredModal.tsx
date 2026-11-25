@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { LogIn, Lock, X } from 'lucide-react';
 
-export const SESSION_EXPIRED_EVENT = 'fitnessleveling:session-expired';
+export const SESSION_EXPIRED_EVENT = 'fittrack:session-expired';
 
 export function triggerSessionExpired() {
   if (typeof window !== 'undefined') {

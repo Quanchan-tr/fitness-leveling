@@ -194,7 +194,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                <span>FitnessLeveling v2.5</span>
+                <span>FitTrack v2.5</span>
               </div>
               <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
                 Online

@@ -16,7 +16,7 @@ export const Testimonials: React.FC = () => {
             Cộng đồng người tập nói gì về chúng tôi?
           </h2>
           <p className="text-base text-slate-600">
-            Lắng nghe chia sẻ từ những vận động viên và gymer luyện tập cùng Fitness-Leveling mỗi ngày.
+            Lắng nghe chia sẻ từ những vận động viên và gymer luyện tập cùng FitTrack mỗi ngày.
           </p>
         </div>
 

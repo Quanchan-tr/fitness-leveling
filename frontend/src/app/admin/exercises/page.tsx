@@ -257,14 +257,9 @@ export default function AdminExercisesPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-[#111111] tracking-tight">
-            Kho Bài tập &amp; Kiểm duyệt
-          </h2>
-          <p className="text-sm text-[#6B7280] mt-0.5">
-            Quản lý kho bài tập, duyệt đóng góp mới và xử lý báo cáo lỗi từ người dùng.
-          </p>
-        </div>
+        <h2 className="text-2xl font-bold text-[#111111] tracking-tight">
+          Kho Bài tập &amp; Kiểm duyệt
+        </h2>
 
         <button
           type="button"
@@ -281,7 +276,7 @@ export default function AdminExercisesPage() {
         {(
           [
             { id: 'catalog', label: 'Kho bài tập', icon: Dumbbell },
-            { id: 'pending', label: 'Chờ duyệt (User đóng góp)', icon: Check },
+            { id: 'pending', label: 'Chờ duyệt', icon: Check },
             { id: 'reports', label: 'Báo cáo lỗi', icon: Flag },
           ] as const
         ).map((tab) => {

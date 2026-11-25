@@ -22,21 +22,19 @@ export interface ApiError {
   details?: Record<string, string[]>;
 }
 
-export class FitnessLevelingApiException extends Error {
+export class FitTrackApiException extends Error {
   code: string;
   details?: Record<string, string[]>;
   status: number;
 
   constructor(status: number, error: ApiError) {
     super(error.message);
-    this.name = 'FitnessLevelingApiException';
+    this.name = 'FitTrackApiException';
     this.status = status;
     this.code = error.code || 'INTERNAL_SERVER_ERROR';
     this.details = error.details;
   }
 }
-
-export const FitTrackApiException = FitnessLevelingApiException;
 
 export function generateUUID(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -55,7 +53,7 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const token =
     typeof window !== 'undefined'
-      ? localStorage.getItem('fitnessleveling_token') || localStorage.getItem('fittrack_token')
+      ? localStorage.getItem('fittrack_token')
       : null;
   // Don't set Content-Type for FormData — the browser adds multipart boundary automatically.
   const isFormData = options.body instanceof FormData;
@@ -93,24 +91,24 @@ export async function apiRequest<T>(
 
     if (!response.ok) {
       if (response.status === 401 && typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('fitnessleveling:session-expired'));
+        window.dispatchEvent(new CustomEvent('fittrack:session-expired'));
       }
       const errorPayload: ApiError = data?.error || {
         code: `HTTP_${response.status}`,
         message: data?.message || response.statusText || 'An error occurred during the request.',
         details: data?.errors,
       };
-      throw new FitnessLevelingApiException(response.status, errorPayload);
+      throw new FitTrackApiException(response.status, errorPayload);
     }
 
     return data as T;
   } catch (err) {
     clearTimeout(timeoutId);
-    if (err instanceof FitnessLevelingApiException) {
+    if (err instanceof FitTrackApiException) {
       throw err;
     }
     const isAbort = (err as Error)?.name === 'AbortError';
-    throw new FitnessLevelingApiException(isAbort ? 408 : 500, {
+    throw new FitTrackApiException(isAbort ? 408 : 500, {
       code: isAbort ? 'REQUEST_TIMEOUT' : 'NETWORK_ERROR',
       message: isAbort
         ? 'Kết nối quá thời gian chờ. Vui lòng thử lại.'

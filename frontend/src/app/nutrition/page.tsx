@@ -64,7 +64,7 @@ export default function NutritionPage() {
   // 3. Daily Macros (Derived State)
   const dailySummary = useDailyMacros(foodLog);
 
-  // Synchronize in-memory FitnessContext and fitnessleveling_vitals so Dashboard stays 100% in sync
+  // Synchronize in-memory FitnessContext and fittrack_vitals so Dashboard stays 100% in sync
   useEffect(() => {
     if (updateNutrition) {
       updateNutrition({

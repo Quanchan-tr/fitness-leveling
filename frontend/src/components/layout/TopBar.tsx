@@ -79,7 +79,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem('fitnessleveling_notifications_v1');
+        const saved = localStorage.getItem('fittrack_notifications_v1');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.error('Failed reading notifications', e);
@@ -99,7 +99,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        localStorage.setItem('fitnessleveling_notifications_v1', JSON.stringify(notifications));
+        localStorage.setItem('fittrack_notifications_v1', JSON.stringify(notifications));
       } catch (e) {
         console.error('Failed saving notifications', e);
       }
@@ -201,7 +201,7 @@ export const TopBar: React.FC<TopBarProps> = ({
       },
       {
         id: `notif-${Date.now()}-3`,
-        title: 'Cập nhật hệ thống FitnessLeveling v2.5',
+        title: 'Cập nhật hệ thống FitTrack v2.5',
         message:
           'Tính năng AI Pose Coach đã được cập nhật thuật toán phát hiện góc khớp gối và độ võng lưng theo thời gian thực cho bài Squat & Push-up.',
         time: '2 giờ trước',

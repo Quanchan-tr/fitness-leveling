@@ -132,8 +132,50 @@ class AdminStatsController extends Controller
                 'ai_pose' => $aiPose,
                 'series' => $series,
                 'top_exercises' => $topExercises,
+                'recent_errors' => $this->buildRecentErrors($since, 4),
             ],
         ]);
+    }
+
+    private function buildRecentErrors(Carbon $since, int $limit = 4): array
+    {
+        $llmErrors = AiRecommendation::where('type', 'exercise_plan')
+            ->where('created_at', '>=', $since)
+            ->where('status', '!=', 'success')
+            ->orderByDesc('created_at')
+            ->limit($limit)
+            ->get()
+            ->map(fn (AiRecommendation $row) => [
+                'id' => $row->id,
+                'source' => 'llm',
+                'service' => 'AI Đề xuất bài tập',
+                'status' => $row->status,
+                'code' => $row->status,
+                'reason' => $row->fallback_reason ?: 'Không nhận được phản hồi từ dịch vụ AI',
+                'occurred_at' => $row->created_at?->toIso8601String(),
+            ]);
+
+        $poseErrors = PoseCheckSession::where('created_at', '>=', $since)
+            ->where('status', 'failed')
+            ->orderByDesc('created_at')
+            ->limit($limit)
+            ->get()
+            ->map(fn (PoseCheckSession $row) => [
+                'id' => $row->id,
+                'source' => 'pose_worker',
+                'service' => 'AI Pose Check',
+                'status' => $row->status,
+                'code' => $row->error_code,
+                'reason' => $row->error_message ?: ($row->error_code ?: 'Lỗi xử lý khung hình'),
+                'occurred_at' => $row->created_at?->toIso8601String(),
+            ]);
+
+        return $llmErrors
+            ->concat($poseErrors)
+            ->sortByDesc('occurred_at')
+            ->take($limit)
+            ->values()
+            ->all();
     }
 
     private function buildSeries(Carbon $since, int $days): array

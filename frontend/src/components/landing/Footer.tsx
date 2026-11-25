@@ -11,12 +11,12 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12 mb-14">
           {/* Brand Info */}
           <div className="col-span-2 flex flex-col items-start pr-4">
-            <Link href="/" className="flex items-center gap-2.5 mb-4 group" aria-label="Fitness-Leveling">
+            <Link href="/" className="flex items-center gap-2.5 mb-4 group" aria-label="FitTrack">
               <div className="w-8 h-8 rounded-xl bg-[#FF5722] text-white flex items-center justify-center font-black text-sm">
-                FL
+                FT
               </div>
               <span className="font-black text-lg text-[#0F172A] tracking-tight">
-                Fitness<span className="text-[#FF5722]">-Leveling</span>
+                Fit<span className="text-[#FF5722]">Track</span>
               </span>
             </Link>
 
@@ -56,7 +56,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Strip */}
         <div className="pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <div>
-            © 2026 Fitness-Leveling. Bảo lưu mọi quyền.
+            © 2026 FitTrack. Bảo lưu mọi quyền.
           </div>
 
           <div className="flex items-center gap-6">

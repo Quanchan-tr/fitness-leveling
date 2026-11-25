@@ -14,11 +14,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
   useEffect(() => {
     try {
       if (typeof window !== 'undefined') {
-        let stored = window.localStorage.getItem(key);
-        if (stored === null && key.startsWith('fitnessleveling_')) {
-          const fallbackKey = key.replace('fitnessleveling_', 'fittrack_');
-          stored = window.localStorage.getItem(fallbackKey);
-        }
+        const stored = window.localStorage.getItem(key);
         if (stored !== null) {
           const parsed = JSON.parse(stored);
           setValue(parsed);

@@ -46,7 +46,7 @@ export default function SettingsPage() {
   const [reminders, setReminders] = useState(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem('fitnessleveling_reminders_v1');
+        const saved = localStorage.getItem('fittrack_reminders_v1');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.error('Failed reading reminders', e);
@@ -65,7 +65,7 @@ export default function SettingsPage() {
   const [preferences, setPreferences] = useState(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem('fitnessleveling_preferences_v1');
+        const saved = localStorage.getItem('fittrack_preferences_v1');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.error('Failed reading preferences', e);
@@ -120,7 +120,7 @@ export default function SettingsPage() {
     const updated = { ...reminders, [key]: val };
     setReminders(updated);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('fitnessleveling_reminders_v1', JSON.stringify(updated));
+      localStorage.setItem('fittrack_reminders_v1', JSON.stringify(updated));
     }
     showSuccess('Đã lưu tùy chọn lời nhắc thông báo.');
   };
@@ -130,7 +130,7 @@ export default function SettingsPage() {
     const updated = { ...preferences, [key]: val };
     setPreferences(updated);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('fitnessleveling_preferences_v1', JSON.stringify(updated));
+      localStorage.setItem('fittrack_preferences_v1', JSON.stringify(updated));
     }
     showSuccess('Đã cập nhật cài đặt ứng dụng.');
   };
@@ -159,11 +159,11 @@ export default function SettingsPage() {
   const handleResetStorage = () => {
     if (confirm('Bạn có chắc muốn xóa bộ nhớ đệm và khôi phục cài đặt gốc? (Dữ liệu cục bộ sẽ được làm mới)')) {
       if (typeof window !== 'undefined') {
-        const preserveUser = localStorage.getItem('fitnessleveling_user');
-        const preserveToken = localStorage.getItem('fitnessleveling_token');
+        const preserveUser = localStorage.getItem('fittrack_auth_user');
+        const preserveToken = localStorage.getItem('fittrack_token');
         localStorage.clear();
-        if (preserveUser) localStorage.setItem('fitnessleveling_user', preserveUser);
-        if (preserveToken) localStorage.setItem('fitnessleveling_token', preserveToken);
+        if (preserveUser) localStorage.setItem('fittrack_auth_user', preserveUser);
+        if (preserveToken) localStorage.setItem('fittrack_token', preserveToken);
         showSuccess('Đã xóa bộ nhớ đệm. Đang làm mới ứng dụng...');
         setTimeout(() => window.location.reload(), 1000);
       }
@@ -589,7 +589,7 @@ export default function SettingsPage() {
                   {/* App Version Info */}
                   <div className="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
                     <span className="font-bold text-slate-600">Phiên bản Web:</span>
-                    <span className="font-black text-slate-900">FitnessLeveling v2.5.0</span>
+                    <span className="font-black text-slate-900">FitTrack v2.5.0</span>
                   </div>
 
                   {/* Sign Out Action */}

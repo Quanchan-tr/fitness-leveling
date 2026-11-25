@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFitness } from '@/contexts/FitnessContext';
-import { RoutineItem } from '@/types/fitnessleveling.types';
+import { RoutineItem } from '@/types/fittrack.types';
 import { WeeklyCalendar } from '@/components/workout/WeeklyCalendar';
 import { RoutineCard } from '@/components/workout/RoutineCard';
 import { RoutineEditor } from '@/components/workout/RoutineEditor';

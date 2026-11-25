@@ -7,7 +7,7 @@ import { PwaRegister } from '@/components/pwa/PwaRegister';
 
 
 export const metadata: Metadata = {
-  title: 'Fitness-Leveling — Web Command Center & 3D Avatar',
+  title: 'FitTrack — Web Command Center & 3D Avatar',
   description:
     'Comprehensive fitness platform with 3D athletic character leveling, workout tracking, nutrition logging, body metrics, AI recommendations, and AI Pose Check.',
   manifest: '/manifest.json',

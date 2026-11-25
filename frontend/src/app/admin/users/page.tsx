@@ -192,14 +192,9 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-[#111111] tracking-tight">
-            Quản lý Người dùng
-          </h2>
-          <p className="text-sm text-[#6B7280] mt-0.5">
-            Phân quyền tài khoản, theo dõi mức độ hoạt động, khóa hoặc khôi phục tài khoản.
-          </p>
-        </div>
+        <h2 className="text-2xl font-bold text-[#111111] tracking-tight">
+          Quản lý Người dùng
+        </h2>
 
         <button
           type="button"

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Data structures, configuration, and copy for Fitness-Leveling Web Application Landing Page.
+ * Data structures, configuration, and copy for FitTrack Web Application Landing Page.
  * - Primary Brand Color: Athletic Vibrant Orange (#FF5722, hover #E64A19, light #FFF7ED)
  * - Brand Dark: #0F172A
  * - Background: #FFFFFF & #F8FAFC
@@ -204,10 +204,10 @@ export const FOOTER_SECTIONS: FooterSection[] = [
   {
     title: 'Hệ sinh thái',
     links: [
-      { label: 'Về Fitness-Leveling', href: '#showcase' },
+      { label: 'Về FitTrack', href: '#showcase' },
       { label: 'Cộng đồng tập luyện', href: '/community' },
       { label: 'Đội ngũ phát triển', href: '#testimonials' },
-      { label: 'Liên hệ hỗ trợ', href: 'mailto:support@fitness-leveling.com' },
+      { label: 'Liên hệ hỗ trợ', href: 'mailto:support@myfittrack.io.vn' },
     ],
   },
   {

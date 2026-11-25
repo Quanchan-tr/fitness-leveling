@@ -107,14 +107,9 @@ export default function AdminCommunityPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-[#111111] tracking-tight">
-          Kiểm duyệt Cộng đồng
-        </h2>
-        <p className="text-sm text-[#6B7280] mt-0.5">
-          Giám sát bài viết và bình luận từ người dùng, xóa mềm nội dung vi phạm hoặc khôi phục.
-        </p>
-      </div>
+      <h2 className="text-2xl font-bold text-[#111111] tracking-tight">
+        Kiểm duyệt Cộng đồng
+      </h2>
 
       {/* Sub-tabs */}
       <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-2 flex flex-wrap gap-2">

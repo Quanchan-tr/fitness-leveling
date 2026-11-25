@@ -184,12 +184,12 @@ export const Navbar: React.FC = () => {
         }`}
       >
         <div className="max-w-[1280px] mx-auto flex items-center justify-between">
-          {/* Logo Brand: Fitness-Leveling */}
+          {/* Logo Brand: FitTrack */}
           <Link
             href="/"
             onClick={(e) => handleNavClick(e, '#hero', 'hero')}
             className="flex items-center gap-2.5 group transition-transform duration-200 hover:scale-[1.03] active:scale-95 shrink-0"
-            aria-label="Fitness-Leveling Trang chủ"
+            aria-label="FitTrack Trang chủ"
           >
             <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FF5722] to-[#E64A19] text-white flex items-center justify-center font-black text-lg shadow-md shadow-orange-500/25 transition-transform duration-200 group-hover:rotate-6">
               <svg
@@ -204,7 +204,7 @@ export const Navbar: React.FC = () => {
             </div>
             <div className="flex flex-col text-left">
               <span className="font-black text-xl tracking-tight text-[#0F172A] leading-none">
-                Fitness<span className="text-[#FF5722]">-Leveling</span>
+                Fit<span className="text-[#FF5722]">Track</span>
               </span>
               <span className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-1">
                 Web Command Center

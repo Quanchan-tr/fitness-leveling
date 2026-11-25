@@ -9,7 +9,7 @@ import {
   ExerciseSet,
   RoutineFolder,
   EquipmentType,
-} from '@/types/fitnessleveling.types';
+} from '@/types/fittrack.types';
 import { useFitness } from '@/contexts/FitnessContext';
 import { MuscleHeatmapSvg } from './MuscleHeatmapSvg';
 import { MuscleDetailModal } from './MuscleDetailModal';

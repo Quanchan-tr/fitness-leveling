@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Exercise } from '@/types/fitnessleveling.types';
+import { Exercise } from '@/types/fittrack.types';
 import {
   X,
   Play,

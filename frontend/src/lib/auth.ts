@@ -1,5 +1,5 @@
 /**
- * FitnessLeveling — Authentication Service
+ * FitTrack — Authentication Service
  *
  * Connects with Laravel Sanctum API (/api/v1/auth) and manages
  * Bearer token persistence in localStorage.
@@ -113,9 +113,9 @@ interface AuthResponse {
 // ─── Storage Keys ─────────────────────────────────────────────────────────────
 
 const STORAGE_KEYS = {
-  user: 'fitnessleveling_auth_user',
-  fitnessProfile: 'fitnessleveling_fitness_profile',
-  token: 'fitnessleveling_token',
+  user: 'fittrack_auth_user',
+  fitnessProfile: 'fittrack_fitness_profile',
+  token: 'fittrack_token',
 } as const;
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -132,8 +132,7 @@ function _saveToStorage<T>(key: string, value: T): void {
 function _readFromStorage<T>(key: string): T | null {
   if (typeof window === 'undefined') return null;
   try {
-    const fallbackKey = key.replace('fitnessleveling_', 'fittrack_');
-    const raw = localStorage.getItem(key) || localStorage.getItem(fallbackKey);
+    const raw = localStorage.getItem(key);
     return raw ? (JSON.parse(raw) as T) : null;
   } catch {
     return null;
@@ -143,8 +142,6 @@ function _readFromStorage<T>(key: string): T | null {
 function _removeFromStorage(key: string): void {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(key);
-  const fallbackKey = key.replace('fitnessleveling_', 'fittrack_');
-  localStorage.removeItem(fallbackKey);
 }
 
 function _mapBackendUserToAuthUser(u: BackendUser): AuthUser {

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Flame, Eye, EyeOff, ArrowRight, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { FitnessLevelingApiException } from '@/lib/api';
+import { FitTrackApiException } from '@/lib/api';
 
 interface LoginFormState {
   email: string;
@@ -77,11 +77,11 @@ function LoginForm() {
       });
       router.push('/dashboard');
     } catch (err) {
-      if (err instanceof FitnessLevelingApiException && err.code === 'EMAIL_NOT_VERIFIED') {
+      if (err instanceof FitTrackApiException && err.code === 'EMAIL_NOT_VERIFIED') {
         if (typeof window !== 'undefined') {
           const email = form.email.trim().toLowerCase();
           localStorage.setItem(
-            'fitnessleveling_auth_user',
+            'fittrack_auth_user',
             JSON.stringify({
               id: '',
               email,

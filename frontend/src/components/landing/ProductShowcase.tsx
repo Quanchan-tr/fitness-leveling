@@ -36,7 +36,7 @@ export const ProductShowcase: React.FC = () => {
             TRẢI NGHIỆM WEB TRỰC TIẾP
           </span>
           <h2 className="text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight mb-3">
-            Giao diện bên trong Fitness-Leveling
+            Giao diện bên trong FitTrack
           </h2>
           <p className="text-base text-slate-600">
             Xem trước trải nghiệm thực tế khi bạn mở phòng tập ảo trên trình duyệt Web.

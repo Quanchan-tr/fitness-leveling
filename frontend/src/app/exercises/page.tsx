@@ -3,7 +3,7 @@
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Exercise, RoutineItem } from '@/types/fitnessleveling.types';
+import { Exercise, RoutineItem } from '@/types/fittrack.types';
 import { useFitness } from '@/contexts/FitnessContext';
 import { ExerciseDetailModal } from '@/components/exercises/ExerciseDetailModal';
 import { NoSearchResults } from '@/components/ui/NoSearchResults';

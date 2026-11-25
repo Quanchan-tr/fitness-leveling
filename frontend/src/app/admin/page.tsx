@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import {
   adminApi,
+  type AdminRecentError,
   type AdminStatsData,
   type AdminStatsRange,
   type AdminStatsSeriesPoint,
@@ -37,6 +38,17 @@ const CHART_METRICS: Array<{ key: ChartMetricKey; label: string }> = [
 
 function formatNumber(n: number): string {
   return n.toLocaleString('vi-VN');
+}
+
+function formatErrorTimestamp(iso: string | null): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return '—';
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${dd}/${mm} ${hh}:${min}`;
 }
 
 export default function AdminStatsPage() {
@@ -116,6 +128,7 @@ export default function AdminStatsPage() {
   const kpis = stats!.kpis;
   const aiPlan = stats!.ai_exercise_plan;
   const aiPose = stats!.ai_pose;
+  const recentErrors: AdminRecentError[] = (stats!.recent_errors ?? []).slice(0, 4);
   const pendingTotal = kpis.pending_exercises_count + kpis.pending_reports_count;
 
   const activePoint: AdminStatsSeriesPoint | null =
@@ -125,14 +138,9 @@ export default function AdminStatsPage() {
     <div className="space-y-8">
       {/* Header & Range Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-[#111111] tracking-tight">
-            Tổng quan Hệ thống
-          </h2>
-          <p className="text-sm text-[#6B7280] mt-0.5">
-            Theo dõi tăng trưởng người dùng, hoạt động luyện tập, AI LLM và Pose Check.
-          </p>
-        </div>
+        <h2 className="text-2xl font-bold text-[#111111] tracking-tight">
+          Tổng quan Hệ thống
+        </h2>
 
         <div className="flex items-center gap-2">
           <div className="inline-flex bg-[#FFFFFF] border border-[#E5E7EB] rounded-lg p-1">
@@ -246,23 +254,18 @@ export default function AdminStatsPage() {
         </Link>
       </section>
 
-      {/* Section 2: Dedicated AI Telemetry Cards (LLM Exercise Plan & MediaPipe AI Pose) */}
+      {/* Section 2: AI Telemetry Cards */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* AI Exercise Plan (LLM_API_KEY) */}
+        {/* AI Exercise Plan */}
         <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-6">
-          <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#E5E7EB]">
+          <div className="flex items-center justify-between gap-4 pb-4 border-b border-[#E5E7EB]">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center shrink-0">
                 <Bot className="w-5 h-5" />
               </div>
-              <div>
-                <h3 className="text-base font-bold text-[#111111]">
-                  AI Đề xuất bài tập (LLM)
-                </h3>
-                <p className="text-xs text-[#6B7280]">
-                  Theo dõi lượt gọi qua LLM_API_KEY, token tiêu thụ &amp; độ trễ phản hồi
-                </p>
-              </div>
+              <h3 className="text-base font-bold text-[#111111]">
+                AI Đề xuất bài tập
+              </h3>
             </div>
             <span className="text-[11px] font-semibold uppercase tracking-[0.05em] px-2 py-1 rounded bg-[#EFF6FF] text-[#2563EB]">
               Kỳ {range}
@@ -308,30 +311,25 @@ export default function AdminStatsPage() {
                 {formatNumber(aiPlan.avg_llm_latency_ms)} ms
               </div>
               <div className="mt-1 text-xs text-[#6B7280] tabular-nums">
-                Riêng LLM API
+                API chính
               </div>
               <div className="mt-1 text-[11px] text-[#6B7280] tabular-nums">
-                Chung (gồm fallback): {formatNumber(aiPlan.avg_latency_ms)} ms
+                Trung bình chung: {formatNumber(aiPlan.avg_latency_ms)} ms
               </div>
             </div>
           </div>
         </div>
 
-        {/* AI Pose (MediaPipe / Pose Worker) */}
+        {/* AI Pose */}
         <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-6">
-          <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#E5E7EB]">
+          <div className="flex items-center justify-between gap-4 pb-4 border-b border-[#E5E7EB]">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#EFF6FF] text-[#2563EB] flex items-center justify-center shrink-0">
                 <Camera className="w-5 h-5" />
               </div>
-              <div>
-                <h3 className="text-base font-bold text-[#111111]">
-                  AI Pose Check (MediaPipe)
-                </h3>
-                <p className="text-xs text-[#6B7280]">
-                  Số lượt chấm form qua pose-worker (Video Upload) &amp; Realtime Camera
-                </p>
-              </div>
+              <h3 className="text-base font-bold text-[#111111]">
+                AI Pose Check
+              </h3>
             </div>
             <span className="text-[11px] font-semibold uppercase tracking-[0.05em] px-2 py-1 rounded bg-[#EFF6FF] text-[#2563EB]">
               Kỳ {range}
@@ -376,6 +374,62 @@ export default function AdminStatsPage() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* Compact Recent AI / Pose Error Log */}
+      <section className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-5">
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            <h3 className="text-sm font-bold text-[#111111]">Sự cố gần nhất</h3>
+          </div>
+          {recentErrors.length > 0 && (
+            <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-rose-50 text-rose-700 tabular-nums">
+              {recentErrors.length} mục
+            </span>
+          )}
+        </div>
+
+        {recentErrors.length === 0 ? (
+          <div className="text-xs text-[#6B7280] py-1">
+            Không ghi nhận lỗi trong kỳ này.
+          </div>
+        ) : (
+          <div className="divide-y divide-[#E5E7EB]">
+            {recentErrors.map((err) => {
+              const isPose = err.source === 'pose_worker';
+              return (
+                <div
+                  key={`${err.source}-${err.id}`}
+                  className="py-2 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-4 text-xs"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span
+                      className={`px-2 py-0.5 rounded text-[11px] font-semibold shrink-0 ${
+                        isPose
+                          ? 'bg-rose-50 text-rose-700'
+                          : 'bg-amber-50 text-amber-700'
+                      }`}
+                    >
+                      {isPose ? 'pose-worker' : 'LLM API'}
+                    </span>
+                    {err.code && (
+                      <code className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-[#F8FAFC] border border-[#E5E7EB] text-[#111111] shrink-0">
+                        {err.code}
+                      </code>
+                    )}
+                    <span className="text-[#111111] truncate" title={err.reason}>
+                      {err.reason}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-[#6B7280] tabular-nums shrink-0">
+                    {formatErrorTimestamp(err.occurred_at)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* Section 3: Pure SVG Growth Chart + Top 5 Popular Exercises */}
@@ -490,10 +544,7 @@ export default function AdminStatsPage() {
 
         {/* Top 5 Popular Exercises */}
         <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-2xl p-6">
-          <h3 className="text-base font-bold text-[#111111]">Top 5 Bài tập phổ biến</h3>
-          <p className="text-xs text-[#6B7280] mt-0.5 mb-4">
-            Tính theo tổng số hiệp tập ghi nhận trong kỳ
-          </p>
+          <h3 className="text-base font-bold text-[#111111] mb-4">Top 5 Bài tập phổ biến</h3>
 
           {stats!.top_exercises.length === 0 ? (
             <div className="py-12 text-center text-sm text-[#6B7280]">

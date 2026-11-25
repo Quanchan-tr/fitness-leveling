@@ -1,4 +1,4 @@
-import { RoutineExerciseItem, Exercise } from '@/types/fitnessleveling.types';
+import { RoutineExerciseItem, Exercise } from '@/types/fittrack.types';
 
 export const MUSCLE_LABELS_VI: Record<string, string> = {
   chest: 'Cơ ngực',

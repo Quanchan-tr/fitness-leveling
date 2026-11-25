@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         // Default Demo User for direct API authentication (Buffed to Level 50)
         $demoUser = User::updateOrCreate(
-            ['email' => 'demo@fitnessleveling.test'],
+            ['email' => 'demo@fittrack.vn'],
             [
                 'name' => 'Demo Athlete (Lv.50)',
                 'password' => Hash::make('password123'),
@@ -47,7 +47,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $adminEmail = strtolower(trim((string) env('ADMIN_EMAIL', 'admin@fitnessleveling.test')));
+        $adminEmail = strtolower(trim((string) env('ADMIN_EMAIL', 'admin@fittrack.vn')));
         $adminPassword = (string) env('ADMIN_PASSWORD', 'Admin@123456');
 
         User::updateOrCreate(

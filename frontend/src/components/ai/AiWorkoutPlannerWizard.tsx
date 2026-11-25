@@ -35,7 +35,7 @@ import {
   recommendSplit,
   validateSplit,
 } from '@/lib/workoutPlannerEngine';
-import { WeekDayVi } from '@/types/fitnessleveling.types';
+import { WeekDayVi } from '@/types/fittrack.types';
 import { Skeleton } from '@/components/ui/Skeleton';
 
 export const AiWorkoutPlannerWizard: React.FC = () => {

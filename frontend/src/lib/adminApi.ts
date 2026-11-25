@@ -18,6 +18,16 @@ export interface AdminTopExercise {
   sets_count: number;
 }
 
+export interface AdminRecentError {
+  id: string;
+  source: 'llm' | 'pose_worker';
+  service: string;
+  status: string;
+  code: string | null;
+  reason: string;
+  occurred_at: string | null;
+}
+
 export interface AdminStatsData {
   range: AdminStatsRange;
   kpis: {
@@ -57,6 +67,7 @@ export interface AdminStatsData {
   };
   series: AdminStatsSeriesPoint[];
   top_exercises: AdminTopExercise[];
+  recent_errors?: AdminRecentError[];
 }
 
 export interface PaginationMeta {

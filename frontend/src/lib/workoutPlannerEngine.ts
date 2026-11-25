@@ -5,7 +5,7 @@ import {
   RoutineExerciseItem,
   RoutineItem,
   WeekDayVi,
-} from '@/types/fitnessleveling.types';
+} from '@/types/fittrack.types';
 
 // ─── TYPES ───────────────────────────────────────────────────────────────────
 

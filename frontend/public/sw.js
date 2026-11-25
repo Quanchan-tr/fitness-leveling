@@ -1,4 +1,4 @@
-// FitnessLeveling PWA Service Worker v1.0.0
+// FitTrack PWA Service Worker v1.0.0
 const CACHE_NAME = 'fittrack-cache-v1';
 const STATIC_ASSETS = [
   '/',

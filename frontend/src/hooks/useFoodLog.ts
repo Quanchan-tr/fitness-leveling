@@ -13,8 +13,8 @@ import {
 import { useLocalStorage } from './useLocalStorage';
 import { vietnameseFoods, initialDefaultCombos } from '@/data/vietnameseFoods';
 
-const STORAGE_KEY_FOOD_LOG = 'fitnessleveling_food_log_v1';
-const STORAGE_KEY_COMBOS = 'fitnessleveling_saved_combos_v1';
+const STORAGE_KEY_FOOD_LOG = 'fittrack_food_log_v1';
+const STORAGE_KEY_COMBOS = 'fittrack_saved_combos_v1';
 
 export function getDefaultMealByTime(date: Date = new Date()): MealType {
   const totalMinutes = date.getHours() * 60 + date.getMinutes();
@@ -50,7 +50,7 @@ export function useFoodLog(availableFoods: FoodItem[] = vietnameseFoods) {
   // Notify global context and other listeners whenever food logs change
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('fitnessleveling:food-log-updated'));
+      window.dispatchEvent(new CustomEvent('fittrack:food-log-updated'));
     }
   }, [allLogs]);
 

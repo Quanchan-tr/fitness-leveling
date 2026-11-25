@@ -150,7 +150,7 @@ const AvatarLevelingScreen: React.FC = () => {
       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
         <div className="flex flex-col">
           <span className="text-[10px] font-black text-[#FF5722] tracking-wider uppercase">
-            Fitness-Leveling 3D
+            FitTrack 3D
           </span>
           <span className="text-sm font-black text-[#0F172A]">VĐV Level 17</span>
         </div>

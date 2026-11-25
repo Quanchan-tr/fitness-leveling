@@ -137,7 +137,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="demo@fitnessleveling.test"
+                        android:text="user@fittrack.vn"
                         android:textColor="@color/text_slate"
                         android:textSize="12sp" />
 

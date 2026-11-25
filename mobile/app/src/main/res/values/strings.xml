@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">FitnessLeveling</string>
+    <string name="app_name">FitTrack</string>
 
     <!-- Common Controls & Navigation -->
     <string name="label_optional">Không bắt buộc</string>
@@ -42,7 +42,7 @@
 
     <!-- 4. Forgot Password Screen -->
     <string name="forgot_password_title">Quên mật khẩu</string>
-    <string name="forgot_password_description">Nhập địa chỉ email đã đăng ký. FitnessLeveling sẽ gửi liên kết khôi phục mật khẩu vào hòm thư của bạn.</string>
+    <string name="forgot_password_description">Nhập địa chỉ email đã đăng ký. FitTrack sẽ gửi liên kết khôi phục mật khẩu vào hòm thư của bạn.</string>
     <string name="btn_submit">Gửi yêu cầu</string>
     <string name="remember_password_full"><![CDATA[Đã nhớ lại mật khẩu? <font color="#1443C3"><b>Đăng nhập ngay</b></font>]]></string>
 
@@ -171,7 +171,7 @@
     <string name="nav_profile">Hồ sơ</string>
 
     <!-- 001. Dashboard -->
-    <string name="dashboard_app_title">FitnessLeveling</string>
+    <string name="dashboard_app_title">FitTrack</string>
     <string name="dashboard_command_center">NÂNG CẤP BẢN THÂN MỖI NGÀY</string>
     <string name="dashboard_streak">1 ngày</string>
     <string name="dashboard_enter_workout_cta">Vào buổi tập ngay</string>
@@ -262,7 +262,7 @@
     <string name="btn_create_combo">Tạo combo món</string>
 
     <!-- 006. Community -->
-    <string name="community_title">Cộng đồng FitnessLeveling</string>
+    <string name="community_title">Cộng đồng FitTrack</string>
     <string name="community_subtitle">Chia sẻ lịch tập &amp; Kết nối gymer</string>
     <string name="community_filter_all">Tất cả</string>
     <string name="community_filter_chest">Ngực &amp; Tay sau</string>

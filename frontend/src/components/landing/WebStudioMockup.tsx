@@ -27,7 +27,7 @@ export const WebStudioMockup: React.FC<WebStudioMockupProps> = ({
         {/* Browser URL Pill */}
         <div className="bg-white px-4 py-1 rounded-full border border-slate-200 text-[11px] font-mono text-slate-500 flex items-center gap-2 shadow-2xs max-w-[280px] w-full justify-center">
           <span className="text-emerald-500 font-bold">🔒</span>
-          <span className="truncate">fitness-leveling.app/workout/live</span>
+          <span className="truncate">myfittrack.io.vn/workout/live</span>
         </div>
 
         {/* Live Status Badge */}
@@ -46,11 +46,11 @@ export const WebStudioMockup: React.FC<WebStudioMockupProps> = ({
         <div className="flex items-center justify-between border-b border-slate-800 pb-3 z-10">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-[#FF5722] text-white flex items-center justify-center font-black text-xs">
-              FL
+              FT
             </div>
             <div>
               <span className="text-xs font-black tracking-tight text-white block leading-none">
-                Fitness-Leveling <span className="text-[#FF5722]">Studio</span>
+                FitTrack <span className="text-[#FF5722]">Studio</span>
               </span>
               <span className="text-[9px] text-slate-400 font-medium">Session: Barbell Squat • High Intensity</span>
             </div>

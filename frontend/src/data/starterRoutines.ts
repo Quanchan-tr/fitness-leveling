@@ -1,4 +1,4 @@
-import { RoutineItem, RoutineFolder, DaySchedule, Exercise } from '@/types/fitnessleveling.types';
+import { RoutineItem, RoutineFolder, DaySchedule, Exercise } from '@/types/fittrack.types';
 import exerciseDataset from './exerciseDataset.json';
 
 const dataset = exerciseDataset as any[];

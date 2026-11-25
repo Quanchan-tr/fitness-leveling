@@ -185,14 +185,9 @@ export default function AdminFoodsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-[#111111] tracking-tight">
-            Kho Món ăn &amp; Dinh dưỡng
-          </h2>
-          <p className="text-sm text-[#6B7280] mt-0.5">
-            Cập nhật trực tiếp danh sách món ăn đồng bộ tức thì tới Web và Mobile.
-          </p>
-        </div>
+        <h2 className="text-2xl font-bold text-[#111111] tracking-tight">
+          Kho Món ăn &amp; Dinh dưỡng
+        </h2>
 
         <button
           type="button"
