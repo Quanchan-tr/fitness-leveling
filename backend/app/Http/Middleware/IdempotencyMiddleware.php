@@ -108,10 +108,14 @@ class IdempotencyMiddleware
 
         // --- Store or release the record based on outcome ---
         if ($response->isSuccessful()) {
+            $rawContent = (string) $response->getContent();
+            $decoded = json_decode($rawContent, true);
+            $encodedBody = json_last_error() === JSON_ERROR_NONE ? json_encode($decoded) : null;
+
             IdempotencyRecord::where('key', $compositeKey)->update([
                 'status'        => 'completed',
                 'http_status'   => $response->getStatusCode(),
-                'response_body' => json_decode((string) $response->getContent(), true),
+                'response_body' => $encodedBody,
             ]);
         } else {
             // Release the lock so the client may retry after fixing the error.

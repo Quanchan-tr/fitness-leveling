@@ -76,12 +76,12 @@ class AiOrchestrationService
         }
 
         $candidates = $this->selectCandidateExercises((string) $context['equipment']);
-        $fallbackReason = 'LLM_EXCEPTION_TRIGGERED';
+        $endpoint = str_ends_with($baseUrl, '/chat/completions') ? $baseUrl : "{$baseUrl}/chat/completions";
 
         try {
             $response = Http::timeout((int) config('ai.timeout', 25))
                 ->withToken($apiKey)
-                ->post("{$baseUrl}/chat/completions", [
+                ->post($endpoint, [
                     'model' => $model,
                     'temperature' => 0.2,
                     'response_format' => ['type' => 'json_object'],
@@ -92,7 +92,11 @@ class AiOrchestrationService
                 ]);
 
             if (!$response->successful()) {
-                $fallbackReason = 'LLM_HTTP_' . $response->status();
+                $apiErr = $response->json('error.message') ?? $response->json('0.error.message');
+                $detail = is_string($apiErr) && $apiErr !== ''
+                    ? Str::limit(trim($apiErr), 180)
+                    : Str::limit(trim((string) $response->body()), 180);
+                $fallbackReason = 'LLM_HTTP_' . $response->status() . ($detail !== '' ? ': ' . $detail : '');
                 Log::warning('LLM API HTTP failure', ['status' => $response->status(), 'body' => $response->body()]);
                 return $this->fallbackAndRecord($user, $mergedOptions, $context, $idempotencyKey, $startTime, $fallbackReason, $autoSave);
             }
@@ -132,7 +136,9 @@ class AiOrchestrationService
             return $autoSave ? $this->attachSavedRoutine($user, $validatedPlan) : $validatedPlan;
         } catch (\Throwable $e) {
             Log::warning('AI Generation Error: ' . $e->getMessage());
-            return $this->fallbackAndRecord($user, $mergedOptions, $context, $idempotencyKey, $startTime, $fallbackReason, $autoSave);
+            $detail = Str::limit(trim($e->getMessage()), 180);
+            $reason = 'LLM_EXCEPTION: ' . ($detail !== '' ? $detail : class_basename($e));
+            return $this->fallbackAndRecord($user, $mergedOptions, $context, $idempotencyKey, $startTime, $reason, $autoSave);
         }
     }
 
