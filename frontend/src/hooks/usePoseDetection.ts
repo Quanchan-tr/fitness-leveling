@@ -967,7 +967,6 @@ export function usePoseDetection({ exercise, onRepCompleted, onVideoEnded }: Use
         const wsUrl = `${wsBase}/ws/pose-stream/${exercise}`;
         const ws = new WebSocket(wsUrl);
         ws.onopen = () => {
-          console.info(`[usePoseDetection] Connected to Pose Worker WebSocket fallback: ${wsUrl}`);
           wsRef.current = ws;
         };
         ws.onmessage = (event) => {

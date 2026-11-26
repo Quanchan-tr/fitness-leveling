@@ -127,7 +127,7 @@
                         android:id="@+id/tv_user_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Demo Hunter"
+                        tools:text="Người dùng FitTrack"
                         android:textColor="@color/text_dark"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -137,7 +137,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="user@fittrack.vn"
+                        tools:text="user@fittrack.vn"
                         android:textColor="@color/text_slate"
                         android:textSize="12sp" />
 
@@ -205,17 +205,21 @@
                 </LinearLayout>
 
                 <View
+                    android:id="@+id/divider_2fa"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#F1F5F9" />
+                    android:background="#F1F5F9"
+                    android:visibility="gone" />
 
-                <!-- 2FA -->
+                <!-- 2FA (hidden until server-side TOTP verification is implemented) -->
                 <LinearLayout
+                    android:id="@+id/row_2fa"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="16dp">
+                    android:padding="16dp"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="0dp"

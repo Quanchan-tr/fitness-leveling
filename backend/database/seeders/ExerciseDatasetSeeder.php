@@ -11,10 +11,42 @@ use Illuminate\Support\Str;
 
 class ExerciseDatasetSeeder extends Seeder
 {
-    private const CDN_BASE_URL = 'https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/';
+    private const DEV_CDN_PREFIX = 'https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/';
+
+    private function cdnBaseUrl(): string
+    {
+        $configured = (string) config(
+            'services.exercise_media.cdn_url',
+            'https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/'
+        );
+
+        return rtrim($configured, '/') . '/';
+    }
+
+    private function normalizeMediaUrl(?string $url, string $cdnBase): ?string
+    {
+        if (empty($url)) {
+            return null;
+        }
+
+        if (str_starts_with($url, self::DEV_CDN_PREFIX)) {
+            return $cdnBase . ltrim(substr($url, strlen(self::DEV_CDN_PREFIX)), '/');
+        }
+
+        if (str_starts_with($url, 'http') || str_starts_with($url, '/')) {
+            return $url;
+        }
+
+        if (str_starts_with($url, 'exercises/')) {
+            return '/' . $url;
+        }
+
+        return $cdnBase . ltrim($url, '/');
+    }
 
     public function run(): void
     {
+        $cdnBase = $this->cdnBaseUrl();
         $filePath = database_path('data/exercises.json');
 
         if (!File::exists($filePath)) {
@@ -65,24 +97,13 @@ class ExerciseDatasetSeeder extends Seeder
                     $poseRulesKey = 'plank';
                 }
 
-                $gifUrl = null;
-                if (!empty($item['gif_url'])) {
-                    if (str_starts_with($item['gif_url'], 'http') || str_starts_with($item['gif_url'], '/')) {
-                        $gifUrl = $item['gif_url'];
-                    } elseif (str_starts_with($item['gif_url'], 'exercises/')) {
-                        $gifUrl = '/' . $item['gif_url'];
-                    } else {
-                        $gifUrl = self::CDN_BASE_URL . ltrim($item['gif_url'], '/');
-                    }
-                }
+                $gifUrl = $this->normalizeMediaUrl($item['gif_url'] ?? null, $cdnBase);
 
                 $thumbUrl = null;
                 if (!empty($item['thumbnail_url'])) {
-                    $thumbUrl = $item['thumbnail_url'];
+                    $thumbUrl = $this->normalizeMediaUrl($item['thumbnail_url'], $cdnBase);
                 } elseif (!empty($item['image'])) {
-                    $thumbUrl = str_starts_with($item['image'], 'http')
-                        ? $item['image']
-                        : self::CDN_BASE_URL . ltrim($item['image'], '/');
+                    $thumbUrl = $this->normalizeMediaUrl($item['image'], $cdnBase);
                 } else {
                     $thumbUrl = $gifUrl;
                 }

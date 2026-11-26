@@ -132,8 +132,8 @@ const initialEquipped: EquippedMap =
     ? initialLocal.equipped
     : getDefaultEquipped(initialGender);
 
-// Initial unlocked items: all items for mock test buff
-const initialUnlocked = STARTER_AVATAR_CATALOG;
+// Initial unlocked items: only DEFAULT starter items until backend inventory loads
+const initialUnlocked = STARTER_AVATAR_CATALOG.filter((item) => item.unlockType === 'DEFAULT');
 
 export const useAvatarStore = create<AvatarState>((set, get) => ({
   characterGender: initialGender,
@@ -320,12 +320,13 @@ export const useAvatarStore = create<AvatarState>((set, get) => ({
     saveLocalConfig(characterGender, null, defaults);
   },
 
-  // Mock Test Buff: Buff level to 50 & streak to 30 so ALL items in the entire catalog are unlocked!
-  isItemUnlocked: (_item, userLevel = 50, streak = 30) => {
-    if (userLevel >= 50 || streak >= 30) return true;
-    if (_item.unlockType === 'DEFAULT') return true;
-    if (_item.unlockType === 'LEVEL') return userLevel >= _item.unlockValue;
-    if (_item.unlockType === 'STREAK') return streak >= _item.unlockValue;
-    return true;
+  isItemUnlocked: (item, userLevel = 1, streak = 0) => {
+    if (item.unlockType === 'DEFAULT') return true;
+    if (get().inventory.some((owned) => owned.id === item.id || owned.itemCode === item.itemCode)) {
+      return true;
+    }
+    if (item.unlockType === 'LEVEL') return userLevel >= item.unlockValue;
+    if (item.unlockType === 'STREAK') return streak >= item.unlockValue;
+    return false;
   },
 }));

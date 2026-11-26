@@ -3,6 +3,10 @@
 
 services:
   frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      target: dev
     command: ["npm", "run", "dev"]
     environment:
       - WATCHPACK_POLLING=true
@@ -22,7 +26,18 @@ services:
       - ./backend:/var/www/html
       - private_storage:/var/www/html/storage/app/private
 
+  pose-worker:
+    environment:
+      - APP_ENV=local
+      - CORS_ALLOWED_ORIGINS=*
+      - PRIVATE_STORAGE_PATH=/app/private_storage
+    volumes:
+      - ./pose-worker:/app
+      - private_storage:/app/private_storage
+
   # Expose Postgres port 5432 ONLY for local dev database management tools (DBeaver, Navicat, etc.)
   postgres:
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-fitnessleveling_password}
     ports:
       - "5432:5432"

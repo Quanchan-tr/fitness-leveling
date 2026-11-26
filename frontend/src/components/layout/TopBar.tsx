@@ -175,45 +175,6 @@ export const TopBar: React.FC<TopBarProps> = ({
     });
   };
 
-  const handleAddSampleNotification = () => {
-    const samples: NotificationItem[] = [
-      {
-        id: `notif-${Date.now()}-1`,
-        title: 'Lịch tập hôm nay sẵn sàng!',
-        message:
-          'Buổi tập Chủ nhật: Chest & Triceps (4 bài, ~45 phút) đã được khởi tạo theo giáo án của bạn. Nhấp để xem chi tiết bài tập và khởi động.',
-        time: 'Vừa xong',
-        read: false,
-        type: 'workout',
-        actionUrl: '/workout',
-        actionLabel: 'Vào xem bài tập',
-      },
-      {
-        id: `notif-${Date.now()}-2`,
-        title: 'Nhắc nhở nạp nước đều đặn',
-        message:
-          'Bạn đã nạp 1.8L / 2.0L mục tiêu hôm nay. Hãy uống thêm một cốc nước 250ml để hỗ trợ quá trình phục hồi cơ bắp và trao đổi chất.',
-        time: '15 phút trước',
-        read: false,
-        type: 'water',
-        actionUrl: '/dashboard',
-        actionLabel: 'Ghi nhanh nước',
-      },
-      {
-        id: `notif-${Date.now()}-3`,
-        title: 'Cập nhật hệ thống FitTrack v2.5',
-        message:
-          'Tính năng AI Pose Coach đã được cập nhật thuật toán phát hiện góc khớp gối và độ võng lưng theo thời gian thực cho bài Squat & Push-up.',
-        time: '2 giờ trước',
-        read: true,
-        type: 'system',
-        actionUrl: '/ai-coach',
-        actionLabel: 'Mở AI Coach',
-      },
-    ];
-    setNotifications((prev) => [...samples, ...prev]);
-  };
-
   const handleSignOut = async () => {
     setIsProfileMenuOpen(false);
     try {

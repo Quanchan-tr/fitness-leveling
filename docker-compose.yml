@@ -10,7 +10,7 @@ services:
     container_name: fitnessleveling-frontend
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-https://myfittrack.io.vn/api/v1}
       - NEXT_PUBLIC_POSE_WS_URL=${NEXT_PUBLIC_POSE_WS_URL:-wss://myfittrack.io.vn}
@@ -25,7 +25,7 @@ services:
     container_name: fitnessleveling-backend
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     env_file:
       - ./backend/.env
     volumes:
@@ -68,15 +68,13 @@ services:
     container_name: fitnessleveling-pose-worker
     restart: unless-stopped
     ports:
-      - "8001:8001"
+      - "127.0.0.1:8001:8001"
     environment:
-      - PORT=8001
-      - POSE_VIDEO_MAX_SIZE_MB=100
-      - POSE_VIDEO_MAX_DURATION_SEC=60
+      - APP_ENV=${APP_ENV:-production}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-https://myfittrack.io.vn}
       # Shared storage mount path (same volume as backend)
       - PRIVATE_STORAGE_PATH=/app/private_storage
     volumes:
-      - ./pose-worker:/app
       # Pose worker reads videos directly from the shared volume
       - private_storage:/app/private_storage
 
@@ -90,7 +88,7 @@ services:
     environment:
       POSTGRES_DB: ${DB_DATABASE:-fitnessleveling}
       POSTGRES_USER: ${DB_USERNAME:-fitnessleveling_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-fitnessleveling_password}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set}
     volumes:
       - pgdata:/var/lib/postgresql/data
 

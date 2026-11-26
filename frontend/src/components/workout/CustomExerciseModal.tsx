@@ -36,7 +36,6 @@ export const CustomExerciseModal: React.FC<CustomExerciseModalProps> = ({
       equipment,
       type,
       description: description.trim() || undefined,
-      gifPlaceholderUrl: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=600&auto=format&fit=crop&q=80',
     });
 
     onClose();

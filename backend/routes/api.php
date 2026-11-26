@@ -43,6 +43,7 @@ Route::prefix('v1')->group(function () {
         Route::middleware(['auth:sanctum', EnsureUserNotBanned::class])->group(function () {
             Route::get('me', [AuthController::class, 'me']);
             Route::put('profile', [AuthController::class, 'updateProfile']);
+            Route::post('change-password', [AuthController::class, 'changePassword']);
             Route::post('logout', [AuthController::class, 'logout']);
         });
     });
@@ -87,6 +88,8 @@ Route::prefix('v1')->group(function () {
         Route::get('community/posts/{id}/comments', [CommunityController::class, 'comments']);
         Route::post('community/posts/{id}/comments', [CommunityController::class, 'addComment']);
         Route::delete('community/posts/{id}', [CommunityController::class, 'destroy']);
+        Route::get('community/suggested-athletes', [CommunityController::class, 'suggestedAthletes']);
+        Route::post('community/users/{id}/follow', [CommunityController::class, 'toggleFollow']);
 
         // Nutrition Logs
         Route::get('nutrition-logs', [NutritionLogController::class, 'index']);
@@ -100,14 +103,11 @@ Route::prefix('v1')->group(function () {
         // AI Hub (Throttled 30 requests / minute)
         Route::prefix('ai')->middleware(['throttle:30,1', IdempotencyMiddleware::class])->group(function () {
             Route::post('exercise-plan', [AiController::class, 'exercisePlan']);
-            Route::post('meal-plan', [AiController::class, 'mealPlan']);
         });
 
         // Pose Check Subsystem
         Route::prefix('pose-check')->group(function () {
             Route::post('realtime/result', [PoseCheckController::class, 'realtimeResult']);
-            // Backward compatibility alias route
-            Route::post('realtime/frame', [PoseCheckController::class, 'realtimeResult']);
             Route::post('upload', [PoseCheckController::class, 'upload'])->middleware(IdempotencyMiddleware::class);
             Route::get('sessions', [PoseCheckController::class, 'index']);
             Route::get('sessions/{id}', [PoseCheckController::class, 'show']);

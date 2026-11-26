@@ -31,7 +31,7 @@ interface MainGridProps {
 
 export const MainGrid: React.FC<MainGridProps> = ({
   outfit,
-  photoCount = 4,
+  photoCount = 0,
   isAutoRotating = false,
   onToggleAutoRotate = () => {},
   onOpenBodyMetrics,
@@ -41,6 +41,7 @@ export const MainGrid: React.FC<MainGridProps> = ({
 }) => {
   const router = useRouter();
   const {
+    schedule,
     todaySchedule,
     startWorkout,
     activeWorkout,
@@ -50,12 +51,28 @@ export const MainGrid: React.FC<MainGridProps> = ({
     updateSleep,
     profile,
     updateProfile,
-    routines,
   } = useFitness();
 
   const assignedRoutine = todaySchedule?.assignedRoutines?.[0] || todaySchedule?.assignedRoutine || null;
   const exerciseCount = assignedRoutine?.exercises?.length || 0;
-  const estimatedDuration = 45; // Minutes
+  const estimatedDuration = exerciseCount > 0 ? Math.max(15, exerciseCount * 8) : 0;
+
+  const plannedDaysCount = schedule.filter(
+    (d) => (d.assignedRoutines && d.assignedRoutines.length > 0) || Boolean(d.assignedRoutine)
+  ).length;
+  const completedDaysCount = schedule.filter((d) => d.status === 'completed').length;
+
+  const goalLabelMap: Record<string, string> = {
+    gain_muscle: 'Tăng cơ',
+    muscle_gain: 'Tăng cơ',
+    build_muscle: 'Tăng cơ',
+    lose_weight: 'Giảm mỡ',
+    lose_fat: 'Giảm mỡ',
+    fat_loss: 'Giảm mỡ',
+    endurance: 'Sức bền',
+    maintain: 'Duy trì',
+  };
+  const goalLabel = goalLabelMap[profile.goal] || 'Duy trì';
 
   const handleStartTodayWorkout = () => {
     if (!activeWorkout && assignedRoutine) {
@@ -80,11 +97,14 @@ export const MainGrid: React.FC<MainGridProps> = ({
           </h1>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-slate-600 mt-1 font-medium">
             <span>
-              Mục tiêu tuần: <strong className="text-slate-900 font-bold">5/7 buổi</strong>
+              Mục tiêu tuần:{' '}
+              <strong className="text-slate-900 font-bold">
+                {completedDaysCount}/{Math.max(plannedDaysCount, completedDaysCount)} buổi
+              </strong>
             </span>
             <span className="text-slate-300">•</span>
             <span>
-              Mục tiêu: <strong className="text-slate-900 font-bold">Tăng cơ</strong>
+              Mục tiêu: <strong className="text-slate-900 font-bold">{goalLabel}</strong>
             </span>
           </div>
         </div>
@@ -99,7 +119,11 @@ export const MainGrid: React.FC<MainGridProps> = ({
               name: profile.name,
               level: profile.level,
               exp: { current: profile.xp, max: profile.maxXp },
-              stats: { STR: 24, END: 18, AGI: 15 },
+              stats: {
+                STR: Math.min(99, 10 + profile.totalWorkouts * 2),
+                END: Math.min(99, 10 + profile.streak * 2),
+                AGI: Math.min(99, 10 + profile.level * 2),
+              },
             }}
             outfit={outfit}
             photoCount={photoCount}

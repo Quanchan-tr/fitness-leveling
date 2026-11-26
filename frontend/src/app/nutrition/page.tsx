@@ -2,7 +2,6 @@
 'use client';
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { initialFitnessData } from '@/lib/fitnessData';
 import { useFitness } from '@/contexts/FitnessContext';
 import { Utensils } from 'lucide-react';
 

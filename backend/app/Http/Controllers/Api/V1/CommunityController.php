@@ -7,10 +7,11 @@ namespace App\Http\Controllers\Api\V1;
 use App\Models\CommunityPost;
 use App\Models\PostComment;
 use App\Models\PostLike;
+use App\Models\User;
+use App\Models\UserFollow;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
 
 class CommunityController extends Controller
 {
@@ -156,6 +157,100 @@ class CommunityController extends Controller
         return response()->json([
             'data' => [
                 'message' => 'Post deleted successfully.',
+            ],
+        ]);
+    }
+
+    public function suggestedAthletes(Request $request): JsonResponse
+    {
+        $authUser = $request->user();
+        $limit = min(max((int) $request->query('limit', 8), 1), 20);
+
+        $athletes = User::query()
+            ->where('id', '!=', $authUser->id)
+            ->whereNull('banned_at')
+            ->withCount('followers')
+            ->orderByDesc('level')
+            ->orderByDesc('xp')
+            ->limit($limit)
+            ->get(['id', 'name', 'avatar_url', 'level', 'current_streak', 'goal']);
+
+        $followingIds = UserFollow::query()
+            ->where('follower_id', $authUser->id)
+            ->whereIn('following_id', $athletes->pluck('id'))
+            ->pluck('following_id')
+            ->flip()
+            ->toArray();
+
+        $goalLabels = [
+            'lose_weight' => 'Giảm mỡ',
+            'fat_loss' => 'Giảm mỡ',
+            'gain_muscle' => 'Tăng cơ',
+            'muscle_gain' => 'Tăng cơ',
+            'maintain' => 'Duy trì',
+            'endurance' => 'Sức bền',
+        ];
+
+        $data = $athletes->map(function (User $athlete) use ($followingIds, $goalLabels) {
+            $goalLabel = $goalLabels[$athlete->goal] ?? 'Vận động viên';
+            $badge = $athlete->current_streak > 0
+                ? "Chuỗi {$athlete->current_streak} ngày"
+                : $goalLabel;
+
+            return [
+                'id' => $athlete->id,
+                'name' => $athlete->name,
+                'avatar_url' => $athlete->avatar_url,
+                'level' => (int) ($athlete->level ?? 1),
+                'current_streak' => (int) ($athlete->current_streak ?? 0),
+                'goal' => $athlete->goal,
+                'badge' => $badge,
+                'followers_count' => (int) ($athlete->followers_count ?? 0),
+                'is_following' => isset($followingIds[$athlete->id]),
+            ];
+        });
+
+        return response()->json([
+            'data' => $data,
+        ]);
+    }
+
+    public function toggleFollow(Request $request, string $id): JsonResponse
+    {
+        $authUser = $request->user();
+
+        if ($authUser->id === $id) {
+            return response()->json([
+                'error' => [
+                    'code' => 'CANNOT_FOLLOW_SELF',
+                    'message' => 'Không thể tự theo dõi chính mình.',
+                ],
+            ], 422);
+        }
+
+        $targetUser = User::whereNull('banned_at')->findOrFail($id);
+
+        $deleted = UserFollow::where('follower_id', $authUser->id)
+            ->where('following_id', $targetUser->id)
+            ->delete();
+
+        if ($deleted) {
+            $following = false;
+        } else {
+            UserFollow::create([
+                'follower_id' => $authUser->id,
+                'following_id' => $targetUser->id,
+            ]);
+            $following = true;
+        }
+
+        $followersCount = UserFollow::where('following_id', $targetUser->id)->count();
+
+        return response()->json([
+            'data' => [
+                'user_id' => $targetUser->id,
+                'following' => $following,
+                'followers_count' => $followersCount,
             ],
         ]);
     }

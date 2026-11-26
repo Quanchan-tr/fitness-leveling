@@ -377,33 +377,6 @@ export const CommunityPostComposer: React.FC = () => {
               )}
             </div>
 
-            {/* Quick sample videos */}
-            <div className="flex flex-wrap items-center gap-2 text-[11px]">
-              <span className="text-slate-500 font-semibold">Video demo:</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4');
-                  setVideoFileName('Squat_Pose_Check_Demo.mp4');
-                  setHasPoseCheck(true);
-                }}
-                className="px-2.5 py-1 rounded-lg bg-white border border-purple-200 text-purple-700 hover:bg-purple-100/60 font-semibold cursor-pointer"
-              >
-                + Squat Pose Check mẫu
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setVideoUrl('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4');
-                  setVideoFileName('Pushup_Form_Check_Demo.mp4');
-                  setHasPoseCheck(true);
-                }}
-                className="px-2.5 py-1 rounded-lg bg-white border border-purple-200 text-purple-700 hover:bg-purple-100/60 font-semibold cursor-pointer"
-              >
-                + Push-up Form Check mẫu
-              </button>
-            </div>
-
             {/* AI Pose Check Toggle */}
             <div className="pt-2 border-t border-purple-100 flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer">

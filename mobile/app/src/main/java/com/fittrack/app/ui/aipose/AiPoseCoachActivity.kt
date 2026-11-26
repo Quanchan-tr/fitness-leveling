@@ -34,21 +34,13 @@ class AiPoseCoachActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val res = withContext(Dispatchers.IO) {
+                withContext(Dispatchers.IO) {
                     ApiClient.getService(this@AiPoseCoachActivity).getPoseSessions()
                 }
-                if (res.isSuccessful) {
-                    val count = res.body()?.data?.size ?: 0
-                    Toast.makeText(
-                        this@AiPoseCoachActivity,
-                        "Đã đồng bộ $count phiên AI Pose Check từ VPS",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Toast.makeText(
                     this@AiPoseCoachActivity,
-                    "Không thể tải lịch sử AI Pose: ${e.localizedMessage}",
+                    "Không thể tải lịch sử AI Pose. Vui lòng thử lại.",
                     Toast.LENGTH_SHORT
                 ).show()
             }

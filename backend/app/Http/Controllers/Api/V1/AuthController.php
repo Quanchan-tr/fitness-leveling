@@ -39,7 +39,9 @@ class AuthController extends Controller
             'expires_at' => now()->addMinutes(15),
         ]);
 
-        Log::info("[OTP GENERATED] Type: {$type} | Email: {$email} | Code: {$code}");
+        if (app()->isLocal()) {
+            Log::info("[OTP GENERATED] Type: {$type} | Email: {$email} | Code: {$code}");
+        }
 
         try {
             Mail::to($email)->send(new AuthOtpMail($code, $type, $userName));
@@ -382,6 +384,33 @@ class AuthController extends Controller
                     'gamification' => $gamification,
                 ],
                 'message' => 'Profile updated successfully.',
+            ],
+        ]);
+    }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'string'],
+            'new_password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = $request->user();
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return response()->json([
+                'error' => [
+                    'code' => 'INVALID_PASSWORD',
+                    'message' => 'Mật khẩu hiện tại không đúng.',
+                ],
+            ], 422);
+        }
+
+        $user->password = Hash::make($validated['new_password']);
+        $user->save();
+
+        return response()->json([
+            'data' => [
+                'message' => 'Đổi mật khẩu thành công.',
             ],
         ]);
     }

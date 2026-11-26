@@ -46,7 +46,7 @@ interface AvatarHeroCardProps {
 export const AvatarHeroCard: React.FC<AvatarHeroCardProps> = ({
   user,
   outfit,
-  photoCount = 4,
+  photoCount = 0,
   isAutoRotating,
   onToggleAutoRotate,
   onOpenOutfit,

@@ -1,6 +1,7 @@
 package com.fittrack.app.data.api
 
 import android.content.Context
+import com.fittrack.app.BuildConfig
 import com.fittrack.app.data.session.SessionManager
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -47,7 +48,7 @@ object ApiClient {
 
     private fun buildOkHttpClient(session: SessionManager): OkHttpClient {
         val logging = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
         }
 
         val authInterceptor = Interceptor { chain ->
@@ -70,13 +71,6 @@ object ApiClient {
             .readTimeout(20, TimeUnit.SECONDS)
             .writeTimeout(20, TimeUnit.SECONDS)
             .build()
-    }
-
-    fun resetService() {
-        synchronized(this) {
-            apiService = null
-            currentBaseUrl = null
-        }
     }
 }
 

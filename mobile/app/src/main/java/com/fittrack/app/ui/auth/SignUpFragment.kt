@@ -139,16 +139,16 @@ class SignUpFragment : Fragment() {
                     binding.btnSignup.isEnabled = true
                     binding.btnSignup.text = originalText
                 }
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 Toast.makeText(
                     requireContext(),
-                    "Không thể kết nối đến máy chủ FitTrack VPS Cloud. Vui lòng kiểm tra lại kết nối mạng.",
+                    "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.",
                     Toast.LENGTH_LONG
                 ).show()
                 binding.btnSignup.isEnabled = true
                 binding.btnSignup.text = originalText
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Lỗi: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            } catch (_: Exception) {
+                Toast.makeText(requireContext(), "Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại.", Toast.LENGTH_LONG).show()
                 binding.btnSignup.isEnabled = true
                 binding.btnSignup.text = originalText
             }

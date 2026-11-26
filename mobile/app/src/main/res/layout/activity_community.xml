@@ -573,7 +573,7 @@
                                 android:id="@+id/tv_new_post_author"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Quan Tran"
+                                tools:text="Người dùng FitTrack"
                                 android:textColor="@color/text_dark"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -766,7 +766,7 @@
                                 android:id="@+id/tv_post1_author"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Quan Tran"
+                                tools:text="Người dùng FitTrack"
                                 android:textColor="@color/text_dark"
                                 android:textSize="14sp"
                                 android:textStyle="bold" />
@@ -1069,6 +1069,7 @@
 
                         <!-- User Card 1 -->
                         <LinearLayout
+                            android:id="@+id/card_suggested_user_1"
                             android:layout_width="140dp"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
@@ -1086,21 +1087,23 @@
                                 app:tint="@color/primary" />
 
                             <TextView
+                                android:id="@+id/tv_suggested_name_1"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:ellipsize="end"
                                 android:maxLines="1"
-                                android:text="Huy Hoàng"
+                                tools:text="Vận động viên 1"
                                 android:textColor="@color/text_dark"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_suggested_meta_1"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="1dp"
-                                android:text="Lv. 15 • Powerlifter"
+                                tools:text="Lv. 1"
                                 android:textColor="@color/text_slate"
                                 android:textSize="9.5sp" />
 
@@ -1121,6 +1124,7 @@
 
                         <!-- User Card 2 -->
                         <LinearLayout
+                            android:id="@+id/card_suggested_user_2"
                             android:layout_width="140dp"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
@@ -1138,21 +1142,23 @@
                                 app:tint="@color/primary_blue" />
 
                             <TextView
+                                android:id="@+id/tv_suggested_name_2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:ellipsize="end"
                                 android:maxLines="1"
-                                android:text="Thanh Vân"
+                                tools:text="Vận động viên 2"
                                 android:textColor="@color/text_dark"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_suggested_meta_2"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="1dp"
-                                android:text="Lv. 9 • Calisthenics"
+                                tools:text="Lv. 1"
                                 android:textColor="@color/text_slate"
                                 android:textSize="9.5sp" />
 
@@ -1173,6 +1179,7 @@
 
                         <!-- User Card 3 -->
                         <LinearLayout
+                            android:id="@+id/card_suggested_user_3"
                             android:layout_width="140dp"
                             android:layout_height="wrap_content"
                             android:layout_margin="4dp"
@@ -1190,21 +1197,23 @@
                                 app:tint="@color/badge_streak_text" />
 
                             <TextView
+                                android:id="@+id/tv_suggested_name_3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="8dp"
                                 android:ellipsize="end"
                                 android:maxLines="1"
-                                android:text="Đức Thắng"
+                                tools:text="Vận động viên 3"
                                 android:textColor="@color/text_dark"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_suggested_meta_3"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="1dp"
-                                android:text="Lv. 18 • HLV Thể hình"
+                                tools:text="Lv. 1"
                                 android:textColor="@color/text_slate"
                                 android:textSize="9.5sp" />
 

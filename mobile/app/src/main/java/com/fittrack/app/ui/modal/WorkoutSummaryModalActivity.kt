@@ -33,9 +33,9 @@ class WorkoutSummaryModalActivity : AppCompatActivity() {
     }
 
     private fun bindSummaryData() {
-        val totalTime = intent.getStringExtra("TOTAL_TIME") ?: "45 phút"
-        val totalVolume = intent.getStringExtra("TOTAL_VOLUME") ?: "3.200 kg"
-        val totalSets = intent.getStringExtra("TOTAL_SETS") ?: "6 hiệp"
+        val totalTime = intent.getStringExtra("TOTAL_TIME") ?: "0 phút"
+        val totalVolume = intent.getStringExtra("TOTAL_VOLUME") ?: "0 kg"
+        val totalSets = intent.getStringExtra("TOTAL_SETS") ?: "0 hiệp"
 
         binding.tvSummaryTime.text = totalTime
         binding.tvSummaryVolume.text = totalVolume
@@ -86,14 +86,14 @@ class WorkoutSummaryModalActivity : AppCompatActivity() {
                 } else {
                     Toast.makeText(
                         this@WorkoutSummaryModalActivity,
-                        "Không thể xác nhận hoàn tất buổi tập trên VPS",
+                        "Không thể xác nhận hoàn tất buổi tập với máy chủ",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 Toast.makeText(
                     this@WorkoutSummaryModalActivity,
-                    "Lỗi đồng bộ buổi tập: ${e.localizedMessage}",
+                    "Lỗi đồng bộ buổi tập. Vui lòng kiểm tra kết nối mạng.",
                     Toast.LENGTH_SHORT
                 ).show()
             }

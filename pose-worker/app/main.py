@@ -12,26 +12,23 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import config
 from app.cv.mediapipe_extractor import get_extractor
 from app.rules import EXERCISE_RULES
-from app.schemas.request import AnalyzeFrameRequest, ProcessVideoRequest
-from app.schemas.response import (
-    AnalyzeFrameResponse,
-    PoseFeedbackResponse,
-    WorkerTaskResult,
-)
+from app.schemas.request import ProcessVideoRequest
+from app.schemas.response import WorkerTaskResult
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("fitnessleveling-pose-worker")
 
+_is_local = config.app_env == "local"
 app = FastAPI(
     title=config.app_name,
     version=config.version,
-    docs_url="/docs",
-    redoc_url="/redoc",
+    docs_url="/docs" if _is_local else None,
+    redoc_url="/redoc" if _is_local else None,
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=config.cors_allowed_origins,
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -157,56 +154,6 @@ async def process_video_task(payload: ProcessVideoRequest):
         score=feedback_result.score,
         feedback_json=feedback_result,
         worker_version=config.version,
-    )
-
-
-@app.post("/v1/analyze-frame", response_model=AnalyzeFrameResponse)
-async def analyze_frame(payload: AnalyzeFrameRequest):
-    """
-    Analyze a single webcam frame for pose landmarks.
-
-    The frontend sends a base64-encoded JPEG/PNG image captured from the
-    user's webcam. This endpoint runs MediaPipe Pose on the frame and
-    returns the extracted landmark coordinates.
-
-    The client is responsible for:
-    - Counting reps using the returned landmarks
-    - Displaying skeleton overlay on the canvas
-    - Accumulating landmarks for a full-session summary to send to /pose-check/realtime/result
-
-    This design keeps the heavy model computation server-side while
-    allowing low-latency streaming from the browser.
-    """
-    try:
-        # Decode base64 image
-        img_bytes = base64.b64decode(payload.frame_b64)
-        img_array = np.frombuffer(img_bytes, dtype=np.uint8)
-        bgr_frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
-
-        if bgr_frame is None:
-            raise HTTPException(
-                status_code=422,
-                detail={
-                    "error": "INVALID_FRAME",
-                    "message": "Could not decode the provided base64 image. Ensure it is a valid JPEG or PNG.",
-                },
-            )
-    except Exception as exc:
-        raise HTTPException(
-            status_code=422,
-            detail={
-                "error": "FRAME_DECODE_ERROR",
-                "message": f"Failed to decode frame: {exc}",
-            },
-        )
-
-    extractor = get_extractor(model_complexity=0, frame_skip=1)
-    lm_dict = extractor.extract_frame(bgr_frame)
-
-    return AnalyzeFrameResponse(
-        landmarks=lm_dict,
-        pose_detected=bool(lm_dict),
-        exercise_type=payload.exercise_type,
     )
 
 

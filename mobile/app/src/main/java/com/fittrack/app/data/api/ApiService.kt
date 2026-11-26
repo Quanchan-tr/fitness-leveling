@@ -50,6 +50,11 @@ interface ApiService {
         @Body request: com.fittrack.app.data.models.UpdateProfileRequest
     ): Response<ApiResponse<Any>>
 
+    @POST("auth/change-password")
+    suspend fun changePassword(
+        @Body request: ChangePasswordRequest
+    ): Response<ApiResponse<SimpleMessageResponse>>
+
     @POST("auth/logout")
     suspend fun logout(): Response<ApiResponse<Map<String, String>>>
 
@@ -152,6 +157,27 @@ interface ApiService {
     suspend fun togglePostLike(
         @Path("id") id: String
     ): Response<ApiResponse<Map<String, Any>>>
+
+    @GET("community/posts/{id}/comments")
+    suspend fun getPostComments(
+        @Path("id") id: String
+    ): Response<ApiResponse<List<PostCommentDto>>>
+
+    @POST("community/posts/{id}/comments")
+    suspend fun addPostComment(
+        @Path("id") id: String,
+        @Body request: CreateCommentRequest
+    ): Response<ApiResponse<PostCommentDto>>
+
+    @GET("community/suggested-athletes")
+    suspend fun getSuggestedAthletes(
+        @Query("limit") limit: Int = 8
+    ): Response<ApiResponse<List<SuggestedAthleteDto>>>
+
+    @POST("community/users/{id}/follow")
+    suspend fun toggleFollowUser(
+        @Path("id") id: String
+    ): Response<ApiResponse<FollowToggleResponse>>
 
     // ── 3D Avatar & Wardrobe ────────────────────────────────────
     @GET("avatar")

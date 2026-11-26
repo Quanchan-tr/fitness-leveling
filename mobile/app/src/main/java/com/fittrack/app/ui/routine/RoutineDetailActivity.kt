@@ -147,8 +147,8 @@ class RoutineDetailActivity : AppCompatActivity() {
             bodyPart = "Cơ ngực",
             targetMuscle = "Cơ ngực giữa",
             equipment = "Thanh đòn & Ghế phẳng",
-            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp",
-            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0025-EIeI8Vf.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0025-EIeI8Vf.webp",
             description = "Nằm phẳng trên ghế tập, hai chân đặt chắc chắn trên sàn, mắt nhìn thẳng lên thanh đòn.\nCầm thanh đòn rộng hơn vai một chút, nhấc tạ ra khỏi giá và giữ thăng bằng trên ngực.\nHít sâu, từ từ hạ thanh đòn có kiểm soát xuống chạm nhẹ vào phần giữa ngực.\nThở ra dứt khoát, dùng lực cơ ngực đẩy thanh đòn về vị trí ban đầu và siết chặt cơ ở đỉnh."
         )
 
@@ -160,8 +160,8 @@ class RoutineDetailActivity : AppCompatActivity() {
             bodyPart = "Cơ ngực",
             targetMuscle = "Cơ ngực trên & Vai trước",
             equipment = "Tạ đơn & Ghế dốc",
-            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0314-ns0SIbU.webp",
-            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0314-ns0SIbU.webp",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0314-ns0SIbU.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0314-ns0SIbU.webp",
             description = "Chỉnh ghế dốc góc 30-45 độ, hai tay cầm tạ đơn đặt trên đùi rồi dùng gối trợ lực hất lên ngang vai.\nƯỡn ngực, mở rộng lồng ngực và hạ tạ có kiểm soát sao cho cẳng tay luôn vuông góc sàn.\nThở ra và đẩy hai quả tạ hướng lên theo hình vòng cung nhẹ, tránh chạm tạ vào nhau làm mất áp lực cơ."
         )
 
@@ -173,8 +173,8 @@ class RoutineDetailActivity : AppCompatActivity() {
             bodyPart = "Cơ ngực",
             targetMuscle = "Cơ ngực trong & viền ngực",
             equipment = "Máy kéo cáp đôi",
-            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/1262-w4dLzSx.webp",
-            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/1262-w4dLzSx.webp",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/1262-w4dLzSx.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/1262-w4dLzSx.webp",
             description = "Đứng giữa giàn cáp kép, hai tay nắm tay cầm, một chân bước lên trước để tạo thế đứng vững.\nHơi khuỵu khuỷu tay cố định, thở ra và ép hai cánh tay về phía trước ngực như đang ôm thân cây.\nGiữ điểm ép căng nhất 1 giây, hít vào rồi từ từ mở rộng cánh tay về lại vị trí bắt đầu."
         )
 
@@ -186,8 +186,8 @@ class RoutineDetailActivity : AppCompatActivity() {
             bodyPart = "Bắp tay sau",
             targetMuscle = "Cơ tay sau (Triceps)",
             equipment = "Dây thừng kéo cáp",
-            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0172-1PK5Uo3.webp",
-            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0172-1PK5Uo3.webp",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0172-1PK5Uo3.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0172-1PK5Uo3.webp",
             description = "Đứng thẳng trước máy kéo cáp, hai tay nắm tay cầm ngang ngực, ép chặt khuỷu tay vào sát hai bên mạn sườn.\nThở ra, ghì cánh tay duỗi thẳng xuống phía dưới cho đến khi cơ tay sau căng hết cỡ.\nHít vào và từ từ đưa cẳng tay nâng lên góc 90 độ mà không di chuyển khuỷu tay."
         )
 
@@ -199,8 +199,8 @@ class RoutineDetailActivity : AppCompatActivity() {
             bodyPart = "Ngực dưới & Tay sau",
             targetMuscle = "Ngực dưới & Tay sau",
             equipment = "Xà kép",
-            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0009-PAgTVaK.webp",
-            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0009-PAgTVaK.webp",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0009-PAgTVaK.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0009-PAgTVaK.webp",
             description = "Nhảy lên thanh xà kép, duỗi thẳng tay, siết cơ bụng và hơi nghiêng phần thân trên về phía trước.\nHít sâu, từ từ gập khuỷu tay hạ thấp người xuống cho đến khi cánh tay đạt góc 90 độ.\nThở ra, dồn lực ngực dưới và tay sau đẩy mạnh toàn bộ cơ thể trở lại vị trí ban đầu."
         )
 

@@ -77,7 +77,7 @@ class WardrobeModalActivity : AppCompatActivity() {
     private fun fetchAvatarCatalogFromBackend() {
         val session = SessionManager.getInstance(this)
         if (!session.isLoggedIn) {
-            Toast.makeText(this, "Vui lòng đăng nhập để mở tủ đồ trên VPS", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Vui lòng đăng nhập để mở tủ đồ", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -136,8 +136,8 @@ class WardrobeModalActivity : AppCompatActivity() {
                 } else {
                     Toast.makeText(this@WardrobeModalActivity, "Không thể tải tủ đồ (${res.code()})", Toast.LENGTH_SHORT).show()
                 }
-            } catch (e: Exception) {
-                Toast.makeText(this@WardrobeModalActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            } catch (_: Exception) {
+                Toast.makeText(this@WardrobeModalActivity, "Không thể tải tủ đồ. Vui lòng thử lại.", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -317,15 +317,15 @@ class WardrobeModalActivity : AppCompatActivity() {
                             putExtra("SELECTED_SPECIAL_COLOR", specialColor)
                         }
                         setResult(RESULT_OK, resultIntent)
-                        Toast.makeText(this@WardrobeModalActivity, "✓ Đã lưu trang phục lên VPS!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@WardrobeModalActivity, "✓ Đã lưu trang phục!", Toast.LENGTH_SHORT).show()
                         finish()
                     } else {
                         binding.btnApplyOutfit.isEnabled = true
                         Toast.makeText(this@WardrobeModalActivity, "Không thể lưu trang phục (${res.code()})", Toast.LENGTH_SHORT).show()
                     }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     binding.btnApplyOutfit.isEnabled = true
-                    Toast.makeText(this@WardrobeModalActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@WardrobeModalActivity, "Lỗi kết nối máy chủ. Vui lòng thử lại.", Toast.LENGTH_SHORT).show()
                 }
             }
         }

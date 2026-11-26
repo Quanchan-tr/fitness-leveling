@@ -2,7 +2,9 @@ package com.fittrack.app.ui.settings
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +12,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import com.fittrack.app.MainActivity
 import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.models.ChangePasswordRequest
 import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivitySettingsBinding
 import com.fittrack.app.ui.BottomNavTab
@@ -68,15 +71,9 @@ class SettingsActivity : AppCompatActivity() {
             showChangePasswordDialog()
         }
 
-        binding.switch2fa.setOnCheckedChangeListener { _, isChecked ->
-            Toast.makeText(
-                this,
-                if (isChecked) "Đã kích hoạt xác thực 2 lớp qua Email" else "Đã tắt xác thực 2 lớp",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-
+        binding.switchNotifications.isChecked = session.notificationsEnabled
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
+            session.notificationsEnabled = isChecked
             Toast.makeText(
                 this,
                 if (isChecked) "Đã bật nhắc nhở luyện tập hàng ngày" else "Đã tắt thông báo",
@@ -102,20 +99,67 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun showChangePasswordDialog() {
-        val input = EditText(this)
-        input.hint = "Nhập mật khẩu mới (tối thiểu 6 ký tự)"
-        input.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-        input.setPadding(48, 32, 48, 32)
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(48, 24, 48, 8)
+        }
+        val inputCurrent = EditText(this).apply {
+            hint = "Mật khẩu hiện tại"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        val inputNew = EditText(this).apply {
+            hint = "Mật khẩu mới (tối thiểu 8 ký tự)"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        val inputConfirm = EditText(this).apply {
+            hint = "Xác nhận mật khẩu mới"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+        container.addView(inputCurrent)
+        container.addView(inputNew)
+        container.addView(inputConfirm)
 
         AlertDialog.Builder(this)
             .setTitle("Đổi mật khẩu tài khoản")
-            .setView(input)
+            .setView(container)
             .setPositiveButton("Cập nhật") { _, _ ->
-                val newPass = input.text.toString().trim()
-                if (newPass.length < 6) {
-                    Toast.makeText(this, "Mật khẩu phải có ít nhất 6 ký tự!", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "✓ Đã cập nhật mật khẩu mới thành công!", Toast.LENGTH_LONG).show()
+                val currentPass = inputCurrent.text.toString()
+                val newPass = inputNew.text.toString()
+                val confirmPass = inputConfirm.text.toString()
+
+                if (currentPass.isBlank()) {
+                    Toast.makeText(this, "Vui lòng nhập mật khẩu hiện tại", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                if (newPass.length < 8) {
+                    Toast.makeText(this, "Mật khẩu mới phải có ít nhất 8 ký tự!", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+                if (newPass != confirmPass) {
+                    Toast.makeText(this, "Mật khẩu xác nhận không khớp!", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                lifecycleScope.launch {
+                    try {
+                        val res = withContext(Dispatchers.IO) {
+                            ApiClient.getService(this@SettingsActivity).changePassword(
+                                ChangePasswordRequest(
+                                    currentPassword = currentPass,
+                                    newPassword = newPass,
+                                    newPasswordConfirmation = confirmPass
+                                )
+                            )
+                        }
+                        if (res.isSuccessful) {
+                            Toast.makeText(this@SettingsActivity, "✓ Đã cập nhật mật khẩu mới thành công!", Toast.LENGTH_LONG).show()
+                        } else {
+                            val errMsg = res.body()?.error?.message ?: "Không thể đổi mật khẩu. Vui lòng kiểm tra mật khẩu hiện tại."
+                            Toast.makeText(this@SettingsActivity, errMsg, Toast.LENGTH_LONG).show()
+                        }
+                    } catch (_: Exception) {
+                        Toast.makeText(this@SettingsActivity, "Không thể kết nối máy chủ. Vui lòng thử lại.", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
             .setNegativeButton("Hủy", null)

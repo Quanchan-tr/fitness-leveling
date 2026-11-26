@@ -145,16 +145,16 @@ class VerifyEmailFragment : Fragment() {
                     binding.btnVerify.isEnabled = true
                     binding.btnVerify.text = originalText
                 }
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 Toast.makeText(
                     requireContext(),
-                    "Lỗi kết nối máy chủ VPS. Vui lòng kiểm tra lại mạng.",
+                    "Lỗi kết nối máy chủ. Vui lòng kiểm tra lại mạng.",
                     Toast.LENGTH_LONG
                 ).show()
                 binding.btnVerify.isEnabled = true
                 binding.btnVerify.text = originalText
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Lỗi: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            } catch (_: Exception) {
+                Toast.makeText(requireContext(), "Đã xảy ra lỗi xác thực. Vui lòng thử lại.", Toast.LENGTH_LONG).show()
                 binding.btnVerify.isEnabled = true
                 binding.btnVerify.text = originalText
             }
@@ -185,8 +185,8 @@ class VerifyEmailFragment : Fragment() {
                     val msg = response.body()?.error?.message ?: "Gửi lại mã thất bại. Vui lòng thử lại sau."
                     Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
                 }
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Lỗi gửi lại mã: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+            } catch (_: Exception) {
+                Toast.makeText(requireContext(), "Không thể gửi lại mã lúc này. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 
 export default function SettingsPage() {
-  const { user, signOut, saveFitnessProfile } = useAuth();
+  const { user, fitnessProfile, signOut, saveFitnessProfile } = useAuth();
   const { profile, updateProfile, vitals, updateWeight } = useFitness();
   const router = useRouter();
 
@@ -34,13 +34,15 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'notifications' | 'preferences' | 'data'>('profile');
 
   // Profile Form State
-  const [displayName, setDisplayName] = useState(profile.name || user?.displayName || 'Quan Tran');
+  const [displayName, setDisplayName] = useState(profile.name || user?.displayName || '');
   const [goal, setGoal] = useState<'gain_muscle' | 'lose_weight' | 'maintain'>(
     (profile.goal as any) || (user?.goal as any) || 'gain_muscle'
   );
-  const [weightKg, setWeightKg] = useState<number>(user?.weightKg || 68.5);
-  const [heightCm, setHeightCm] = useState<number>(user?.heightCm || 175);
-  const [gender, setGender] = useState<'male' | 'female'>(user?.gender === 'female' ? 'female' : 'male');
+  const [weightKg, setWeightKg] = useState<number>(user?.weightKg || fitnessProfile?.weightKg || 70);
+  const [heightCm, setHeightCm] = useState<number>(user?.heightCm || fitnessProfile?.heightCm || 170);
+  const [gender, setGender] = useState<'male' | 'female'>(
+    fitnessProfile?.gender || (user?.gender === 'female' ? 'female' : 'male')
+  );
 
   // Notification Preferences State (Persisted in localStorage)
   const [reminders, setReminders] = useState(() => {
@@ -101,12 +103,12 @@ export default function SettingsPage() {
       try {
         await saveFitnessProfile({
           fitnessGoal: goal === 'gain_muscle' ? 'build_muscle' : goal === 'lose_weight' ? 'lose_fat' : 'maintain',
-          dailyActivityLevel: 'moderately_active',
+          dailyActivityLevel: fitnessProfile?.dailyActivityLevel || 'moderately_active',
           weightKg,
           heightCm,
           gender: gender === 'female' ? 'female' : 'male',
-          age: 24,
-          trainingExperience: 'intermediate',
+          age: fitnessProfile?.age || 25,
+          trainingExperience: fitnessProfile?.trainingExperience || 'intermediate',
         });
       } catch (err) {
         console.warn('Could not save fitness profile to auth storage:', err);

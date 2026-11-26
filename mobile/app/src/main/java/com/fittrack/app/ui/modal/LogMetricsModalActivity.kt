@@ -94,15 +94,15 @@ class LogMetricsModalActivity : AppCompatActivity() {
                         if (fatStr.isNotEmpty()) putExtra("SAVED_FAT", fatStr)
                     }
                     setResult(Activity.RESULT_OK, resultIntent)
-                    Toast.makeText(this@LogMetricsModalActivity, "✓ Đã lưu số đo thể chất lên VPS!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@LogMetricsModalActivity, "✓ Đã lưu số đo thể chất!", Toast.LENGTH_SHORT).show()
                     finish()
                 } else {
                     binding.btnSaveMetrics.isEnabled = true
                     Toast.makeText(this@LogMetricsModalActivity, "Không thể lưu chỉ số (${res.code()})", Toast.LENGTH_SHORT).show()
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 binding.btnSaveMetrics.isEnabled = true
-                Toast.makeText(this@LogMetricsModalActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@LogMetricsModalActivity, "Lỗi kết nối máy chủ. Vui lòng thử lại.", Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -1,10 +1,15 @@
 package com.fittrack.app.ui.community
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,7 +19,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.fittrack.app.R
 import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.models.CreateCommentRequest
 import com.fittrack.app.data.models.CreatePostRequest
+import com.fittrack.app.data.models.SuggestedAthleteDto
 import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityCommunityBinding
 import com.fittrack.app.ui.BottomNavTab
@@ -32,12 +39,14 @@ class CommunityActivity : AppCompatActivity() {
     private lateinit var session: SessionManager
 
     private var post1Id: String? = null
-    private var isLiked1 = true
-    private var likeCount1 = 48
+    private var isLiked1 = false
+    private var likeCount1 = 0
 
     private var post2Id: String? = null
     private var isLiked2 = false
-    private var likeCount2 = 35
+    private var likeCount2 = 0
+
+    private var suggestedAthletes: List<SuggestedAthleteDto> = emptyList()
 
     private var attachedMediaType: String? = null // null, "IMAGE", "VIDEO", "WORKOUT", "MEAL"
     private var attachedWorkoutTitle: String? = null
@@ -101,27 +110,33 @@ class CommunityActivity : AppCompatActivity() {
                 val response = withContext(Dispatchers.IO) {
                     ApiClient.getService(this@CommunityActivity).getCommunityPosts()
                 }
-                if (response.isSuccessful && response.body()?.data?.isNotEmpty() == true) {
+                if (response.isSuccessful && response.body()?.data != null) {
                     val posts = response.body()!!.data!!
 
                     if (posts.isNotEmpty()) {
                         val p1 = posts[0]
                         post1Id = p1.id
-                        binding.tvPost1Author.text = p1.userName ?: "Thợ săn cao cấp"
+                        binding.cardPost1.visibility = View.VISIBLE
+                        binding.tvPost1Author.text = p1.userName ?: "Người dùng FitTrack"
                         binding.tvPost1Content.text = p1.content
                         likeCount1 = p1.likesCount
                         isLiked1 = p1.isLiked
                         binding.tvLikeCount1.text = likeCount1.toString()
+                    } else {
+                        binding.cardPost1.visibility = View.GONE
                     }
 
                     if (posts.size > 1) {
                         val p2 = posts[1]
                         post2Id = p2.id
-                        binding.tvPost2Author.text = p2.userName ?: "Chiến binh Fitness"
+                        binding.cardPost2.visibility = View.VISIBLE
+                        binding.tvPost2Author.text = p2.userName ?: "Người dùng FitTrack"
                         binding.tvPost2Content.text = p2.content
                         likeCount2 = p2.likesCount
                         isLiked2 = p2.isLiked
                         binding.tvLikeCount2.text = likeCount2.toString()
+                    } else {
+                        binding.cardPost2.visibility = View.GONE
                     }
                 }
             } catch (_: Exception) {
@@ -244,20 +259,20 @@ class CommunityActivity : AppCompatActivity() {
         binding.btnAttachWorkout.setOnClickListener {
             val calendar = Calendar.getInstance()
             val dayKey = when (calendar.get(Calendar.DAY_OF_WEEK)) {
-                Calendar.MONDAY -> "t2"
-                Calendar.TUESDAY -> "t3"
-                Calendar.WEDNESDAY -> "t4"
-                Calendar.THURSDAY -> "t5"
-                Calendar.FRIDAY -> "t6"
-                Calendar.SATURDAY -> "t7"
-                else -> "cn"
+                Calendar.MONDAY -> "T2"
+                Calendar.TUESDAY -> "T3"
+                Calendar.WEDNESDAY -> "T4"
+                Calendar.THURSDAY -> "T5"
+                Calendar.FRIDAY -> "T6"
+                Calendar.SATURDAY -> "T7"
+                else -> "CN"
             }
             val todayRoutines = session.getScheduleForDay(dayKey)
-            val options = if (todayRoutines.isNotEmpty()) {
-                todayRoutines.toTypedArray()
-            } else {
-                arrayOf("Ngực & Tay Sau Cắt Nét (5 bài tập)", "Thân Dưới & Đùi Trước (5 bài tập)", "Cardio HIIT đốt mỡ (30 phút)")
+            if (todayRoutines.isEmpty()) {
+                Toast.makeText(this, "Bạn chưa lên lịch buổi tập cho hôm nay ($dayKey).", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+            val options = todayRoutines.toTypedArray()
 
             AlertDialog.Builder(this)
                 .setTitle("Chọn buổi tập hôm nay để đính kèm")
@@ -274,28 +289,43 @@ class CommunityActivity : AppCompatActivity() {
                 .show()
         }
 
-        // Attach meal action - pick from today's logged meals
+        // Attach meal action - pick from today's real logged meals
         binding.btnAttachMeal.setOnClickListener {
-            val mealOptions = arrayOf(
-                "Bữa Sáng: Trứng ốp la + Bánh mì ngũ cốc (420 kcal • 28g P)",
-                "Bữa Trưa: Combo Ức gà áp chảo + Khoai lang (580 kcal • 48g P)",
-                "Bữa Tối: Cá hồi nướng măng tây + Salad bơ (510 kcal • 42g P)",
-                "Bữa Phụ: Whey Isolate + Chuối tiêu (220 kcal • 26g P)"
-            )
+            if (!session.isLoggedIn) {
+                Toast.makeText(this, "Vui lòng đăng nhập để đính kèm bữa ăn đã ghi nhận.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            lifecycleScope.launch {
+                try {
+                    val res = withContext(Dispatchers.IO) {
+                        ApiClient.getService(this@CommunityActivity).getNutritionLogs()
+                    }
+                    val logs = res.body()?.data.orEmpty()
+                    if (logs.isEmpty()) {
+                        Toast.makeText(this@CommunityActivity, "Bạn chưa ghi nhận bữa ăn nào hôm nay.", Toast.LENGTH_SHORT).show()
+                        return@launch
+                    }
+                    val mealOptions = logs.take(10).map { log ->
+                        "${log.foodName} (${log.calories} kcal • ${log.proteinGrams.toInt()}g P)"
+                    }.toTypedArray()
 
-            AlertDialog.Builder(this)
-                .setTitle("Chọn bữa ăn hôm nay để đính kèm")
-                .setItems(mealOptions) { _, which ->
-                    val chosen = mealOptions[which]
-                    attachedMediaType = "MEAL"
-                    attachedMealTitle = chosen
-                    binding.layoutMediaPreview.visibility = View.VISIBLE
-                    binding.layoutPreviewImage.visibility = View.VISIBLE
-                    binding.layoutPreviewVideo.visibility = View.GONE
-                    Toast.makeText(this, "🥗 Đã đính kèm: $chosen", Toast.LENGTH_SHORT).show()
+                    AlertDialog.Builder(this@CommunityActivity)
+                        .setTitle("Chọn bữa ăn đã ghi nhận")
+                        .setItems(mealOptions) { _, which ->
+                            val chosen = mealOptions[which]
+                            attachedMediaType = "MEAL"
+                            attachedMealTitle = chosen
+                            binding.layoutMediaPreview.visibility = View.VISIBLE
+                            binding.layoutPreviewImage.visibility = View.VISIBLE
+                            binding.layoutPreviewVideo.visibility = View.GONE
+                            Toast.makeText(this@CommunityActivity, "🥗 Đã đính kèm: $chosen", Toast.LENGTH_SHORT).show()
+                        }
+                        .setNegativeButton("Hủy", null)
+                        .show()
+                } catch (_: Exception) {
+                    Toast.makeText(this@CommunityActivity, "Không thể tải nhật ký dinh dưỡng.", Toast.LENGTH_SHORT).show()
                 }
-                .setNegativeButton("Hủy", null)
-                .show()
+            }
         }
 
         // Remove media buttons
@@ -330,20 +360,15 @@ class CommunityActivity : AppCompatActivity() {
                 else -> "Vừa hoàn thành buổi tập với thành tích mới!"
             }
 
-            // Sync with VPS Backend API
+            // Sync with Backend API (do not send local content:// URIs or third-party sample URLs)
             if (session.isLoggedIn) {
                 val api = ApiClient.getService(this)
-                val mediaUrl = when (attachedMediaType) {
-                    "IMAGE" -> selectedImageUri?.toString() ?: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd"
-                    "VIDEO" -> selectedVideoUri?.toString() ?: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-                    else -> null
-                }
                 lifecycleScope.launch {
                     try {
                         withContext(Dispatchers.IO) {
                             api.createCommunityPost(
                                 idempotencyKey = UUID.randomUUID().toString(),
-                                request = CreatePostRequest(content = finalContent, mediaUrl = mediaUrl)
+                                request = CreatePostRequest(content = finalContent, mediaUrl = null)
                             )
                         }
                     } catch (_: Exception) {
@@ -407,68 +432,81 @@ class CommunityActivity : AppCompatActivity() {
     }
 
     private fun setupSuggestedUsers() {
-        if (session.userFollowersCount < 5) {
-            binding.cardSuggestedUsers.visibility = View.GONE
-            return
-        }
-        binding.cardSuggestedUsers.visibility = View.VISIBLE
-        var isFollowed1 = false
-        var isFollowed2 = false
-        var isFollowed3 = false
+        binding.cardSuggestedUsers.visibility = View.GONE
+        if (!session.isLoggedIn) return
 
-        binding.btnFollowUser1.setOnClickListener {
-            isFollowed1 = !isFollowed1
-            binding.btnFollowUser1.text = if (isFollowed1) "✓ Đang theo dõi" else "Theo dõi"
-            binding.btnFollowUser1.background = ContextCompat.getDrawable(
-                this,
-                if (isFollowed1) R.drawable.bg_tag_chip else R.drawable.bg_primary_button
-            )
-            binding.btnFollowUser1.setTextColor(
-                ContextCompat.getColor(this, if (isFollowed1) R.color.text_dark else R.color.white)
-            )
-            Toast.makeText(
-                this,
-                if (isFollowed1) "Đã theo dõi Huy Hoàng (Powerlifter)" else "Đã bỏ theo dõi",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        lifecycleScope.launch {
+            try {
+                val res = withContext(Dispatchers.IO) {
+                    ApiClient.getService(this@CommunityActivity).getSuggestedAthletes(limit = 6)
+                }
+                val list = res.body()?.data.orEmpty()
+                if (!res.isSuccessful || list.isEmpty()) {
+                    binding.cardSuggestedUsers.visibility = View.GONE
+                    return@launch
+                }
+                suggestedAthletes = list
+                binding.cardSuggestedUsers.visibility = View.VISIBLE
 
-        binding.btnFollowUser2.setOnClickListener {
-            isFollowed2 = !isFollowed2
-            binding.btnFollowUser2.text = if (isFollowed2) "✓ Đang theo dõi" else "Theo dõi"
-            binding.btnFollowUser2.background = ContextCompat.getDrawable(
-                this,
-                if (isFollowed2) R.drawable.bg_tag_chip else R.drawable.bg_primary_button
-            )
-            binding.btnFollowUser2.setTextColor(
-                ContextCompat.getColor(this, if (isFollowed2) R.color.text_dark else R.color.white)
-            )
-            Toast.makeText(
-                this,
-                if (isFollowed2) "Đã theo dõi Thanh Vân (Calisthenics)" else "Đã bỏ theo dõi",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+                val slots = listOf(
+                    Triple(binding.cardSuggestedUser1, binding.tvSuggestedName1 to binding.tvSuggestedMeta1, binding.btnFollowUser1),
+                    Triple(binding.cardSuggestedUser2, binding.tvSuggestedName2 to binding.tvSuggestedMeta2, binding.btnFollowUser2),
+                    Triple(binding.cardSuggestedUser3, binding.tvSuggestedName3 to binding.tvSuggestedMeta3, binding.btnFollowUser3)
+                )
 
-        binding.btnFollowUser3.setOnClickListener {
-            isFollowed3 = !isFollowed3
-            binding.btnFollowUser3.text = if (isFollowed3) "✓ Đang theo dõi" else "Theo dõi"
-            binding.btnFollowUser3.background = ContextCompat.getDrawable(
-                this,
-                if (isFollowed3) R.drawable.bg_tag_chip else R.drawable.bg_primary_button
-            )
-            binding.btnFollowUser3.setTextColor(
-                ContextCompat.getColor(this, if (isFollowed3) R.color.text_dark else R.color.white)
-            )
-            Toast.makeText(
-                this,
-                if (isFollowed3) "Đã theo dõi Đức Thắng (HLV Thể hình)" else "Đã bỏ theo dõi",
-                Toast.LENGTH_SHORT
-            ).show()
+                slots.forEachIndexed { idx, (card, nameMeta, btnFollow) ->
+                    val athlete = list.getOrNull(idx)
+                    if (athlete == null) {
+                        card.visibility = View.GONE
+                    } else {
+                        card.visibility = View.VISIBLE
+                        nameMeta.first.text = athlete.name
+                        nameMeta.second.text = "Lv. ${athlete.level} • ${athlete.badge ?: "Vận động viên"}"
+                        var isFollowed = athlete.isFollowing
+                        fun renderBtn() {
+                            btnFollow.text = if (isFollowed) "✓ Đang theo dõi" else "Theo dõi"
+                            btnFollow.background = ContextCompat.getDrawable(
+                                this@CommunityActivity,
+                                if (isFollowed) R.drawable.bg_tag_chip else R.drawable.bg_primary_button
+                            )
+                            btnFollow.setTextColor(
+                                ContextCompat.getColor(
+                                    this@CommunityActivity,
+                                    if (isFollowed) R.color.text_dark else R.color.white
+                                )
+                            )
+                        }
+                        renderBtn()
+                        btnFollow.setOnClickListener {
+                            lifecycleScope.launch {
+                                try {
+                                    val followRes = withContext(Dispatchers.IO) {
+                                        ApiClient.getService(this@CommunityActivity).toggleFollowUser(athlete.id)
+                                    }
+                                    if (followRes.isSuccessful && followRes.body()?.data != null) {
+                                        isFollowed = followRes.body()!!.data!!.following
+                                        renderBtn()
+                                    }
+                                } catch (_: Exception) {
+                                    Toast.makeText(this@CommunityActivity, "Không thể cập nhật theo dõi.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (_: Exception) {
+                binding.cardSuggestedUsers.visibility = View.GONE
+            }
         }
 
         binding.btnSeeAllSuggestions.setOnClickListener {
-            Toast.makeText(this, "Đang mở danh sách gợi ý bạn bè và thợ săn cùng cấp...", Toast.LENGTH_SHORT).show()
+            if (suggestedAthletes.isEmpty()) return@setOnClickListener
+            val items = suggestedAthletes.map { "${it.name} (Lv. ${it.level})" }.toTypedArray()
+            AlertDialog.Builder(this)
+                .setTitle("Vận động viên nổi bật")
+                .setItems(items, null)
+                .setPositiveButton("Đóng", null)
+                .show()
         }
     }
 
@@ -516,34 +554,97 @@ class CommunityActivity : AppCompatActivity() {
         }
 
         binding.btnCommentPost1.setOnClickListener {
-            showCommentsDialog("Quan Tran")
+            showCommentsDialog(post1Id, binding.tvPost1Author.text.toString())
         }
 
         binding.btnCommentPost2.setOnClickListener {
-            showCommentsDialog("Minh Anh")
+            showCommentsDialog(post2Id, binding.tvPost2Author.text.toString())
         }
 
         binding.btnSharePost1.setOnClickListener {
-            Toast.makeText(this, "Đã sao chép liên kết bài viết vào bộ nhớ tạm!", Toast.LENGTH_SHORT).show()
+            copyPostToClipboard(binding.tvPost1Author.text.toString(), binding.tvPost1Content.text.toString())
         }
 
         binding.btnSharePost2.setOnClickListener {
-            Toast.makeText(this, "Đã sao chép liên kết bài viết vào bộ nhớ tạm!", Toast.LENGTH_SHORT).show()
+            copyPostToClipboard(binding.tvPost2Author.text.toString(), binding.tvPost2Content.text.toString())
         }
     }
 
-    private fun showCommentsDialog(authorName: String) {
-        val comments = arrayOf(
-            "Tuấn Kiệt: Form Bench Press chuẩn đét anh ơi! 🔥",
-            "Hương Giang: Chúc mừng bác đã nâng mốc tạ mới nhé!",
-            "Coach Hoàng: Nhớ khóa khớp gối khi hạ tạ và siết cơ ngực nhé."
-        )
+    private fun copyPostToClipboard(author: String, content: String) {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+        clipboard?.setPrimaryClip(ClipData.newPlainText("FitTrack Post", "$author: $content"))
+        Toast.makeText(this, "Đã sao chép nội dung bài viết vào bộ nhớ tạm!", Toast.LENGTH_SHORT).show()
+    }
 
-        AlertDialog.Builder(this)
-            .setTitle("Bình luận về bài viết của $authorName")
-            .setItems(comments, null)
-            .setPositiveButton("Đóng", null)
-            .show()
+    private fun showCommentsDialog(postId: String?, authorName: String) {
+        if (postId.isNullOrBlank()) {
+            Toast.makeText(this, "Bài viết chưa đồng bộ với máy chủ.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        lifecycleScope.launch {
+            val commentsList = try {
+                val res = withContext(Dispatchers.IO) {
+                    ApiClient.getService(this@CommunityActivity).getPostComments(postId)
+                }
+                res.body()?.data.orEmpty()
+            } catch (_: Exception) {
+                emptyList()
+            }
+
+            val container = LinearLayout(this@CommunityActivity).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(48, 24, 48, 12)
+            }
+            if (commentsList.isEmpty()) {
+                container.addView(TextView(this@CommunityActivity).apply {
+                    text = "Chưa có bình luận nào. Hãy là người đầu tiên!"
+                    setTextColor(ContextCompat.getColor(this@CommunityActivity, R.color.text_slate))
+                    textSize = 12f
+                })
+            } else {
+                commentsList.forEach { c ->
+                    container.addView(TextView(this@CommunityActivity).apply {
+                        text = "• ${c.user?.name ?: "Thành viên"}: ${c.content}"
+                        setTextColor(ContextCompat.getColor(this@CommunityActivity, R.color.text_dark))
+                        textSize = 13f
+                        setPadding(0, 6, 0, 6)
+                    })
+                }
+            }
+
+            val input = EditText(this@CommunityActivity).apply {
+                hint = "Viết bình luận của bạn..."
+            }
+            container.addView(input)
+
+            AlertDialog.Builder(this@CommunityActivity)
+                .setTitle("Bình luận bài viết của $authorName")
+                .setView(container)
+                .setPositiveButton("Gửi") { _, _ ->
+                    val text = input.text.toString().trim()
+                    if (text.isNotEmpty()) {
+                        lifecycleScope.launch {
+                            try {
+                                val res = withContext(Dispatchers.IO) {
+                                    ApiClient.getService(this@CommunityActivity).addPostComment(
+                                        postId,
+                                        CreateCommentRequest(content = text)
+                                    )
+                                }
+                                if (res.isSuccessful) {
+                                    Toast.makeText(this@CommunityActivity, "✓ Đã gửi bình luận!", Toast.LENGTH_SHORT).show()
+                                    fetchCommunityFeed()
+                                }
+                            } catch (_: Exception) {
+                                Toast.makeText(this@CommunityActivity, "Không thể gửi bình luận lúc này.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
+                .setNegativeButton("Đóng", null)
+                .show()
+        }
     }
 
     private fun setupBottomNav() {

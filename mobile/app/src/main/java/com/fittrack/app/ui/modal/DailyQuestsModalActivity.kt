@@ -1,25 +1,21 @@
 package com.fittrack.app.ui.modal
 
 import android.os.Bundle
-import android.widget.Toast
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.fittrack.app.R
 import com.fittrack.app.data.api.ApiClient
+import com.fittrack.app.data.models.DailyQuestDto
 import com.fittrack.app.data.session.SessionManager
 import com.fittrack.app.databinding.ActivityModalDailyQuestsBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class DailyQuestsModalActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityModalDailyQuestsBinding
-    private val todayKey: String
-        get() = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,117 +23,44 @@ class DailyQuestsModalActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupListeners()
-        bindQuests()
+        bindEmptyOrLoadingState()
         loadQuestsFromBackend()
     }
 
     private fun setupListeners() {
-        binding.btnClose.setOnClickListener {
-            finish()
-        }
-
-        binding.rootContainer.setOnClickListener {
-            finish()
-        }
-
-        binding.cardModal.setOnClickListener {
-            // Prevent dismiss when tapping inside modal content
-        }
-
-        binding.btnClaimAll.setOnClickListener {
-            finish()
-        }
-    }
-
-    private fun isQuestClaimed(questId: String): Boolean {
-        val sp = getSharedPreferences("fittrack_quest_prefs", MODE_PRIVATE)
-        return sp.getBoolean("claimed_${todayKey}_$questId", false)
-    }
-
-    private fun markQuestClaimed(questId: String) {
-        val sp = getSharedPreferences("fittrack_quest_prefs", MODE_PRIVATE)
-        sp.edit().putBoolean("claimed_${todayKey}_$questId", true).apply()
-    }
-
-    private fun claimQuest(questId: String, xp: Int) {
-        if (isQuestClaimed(questId)) {
-            Toast.makeText(this, "Nhiệm vụ này đã nhận thưởng hôm nay rồi!", Toast.LENGTH_SHORT).show()
-            return
-        }
-        val session = SessionManager.getInstance(this)
-        markQuestClaimed(questId)
-        session.userXp += xp
-        val neededXp = maxOf(200, session.userLevel * 200)
-        if (session.userXp >= neededXp) {
-            session.userLevel += 1
-            session.userXp -= neededXp
-            Toast.makeText(this, "🎉 LÊN CẤP ${session.userLevel}! Nhận +$xp XP.", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, "✓ Đã nhận thưởng +$xp XP!", Toast.LENGTH_SHORT).show()
-        }
-        bindQuests()
-    }
-
-    private fun bindQuests() {
-        val session = SessionManager.getInstance(this)
-
-        // Quest 1: Workout routine completed
-        val q1Completed = session.userStreak > 0 || session.isWorkoutActive
-        val q1Claimed = isQuestClaimed("q1")
-        binding.tvQ1Title.text = "Hoàn thành 1 buổi tập hôm nay"
-        binding.tvQ1Progress.text = if (q1Completed) "1/1 • Đã hoàn thành" else "0/1 • Chưa hoàn thành"
-        if (q1Claimed) {
-            binding.badgeQ1Xp.text = "✓ Đã nhận"
-            binding.badgeQ1Xp.isEnabled = false
-            binding.badgeQ1Xp.alpha = 0.6f
-        } else if (q1Completed) {
-            binding.badgeQ1Xp.text = "Nhận +50 XP"
-            binding.badgeQ1Xp.isEnabled = true
-            binding.badgeQ1Xp.alpha = 1.0f
-            binding.badgeQ1Xp.setOnClickListener { claimQuest("q1", 50) }
-        } else {
-            binding.badgeQ1Xp.text = "+50 XP (Chưa xong)"
-            binding.badgeQ1Xp.isEnabled = false
-            binding.badgeQ1Xp.alpha = 0.5f
-        }
-
-        // Quest 2: Drink water (target >= 1000ml)
-        val q2Completed = session.waterLoggedMl >= 1000
-        val q2Claimed = isQuestClaimed("q2")
-        binding.tvQ2Title.text = "Uống đủ tối thiểu 1.0L nước"
-        binding.tvQ2Progress.text = "${session.waterLoggedMl}ml / 1000ml" + if (q2Completed) " • Đạt chuẩn" else ""
-        if (q2Claimed) {
-            binding.badgeQ2Xp.text = "✓ Đã nhận"
-            binding.badgeQ2Xp.isEnabled = false
-            binding.badgeQ2Xp.alpha = 0.6f
-        } else if (q2Completed) {
-            binding.badgeQ2Xp.text = "Nhận +50 XP"
-            binding.badgeQ2Xp.isEnabled = true
-            binding.badgeQ2Xp.alpha = 1.0f
-            binding.badgeQ2Xp.setOnClickListener { claimQuest("q2", 50) }
-        } else {
-            binding.badgeQ2Xp.text = "+50 XP (Chưa đủ)"
-            binding.badgeQ2Xp.isEnabled = false
-            binding.badgeQ2Xp.alpha = 0.5f
-        }
-
-        // Quest 3: Check-in / Login Streak
-        val q3Completed = true // Logged in
-        val q3Claimed = isQuestClaimed("q3")
-        binding.tvQ3Title.text = "Điểm danh mở ứng dụng hàng ngày"
-        binding.tvQ3Progress.text = "1/1 • Đã điểm danh"
-        if (q3Claimed) {
-            binding.badgeQ3Xp.text = "✓ Đã nhận"
-            binding.badgeQ3Xp.isEnabled = false
-            binding.badgeQ3Xp.alpha = 0.6f
-        } else {
-            binding.badgeQ3Xp.text = "Nhận +50 XP"
-            binding.badgeQ3Xp.isEnabled = true
-            binding.badgeQ3Xp.alpha = 1.0f
-            binding.badgeQ3Xp.setOnClickListener { claimQuest("q3", 50) }
-        }
-
+        binding.btnClose.setOnClickListener { finish() }
+        binding.rootContainer.setOnClickListener { finish() }
+        binding.cardModal.setOnClickListener { /* Keep modal open */ }
         binding.btnClaimAll.text = "Đóng"
+        binding.btnClaimAll.setOnClickListener { finish() }
+    }
+
+    private fun bindEmptyOrLoadingState() {
+        val slots = listOf(binding.itemQuest1, binding.itemQuest2, binding.itemQuest3, binding.itemQuest4)
+        slots.forEach { it.visibility = View.GONE }
+    }
+
+    private fun bindQuestsFromBackend(quests: List<DailyQuestDto>) {
+        val rows: List<Quadruple<View, TextView, TextView, TextView>> = listOf(
+            Quadruple(binding.itemQuest1, binding.tvQ1Title, binding.tvQ1Progress, binding.badgeQ1Xp),
+            Quadruple(binding.itemQuest2, binding.tvQ2Title, binding.tvQ2Progress, binding.badgeQ2Xp),
+            Quadruple(binding.itemQuest3, binding.tvQ3Title, binding.tvQ3Progress, binding.badgeQ3Xp),
+            Quadruple(binding.itemQuest4, binding.tvQ4Title, binding.tvQ4Progress, binding.badgeQ4Xp)
+        )
+
+        rows.forEachIndexed { idx, (container, tvTitle, tvProgress, tvBadge) ->
+            val q = quests.getOrNull(idx)
+            if (q == null) {
+                container.visibility = View.GONE
+            } else {
+                container.visibility = View.VISIBLE
+                tvTitle.text = q.title
+                val statusLabel = if (q.completed) "Đã hoàn thành" else "Đang thực hiện"
+                tvProgress.text = "${q.current}/${q.target} • $statusLabel"
+                tvBadge.text = if (q.completed) "✓ +${q.xpReward} XP" else "+${q.xpReward} XP"
+                tvBadge.alpha = if (q.completed) 1.0f else 0.7f
+            }
+        }
     }
 
     private fun loadQuestsFromBackend() {
@@ -149,15 +72,18 @@ class DailyQuestsModalActivity : AppCompatActivity() {
                 val res = withContext(Dispatchers.IO) {
                     ApiClient.getService(this@DailyQuestsModalActivity).getMe()
                 }
-                if (res.isSuccessful && res.body()?.data?.gamification?.dailyQuests != null) {
-                    val quests = res.body()!!.data!!.gamification!!.dailyQuests
-                    if (quests.isNotEmpty()) {
-                        bindQuests()
-                    }
+                val gamification = res.body()?.data?.gamification
+                if (res.isSuccessful && gamification != null) {
+                    session.userLevel = gamification.level
+                    session.userXp = gamification.xp
+                    session.userStreak = gamification.currentStreak
+                    bindQuestsFromBackend(gamification.dailyQuests)
                 }
             } catch (_: Exception) {
-                // Keep offline logic
+                // Keep empty/offline state cleanly without fabricating XP
             }
         }
     }
+
+    private data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
 }

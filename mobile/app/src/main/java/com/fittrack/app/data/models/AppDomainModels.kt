@@ -220,6 +220,44 @@ data class CreatePostRequest(
     @SerializedName("media_url") val mediaUrl: String? = null
 )
 
+data class CommentUserDto(
+    @SerializedName("id") val id: String,
+    @SerializedName("name") val name: String,
+    @SerializedName("avatar_url") val avatarUrl: String? = null,
+    @SerializedName("level") val level: Int = 1
+)
+
+data class PostCommentDto(
+    @SerializedName("id") val id: String,
+    @SerializedName("post_id") val postId: String? = null,
+    @SerializedName("user_id") val userId: String? = null,
+    @SerializedName("content") val content: String,
+    @SerializedName("created_at") val createdAt: String? = null,
+    @SerializedName("user") val user: CommentUserDto? = null
+)
+
+data class CreateCommentRequest(
+    @SerializedName("content") val content: String
+)
+
+data class SuggestedAthleteDto(
+    @SerializedName("id") val id: String,
+    @SerializedName("name") val name: String,
+    @SerializedName("avatar_url") val avatarUrl: String? = null,
+    @SerializedName("level") val level: Int = 1,
+    @SerializedName("current_streak") val currentStreak: Int = 0,
+    @SerializedName("goal") val goal: String? = null,
+    @SerializedName("badge") val badge: String? = null,
+    @SerializedName("followers_count") val followersCount: Int = 0,
+    @SerializedName("is_following") val isFollowing: Boolean = false
+)
+
+data class FollowToggleResponse(
+    @SerializedName("user_id") val userId: String,
+    @SerializedName("following") val following: Boolean,
+    @SerializedName("followers_count") val followersCount: Int
+)
+
 // ── 3D Avatar & Wardrobe ────────────────────────────────────
 data class AvatarData(
     @SerializedName("gender") val gender: String = "male",

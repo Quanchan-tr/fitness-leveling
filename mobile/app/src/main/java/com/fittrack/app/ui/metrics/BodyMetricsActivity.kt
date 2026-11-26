@@ -164,13 +164,18 @@ class BodyMetricsActivity : AppCompatActivity() {
     private fun renderMetricHistory() {
         val container = binding.llMetricHistoryContainer
         container.removeAllViews()
-        if (loadedMetricsList.isEmpty()) {
-            binding.itemMetricHistory1.visibility = View.VISIBLE
-            binding.itemMetricHistory2.visibility = View.VISIBLE
-            return
-        }
         binding.itemMetricHistory1.visibility = View.GONE
         binding.itemMetricHistory2.visibility = View.GONE
+        if (loadedMetricsList.isEmpty()) {
+            val tvEmpty = TextView(this).apply {
+                text = "Chưa có lịch sử chỉ số cơ thể. Nhấn \"+ Ghi chỉ số\" để thêm bản ghi đầu tiên."
+                setTextColor(ContextCompat.getColor(this@BodyMetricsActivity, R.color.text_slate))
+                textSize = 12f
+                setPadding(8, 20, 8, 8)
+            }
+            container.addView(tvEmpty)
+            return
+        }
 
         loadedMetricsList.forEach { item ->
             val hM = (item.heightCm?.takeIf { it > 50.0 } ?: 175.0) / 100.0
@@ -405,8 +410,9 @@ class BodyMetricsActivity : AppCompatActivity() {
             )
         }
 
-        // Setup click listeners for logged meals to edit portion
-        setupLoggedMealEditListeners()
+        binding.itemMealBreakfast1.visibility = View.GONE
+        binding.itemMealLunch1.visibility = View.GONE
+        binding.itemMealDinner1.visibility = View.GONE
     }
 
     private fun setupLoggedMealEditListeners() {

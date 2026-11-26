@@ -13,16 +13,8 @@ interface WeightSleepCardProps {
 }
 
 export const WeightSleepCard: React.FC<WeightSleepCardProps> = ({
-  weightHistory = [
-    { date: '2026-09-28', weightKg: 68.4 },
-    { date: '2026-09-29', weightKg: 68.2 },
-    { date: '2026-09-30', weightKg: 68.3 },
-    { date: '2026-10-01', weightKg: 68.0 },
-    { date: '2026-10-02', weightKg: 67.9 },
-    { date: '2026-10-03', weightKg: 67.7 },
-    { date: '2026-10-04', weightKg: 67.6 },
-  ],
-  sleepLastNight = { hours: 7, minutes: 30 },
+  weightHistory = [],
+  sleepLastNight = { hours: 0, minutes: 0 },
   onUpdateWeight,
   onUpdateSleep,
   onOpenBodyMetrics,
@@ -34,11 +26,10 @@ export const WeightSleepCard: React.FC<WeightSleepCardProps> = ({
   const [sleepHoursInput, setSleepHoursInput] = useState(sleepLastNight.hours.toString());
   const [sleepMinsInput, setSleepMinsInput] = useState(sleepLastNight.minutes.toString());
 
-  const latestWeight =
-    weightHistory.length > 0 ? weightHistory[weightHistory.length - 1].weightKg : 67.6;
-  const firstWeight =
-    weightHistory.length > 0 ? weightHistory[0].weightKg : 68.4;
-  const rawDiff = latestWeight - firstWeight;
+  const hasWeightData = weightHistory.length > 0;
+  const latestWeight = hasWeightData ? weightHistory[weightHistory.length - 1].weightKg : null;
+  const firstWeight = hasWeightData ? weightHistory[0].weightKg : null;
+  const rawDiff = latestWeight !== null && firstWeight !== null ? latestWeight - firstWeight : 0;
   const weightDiff = Math.abs(rawDiff).toFixed(1);
   const isLoss = rawDiff <= 0;
 
@@ -79,8 +70,8 @@ export const WeightSleepCard: React.FC<WeightSleepCardProps> = ({
       : '';
 
   const weights = weightHistory.map((d) => d.weightKg);
-  const minW = Math.min(...weights) - 0.2;
-  const maxW = Math.max(...weights) + 0.2;
+  const minW = weights.length > 0 ? Math.min(...weights) - 0.2 : 0;
+  const maxW = weights.length > 0 ? Math.max(...weights) + 0.2 : 1;
   const svgWidth = 260;
   const svgHeight = 52;
 
@@ -109,7 +100,7 @@ export const WeightSleepCard: React.FC<WeightSleepCardProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => {
-              setWeightInput(latestWeight.toString());
+              setWeightInput(latestWeight !== null ? latestWeight.toString() : '');
               setIsEditingWeight(true);
             }}
             className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-[#FF5722] transition-colors cursor-pointer"
@@ -153,70 +144,82 @@ export const WeightSleepCard: React.FC<WeightSleepCardProps> = ({
             ) : (
               <>
                 <span className="text-2xl font-black text-slate-900 tabular-nums">
-                  {latestWeight}
+                  {latestWeight !== null ? latestWeight : '—'}
                 </span>
-                <span className="text-xs font-semibold text-slate-400">kg</span>
+                {latestWeight !== null && (
+                  <span className="text-xs font-semibold text-slate-400">kg</span>
+                )}
               </>
             )}
           </div>
 
-          <span
-            className={`text-xs font-semibold flex items-center gap-1 tabular-nums ${
-              isLoss ? 'text-emerald-700' : 'text-amber-700'
-            }`}
-          >
-            {isLoss ? (
-              <TrendingDown className="w-3.5 h-3.5" />
-            ) : (
-              <TrendingUp className="w-3.5 h-3.5" />
-            )}
-            <span>
-              {isLoss ? '-' : '+'}
-              {weightDiff} kg so với 7 ngày trước
+          {hasWeightData && weightHistory.length >= 2 && (
+            <span
+              className={`text-xs font-semibold flex items-center gap-1 tabular-nums ${
+                isLoss ? 'text-emerald-700' : 'text-amber-700'
+              }`}
+            >
+              {isLoss ? (
+                <TrendingDown className="w-3.5 h-3.5" />
+              ) : (
+                <TrendingUp className="w-3.5 h-3.5" />
+              )}
+              <span>
+                {isLoss ? '-' : '+'}
+                {weightDiff} kg so với {weightHistory.length} lần đo
+              </span>
             </span>
-          </span>
+          )}
         </div>
 
         {/* Clean Line Sparkline */}
-        <div className="w-full h-12 relative">
-          <svg
-            viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-            className="w-full h-full overflow-visible"
-          >
-            <line
-              x1="0"
-              y1={svgHeight}
-              x2={svgWidth}
-              y2={svgHeight}
-              stroke="#F1F5F9"
-              strokeWidth="1"
-            />
-            <polyline
-              fill="none"
-              stroke="#0F172A"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              points={polylineStr}
-            />
-            {points.map((pt, i) => (
-              <circle
-                key={`dot-${i}`}
-                cx={pt.x}
-                cy={pt.y}
-                r={i === points.length - 1 ? 3.5 : 2}
-                fill={i === points.length - 1 ? '#FF5722' : '#FFFFFF'}
-                stroke={i === points.length - 1 ? '#FF5722' : '#0F172A'}
-                strokeWidth="1.5"
-              />
-            ))}
-          </svg>
-        </div>
+        {hasWeightData ? (
+          <>
+            <div className="w-full h-12 relative">
+              <svg
+                viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+                className="w-full h-full overflow-visible"
+              >
+                <line
+                  x1="0"
+                  y1={svgHeight}
+                  x2={svgWidth}
+                  y2={svgHeight}
+                  stroke="#F1F5F9"
+                  strokeWidth="1"
+                />
+                <polyline
+                  fill="none"
+                  stroke="#0F172A"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  points={polylineStr}
+                />
+                {points.map((pt, i) => (
+                  <circle
+                    key={`dot-${i}`}
+                    cx={pt.x}
+                    cy={pt.y}
+                    r={i === points.length - 1 ? 3.5 : 2}
+                    fill={i === points.length - 1 ? '#FF5722' : '#FFFFFF'}
+                    stroke={i === points.length - 1 ? '#FF5722' : '#0F172A'}
+                    strokeWidth="1.5"
+                  />
+                ))}
+              </svg>
+            </div>
 
-        <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium px-0.5 mt-1">
-          <span>{firstDateLabel}</span>
-          <span>{lastDateLabel}</span>
-        </div>
+            <div className="flex items-center justify-between text-[10px] text-slate-400 font-medium px-0.5 mt-1">
+              <span>{firstDateLabel}</span>
+              <span>{lastDateLabel}</span>
+            </div>
+          </>
+        ) : (
+          <div className="h-12 flex items-center justify-center text-xs text-slate-400 bg-slate-50/70 rounded-xl border border-dashed border-slate-200">
+            Chưa có dữ liệu cân nặng — nhấn &ldquo;Ghi cân nặng&rdquo; để bắt đầu
+          </div>
+        )}
       </div>
 
       {/* Sleep Sub-metric with Quick Entry */}

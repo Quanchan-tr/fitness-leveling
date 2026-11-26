@@ -6,6 +6,16 @@ WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm ci || npm install
 
+# ─── Stage 1b: Local dev server (used by docker-compose.dev.yml) ───
+FROM node:20-alpine AS dev
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY packages /packages
+COPY frontend /app
+EXPOSE 3000
+CMD ["npm", "run", "dev"]
+
 # ─── Stage 2: Build Next.js application ───
 FROM node:20-alpine AS builder
 WORKDIR /app

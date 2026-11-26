@@ -51,7 +51,7 @@ class ActiveWorkoutActivity : AppCompatActivity() {
         ActiveExerciseItem(
             name = "Nằm đẩy tạ đòn",
             target = "Cơ ngực (Ngực giữa)",
-            imageUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp",
+            imageUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0025-EIeI8Vf.webp",
             steps = listOf(
                 "Nằm phẳng trên ghế tập, hai chân đặt chắc chắn trên sàn, mắt nhìn thẳng lên thanh đòn.",
                 "Cầm thanh đòn rộng hơn vai một chút, nhấc tạ ra khỏi giá và giữ thăng bằng trên ngực.",
@@ -68,7 +68,7 @@ class ActiveWorkoutActivity : AppCompatActivity() {
         ActiveExerciseItem(
             name = "Đẩy ngực trên với tạ đơn",
             target = "Cơ ngực trên & Vai trước",
-            imageUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0314-ns0SIbU.webp",
+            imageUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0314-ns0SIbU.webp",
             steps = listOf(
                 "Chỉnh ghế dốc góc 30-45 độ, hai tay cầm tạ đơn đặt trên đùi rồi dùng gối trợ lực hất lên ngang vai.",
                 "Ưỡn ngực, mở rộng lồng ngực và hạ tạ có kiểm soát sao cho cẳng tay luôn vuông góc sàn.",
@@ -83,7 +83,7 @@ class ActiveWorkoutActivity : AppCompatActivity() {
         ActiveExerciseItem(
             name = "Ép ngực cáp",
             target = "Cơ ngực trong & viền ngực",
-            imageUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/1262-w4dLzSx.webp",
+            imageUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/1262-w4dLzSx.webp",
             steps = listOf(
                 "Đứng giữa giàn cáp kép, hai tay nắm tay cầm, một chân bước lên trước để tạo thế đứng vững.",
                 "Hơi khuỵu khuỷu tay cố định, thở ra và ép hai cánh tay về phía trước ngực như đang ôm thân cây.",
@@ -98,7 +98,7 @@ class ActiveWorkoutActivity : AppCompatActivity() {
         ActiveExerciseItem(
             name = "Kéo cáp tay sau",
             target = "Cơ tay sau (Triceps)",
-            imageUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0172-1PK5Uo3.webp",
+            imageUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0172-1PK5Uo3.webp",
             steps = listOf(
                 "Đứng thẳng trước máy kéo cáp, hai tay nắm tay cầm ngang ngực, ép chặt khuỷu tay vào sát hai bên mạn sườn.",
                 "Thở ra, ghì cánh tay duỗi thẳng xuống phía dưới cho đến khi cơ tay sau căng hết cỡ.",
@@ -113,7 +113,7 @@ class ActiveWorkoutActivity : AppCompatActivity() {
         ActiveExerciseItem(
             name = "Xà kép tay sau & ngực dưới",
             target = "Ngực dưới & Tay sau",
-            imageUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0009-PAgTVaK.webp",
+            imageUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0009-PAgTVaK.webp",
             steps = listOf(
                 "Nhảy lên thanh xà kép, duỗi thẳng tay, siết cơ bụng và hơi nghiêng phần thân trên về phía trước.",
                 "Hít sâu, từ từ gập khuỷu tay hạ thấp người xuống cho đến khi cánh tay đạt góc 90 độ.",
@@ -157,7 +157,7 @@ class ActiveWorkoutActivity : AppCompatActivity() {
                 ActiveExerciseItem(
                     name = ex.name,
                     target = ex.targetMuscle,
-                    imageUrl = ex.gifUrl ?: "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp",
+                    imageUrl = ex.gifUrl ?: "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0025-EIeI8Vf.webp",
                     steps = if (ex.instructions.isNotEmpty()) ex.instructions else listOf(
                         "Thực hiện bài tập với tư thế chuẩn, giữ vững trọng tâm cơ thể.",
                         "Hít thở đều đặn và kiểm soát chuyển động cơ bắp suốt hiệp tập."
@@ -171,7 +171,7 @@ class ActiveWorkoutActivity : AppCompatActivity() {
         val customName = intent.getStringExtra("EXERCISE_NAME")
         if (!customName.isNullOrBlank()) {
             val customTarget = intent.getStringExtra("EXERCISE_TARGET") ?: "Cơ bắp toàn thân"
-            val customImg = intent.getStringExtra("EXERCISE_IMAGE") ?: "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp"
+            val customImg = intent.getStringExtra("EXERCISE_IMAGE") ?: "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0025-EIeI8Vf.webp"
             val customSteps = intent.getStringArrayListExtra("EXERCISE_STEPS") ?: arrayListOf()
             val singleItem = ActiveExerciseItem(
                 name = customName,
@@ -189,6 +189,12 @@ class ActiveWorkoutActivity : AppCompatActivity() {
             )
             workoutExercises = mutableListOf(singleItem)
             session.activeWorkoutName = customName
+        }
+
+        if (workoutExercises.isEmpty()) {
+            Toast.makeText(this, "Chưa có bài tập nào trong buổi tập này.", Toast.LENGTH_SHORT).show()
+            finish()
+            return
         }
 
         // Determine starting exercise index

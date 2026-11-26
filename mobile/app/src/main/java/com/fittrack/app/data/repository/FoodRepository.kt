@@ -41,8 +41,7 @@ class FoodRepository private constructor(private val context: Context) {
                     list
                 }
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (_: Exception) {
             emptyList()
         }
     }

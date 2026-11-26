@@ -30,10 +30,20 @@ import {
   starterRoutines,
   starterSchedule,
 } from '@/data/starterRoutines';
-import {
-  initialCommunityPosts,
-  initialSuggestedAthletes,
-} from '@/data/fittrackMockData';
+
+const WEEKDAY_VI_BY_JS_DAY: WeekDayVi[] = [
+  'Chủ nhật',
+  'Thứ 2',
+  'Thứ 3',
+  'Thứ 4',
+  'Thứ 5',
+  'Thứ 6',
+  'Thứ 7',
+];
+
+function getTodayDayOfWeekVi(): WeekDayVi {
+  return WEEKDAY_VI_BY_JS_DAY[new Date().getDay()] || 'Thứ 2';
+}
 
 const defaultDatasetExercises: Exercise[] = (exerciseDataset as any[]).map((item) => ({
   id: item.id,
@@ -472,8 +482,8 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [schedule]);
 
-  // Sunday is today in our scenario
-  const todaySchedule = schedule.find((s) => s.dayOfWeek === 'Chủ nhật') || schedule[6];
+  const todayDayVi = getTodayDayOfWeekVi();
+  const todaySchedule = schedule.find((s) => s.dayOfWeek === todayDayVi) || schedule[0];
 
   // 4. User Profile & Workout History
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistoryRecord[]>(() => {
@@ -738,7 +748,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
               createdBy: {
                 userId: r.user_id,
                 username: user?.displayName || 'Vận động viên',
-                avatarUrl: user?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+                avatarUrl: user?.avatarUrl || DEFAULT_AVATAR,
               },
             }));
             setRoutines((prev) => {
@@ -753,7 +763,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // 5. Sync community posts from /community/posts
       apiRequest<{ data: any[] }>('/community/posts')
         .then((res) => {
-          if (res?.data && res.data.length > 0) {
+          if (res?.data && Array.isArray(res.data)) {
             const serverPosts: CommunityPost[] = res.data.map((p: any) => ({
               id: p.id,
               title: p.workout_log?.notes || 'Buổi tập cá nhân',
@@ -761,7 +771,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
               author: {
                 id: p.user?.id || 'user',
                 name: p.user?.name || 'Vận động viên',
-                avatar: p.user?.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+                avatar: p.user?.avatar_url || DEFAULT_AVATAR,
                 level: p.user?.level || 1,
                 badge: 'Athlete',
               },
@@ -771,11 +781,25 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
               comments: [],
               tags: ['FITTRACK'],
             }));
-            setPosts((prev) => {
-              const serverIds = new Set(serverPosts.map((sp) => sp.id));
-              const remaining = prev.filter((pr) => !serverIds.has(pr.id));
-              return [...serverPosts, ...remaining];
-            });
+            setPosts(serverPosts);
+          }
+        })
+        .catch(() => {});
+
+      // 6. Sync suggested athletes from /community/suggested-athletes
+      apiRequest<{ data: any[] }>('/community/suggested-athletes')
+        .then((res) => {
+          if (res?.data && Array.isArray(res.data)) {
+            const mappedAthletes: SuggestedAthlete[] = res.data.map((a: any) => ({
+              id: a.id,
+              name: a.name || 'Vận động viên',
+              avatar: a.avatar_url || DEFAULT_AVATAR,
+              level: Number(a.level || 1),
+              badge: a.badge || 'Vận động viên',
+              followersCount: Number(a.followers_count || 0),
+              isFollowing: Boolean(a.is_following),
+            }));
+            setAthletes(mappedAthletes);
           }
         })
         .catch(() => {});
@@ -857,42 +881,9 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeWorkout?.isPaused]);
 
-  // 7. Community Posts & Athletes (with localStorage persistence)
-  const [posts, setPosts] = useState<CommunityPost[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('fittrack_community_posts_v1');
-        if (saved) return JSON.parse(saved);
-      } catch (e) {}
-    }
-    return initialCommunityPosts;
-  });
-
-  const [athletes, setAthletes] = useState<SuggestedAthlete[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('fittrack_athletes_v1');
-        if (saved) return JSON.parse(saved);
-      } catch (e) {}
-    }
-    return initialSuggestedAthletes;
-  });
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('fittrack_community_posts_v1', JSON.stringify(posts));
-      } catch (e) {}
-    }
-  }, [posts]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        localStorage.setItem('fittrack_athletes_v1', JSON.stringify(athletes));
-      } catch (e) {}
-    }
-  }, [athletes]);
+  // 7. Community Posts & Athletes (hydrated from backend API)
+  const [posts, setPosts] = useState<CommunityPost[]>([]);
+  const [athletes, setAthletes] = useState<SuggestedAthlete[]>([]);
 
   // ----------------------------------------------------
   // Exercise Handlers
@@ -1391,9 +1382,10 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setWorkoutHistory((prev) => [record, ...prev]);
 
     // 2. Section 15: Synchronize weekly schedule: today becomes 'completed'
+    const todayLabel = getTodayDayOfWeekVi();
     setSchedule((prev) =>
       prev.map((day) =>
-        day.dayOfWeek === 'Chủ nhật' ? { ...day, status: 'completed' } : day
+        day.dayOfWeek === todayLabel ? { ...day, status: 'completed' } : day
       )
     );
 
@@ -1487,10 +1479,11 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [activeWorkout]);
 
   const cancelWorkout = useCallback(() => {
+    const todayLabel = getTodayDayOfWeekVi();
     setActiveWorkout(null);
     setSchedule((prev) =>
       prev.map((day) =>
-        day.dayOfWeek === 'Chủ nhật' ? { ...day, status: 'planned' } : day
+        day.dayOfWeek === todayLabel ? { ...day, status: 'planned' } : day
       )
     );
   }, []);
@@ -1697,7 +1690,7 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return {
           ...ath,
           isFollowing,
-          followersCount: isFollowing ? ath.followersCount + 1 : ath.followersCount - 1,
+          followersCount: Math.max(0, ath.followersCount + delta),
         };
       })
     );
@@ -1706,6 +1699,29 @@ export const FitnessProvider: React.FC<{ children: React.ReactNode }> = ({ child
         ...prev,
         followingCount: Math.max(0, prev.followingCount + delta),
       }));
+    }
+
+    if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(athleteId)) {
+      apiRequest<{ data: { following: boolean; followers_count: number } }>(
+        `/community/users/${athleteId}/follow`,
+        { method: 'POST' }
+      )
+        .then((res) => {
+          if (res?.data) {
+            setAthletes((prev) =>
+              prev.map((ath) =>
+                ath.id === athleteId
+                  ? {
+                      ...ath,
+                      isFollowing: res.data.following,
+                      followersCount: res.data.followers_count,
+                    }
+                  : ath
+              )
+            );
+          }
+        })
+        .catch(() => {});
     }
   }, []);
 

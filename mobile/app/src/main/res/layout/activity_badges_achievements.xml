@@ -126,6 +126,7 @@
 
             <!-- Badges Section Header -->
             <TextView
+                android:id="@+id/tv_badges_section_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -143,6 +144,7 @@
 
                 <!-- Badge 0 -->
                 <LinearLayout
+                    android:id="@+id/card_badge_0"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
@@ -185,6 +187,7 @@
 
                 <!-- Badge 1 -->
                 <LinearLayout
+                    android:id="@+id/card_badge_1"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
@@ -235,6 +238,7 @@
 
                 <!-- Badge 2 -->
                 <LinearLayout
+                    android:id="@+id/card_badge_2"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
@@ -277,6 +281,7 @@
 
                 <!-- Badge 3 -->
                 <LinearLayout
+                    android:id="@+id/card_badge_3"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
@@ -327,6 +332,7 @@
 
                 <!-- Badge 4 -->
                 <LinearLayout
+                    android:id="@+id/card_badge_4"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="6dp"
@@ -369,6 +375,7 @@
 
                 <!-- Badge 5 -->
                 <LinearLayout
+                    android:id="@+id/card_badge_5"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"

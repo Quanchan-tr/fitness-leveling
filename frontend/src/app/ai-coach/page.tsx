@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { initialFitnessData } from '@/lib/fitnessData';
 import { apiRequest, generateUUID } from '@/lib/api';
 import {
   usePoseDetection,

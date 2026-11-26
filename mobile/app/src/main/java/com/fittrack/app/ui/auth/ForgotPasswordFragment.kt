@@ -96,16 +96,16 @@ class ForgotPasswordFragment : Fragment() {
                     binding.btnSubmit.isEnabled = true
                     binding.btnSubmit.text = originalText
                 }
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 Toast.makeText(
                     requireContext(),
-                    "Không thể kết nối máy chủ FitTrack VPS Cloud. Vui lòng kiểm tra lại mạng.",
+                    "Không thể kết nối máy chủ. Vui lòng kiểm tra lại mạng.",
                     Toast.LENGTH_LONG
                 ).show()
                 binding.btnSubmit.isEnabled = true
                 binding.btnSubmit.text = originalText
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Lỗi: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            } catch (_: Exception) {
+                Toast.makeText(requireContext(), "Đã xảy ra lỗi. Vui lòng thử lại.", Toast.LENGTH_LONG).show()
                 binding.btnSubmit.isEnabled = true
                 binding.btnSubmit.text = originalText
             }

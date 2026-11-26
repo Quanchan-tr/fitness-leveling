@@ -300,13 +300,16 @@ class DashboardActivity : AppCompatActivity() {
             startActivity(Intent(this, DailyQuestsModalActivity::class.java))
         }
 
-        binding.layoutFloatingWorkout.setOnClickListener {
-            startActivity(Intent(this, ActiveWorkoutActivity::class.java))
+        val openActiveWorkout = {
+            startActivity(Intent(this, ActiveWorkoutActivity::class.java).apply {
+                if (todayRoutineId.isNotBlank()) putExtra("ROUTINE_ID", todayRoutineId)
+                if (todayRoutineTitle.isNotBlank()) putExtra("ROUTINE_TITLE", todayRoutineTitle)
+            })
         }
 
-        binding.tvFloatingContinue.setOnClickListener {
-            startActivity(Intent(this, ActiveWorkoutActivity::class.java))
-        }
+        binding.layoutFloatingWorkout.setOnClickListener { openActiveWorkout() }
+
+        binding.tvFloatingContinue.setOnClickListener { openActiveWorkout() }
 
         binding.btnCloseFloatingWorkout.setOnClickListener {
             session.isWorkoutActive = false

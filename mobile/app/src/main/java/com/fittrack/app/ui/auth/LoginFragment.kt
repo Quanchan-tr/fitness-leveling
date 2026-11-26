@@ -11,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.fittrack.app.BuildConfig
 import com.fittrack.app.R
 import com.fittrack.app.data.api.ApiClient
 import com.fittrack.app.data.models.LoginRequest
@@ -52,10 +53,12 @@ class LoginFragment : Fragment() {
             binding.edtEmail.setText(session.userEmail)
         }
 
-        // Long click header to change Server Base URL for emulator / local testing
-        binding.tvTitle.setOnLongClickListener {
-            showServerConfigDialog()
-            true
+        // Long click header to change Server Base URL only in debug builds
+        if (BuildConfig.DEBUG) {
+            binding.tvTitle.setOnLongClickListener {
+                showServerConfigDialog()
+                true
+            }
         }
     }
 
@@ -94,7 +97,7 @@ class LoginFragment : Fragment() {
             }
             .setNeutralButton("Khôi phục mặc định") { _, _ ->
                 session.baseUrl = SessionManager.DEFAULT_BASE_URL
-                Toast.makeText(requireContext(), "Đã đặt lại VPS mặc định", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Đã đặt lại máy chủ mặc định", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Hủy", null)
             .show()
@@ -180,20 +183,28 @@ class LoginFragment : Fragment() {
                     binding.btnLogin.isEnabled = true
                     binding.btnLogin.text = originalText
                 }
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 binding.btnLogin.isEnabled = true
                 binding.btnLogin.text = originalText
 
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Không thể kết nối máy chủ Backend")
-                    .setMessage("Không thể kết nối đến máy chủ tại: ${session.baseUrl}\n\nVui lòng kiểm tra Docker hoặc đổi Base URL.")
-                    .setPositiveButton("⚙️ Đổi Base URL") { _, _ ->
-                        showServerConfigDialog()
-                    }
-                    .setNegativeButton("Đóng", null)
-                    .show()
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Đã xảy ra lỗi: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+                if (BuildConfig.DEBUG) {
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Không thể kết nối máy chủ")
+                        .setMessage("Không thể kết nối đến: ${session.baseUrl}\n\nKiểm tra kết nối mạng hoặc đổi Base URL.")
+                        .setPositiveButton("Đổi Base URL") { _, _ ->
+                            showServerConfigDialog()
+                        }
+                        .setNegativeButton("Đóng", null)
+                        .show()
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối Internet và thử lại.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            } catch (_: Exception) {
+                Toast.makeText(requireContext(), "Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.", Toast.LENGTH_LONG).show()
                 binding.btnLogin.isEnabled = true
                 binding.btnLogin.text = originalText
             }

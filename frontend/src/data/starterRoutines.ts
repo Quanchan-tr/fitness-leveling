@@ -51,7 +51,7 @@ export const starterRoutines: RoutineItem[] = [
     createdBy: {
       userId: 'system-coach',
       username: 'FitLevel Coach',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+      avatarUrl: '',
     },
     exercises: [
       {
@@ -114,7 +114,7 @@ export const starterRoutines: RoutineItem[] = [
     createdBy: {
       userId: 'system-coach',
       username: 'FitLevel Coach',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+      avatarUrl: '',
     },
     exercises: [
       {
@@ -163,7 +163,7 @@ export const starterRoutines: RoutineItem[] = [
     createdBy: {
       userId: 'system-coach',
       username: 'FitLevel Coach',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
+      avatarUrl: '',
     },
     exercises: [
       {

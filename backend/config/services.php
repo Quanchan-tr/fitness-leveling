@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'exercise_media' => [
+        'cdn_url' => env('EXERCISE_MEDIA_CDN_URL', 'https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/'),
+    ],
+
 ];

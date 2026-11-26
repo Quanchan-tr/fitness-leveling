@@ -10,11 +10,13 @@ import { WardrobeModal } from '@/components/home/WardrobeModal';
 import { CharacterOutfit } from '@/components/home/3d/Character';
 import { initialFitnessData, MetricHistoryItem, ProgressPhotoItem } from '@/lib/fitnessData';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFitness } from '@/contexts/FitnessContext';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { apiRequest } from '@/lib/api';
 
 export default function DashboardPage() {
   const { user, isLoading } = useAuth();
+  const { profile } = useFitness();
   const router = useRouter();
 
   const [extraData, setExtraData] = useState(() => {
@@ -64,8 +66,8 @@ export default function DashboardPage() {
             id: m.id,
             date: m.log_date,
             weight: Number(m.weight_kg),
-            bodyFat: Number(m.body_fat_pct || 14.2),
-            muscle: Number(m.muscle_mass_kg || 34.5),
+            bodyFat: Number(m.body_fat_pct || 0),
+            muscle: Number(m.muscle_mass_kg || 0),
           }));
           const latest = mapped[0];
           setExtraData((prev) => ({
@@ -205,11 +207,12 @@ export default function DashboardPage() {
       <WardrobeModal
         isOpen={isOutfitModalOpen}
         onClose={() => setIsOutfitModalOpen(false)}
-        userLevel={extraData.user.level}
+        userLevel={profile.level}
+        userStreak={profile.streak}
         userStats={{
-          str: extraData.user.str,
-          end: extraData.user.end,
-          mob: extraData.user.mob,
+          str: Math.min(99, 10 + profile.totalWorkouts * 2),
+          end: Math.min(99, 10 + profile.streak * 2),
+          mob: Math.min(99, 10 + profile.level * 2),
         }}
       />
     </main>

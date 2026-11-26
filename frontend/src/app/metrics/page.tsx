@@ -5,6 +5,7 @@ import { apiRequest } from '@/lib/api';
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { initialFitnessData, MetricHistoryItem, ProgressPhotoItem } from '@/lib/fitnessData';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   Scale,
   Plus,
@@ -30,6 +31,7 @@ import {
 } from '@/lib/bodyMetrics';
 
 export default function MetricsPage() {
+  const { user, fitnessProfile } = useAuth();
   const [data, setData] = useState<typeof initialFitnessData>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -46,6 +48,24 @@ export default function MetricsPage() {
     }
     return initialFitnessData;
   });
+
+  useEffect(() => {
+    if (!user && !fitnessProfile) return;
+    setData((prev) => {
+      const weight = prev.body.weight || user?.weightKg || fitnessProfile?.weightKg || 0;
+      const height = prev.body.height || user?.heightCm || fitnessProfile?.heightCm || 0;
+      const bmi = weight > 0 && height > 0 ? calculateBmi(weight, height) : prev.body.bmi;
+      return {
+        ...prev,
+        body: {
+          ...prev.body,
+          weight,
+          height,
+          bmi,
+        },
+      };
+    });
+  }, [user, fitnessProfile]);
 
   const [isMetricsModalOpen, setIsMetricsModalOpen] = useState(false);
   const [isPhotosModalOpen, setIsPhotosModalOpen] = useState(false);
@@ -67,9 +87,10 @@ export default function MetricsPage() {
     }
   }, [data.body, data.recentMetrics]);
 
-  const userAge = data.user.age || 22;
-  const userGender = data.user.gender || 'male';
-  const userHeight = data.body.height || 175;
+  const userAge = fitnessProfile?.age || data.user.age || 25;
+  const userGender: 'male' | 'female' =
+    fitnessProfile?.gender || (user?.gender === 'female' ? 'female' : 'male');
+  const userHeight = data.body.height || user?.heightCm || fitnessProfile?.heightCm || 170;
 
   // Sync with backend API GET /api/v1/body-metrics on mount
   useEffect(() => {

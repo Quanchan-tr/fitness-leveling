@@ -64,92 +64,119 @@ export default function ProfilePage() {
     setIsEditModalOpen(false);
   };
 
-  // Month days setup for Personal Calendar (October 2026)
-  const currentMonthYear = 'Tháng 10, 2026';
-  const daysInMonth = 31;
-  // Let's assume Oct 1, 2026 was a Thursday (weekday index 3 if Mon is 0)
-  const firstDayOffset = 3; // 0=Mon, 1=Tue, 2=Wed, 3=Thu, 4=Fri, 5=Sat, 6=Sun
+  // Dynamic current month calendar setup
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonthIndex = now.getMonth();
+  const todayDayNum = now.getDate();
+  const currentMonthYear = `Tháng ${currentMonthIndex + 1}, ${currentYear}`;
+  const daysInMonth = new Date(currentYear, currentMonthIndex + 1, 0).getDate();
+  // Monday-first weekday index (0=Mon .. 6=Sun)
+  const firstDayJs = new Date(currentYear, currentMonthIndex, 1).getDay();
+  const firstDayOffset = (firstDayJs + 6) % 7;
 
-  // Extract completed days of the month from workoutHistory
+  // Extract completed days of the current month from workoutHistory
   const completedDaysMap = workoutHistory.reduce((acc, item) => {
     try {
       const d = new Date(item.completedAt);
-      const dayNum = d.getDate();
-      acc[dayNum] = item;
+      if (d.getFullYear() === currentYear && d.getMonth() === currentMonthIndex) {
+        acc[d.getDate()] = item;
+      }
     } catch {
       // ignore
     }
     return acc;
   }, {} as Record<number, typeof workoutHistory[0]>);
 
-  // Statistics chart datasets according to statFilter and statTab
-  const chartDatasets = {
-    '12_weeks': {
-      duration: [
-        { label: 'T1', value: 160 },
-        { label: 'T2', value: 180 },
-        { label: 'T3', value: 210 },
-        { label: 'T4', value: 195 },
-        { label: 'T5', value: 240 },
-        { label: 'T6', value: 220 },
-        { label: 'T7', value: 260 },
-        { label: 'T8', value: 250 },
-        { label: 'T9', value: 280 },
-        { label: 'T10', value: 270 },
-        { label: 'T11', value: 310 },
-        { label: 'T12', value: 290 },
-      ],
-      reps: [
-        { label: 'T1', value: 240 },
-        { label: 'T2', value: 260 },
-        { label: 'T3', value: 310 },
-        { label: 'T4', value: 290 },
-        { label: 'T5', value: 360 },
-        { label: 'T6', value: 340 },
-        { label: 'T7', value: 410 },
-        { label: 'T8', value: 390 },
-        { label: 'T9', value: 450 },
-        { label: 'T10', value: 430 },
-        { label: 'T11', value: 510 },
-        { label: 'T12', value: 480 },
-      ],
-    },
-    'this_month': {
-      duration: [
-        { label: 'Tuần 1', value: 260 },
-        { label: 'Tuần 2', value: 280 },
-        { label: 'Tuần 3', value: 310 },
-        { label: 'Tuần 4', value: 290 },
-      ],
-      reps: [
-        { label: 'Tuần 1', value: 410 },
-        { label: 'Tuần 2', value: 450 },
-        { label: 'Tuần 3', value: 510 },
-        { label: 'Tuần 4', value: 480 },
-      ],
-    },
-    'all': {
-      duration: [
-        { label: 'Tháng 5', value: 860 },
-        { label: 'Tháng 6', value: 920 },
-        { label: 'Tháng 7', value: 1040 },
-        { label: 'Tháng 8', value: 980 },
-        { label: 'Tháng 9', value: 1120 },
-        { label: 'Tháng 10', value: 1155 },
-      ],
-      reps: [
-        { label: 'Tháng 5', value: 1420 },
-        { label: 'Tháng 6', value: 1580 },
-        { label: 'Tháng 7', value: 1840 },
-        { label: 'Tháng 8', value: 1720 },
-        { label: 'Tháng 9', value: 1960 },
-        { label: 'Tháng 10', value: 2040 },
-      ],
-    },
+  // Build real chart datasets from workoutHistory
+  const getWeekStart = (date: Date) => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    const diff = (d.getDay() + 6) % 7;
+    d.setDate(d.getDate() - diff);
+    return d;
   };
 
+  const chartDatasets = React.useMemo(() => {
+    const thisWeekStart = getWeekStart(now);
+
+    const last12WeeksDuration: { label: string; value: number }[] = [];
+    const last12WeeksReps: { label: string; value: number }[] = [];
+    for (let i = 11; i >= 0; i--) {
+      const start = new Date(thisWeekStart);
+      start.setDate(start.getDate() - i * 7);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 7);
+      const bucket = workoutHistory.filter((w) => {
+        const dt = new Date(w.completedAt);
+        return dt >= start && dt < end;
+      });
+      const label = `T${12 - i}`;
+      last12WeeksDuration.push({
+        label,
+        value: bucket.reduce((sum, w) => sum + Math.round((w.durationSeconds || 0) / 60), 0),
+      });
+      last12WeeksReps.push({
+        label,
+        value: bucket.reduce((sum, w) => sum + (w.totalReps || 0), 0),
+      });
+    }
+
+    const thisMonthDuration: { label: string; value: number }[] = [];
+    const thisMonthReps: { label: string; value: number }[] = [];
+    for (let wIdx = 0; wIdx < 4; wIdx++) {
+      const dayMin = wIdx * 7 + 1;
+      const dayMax = wIdx === 3 ? daysInMonth : (wIdx + 1) * 7;
+      const bucket = workoutHistory.filter((w) => {
+        const dt = new Date(w.completedAt);
+        return (
+          dt.getFullYear() === currentYear &&
+          dt.getMonth() === currentMonthIndex &&
+          dt.getDate() >= dayMin &&
+          dt.getDate() <= dayMax
+        );
+      });
+      const label = `Tuần ${wIdx + 1}`;
+      thisMonthDuration.push({
+        label,
+        value: bucket.reduce((sum, w) => sum + Math.round((w.durationSeconds || 0) / 60), 0),
+      });
+      thisMonthReps.push({
+        label,
+        value: bucket.reduce((sum, w) => sum + (w.totalReps || 0), 0),
+      });
+    }
+
+    const allDuration: { label: string; value: number }[] = [];
+    const allReps: { label: string; value: number }[] = [];
+    for (let mOffset = 5; mOffset >= 0; mOffset--) {
+      const target = new Date(currentYear, currentMonthIndex - mOffset, 1);
+      const tYear = target.getFullYear();
+      const tMonth = target.getMonth();
+      const bucket = workoutHistory.filter((w) => {
+        const dt = new Date(w.completedAt);
+        return dt.getFullYear() === tYear && dt.getMonth() === tMonth;
+      });
+      const label = `Tháng ${tMonth + 1}`;
+      allDuration.push({
+        label,
+        value: bucket.reduce((sum, w) => sum + Math.round((w.durationSeconds || 0) / 60), 0),
+      });
+      allReps.push({
+        label,
+        value: bucket.reduce((sum, w) => sum + (w.totalReps || 0), 0),
+      });
+    }
+
+    return {
+      '12_weeks': { duration: last12WeeksDuration, reps: last12WeeksReps },
+      this_month: { duration: thisMonthDuration, reps: thisMonthReps },
+      all: { duration: allDuration, reps: allReps },
+    };
+  }, [workoutHistory, currentYear, currentMonthIndex, daysInMonth]);
+
   const activeChartData = chartDatasets[statFilter][statTab];
-  const maxChartValue = Math.max(...activeChartData.map((d) => d.value));
+  const maxChartValue = Math.max(1, ...activeChartData.map((d) => d.value));
 
   return (
     <main className="flex-1 flex flex-col min-w-0 bg-slate-50 min-h-screen">
@@ -364,11 +391,11 @@ export default function ProfilePage() {
 
                         <div className="w-full max-w-[28px] bg-slate-200 rounded-t-lg h-40 flex items-end overflow-hidden">
                           <div
-                            className="w-full rounded-t-lg transition-all duration-500 ${
+                            className={`w-full rounded-t-lg transition-all duration-500 ${
                               isLatest
                                 ? 'bg-[#FF5722]'
                                 : 'bg-slate-700 group-hover:bg-[#FF5722]'
-                            }"
+                            }`}
                             style={{ height: `${barHeight}%` }}
                           />
                         </div>
@@ -419,7 +446,7 @@ export default function ProfilePage() {
               {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((dayNum) => {
                 const historyRecord = completedDaysMap[dayNum];
                 const isCompleted = !!historyRecord;
-                const isToday = dayNum === 4; // Oct 4 = today
+                const isToday = dayNum === todayDayNum;
 
                 return (
                   <button

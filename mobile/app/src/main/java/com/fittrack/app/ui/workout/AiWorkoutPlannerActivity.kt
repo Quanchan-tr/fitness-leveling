@@ -232,7 +232,7 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
         setupInjuryToggle(binding.chipInjShoulder, "shoulder")
         setupInjuryToggle(binding.chipInjBack, "back")
 
-        // Generate Plan CTA via Real VPS AI API
+        // Generate Plan CTA via Real AI API
         binding.btnGeneratePlan.setOnClickListener {
             val target = getRequiredDaysCount()
             if (selectedDays.size != target) {
@@ -252,27 +252,33 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
                             idempotencyKey = UUID.randomUUID().toString(),
                             request = GenerateAiPlanRequest(
                                 goal = session.userGoal,
-                                splitType = selectedSplit.lowercase(),
+                                splitType = when (selectedSplit) {
+                                    "UL" -> "upper_lower"
+                                    "FB" -> "full_body"
+                                    else -> "ppl"
+                                },
                                 daysPerWeek = target,
                                 durationMinutes = selectedDuration,
-                                equipment = "all"
+                                equipment = "all",
+                                injuries = selectedInjuries.toList()
                             )
                         )
                     }
 
                     binding.layoutAiLoading.visibility = View.GONE
-                    binding.layoutPlanResult.visibility = View.VISIBLE
                     binding.btnGeneratePlan.isEnabled = true
 
-                    renderPlanResults(response.body()?.data)
-                    Toast.makeText(this@AiWorkoutPlannerActivity, "AI Cloud đã sinh giáo án luyện tập!", Toast.LENGTH_SHORT).show()
-                } catch (e: Exception) {
+                    if (response.isSuccessful && response.body()?.data != null) {
+                        binding.layoutPlanResult.visibility = View.VISIBLE
+                        renderPlanResults(response.body()!!.data)
+                        Toast.makeText(this@AiWorkoutPlannerActivity, "Đã sinh giáo án luyện tập từ AI!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this@AiWorkoutPlannerActivity, "Không thể tạo giáo án (${response.code()}). Vui lòng thử lại.", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (_: Exception) {
                     binding.layoutAiLoading.visibility = View.GONE
-                    binding.layoutPlanResult.visibility = View.VISIBLE
                     binding.btnGeneratePlan.isEnabled = true
-
-                    renderPlanResults(null)
-                    Toast.makeText(this@AiWorkoutPlannerActivity, "Giáo án AI khoa học đã sẵn sàng!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AiWorkoutPlannerActivity, "Không thể kết nối máy chủ AI. Vui lòng thử lại sau.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -375,53 +381,49 @@ class AiWorkoutPlannerActivity : AppCompatActivity() {
     private fun renderPlanResults(data: Any?) {
         binding.llGeneratedSessionsContainer.removeAllViews()
 
-        val splitName = when (selectedSplit) {
+        val gson = com.google.gson.Gson()
+        val jsonObj = try {
+            com.google.gson.JsonParser.parseString(gson.toJson(data)).asJsonObject
+        } catch (_: Exception) {
+            null
+        }
+
+        val planName = jsonObj?.get("plan_name")?.takeIf { !it.isJsonNull }?.asString
+        val splitName = planName ?: when (selectedSplit) {
             "PPL" -> "Push / Pull / Legs ($selectedPplSessions buổi/tuần)"
             "UL" -> "Upper / Lower (4 buổi/tuần)"
             else -> "Full Body Toàn thân (3 buổi/tuần)"
         }
-        val target = getRequiredDaysCount()
-        binding.tvResultSummary.text = "Giáo án $splitName • $selectedDuration phút/buổi"
+        binding.tvResultSummary.text = "$splitName • $selectedDuration phút/buổi"
 
-        // Generate ordered session definitions
-        val sessions: List<Pair<String, List<String>>> = when (selectedSplit) {
-            "PPL" -> {
-                if (selectedPplSessions == 6) {
-                    listOf(
-                        Pair("Push 1 — Sức mạnh (Ngực & Vai)", listOf("Barbell Bench Press (4 hiệp x 6-8 reps • Nghỉ 90s)", "Incline Dumbbell Press (3 hiệp x 8 reps • Nghỉ 60s)", "Overhead Shoulder Press (3 hiệp x 8 reps • Nghỉ 60s)", "Triceps Rope Pushdown (3 hiệp x 12 reps • Nghỉ 45s)")),
-                        Pair("Pull 1 — Sức mạnh (Lưng & Bắp tay)", listOf("Deadlift (4 hiệp x 5 reps • Nghỉ 120s)", "Bent Over Barbell Row (4 hiệp x 8 reps • Nghỉ 90s)", "Lat Pulldown (3 hiệp x 10 reps • Nghỉ 60s)", "Biceps Barbell Curl (3 hiệp x 10 reps • Nghỉ 45s)")),
-                        Pair("Legs 1 — Sức mạnh (Đùi & Mông)", listOf("Barbell Back Squat (4 hiệp x 6-8 reps • Nghỉ 120s)", "Romanian Deadlift (3 hiệp x 8 reps • Nghỉ 90s)", "Leg Press (3 hiệp x 10 reps • Nghỉ 60s)", "Standing Calf Raise (3 hiệp x 15 reps • Nghỉ 45s)")),
-                        Pair("Push 2 — Phì đại cơ (Hypertrophy)", listOf("Dumbbell Bench Press (4 hiệp x 10-12 reps • Nghỉ 60s)", "Dumbbell Lateral Raise (4 hiệp x 15 reps • Nghỉ 45s)", "Cable Chest Fly (3 hiệp x 12 reps • Nghỉ 45s)", "Overhead Triceps Extension (3 hiệp x 12 reps • Nghỉ 45s)")),
-                        Pair("Pull 2 — Phì đại cơ (Hypertrophy)", listOf("Pull-ups / Chin-ups (4 hiệp x 8-10 reps • Nghỉ 60s)", "Seated Cable Row (4 hiệp x 12 reps • Nghỉ 60s)", "Incline Dumbbell Curl (3 hiệp x 12 reps • Nghỉ 45s)", "Face Pull (3 hiệp x 15 reps • Nghỉ 45s)")),
-                        Pair("Legs 2 — Phì đại cơ (Hypertrophy)", listOf("Bulgarian Split Squat (3 hiệp x 10 reps/chân • Nghỉ 60s)", "Leg Extension (4 hiệp x 12 reps • Nghỉ 45s)", "Hamstring Leg Curl (4 hiệp x 12 reps • Nghỉ 45s)", "Seated Calf Raise (4 hiệp x 15 reps • Nghỉ 45s)"))
-                    )
-                } else {
-                    listOf(
-                        Pair("Push Day — Ngực, Vai & Tay sau", listOf("Barbell Bench Press (4 hiệp x 8-10 reps • Nghỉ 90s)", "Incline Dumbbell Press (3 hiệp x 10 reps • Nghỉ 60s)", "Overhead Shoulder Press (3 hiệp x 10 reps • Nghỉ 60s)", "Triceps Rope Pushdown (3 hiệp x 12 reps • Nghỉ 45s)")),
-                        Pair("Pull Day — Lưng xô & Tay trước", listOf("Lat Pulldown (4 hiệp x 10-12 reps • Nghỉ 60s)", "Bent Over Barbell Row (3 hiệp x 8-10 reps • Nghỉ 90s)", "Biceps Barbell Curl (3 hiệp x 10 reps • Nghỉ 45s)", "Face Pull (3 hiệp x 15 reps • Nghỉ 45s)")),
-                        Pair("Legs Day — Cơ đùi, Mông & Bắp chân", listOf("Barbell Back Squat (4 hiệp x 8 reps • Nghỉ 120s)", "Romanian Deadlift (3 hiệp x 10 reps • Nghỉ 90s)", "Leg Press (3 hiệp x 10 reps • Nghỉ 60s)", "Standing Calf Raise (3 hiệp x 15 reps • Nghỉ 45s)"))
-                    )
+        val apiSessions = mutableListOf<Pair<String, List<String>>>()
+        val sessionsJson = jsonObj?.getAsJsonArray("sessions")
+        sessionsJson?.forEach { elem ->
+            val obj = elem.asJsonObject
+            val isRest = obj.get("is_rest")?.takeIf { !it.isJsonNull }?.asBoolean ?: false
+            if (!isRest) {
+                val title = obj.get("session_title")?.takeIf { !it.isJsonNull }?.asString ?: "Buổi tập"
+                val exList = mutableListOf<String>()
+                obj.getAsJsonArray("exercises")?.forEach { exElem ->
+                    val exObj = exElem.asJsonObject
+                    val exName = exObj.get("name")?.takeIf { !it.isJsonNull }?.asString
+                        ?: exObj.get("exercise_name")?.takeIf { !it.isJsonNull }?.asString
+                        ?: "Bài tập"
+                    val sets = exObj.get("sets")?.takeIf { !it.isJsonNull }?.asInt ?: 3
+                    val reps = exObj.get("reps")?.takeIf { !it.isJsonNull }?.asString ?: "10-12"
+                    val restSec = exObj.get("rest_seconds")?.takeIf { !it.isJsonNull }?.asInt ?: 60
+                    exList.add("$exName ($sets hiệp x $reps reps • Nghỉ ${restSec}s)")
                 }
+                apiSessions.add(Pair(title, exList))
             }
-            "UL" -> listOf(
-                Pair("Upper Day A — Thân trên sức mạnh", listOf("Barbell Bench Press (4 hiệp x 6-8 reps • Nghỉ 120s)", "Bent Over Barbell Row (4 hiệp x 6-8 reps • Nghỉ 90s)", "Overhead Shoulder Press (3 hiệp x 8 reps • Nghỉ 60s)", "Biceps Curl (3 hiệp x 10 reps • Nghỉ 45s)")),
-                Pair("Lower Day A — Thân dưới sức mạnh", listOf("Barbell Back Squat (4 hiệp x 6-8 reps • Nghỉ 120s)", "Romanian Deadlift (3 hiệp x 8 reps • Nghỉ 90s)", "Leg Press (3 hiệp x 10 reps • Nghỉ 60s)", "Standing Calf Raise (3 hiệp x 15 reps • Nghỉ 45s)")),
-                Pair("Upper Day B — Thân trên phì đại cơ", listOf("Incline Dumbbell Press (4 hiệp x 10 reps • Nghỉ 60s)", "Lat Pulldown (4 hiệp x 10 reps • Nghỉ 60s)", "Dumbbell Lateral Raise (4 hiệp x 12-15 reps • Nghỉ 45s)", "Triceps Pushdown (3 hiệp x 12 reps • Nghỉ 45s)")),
-                Pair("Lower Day B — Thân dưới phì đại cơ", listOf("Bulgarian Split Squat (3 hiệp x 10 reps/chân • Nghỉ 60s)", "Leg Extension (4 hiệp x 12 reps • Nghỉ 45s)", "Hamstring Curl (4 hiệp x 12 reps • Nghỉ 45s)", "Seated Calf Raise (4 hiệp x 15 reps • Nghỉ 45s)"))
-            )
-            else -> listOf(
-                Pair("Full Body A — Nền tảng sức mạnh", listOf("Barbell Squat (4 hiệp x 8 reps • Nghỉ 90s)", "Barbell Bench Press (4 hiệp x 8 reps • Nghỉ 90s)", "Bent Over Row (3 hiệp x 10 reps • Nghỉ 60s)", "Plank (3 hiệp x 45s • Nghỉ 30s)")),
-                Pair("Full Body B — Sức mạnh bùng nổ", listOf("Deadlift (3 hiệp x 5 reps • Nghỉ 120s)", "Overhead Press (3 hiệp x 8 reps • Nghỉ 60s)", "Pull-ups / Lat Pulldown (3 hiệp x 8-10 reps • Nghỉ 60s)", "Biceps Curl (3 hiệp x 10 reps • Nghỉ 45s)")),
-                Pair("Full Body C — Phì đại & Cân bằng", listOf("Dumbbell Lunge (3 hiệp x 12 reps • Nghỉ 60s)", "Incline Dumbbell Press (3 hiệp x 10 reps • Nghỉ 60s)", "Cable Face Pull (3 hiệp x 15 reps • Nghỉ 45s)", "Triceps Dips (3 hiệp x 10 reps • Nghỉ 45s)"))
-            )
         }
 
-        // Map sessions directly to chosen days in chronological order
+        // Map parsed AI sessions directly to chosen days in chronological order
         val sortedDays = allDays.filter { selectedDays.contains(it) }
         generatedScheduleMap.clear()
         for (i in sortedDays.indices) {
-            if (i < sessions.size) {
-                generatedScheduleMap[sortedDays[i]] = sessions[i]
+            if (i < apiSessions.size) {
+                generatedScheduleMap[sortedDays[i]] = apiSessions[i]
             }
         }
 

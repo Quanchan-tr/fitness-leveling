@@ -128,15 +128,22 @@ export const CommunitySidebar: React.FC = () => {
         </div>
 
         <div className="space-y-3">
-          {athletes.map((ath) => (
+          {athletes.length === 0 ? (
+            <p className="text-xs text-slate-400 text-center py-4">
+              Chưa có vận động viên gợi ý mới.
+            </p>
+          ) : athletes.map((ath) => (
             <div
               key={ath.id}
               className="flex items-center justify-between gap-3 p-2 rounded-xl hover:bg-slate-50 transition-colors"
             >
               <div className="flex items-center gap-2.5 min-w-0">
                 <img
-                  src={ath.avatar}
+                  src={ath.avatar || DEFAULT_AVATAR}
                   alt={ath.name}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = DEFAULT_AVATAR;
+                  }}
                   className="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0"
                 />
                 <div className="min-w-0">

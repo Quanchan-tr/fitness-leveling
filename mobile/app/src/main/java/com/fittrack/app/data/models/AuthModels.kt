@@ -122,3 +122,9 @@ data class UpdateProfileRequest(
     @SerializedName("workout_preferences") val workoutPreferences: Map<String, Any>? = null
 )
 
+data class ChangePasswordRequest(
+    @SerializedName("current_password") val currentPassword: String,
+    @SerializedName("new_password") val newPassword: String,
+    @SerializedName("new_password_confirmation") val newPasswordConfirmation: String
+)
+

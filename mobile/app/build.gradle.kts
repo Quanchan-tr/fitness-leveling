@@ -14,12 +14,16 @@ android {
         versionCode = 1
         versionName = "1.0.0"
 
+        buildConfigField("String", "API_BASE_URL", "\"https://myfittrack.io.vn/api/v1/\"")
+        buildConfigField("String", "POSE_WS_URL", "\"wss://myfittrack.io.vn\"")
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

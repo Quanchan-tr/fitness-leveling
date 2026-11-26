@@ -94,6 +94,11 @@ class ShowcaseDataSeeder extends Seeder
 
     public function run(): void
     {
+        if (app()->isProduction()) {
+            $this->command?->warn('ShowcaseDataSeeder is disabled in production.');
+            return;
+        }
+
         // Idempotent: wipe previous showcase records before re-inserting.
         self::clear();
 

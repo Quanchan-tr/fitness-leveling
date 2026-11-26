@@ -99,8 +99,8 @@ class WorkoutsActivity : AppCompatActivity() {
             bodyPart = "Cơ ngực",
             targetMuscle = "Cơ ngực giữa",
             equipment = "Thanh đòn",
-            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp",
-            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0025-EIeI8Vf.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0025-EIeI8Vf.webp",
             hasAiCheck = false,
             description = "Nằm phẳng trên ghế tập, hai chân đặt chắc chắn trên sàn. Cầm đòn tạ rộng hơn vai một chút, hạ tạ chạm nhẹ ngực và thở ra đẩy mạnh lên vị trí ban đầu."
         ),
@@ -111,8 +111,8 @@ class WorkoutsActivity : AppCompatActivity() {
             bodyPart = "Cơ ngực",
             targetMuscle = "Cơ ngực trên",
             equipment = "Tạ đơn",
-            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0314-ns0SIbU.webp",
-            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0314-ns0SIbU.webp",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0314-ns0SIbU.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0314-ns0SIbU.webp",
             hasAiCheck = false,
             description = "Chỉnh ghế dốc góc 30-45 độ. Hạ tạ ngang ngực trên sao cho cẳng tay vuông góc sàn, thở ra đẩy hai quả tạ lên theo hình vòng cung nhẹ."
         ),
@@ -123,8 +123,8 @@ class WorkoutsActivity : AppCompatActivity() {
             bodyPart = "Cơ bụng / Eo",
             targetMuscle = "Cơ bụng",
             equipment = "Trọng lượng cơ thể",
-            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0001-2gPfomN.webp",
-            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0001-2gPfomN.webp",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0001-2gPfomN.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0001-2gPfomN.webp",
             hasAiCheck = false,
             description = "Nằm ngửa gập đầu gối, hai tay sau đầu với khuỷu tay hướng ra ngoài. Siết cơ bụng nâng thân trên lên góc 45 độ rồi từ từ hạ xuống vị trí ban đầu."
         ),
@@ -135,8 +135,8 @@ class WorkoutsActivity : AppCompatActivity() {
             bodyPart = "Cơ ngực & Tay sau",
             targetMuscle = "Ngực & Cốt lõi",
             equipment = "Trọng lượng cơ thể",
-            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0662-n3V3r4M.webp",
-            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0662-n3V3r4M.webp",
+            thumbnailUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0662-n3V3r4M.webp",
+            gifUrl = "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/main/media/exercises/0662-n3V3r4M.webp",
             hasAiCheck = true,
             description = "Giữ toàn bộ thân người thẳng từ đầu đến gót chân. Hạ ngực xuống cách sàn 3-5cm rồi dùng cơ ngực đẩy mạnh người trở lại tư thế ban đầu."
         )
@@ -478,13 +478,19 @@ class WorkoutsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        binding.btnCalendarRoutineDetail.setOnClickListener {
-            startActivity(Intent(this, RoutineDetailActivity::class.java))
+        val openTodayRoutine = {
+            val first = loadedRoutines.firstOrNull()
+            startActivity(Intent(this, RoutineDetailActivity::class.java).apply {
+                if (first != null) {
+                    putExtra("ROUTINE_ID", first.id)
+                    putExtra("ROUTINE_TITLE", first.title)
+                }
+            })
         }
 
-        binding.cardTodayScheduledRoutine.setOnClickListener {
-            startActivity(Intent(this, RoutineDetailActivity::class.java))
-        }
+        binding.btnCalendarRoutineDetail.setOnClickListener { openTodayRoutine() }
+
+        binding.cardTodayScheduledRoutine.setOnClickListener { openTodayRoutine() }
 
         binding.cardAiPoseCoachEntry.setOnClickListener {
             startActivity(Intent(this, AiPoseCoachActivity::class.java))
@@ -578,7 +584,13 @@ class WorkoutsActivity : AppCompatActivity() {
                             "🗑️ Xóa lịch tập này khỏi $dayName"
                         )) { _, which ->
                             when (which) {
-                                0 -> startActivity(Intent(this, RoutineDetailActivity::class.java))
+                                0 -> {
+                                    val matched = loadedRoutines.firstOrNull { it.title == currentRoutines[0] }
+                                    startActivity(Intent(this, RoutineDetailActivity::class.java).apply {
+                                        putExtra("ROUTINE_TITLE", matched?.title ?: currentRoutines[0])
+                                        if (matched != null) putExtra("ROUTINE_ID", matched.id)
+                                    })
+                                }
                                 1 -> {
                                     val secondCandidates = if (loadedRoutines.isNotEmpty()) {
                                         loadedRoutines.map { it.title }.toTypedArray()
@@ -809,7 +821,7 @@ class WorkoutsActivity : AppCompatActivity() {
                             }
                             loadedRoutines.removeAll { it.id == routineId }
                             renderFoldersAndRoutines()
-                            Toast.makeText(this@WorkoutsActivity, "✓ Đã xóa routine \"$routineName\" trên VPS", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@WorkoutsActivity, "✓ Đã xóa routine \"$routineName\"", Toast.LENGTH_SHORT).show()
                         } catch (_: Exception) {
                             cardView.visibility = View.GONE
                             Toast.makeText(this@WorkoutsActivity, "Đã xóa routine \"$routineName\"", Toast.LENGTH_SHORT).show()

@@ -212,6 +212,7 @@
                                 android:textStyle="bold" />
 
                             <TextView
+                                android:id="@+id/tv_profile_goal_badge"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
@@ -220,7 +221,7 @@
                                 android:paddingTop="2dp"
                                 android:paddingEnd="7dp"
                                 android:paddingBottom="2dp"
-                                android:text="Tăng cơ"
+                                tools:text="Tăng cơ"
                                 android:textColor="@color/badge_streak_text"
                                 android:textSize="10sp"
                                 android:textStyle="bold" />
@@ -405,10 +406,11 @@
                             android:textSize="10sp" />
 
                         <TextView
+                            android:id="@+id/tv_stat_height"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="175 cm"
+                            android:text="-- cm"
                             android:textColor="@color/text_dark"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -431,10 +433,11 @@
                             android:textSize="10sp" />
 
                         <TextView
+                            android:id="@+id/tv_stat_weight"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="68.5 kg"
+                            android:text="-- kg"
                             android:textColor="@color/text_dark"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -457,10 +460,11 @@
                             android:textSize="10sp" />
 
                         <TextView
+                            android:id="@+id/tv_stat_bmi"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="22.4 (Chuẩn)"
+                            android:text="--"
                             android:textColor="@color/live_green"
                             android:textSize="14sp"
                             android:textStyle="bold" />
@@ -490,10 +494,11 @@
                             android:textSize="10sp" />
 
                         <TextView
+                            android:id="@+id/tv_stat_frequency"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="4 buổi/tuần"
+                            android:text="0 buổi/tuần"
                             android:textColor="@color/text_dark"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -516,10 +521,11 @@
                             android:textSize="10sp" />
 
                         <TextView
+                            android:id="@+id/tv_stat_volume"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="34.500 kg"
+                            android:text="0 kg"
                             android:textColor="@color/primary"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -542,10 +548,11 @@
                             android:textSize="10sp" />
 
                         <TextView
+                            android:id="@+id/tv_stat_reps"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="4.820 reps"
+                            android:text="0 reps"
                             android:textColor="@color/text_dark"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -594,10 +601,11 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <TextView
+                    android:id="@+id/tv_chart_subtitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Hoàn thành 42/48 buổi tập dự kiến • Đạt 87.5% mục tiêu"
+                    android:text="Chưa có dữ liệu buổi tập"
                     android:textColor="@color/text_slate"
                     android:textSize="11sp" />
 
@@ -687,6 +695,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
+                        android:id="@+id/tv_recent_logs_badge"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_badge_streak"
@@ -694,7 +703,7 @@
                         android:paddingTop="2dp"
                         android:paddingEnd="7dp"
                         android:paddingBottom="2dp"
-                        android:text="24 buổi"
+                        android:text="0 buổi"
                         android:textColor="@color/badge_streak_text"
                         android:textSize="10sp"
                         android:textStyle="bold"
@@ -702,14 +711,22 @@
                         app:layout_constraintTop_toTopOf="parent" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
+                <LinearLayout
+                    android:id="@+id/ll_recent_logs_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
                 <!-- Session 1: Ngực & Tay Sau -->
                 <LinearLayout
+                    android:id="@+id/card_static_log_1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:background="@drawable/bg_tag_chip"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="12dp"
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -794,12 +811,14 @@
 
                 <!-- Session 2: Lưng Xô & Tay Trước -->
                 <LinearLayout
+                    android:id="@+id/card_static_log_2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/bg_tag_chip"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="12dp"
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -884,12 +903,14 @@
 
                 <!-- Session 3: Chân & Core -->
                 <LinearLayout
+                    android:id="@+id/card_static_log_3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/bg_tag_chip"
                     android:orientation="vertical"
-                    android:padding="12dp">
+                    android:padding="12dp"
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"

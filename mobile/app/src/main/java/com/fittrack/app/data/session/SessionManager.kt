@@ -2,6 +2,8 @@ package com.fittrack.app.data.session
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.fittrack.app.BuildConfig
+import java.util.Locale
 
 class SessionManager(context: Context) {
 
@@ -39,9 +41,9 @@ class SessionManager(context: Context) {
         private const val KEY_OB_FOCUS_MUSCLE = "ob_focus_muscle"
         private const val KEY_OB_EQUIPMENT = "ob_equipment"
 
-        // Production VPS Base URL
-        const val CLOUD_BASE_URL = "https://myfittrack.io.vn/api/v1/"
-        const val DEFAULT_BASE_URL = CLOUD_BASE_URL
+        // Production API Base URL from BuildConfig
+        val CLOUD_BASE_URL: String get() = BuildConfig.API_BASE_URL
+        val DEFAULT_BASE_URL: String get() = CLOUD_BASE_URL
 
         @Volatile
         private var instance: SessionManager? = null
@@ -251,6 +253,10 @@ class SessionManager(context: Context) {
         get() = prefs.getBoolean("is_dark_mode", false)
         set(value) = prefs.edit().putBoolean("is_dark_mode", value).apply()
 
+    var notificationsEnabled: Boolean
+        get() = prefs.getBoolean("notifications_enabled", true)
+        set(value) = prefs.edit().putBoolean("notifications_enabled", value).apply()
+
     // ── Routine Folders & Exercises Local Persistence ────────
     private val gson = com.google.gson.Gson()
 
@@ -323,18 +329,15 @@ class SessionManager(context: Context) {
 
     // Weekly routine schedule preferences (Day -> Routine title list)
     fun getScheduleForDay(dayKey: String): List<String> {
-        val raw = prefs.getString("weekly_schedule_$dayKey", null) ?: when (dayKey) {
-            "T2" -> "Push Day (Ngực & Tay Sau)"
-            "T3" -> "Pull Day (Lưng & Tay Trước)"
-            "T5" -> "Legs Day (Cơ đùi & Mông)"
-            else -> ""
-        }
+        val normalizedKey = dayKey.uppercase(Locale.US)
+        val raw = prefs.getString("weekly_schedule_$normalizedKey", null) ?: return emptyList()
         return if (raw.isBlank()) emptyList() else raw.split(";;").filter { it.isNotBlank() }
     }
 
     fun setScheduleForDay(dayKey: String, routines: List<String>) {
+        val normalizedKey = dayKey.uppercase(Locale.US)
         val raw = routines.filter { it.isNotBlank() }.joinToString(";;")
-        prefs.edit().putString("weekly_schedule_$dayKey", raw).apply()
+        prefs.edit().putString("weekly_schedule_$normalizedKey", raw).apply()
     }
 
     fun saveUserSession(

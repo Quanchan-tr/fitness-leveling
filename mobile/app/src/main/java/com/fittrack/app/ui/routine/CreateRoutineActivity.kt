@@ -40,20 +40,6 @@ class CreateRoutineActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreateRoutineBinding
     private lateinit var session: SessionManager
-<<<<<<< HEAD
-    private val selectedExerciseNames = mutableListOf<String>()
-
-    private val exercisePickerLauncher = registerForActivityResult(
-        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val names = result.data?.getStringArrayListExtra("SELECTED_EXERCISE_NAMES").orEmpty()
-            if (names.isNotEmpty()) {
-                selectedExerciseNames.clear()
-                selectedExerciseNames.addAll(names)
-                Toast.makeText(this, "Đã chọn ${names.size} bài tập: ${names.joinToString(", ")}", Toast.LENGTH_SHORT).show()
-            }
-=======
     private val gson = Gson()
 
     private var editingRoutineId: String? = null
@@ -75,7 +61,6 @@ class CreateRoutineActivity : AppCompatActivity() {
                 }
             }
             renderExercisesList()
->>>>>>> 59db5e3f2a4578230479d1b809d43f5f16159d29
         }
     }
 
@@ -104,13 +89,7 @@ class CreateRoutineActivity : AppCompatActivity() {
             selectedExercises.addAll(saved)
         }
 
-<<<<<<< HEAD
-        binding.btnAddExercise.setOnClickListener {
-            exercisePickerLauncher.launch(Intent(this, ExercisePickerModalActivity::class.java))
-        }
-=======
         renderExercisesList()
->>>>>>> 59db5e3f2a4578230479d1b809d43f5f16159d29
 
         binding.btnBack.setOnClickListener { finish() }
 
@@ -497,28 +476,11 @@ class CreateRoutineActivity : AppCompatActivity() {
             try {
                 val api = ApiClient.getService(this@CreateRoutineActivity)
                 val response = withContext(Dispatchers.IO) {
-<<<<<<< HEAD
-                    api.createRoutine(
-                        idempotencyKey = UUID.randomUUID().toString(),
-                        request = CreateRoutineRequest(
-                            title = title,
-                            description = if (selectedExerciseNames.isNotEmpty()) {
-                                "Bài tập: ${selectedExerciseNames.joinToString(", ")}"
-                            } else {
-                                "Giáo án luyện tập tùy biến trên FitTrack Mobile"
-                            },
-                            targetSplit = "custom",
-                            scheduleDays = listOf("monday", "wednesday", "friday"),
-                            isActive = true
-                        )
-                    )
-=======
                     if (editingRoutineId != null) {
                         api.updateRoutine(editingRoutineId!!, request)
                     } else {
                         api.createRoutine(UUID.randomUUID().toString(), request)
                     }
->>>>>>> 59db5e3f2a4578230479d1b809d43f5f16159d29
                 }
 
                 if (response.isSuccessful && response.body()?.data != null) {
@@ -537,8 +499,8 @@ class CreateRoutineActivity : AppCompatActivity() {
                     binding.btnSaveRoutine.isEnabled = true
                     binding.btnSaveRoutine.text = originalText
                 }
-            } catch (e: Exception) {
-                Toast.makeText(this@CreateRoutineActivity, "Lỗi kết nối VPS: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            } catch (_: Exception) {
+                Toast.makeText(this@CreateRoutineActivity, "Lỗi kết nối máy chủ. Vui lòng thử lại.", Toast.LENGTH_LONG).show()
                 binding.btnSaveRoutine.isEnabled = true
                 binding.btnSaveRoutine.text = originalText
             }

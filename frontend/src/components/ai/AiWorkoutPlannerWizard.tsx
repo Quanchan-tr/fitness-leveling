@@ -129,9 +129,8 @@ export const AiWorkoutPlannerWizard: React.FC = () => {
         return;
       }
       throw new Error('Incomplete backend plan');
-    } catch (err) {
+    } catch {
       // 2. Triple-layer Fallback: Client-side science-based rule engine
-      console.info('[AiWorkoutPlanner] Using client-side rule engine fallback:', err);
       const plan = generateWeeklyWorkoutPlan(config, profile);
       setGeneratedPlan(plan);
       setActiveSessionTab(0);

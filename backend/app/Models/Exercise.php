@@ -55,11 +55,6 @@ class Exercise extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function ratings(): HasMany
-    {
-        return $this->hasMany(ExerciseRating::class);
-    }
-
     public function reports(): HasMany
     {
         return $this->hasMany(ExerciseReport::class);

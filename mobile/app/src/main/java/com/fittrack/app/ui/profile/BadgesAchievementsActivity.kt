@@ -38,18 +38,25 @@ class BadgesAchievementsActivity : AppCompatActivity() {
         if (!session.isLoggedIn) return
         lifecycleScope.launch {
             try {
-                val res = withContext(Dispatchers.IO) {
-                    ApiClient.getService(this@BadgesAchievementsActivity).getMe()
-                }
+                val api = ApiClient.getService(this@BadgesAchievementsActivity)
+                val res = withContext(Dispatchers.IO) { api.getMe() }
                 if (res.isSuccessful && res.body()?.data?.gamification != null) {
                     val g = res.body()!!.data!!.gamification!!
                     session.userLevel = g.level
                     session.userXp = g.xp
                     session.userStreak = g.currentStreak
-                    bindGamificationData()
                 }
-            } catch (e: Exception) {
-                Toast.makeText(this@BadgesAchievementsActivity, "Không thể đồng bộ XP từ VPS: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                val logsRes = withContext(Dispatchers.IO) { api.getWorkoutLogs(50) }
+                if (logsRes.isSuccessful && logsRes.body()?.data != null) {
+                    session.userTotalWorkouts = logsRes.body()!!.data!!.size
+                }
+                bindGamificationData()
+            } catch (_: Exception) {
+                Toast.makeText(
+                    this@BadgesAchievementsActivity,
+                    "Không thể đồng bộ huy hiệu lúc này. Vui lòng thử lại.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
@@ -60,5 +67,29 @@ class BadgesAchievementsActivity : AppCompatActivity() {
         binding.pbXp.max = maxLevelXp
         binding.pbXp.progress = session.userXp
         binding.tvXpStatus.text = "${session.userXp} / $maxLevelXp XP"
+
+        val unlockedStates = listOf(
+            session.userTotalWorkouts >= 1,
+            session.userStreak >= 3,
+            session.userTotalWorkouts >= 5,
+            session.userLevel >= 5,
+            session.userStreak >= 7,
+            session.userLevel >= 10
+        )
+        val badgeCards = listOf(
+            binding.cardBadge0,
+            binding.cardBadge1,
+            binding.cardBadge2,
+            binding.cardBadge3,
+            binding.cardBadge4,
+            binding.cardBadge5
+        )
+        var unlockedCount = 0
+        badgeCards.forEachIndexed { idx, card ->
+            val unlocked = unlockedStates[idx]
+            if (unlocked) unlockedCount++
+            card.alpha = if (unlocked) 1.0f else 0.42f
+        }
+        binding.tvBadgesSectionHeader.text = "HUY HIỆU DANH DỰ ($unlockedCount/${badgeCards.size} ĐÃ MỞ)"
     }
 }

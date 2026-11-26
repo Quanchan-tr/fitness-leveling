@@ -39,6 +39,7 @@ interface WardrobeModalProps {
   isOpen: boolean;
   onClose: () => void;
   userLevel?: number;
+  userStreak?: number;
   userStats?: { str: number; end: number; mob: number };
 }
 
@@ -94,7 +95,8 @@ const RARITY_COLORS: Record<ItemRarity, { border: string; bg: string; text: stri
 export const WardrobeModal: React.FC<WardrobeModalProps> = ({
   isOpen,
   onClose,
-  userLevel = 50,
+  userLevel = 1,
+  userStreak = 0,
 }) => {
   const {
     characterGender,
@@ -157,7 +159,7 @@ export const WardrobeModal: React.FC<WardrobeModalProps> = ({
             </div>
             <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 flex items-center gap-1 ml-2">
               <Sparkles className="w-3 h-3 text-emerald-600" />
-              LV. {userLevel} (Mở Khóa Toàn Bộ)
+              LV. {userLevel}
             </span>
           </div>
 
@@ -340,7 +342,7 @@ export const WardrobeModal: React.FC<WardrobeModalProps> = ({
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {slotItems.map((item) => {
-                  const unlocked = isItemUnlocked(item, userLevel);
+                  const unlocked = isItemUnlocked(item, userLevel, userStreak);
                   const isEquippedInPreview = activePreviewItem?.id === item.id;
                   const rarity = RARITY_COLORS[item.rarity];
 
