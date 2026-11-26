@@ -5,466 +5,182 @@
     android:id="@+id/root_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/modal_overlay"
-    android:clickable="true"
-    android:focusable="true"
+    android:background="@color/bg_screen_gray"
     tools:context=".ui.modal.ExercisePickerModalActivity">
 
-    <!-- Modal Card (Dark Theme) -->
+    <!-- Top Header Bar -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/card_modal"
+        android:id="@+id/layout_header"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/bg_modal_card_dark"
-        android:padding="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/bg_top_header_bar"
+        android:paddingStart="16dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="14dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
-        <!-- Top Bar -->
-        <TextView
-            android:id="@+id/tv_picker_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:text="@string/modal_picker_title"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/btn_close_picker"
-            app:layout_constraintEnd_toStartOf="@+id/btn_close_picker"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
             android:id="@+id/btn_close_picker"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:background="@drawable/bg_modal_circle_close_dark"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
+            android:contentDescription="@string/cd_back_button"
             android:focusable="true"
             android:padding="6dp"
-            android:contentDescription="@string/cd_close"
-            app:srcCompat="@drawable/ic_close"
-            app:tint="@color/modal_dark_text_muted"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Search Box -->
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layout_search_box"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/bg_modal_picker_item"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_close_picker">
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_back"
+            app:tint="@color/text_dark" />
 
-            <EditText
-                android:id="@+id/et_search_exercise"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:background="@null"
-                android:hint="@string/modal_picker_search_hint"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:textColor="@color/white"
-                android:textColorHint="@color/modal_dark_text_muted"
-                android:textSize="13sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <!-- Filter Chips (Horizontal Scroll) -->
-        <HorizontalScrollView
-            android:id="@+id/scroll_filter_chips"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/tv_picker_title"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:overScrollMode="never"
-            android:scrollbars="none"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layout_search_box">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/chip_all"
-                    android:layout_width="wrap_content"
-                    android:layout_height="28dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_primary_button"
-                    android:gravity="center"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:text="@string/modal_picker_chip_all"
-                    android:textColor="@color/white"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/chip_chest"
-                    android:layout_width="wrap_content"
-                    android:layout_height="28dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_modal_picker_item"
-                    android:gravity="center"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:text="@string/modal_picker_chip_chest"
-                    android:textColor="@color/modal_dark_text_muted"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/chip_back"
-                    android:layout_width="wrap_content"
-                    android:layout_height="28dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_modal_picker_item"
-                    android:gravity="center"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:text="@string/modal_picker_chip_back"
-                    android:textColor="@color/modal_dark_text_muted"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/chip_legs"
-                    android:layout_width="wrap_content"
-                    android:layout_height="28dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_modal_picker_item"
-                    android:gravity="center"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:text="@string/modal_picker_chip_legs"
-                    android:textColor="@color/modal_dark_text_muted"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/chip_shoulders"
-                    android:layout_width="wrap_content"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_modal_picker_item"
-                    android:gravity="center"
-                    android:paddingStart="14dp"
-                    android:paddingEnd="14dp"
-                    android:text="@string/modal_picker_chip_shoulders"
-                    android:textColor="@color/modal_dark_text_muted"
-                    android:textSize="12sp" />
-            </LinearLayout>
-        </HorizontalScrollView>
-
-        <!-- Exercises List Container -->
-        <LinearLayout
-            android:id="@+id/layout_exercise_list"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/scroll_filter_chips">
-
-            <!-- Item 1 (Bench Press) -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_exercise_1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/bg_modal_picker_item"
-                android:paddingStart="12dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="10dp">
-
-                <ImageView
-                    android:id="@+id/tv_icon_ex1"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@drawable/bg_icon_container_white"
-                    android:padding="6dp"
-                    android:contentDescription="@string/modal_picker_ex1_name"
-                    app:srcCompat="@drawable/ic_dumbbell_solid"
-                    app:tint="@color/primary"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_name_ex1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="8dp"
-                    android:text="@string/modal_picker_ex1_name"
-                    android:textColor="@color/white"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_select_ex1"
-                    app:layout_constraintStart_toEndOf="@+id/tv_icon_ex1"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_desc_ex1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="2dp"
-                    android:text="@string/modal_picker_ex1_desc"
-                    android:textColor="@color/primary"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@+id/tv_icon_ex1"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_name_ex1" />
-
-                <ImageView
-                    android:id="@+id/btn_select_ex1"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_modal_circle_primary"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:padding="6dp"
-                    android:contentDescription="@string/cd_select_exercise"
-                    app:srcCompat="@drawable/ic_plus_solid"
-                    app:tint="@color/white"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <!-- Item 2 (Incline Press) -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_exercise_2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/bg_modal_picker_item"
-                android:paddingStart="12dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="10dp">
-
-                <ImageView
-                    android:id="@+id/tv_icon_ex2"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@drawable/bg_icon_container_white"
-                    android:padding="6dp"
-                    android:contentDescription="@string/modal_picker_ex2_name"
-                    app:srcCompat="@drawable/ic_dumbbell_solid"
-                    app:tint="@color/primary"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_name_ex2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="8dp"
-                    android:text="@string/modal_picker_ex2_name"
-                    android:textColor="@color/white"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_select_ex2"
-                    app:layout_constraintStart_toEndOf="@+id/tv_icon_ex2"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_desc_ex2"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="2dp"
-                    android:text="@string/modal_picker_ex2_desc"
-                    android:textColor="@color/primary"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@+id/tv_icon_ex2"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_name_ex2" />
-
-                <ImageView
-                    android:id="@+id/btn_select_ex2"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_modal_circle_primary"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:padding="6dp"
-                    android:contentDescription="@string/cd_select_exercise"
-                    app:srcCompat="@drawable/ic_plus_solid"
-                    app:tint="@color/white"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <!-- Item 3 (Bent-Over Row) -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_exercise_3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/bg_modal_picker_item"
-                android:paddingStart="12dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="10dp">
-
-                <ImageView
-                    android:id="@+id/tv_icon_ex3"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@drawable/bg_icon_container_white"
-                    android:padding="6dp"
-                    android:contentDescription="@string/modal_picker_ex3_name"
-                    app:srcCompat="@drawable/ic_bolt_solid"
-                    app:tint="@color/primary"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_name_ex3"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="8dp"
-                    android:text="@string/modal_picker_ex3_name"
-                    android:textColor="@color/white"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_select_ex3"
-                    app:layout_constraintStart_toEndOf="@+id/tv_icon_ex3"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_desc_ex3"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="2dp"
-                    android:text="@string/modal_picker_ex3_desc"
-                    android:textColor="@color/primary"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@+id/tv_icon_ex3"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_name_ex3" />
-
-                <ImageView
-                    android:id="@+id/btn_select_ex3"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_modal_circle_primary"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:padding="6dp"
-                    android:contentDescription="@string/cd_select_exercise"
-                    app:srcCompat="@drawable/ic_plus_solid"
-                    app:tint="@color/white"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <!-- Item 4 (Barbell Squat) -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/item_exercise_4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/bg_modal_picker_item"
-                android:paddingStart="12dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="10dp">
-
-                <ImageView
-                    android:id="@+id/tv_icon_ex4"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@drawable/bg_icon_container_white"
-                    android:padding="6dp"
-                    android:contentDescription="@string/modal_picker_ex4_name"
-                    app:srcCompat="@drawable/ic_leg_solid"
-                    app:tint="@color/primary"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_name_ex4"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="8dp"
-                    android:text="@string/modal_picker_ex4_name"
-                    android:textColor="@color/white"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_select_ex4"
-                    app:layout_constraintStart_toEndOf="@+id/tv_icon_ex4"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/tv_desc_ex4"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="2dp"
-                    android:text="@string/modal_picker_ex4_desc"
-                    android:textColor="@color/primary"
-                    android:textSize="11sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toEndOf="@+id/tv_icon_ex4"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_name_ex4" />
-
-                <ImageView
-                    android:id="@+id/btn_select_ex4"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:background="@drawable/bg_modal_circle_primary"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:padding="6dp"
-                    android:contentDescription="@string/cd_select_exercise"
-                    app:srcCompat="@drawable/ic_plus_solid"
-                    app:tint="@color/white"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </LinearLayout>
-
-        <!-- Button Add to Workout -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_add_to_workout"
-            style="@style/Widget.FitTrack.PrimaryButton"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:text="@string/modal_picker_btn_add"
-            android:textSize="15sp"
-            app:cornerRadius="12dp"
+            android:text="@string/modal_picker_title"
+            android:textColor="@color/text_dark"
+            android:textSize="17sp"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layout_exercise_list" />
-
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Search + 50/50 Equipment & Muscle Filter Bar -->
+    <LinearLayout
+        android:id="@+id/layout_filters_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="10dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_header">
+
+        <EditText
+            android:id="@+id/et_search_exercise"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_edit_text_default"
+            android:hint="@string/modal_picker_search_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:textColor="@color/text_dark"
+            android:textColorHint="@color/text_muted"
+            android:textSize="13sp" />
+
+        <!-- 50/50 Split Filter Buttons: Equipment & Muscle -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btn_filter_equipment"
+                android:layout_width="0dp"
+                android:layout_height="38dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_card_selectable"
+                android:clickable="true"
+                android:ellipsize="end"
+                android:focusable="true"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="🏋️ Dụng cụ: Tất cả ▾"
+                android:textColor="@color/text_dark"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btn_filter_muscle"
+                android:layout_width="0dp"
+                android:layout_height="38dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_card_selectable"
+                android:clickable="true"
+                android:ellipsize="end"
+                android:focusable="true"
+                android:gravity="center"
+                android:maxLines="1"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="💪 Nhóm cơ: Tất cả ▾"
+                android:textColor="@color/text_dark"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Exercise List Container (RecyclerView + Status) -->
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/layout_bottom_cta"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layout_filters_container">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_exercise_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp" />
+
+        <TextView
+            android:id="@+id/tv_picker_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="24dp"
+            android:text="Đang tải dữ liệu bài tập..."
+            android:textColor="@color/text_muted"
+            android:textSize="13.5sp"
+            android:visibility="visible" />
+    </FrameLayout>
+
+    <!-- Bottom Sticky CTA -->
+    <LinearLayout
+        android:id="@+id/layout_bottom_cta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_bottom_nav_bar"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_add_to_workout"
+            style="@style/Widget.FitTrack.PrimaryButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="@string/modal_picker_btn_add"
+            android:textSize="15sp"
+            app:cornerRadius="12dp" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

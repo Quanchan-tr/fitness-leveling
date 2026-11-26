@@ -247,6 +247,80 @@ class SessionManager(context: Context) {
         }
     }
 
+    var isDarkMode: Boolean
+        get() = prefs.getBoolean("is_dark_mode", false)
+        set(value) = prefs.edit().putBoolean("is_dark_mode", value).apply()
+
+    // ── Routine Folders & Exercises Local Persistence ────────
+    private val gson = com.google.gson.Gson()
+
+    fun getFolders(): MutableList<com.fittrack.app.data.models.RoutineFolderLocal> {
+        val json = prefs.getString("routine_folders_json", null) ?: return mutableListOf()
+        return try {
+            val type = object : com.google.gson.reflect.TypeToken<MutableList<com.fittrack.app.data.models.RoutineFolderLocal>>() {}.type
+            gson.fromJson(json, type) ?: mutableListOf()
+        } catch (_: Exception) {
+            mutableListOf()
+        }
+    }
+
+    fun saveFolders(folders: List<com.fittrack.app.data.models.RoutineFolderLocal>) {
+        prefs.edit().putString("routine_folders_json", gson.toJson(folders)).apply()
+    }
+
+    fun getRoutineFolderId(routineId: String): String? {
+        if (routineId.isBlank()) return null
+        return prefs.getString("routine_folder_$routineId", null)
+    }
+
+    fun setRoutineFolderId(routineId: String, folderId: String?) {
+        if (routineId.isBlank()) return
+        val editor = prefs.edit()
+        if (folderId.isNullOrBlank()) editor.remove("routine_folder_$routineId")
+        else editor.putString("routine_folder_$routineId", folderId)
+        editor.apply()
+    }
+
+    fun getRoutineExercises(routineId: String): MutableList<com.fittrack.app.data.models.RoutineExerciseLocal> {
+        if (routineId.isBlank()) return mutableListOf()
+        val json = prefs.getString("routine_exercises_$routineId", null) ?: return mutableListOf()
+        return try {
+            val type = object : com.google.gson.reflect.TypeToken<MutableList<com.fittrack.app.data.models.RoutineExerciseLocal>>() {}.type
+            gson.fromJson(json, type) ?: mutableListOf()
+        } catch (_: Exception) {
+            mutableListOf()
+        }
+    }
+
+    fun saveRoutineExercises(routineId: String, exercises: List<com.fittrack.app.data.models.RoutineExerciseLocal>) {
+        if (routineId.isBlank()) return
+        prefs.edit().putString("routine_exercises_$routineId", gson.toJson(exercises)).apply()
+    }
+
+    fun getSavedCombos(): MutableList<com.fittrack.app.data.models.SavedComboLocal> {
+        val json = prefs.getString("saved_combos_json", null) ?: return mutableListOf()
+        return try {
+            val type = object : com.google.gson.reflect.TypeToken<MutableList<com.fittrack.app.data.models.SavedComboLocal>>() {}.type
+            gson.fromJson(json, type) ?: mutableListOf()
+        } catch (_: Exception) {
+            mutableListOf()
+        }
+    }
+
+    fun saveSavedCombos(combos: List<com.fittrack.app.data.models.SavedComboLocal>) {
+        prefs.edit().putString("saved_combos_json", gson.toJson(combos)).apply()
+    }
+
+    fun getHiddenMetricIds(): MutableSet<String> {
+        return prefs.getStringSet("hidden_metric_ids", emptySet())?.toMutableSet() ?: mutableSetOf()
+    }
+
+    fun hideMetricId(id: String) {
+        val next = getHiddenMetricIds()
+        next.add(id)
+        prefs.edit().putStringSet("hidden_metric_ids", next).apply()
+    }
+
     // Weekly routine schedule preferences (Day -> Routine title list)
     fun getScheduleForDay(dayKey: String): List<String> {
         val raw = prefs.getString("weekly_schedule_$dayKey", null) ?: when (dayKey) {
@@ -309,6 +383,7 @@ class SessionManager(context: Context) {
             .remove("daily_nutrition_date")
             .remove("is_workout_active")
             .remove("active_workout_name")
+            .remove("is_dark_mode")
         listOf("T2", "T3", "T4", "T5", "T6", "T7", "CN").forEach {
             editor.remove("weekly_schedule_$it")
         }

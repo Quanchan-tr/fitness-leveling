@@ -139,8 +139,33 @@ class ActiveWorkoutActivity : AppCompatActivity() {
 
         // Mark active workout session
         session.isWorkoutActive = true
+        val routineId = intent.getStringExtra("ROUTINE_ID").orEmpty()
         val routineTitle = intent.getStringExtra("ROUTINE_TITLE") ?: "Buổi tập: Ngực & Tay sau"
         session.activeWorkoutName = routineTitle
+
+        // Load custom exercises from routine if saved in SessionManager
+        val savedRoutineExercises = if (routineId.isNotBlank()) session.getRoutineExercises(routineId) else emptyList()
+        if (savedRoutineExercises.isNotEmpty()) {
+            workoutExercises = savedRoutineExercises.map { ex ->
+                val sets = if (ex.sets.isNotEmpty()) {
+                    ex.sets.mapIndexed { idx, s -> ActiveWorkoutSet(idx + 1, s.weightKg, s.reps, false) }
+                } else {
+                    (1..ex.setsCount.coerceAtLeast(1)).map { idx ->
+                        ActiveWorkoutSet(idx, ex.weightKg, ex.reps, false)
+                    }
+                }
+                ActiveExerciseItem(
+                    name = ex.name,
+                    target = ex.targetMuscle,
+                    imageUrl = ex.gifUrl ?: "https://raw.githubusercontent.com/Quanchan-tr/fitness-leveling/dev/media/exercises/0025-EIeI8Vf.webp",
+                    steps = if (ex.instructions.isNotEmpty()) ex.instructions else listOf(
+                        "Thực hiện bài tập với tư thế chuẩn, giữ vững trọng tâm cơ thể.",
+                        "Hít thở đều đặn và kiểm soát chuyển động cơ bắp suốt hiệp tập."
+                    ),
+                    defaultSets = sets
+                )
+            }.toMutableList()
+        }
 
         // Check if single custom exercise is passed
         val customName = intent.getStringExtra("EXERCISE_NAME")

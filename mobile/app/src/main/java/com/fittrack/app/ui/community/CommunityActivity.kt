@@ -135,6 +135,10 @@ class CommunityActivity : AppCompatActivity() {
         if (!prefillShare.isNullOrBlank()) {
             binding.etCreatePost.setText(prefillShare)
         }
+        val highlightContent = intent.getStringExtra("HIGHLIGHT_POST_CONTENT")
+        if (!highlightContent.isNullOrBlank()) {
+            Toast.makeText(this, "Đang xem bài viết: ${highlightContent.take(40)}...", Toast.LENGTH_SHORT).show()
+        }
 
         // Toggle search bar on header icon click
         var isSearchExpanded = false

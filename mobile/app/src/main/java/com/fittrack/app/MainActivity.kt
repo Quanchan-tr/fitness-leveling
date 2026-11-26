@@ -14,8 +14,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Check if user is already authenticated
+        // Apply saved theme preference (defaults to Light Mode) before any navigation
         val session = SessionManager.getInstance(this)
+        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
+            if (session.isDarkMode) androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+            else androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+        )
+
+        // Check if user is already authenticated
         if (session.isLoggedIn) {
             val intent = Intent(this, DashboardActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -23,9 +29,6 @@ class MainActivity : AppCompatActivity() {
             finish()
             return
         }
-
-        // Enforce Light Mode on Login screen when not authenticated
-        androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

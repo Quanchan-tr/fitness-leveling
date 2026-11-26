@@ -40,6 +40,11 @@ class LogMetricsModalActivity : AppCompatActivity() {
         binding.etWeight.addTextChangedListener(bmiWatcher)
         binding.etHeight.addTextChangedListener(bmiWatcher)
 
+        val session = SessionManager.getInstance(this)
+        binding.etWeight.setText(session.userWeight.toString())
+        binding.etHeight.setText(session.userHeight.toInt().toString())
+        calculateBmi()
+
         binding.btnSaveMetrics.setOnClickListener {
             handleSaveMetrics()
         }

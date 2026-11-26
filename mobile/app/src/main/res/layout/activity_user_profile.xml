@@ -1012,9 +1012,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="Lướt xuống để tự động tải thêm các khoảnh khắc và kỷ lục"
+                    android:text="Chạm vào bài viết để xem chi tiết trong Cộng đồng"
                     android:textColor="@color/text_slate_light"
                     android:textSize="10.5sp" />
+
+                <!-- Dynamic User Posts Container -->
+                <LinearLayout
+                    android:id="@+id/ll_user_posts_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical" />
 
                 <!-- Post Item 1 -->
                 <LinearLayout
@@ -1312,6 +1320,21 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="12dp"
                     android:indeterminateTint="@color/primary"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/btn_load_more_posts"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_outline_button"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:text="Xem thêm bài viết"
+                    android:textColor="@color/primary"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold"
                     android:visibility="gone" />
 
             </LinearLayout>

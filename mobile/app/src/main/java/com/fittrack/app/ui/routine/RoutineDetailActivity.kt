@@ -18,9 +18,63 @@ class RoutineDetailActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val routineTitle = intent.getStringExtra("ROUTINE_TITLE")
+        val routineId = intent.getStringExtra("ROUTINE_ID").orEmpty()
+        val session = com.fittrack.app.data.session.SessionManager.getInstance(this)
         if (!routineTitle.isNullOrBlank()) {
             binding.tvRoutineName.text = routineTitle
             binding.tvTitle.text = routineTitle
+        }
+
+        val savedExercises = if (routineId.isNotBlank()) session.getRoutineExercises(routineId) else emptyList()
+        if (savedExercises.isNotEmpty()) {
+            binding.tvRoutineStats.text = "${savedExercises.size} bài tập • ${savedExercises.sumOf { it.setsCount }} hiệp"
+            binding.cardExercise1.visibility = android.view.View.GONE
+            binding.cardExercise2.visibility = android.view.View.GONE
+            binding.cardExercise3.visibility = android.view.View.GONE
+            binding.cardExercise4.visibility = android.view.View.GONE
+            binding.cardExercise5.visibility = android.view.View.GONE
+            binding.llDynamicExercises.visibility = android.view.View.VISIBLE
+            binding.llDynamicExercises.removeAllViews()
+
+            savedExercises.forEachIndexed { idx, ex ->
+                val card = android.widget.LinearLayout(this).apply {
+                    layoutParams = android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply { topMargin = if (idx == 0) 0 else 16 }
+                    background = androidx.core.content.ContextCompat.getDrawable(this@RoutineDetailActivity, com.fittrack.app.R.drawable.bg_card_white)
+                    orientation = android.widget.LinearLayout.VERTICAL
+                    setPadding(32, 28, 32, 28)
+                    isClickable = true
+                    isFocusable = true
+                }
+                val tvTitle = android.widget.TextView(this).apply {
+                    text = ex.name
+                    setTextColor(androidx.core.content.ContextCompat.getColor(this@RoutineDetailActivity, com.fittrack.app.R.color.text_dark))
+                    textSize = 14f
+                    typeface = android.graphics.Typeface.DEFAULT_BOLD
+                }
+                val tvSub = android.widget.TextView(this).apply {
+                    text = "${ex.setsCount} hiệp × ${ex.reps} reps • ${ex.weightKg.toInt()} kg  (${ex.targetMuscle})"
+                    setTextColor(androidx.core.content.ContextCompat.getColor(this@RoutineDetailActivity, com.fittrack.app.R.color.text_muted))
+                    textSize = 12f
+                }
+                card.addView(tvTitle)
+                card.addView(tvSub)
+                card.setOnClickListener {
+                    val dto = ExerciseDto(
+                        id = ex.exerciseId,
+                        name = ex.name,
+                        targetMuscle = ex.targetMuscle,
+                        equipment = ex.equipment,
+                        gifUrl = ex.gifUrl,
+                        thumbnailUrl = ex.gifUrl,
+                        description = ex.instructions.joinToString("\n")
+                    )
+                    ExerciseDetailBottomSheet.newInstance(dto, idx).show(supportFragmentManager, "ex_detail_$idx")
+                }
+                binding.llDynamicExercises.addView(card)
+            }
         }
 
         binding.btnBack.setOnClickListener {
@@ -78,6 +132,7 @@ class RoutineDetailActivity : AppCompatActivity() {
 
         val startWorkout = { startIndex: Int ->
             val intent = Intent(this, ActiveWorkoutActivity::class.java).apply {
+                putExtra("ROUTINE_ID", routineId)
                 putExtra("ROUTINE_TITLE", binding.tvRoutineName.text.toString())
                 putExtra("START_EXERCISE_INDEX", startIndex)
             }

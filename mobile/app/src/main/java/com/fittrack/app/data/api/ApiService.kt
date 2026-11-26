@@ -58,6 +58,7 @@ interface ApiService {
     suspend fun getExercises(
         @Query("per_page") perPage: Int = 100,
         @Query("category") category: String? = null,
+        @Query("equipment") equipment: String? = null,
         @Query("q") q: String? = null,
         @Query("search") search: String? = null
     ): Response<ApiResponse<List<ExerciseDto>>>
@@ -74,6 +75,12 @@ interface ApiService {
     @POST("routines")
     suspend fun createRoutine(
         @Header("Idempotency-Key") idempotencyKey: String,
+        @Body request: CreateRoutineRequest
+    ): Response<ApiResponse<WorkoutRoutineDto>>
+
+    @PUT("routines/{id}")
+    suspend fun updateRoutine(
+        @Path("id") id: String,
         @Body request: CreateRoutineRequest
     ): Response<ApiResponse<WorkoutRoutineDto>>
 
@@ -116,6 +123,11 @@ interface ApiService {
         @Header("Idempotency-Key") idempotencyKey: String,
         @Body request: CreateNutritionLogRequest
     ): Response<ApiResponse<NutritionLogDto>>
+
+    @DELETE("nutrition-logs/{id}")
+    suspend fun deleteNutritionLog(
+        @Path("id") id: String
+    ): Response<ApiResponse<Map<String, Any>>>
 
     // ── Body Metrics ────────────────────────────────────────────
     @GET("body-metrics")

@@ -722,6 +722,14 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <!-- Dynamic Folders & Routines Container -->
+            <LinearLayout
+                android:id="@+id/ll_routines_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical" />
+
             <!-- Card 1: Routine Push Day -->
             <LinearLayout
                 android:id="@+id/card_routine_push"

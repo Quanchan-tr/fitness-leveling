@@ -176,6 +176,15 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
+            <!-- Dynamic Exercises Container (when routine has custom exercises) -->
+            <LinearLayout
+                android:id="@+id/ll_dynamic_exercises"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="vertical"
+                android:visibility="gone" />
+
             <!-- Exercise 1 -->
             <LinearLayout
                 android:id="@+id/card_exercise_1"
