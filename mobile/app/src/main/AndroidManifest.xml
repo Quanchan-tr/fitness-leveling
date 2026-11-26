@@ -62,8 +62,7 @@
             android:theme="@style/Theme.FitTrack.Modal" />
         <activity
             android:name=".ui.modal.ExercisePickerModalActivity"
-            android:exported="false"
-            android:theme="@style/Theme.FitTrack.Modal" />
+            android:exported="false" />
         <activity
             android:name=".ui.modal.WorkoutSummaryModalActivity"
             android:exported="false"

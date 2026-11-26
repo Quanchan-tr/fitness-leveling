@@ -59,6 +59,7 @@ class WorkoutsActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         setupWeeklyScheduleCards()
+        renderFoldersAndRoutines()
         fetchRoutinesFromBackend()
     }
 
@@ -257,49 +258,192 @@ class WorkoutsActivity : AppCompatActivity() {
                     loadedRoutines.addAll(list)
 
                     if (list.isNotEmpty()) {
-                        binding.cardRoutinePush.visibility = View.VISIBLE
-                        binding.tvRoutinePushName.text = list[0].title
                         binding.tvScheduleTitle.text = "Lịch tập hôm nay: ${list[0].title}"
-
-                        if (list.size > 1) {
-                            binding.cardRoutinePull.visibility = View.VISIBLE
-                            binding.tvRoutinePullName.text = list[1].title
-                        } else {
-                            binding.cardRoutinePull.visibility = View.GONE
-                        }
                     }
+                    renderFoldersAndRoutines()
                 }
             } catch (_: Exception) {
-                // Keep current layouts on connection hiccup
+                renderFoldersAndRoutines()
             }
         }
     }
 
+    private fun renderFoldersAndRoutines() {
+        val container = binding.llRoutinesContainer
+        container.removeAllViews()
+
+        if (loadedRoutines.isEmpty()) {
+            binding.cardRoutinePush.visibility = View.VISIBLE
+            binding.cardRoutinePull.visibility = View.VISIBLE
+            return
+        }
+
+        binding.cardRoutinePush.visibility = View.GONE
+        binding.cardRoutinePull.visibility = View.GONE
+
+        loadedRoutines.forEach { routine ->
+            container.addView(buildRoutineCardView(routine, insideFolder = false))
+        }
+    }
+
+    private fun buildRoutineCardView(routine: WorkoutRoutineDto, insideFolder: Boolean): View {
+        val card = LinearLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                topMargin = 16
+            }
+            background = ContextCompat.getDrawable(
+                this@WorkoutsActivity,
+                if (insideFolder) R.drawable.bg_tag_chip else R.drawable.bg_card_white
+            )
+            orientation = LinearLayout.VERTICAL
+            setPadding(28, 24, 28, 24)
+            isClickable = true
+            isFocusable = true
+        }
+
+        val headerRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+        }
+
+        val tvName = android.widget.TextView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            text = routine.title
+            setTextColor(ContextCompat.getColor(this@WorkoutsActivity, R.color.text_dark))
+            textSize = 15f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+        }
+
+        val btnMore = android.widget.ImageView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(64, 64)
+            setPadding(12, 12, 12, 12)
+            setImageResource(R.drawable.ic_more_vert)
+            setColorFilter(ContextCompat.getColor(this@WorkoutsActivity, R.color.icon_tint))
+            setOnClickListener { anchor ->
+                showRoutineActionMenu(anchor, routine.title, card, routine.id)
+            }
+        }
+
+        headerRow.addView(tvName)
+        headerRow.addView(btnMore)
+        card.addView(headerRow)
+
+        val savedExercises = session.getRoutineExercises(routine.id)
+        val statsText = if (savedExercises.isNotEmpty()) {
+            val totalSets = savedExercises.sumOf { it.setsCount }
+            "${savedExercises.size} bài tập • $totalSets hiệp • ${routine.estimatedMinutes} phút"
+        } else {
+            routine.description?.takeIf { it.isNotBlank() } ?: "${routine.estimatedMinutes} phút"
+        }
+
+        val tvStats = android.widget.TextView(this).apply {
+            text = statsText
+            setTextColor(ContextCompat.getColor(this@WorkoutsActivity, R.color.text_slate))
+            textSize = 11.5f
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = 4 }
+        }
+        card.addView(tvStats)
+
+        if (savedExercises.isNotEmpty()) {
+            val previewBox = LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = 14 }
+                background = ContextCompat.getDrawable(this@WorkoutsActivity, R.drawable.bg_card_white)
+                orientation = LinearLayout.VERTICAL
+                setPadding(20, 14, 20, 14)
+            }
+            savedExercises.take(3).forEach { ex ->
+                val tvEx = android.widget.TextView(this).apply {
+                    text = "• ${ex.name} — ${ex.setsCount} sets × ${ex.reps} reps"
+                    setTextColor(ContextCompat.getColor(this@WorkoutsActivity, R.color.text_dark))
+                    textSize = 11f
+                    setPadding(0, 4, 0, 4)
+                }
+                previewBox.addView(tvEx)
+            }
+            if (savedExercises.size > 3) {
+                val tvMore = android.widget.TextView(this).apply {
+                    text = "+ ${savedExercises.size - 3} bài tập khác..."
+                    setTextColor(ContextCompat.getColor(this@WorkoutsActivity, R.color.text_slate))
+                    textSize = 10.5f
+                }
+                previewBox.addView(tvMore)
+            }
+            card.addView(previewBox)
+        }
+
+        val tvStart = android.widget.TextView(this).apply {
+            text = getString(R.string.workouts_view_routine_detail_action)
+            setTextColor(ContextCompat.getColor(this@WorkoutsActivity, R.color.primary))
+            textSize = 12f
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { topMargin = 16 }
+        }
+        card.addView(tvStart)
+
+        val openDetail = {
+            startActivity(Intent(this, RoutineDetailActivity::class.java).apply {
+                putExtra("ROUTINE_TITLE", routine.title)
+                putExtra("ROUTINE_ID", routine.id)
+            })
+        }
+        card.setOnClickListener { openDetail() }
+        tvStart.setOnClickListener { openDetail() }
+
+        return card
+    }
+
+    private fun showRenameFolderDialog(folderId: String, currentName: String) {
+        val input = android.widget.EditText(this).apply {
+            setText(currentName)
+            setPadding(40, 24, 40, 24)
+        }
+        AlertDialog.Builder(this)
+            .setTitle("Đổi tên thư mục")
+            .setView(input)
+            .setPositiveButton("Lưu") { _, _ ->
+                val newName = input.text.toString().trim()
+                if (newName.isNotBlank()) {
+                    val updated = session.getFolders().map {
+                        if (it.id == folderId) it.copy(name = newName) else it
+                    }
+                    session.saveFolders(updated)
+                    renderFoldersAndRoutines()
+                }
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
+    }
+
+    private fun showDeleteFolderDialog(folderId: String, folderName: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Xóa thư mục")
+            .setMessage("Xóa thư mục \"$folderName\"? Các giáo án bên trong sẽ được chuyển về mục Chưa phân loại.")
+            .setPositiveButton("Xóa") { _, _ ->
+                val updated = session.getFolders().filter { it.id != folderId }
+                session.saveFolders(updated)
+                loadedRoutines.filter { session.getRoutineFolderId(it.id) == folderId }
+                    .forEach { session.setRoutineFolderId(it.id, null) }
+                renderFoldersAndRoutines()
+            }
+            .setNegativeButton("Hủy", null)
+            .show()
+    }
+
     private fun setupInteractions() {
         binding.btnCreateRoutine.setOnClickListener {
-            androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Lịch tập & Thư mục")
-                .setItems(arrayOf("➕ Tạo lịch tập mới", "📁 Tạo thư mục mới")) { _, which ->
-                    if (which == 0) {
-                        startActivity(Intent(this, CreateRoutineActivity::class.java))
-                    } else {
-                        val input = android.widget.EditText(this).apply {
-                            hint = "Nhập tên thư mục (vd: Tăng cơ 8 tuần...)"
-                        }
-                        androidx.appcompat.app.AlertDialog.Builder(this)
-                            .setTitle("📁 Tạo thư mục lịch tập mới")
-                            .setView(input)
-                            .setPositiveButton("Tạo") { _, _ ->
-                                val name = input.text.toString().trim()
-                                if (name.isNotBlank()) {
-                                    android.widget.Toast.makeText(this, "✓ Đã tạo thư mục \"$name\" thành công!", android.widget.Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                            .setNegativeButton("Hủy", null)
-                            .show()
-                    }
-                }
-                .show()
+            startActivity(Intent(this, CreateRoutineActivity::class.java))
         }
 
         binding.cardRoutinePush.setOnClickListener {
@@ -436,14 +580,18 @@ class WorkoutsActivity : AppCompatActivity() {
                             when (which) {
                                 0 -> startActivity(Intent(this, RoutineDetailActivity::class.java))
                                 1 -> {
-                                    val candidateRoutines = arrayOf("Pull Day (Lưng & Tay Trước)", "Legs Day (Cơ đùi & Mông)", "Cardio & Bụng HIIT", "Full Body Circuit")
+                                    val secondCandidates = if (loadedRoutines.isNotEmpty()) {
+                                        loadedRoutines.map { it.title }.toTypedArray()
+                                    } else {
+                                        arrayOf("Pull Day (Lưng & Tay Trước)", "Legs Day (Cơ đùi & Mông)", "Cardio & Bụng HIIT", "Full Body Circuit")
+                                    }
                                     AlertDialog.Builder(this)
                                         .setTitle("Chọn buổi thứ 2 cho $dayName")
-                                        .setItems(candidateRoutines) { _, cWhich ->
-                                            currentRoutines.add(candidateRoutines[cWhich])
+                                        .setItems(secondCandidates) { _, cWhich ->
+                                            currentRoutines.add(secondCandidates[cWhich])
                                             session.setScheduleForDay(key, currentRoutines)
                                             refreshScheduleUi()
-                                            Toast.makeText(this, "✓ Đã thêm ${candidateRoutines[cWhich]} vào $dayName!", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(this, "✓ Đã thêm ${secondCandidates[cWhich]} vào $dayName!", Toast.LENGTH_SHORT).show()
                                         }
                                         .show()
                                 }
@@ -456,13 +604,17 @@ class WorkoutsActivity : AppCompatActivity() {
                         }
                         .show()
                 } else {
-                    val candidateRoutines = arrayOf("Push Day (Ngực & Tay Sau)", "Pull Day (Lưng & Tay Trước)", "Legs Day (Cơ đùi & Mông)", "Upper Body", "Cardio & Bụng HIIT")
+                    val emptyDayCandidates = if (loadedRoutines.isNotEmpty()) {
+                        loadedRoutines.map { it.title }.toTypedArray()
+                    } else {
+                        arrayOf("Push Day (Ngực & Tay Sau)", "Pull Day (Lưng & Tay Trước)", "Legs Day (Cơ đùi & Mông)", "Upper Body", "Cardio & Bụng HIIT")
+                    }
                     AlertDialog.Builder(this)
                         .setTitle("➕ Xếp lịch tập vào $dayName")
-                        .setItems(candidateRoutines) { _, which ->
-                            session.setScheduleForDay(key, listOf(candidateRoutines[which]))
+                        .setItems(emptyDayCandidates) { _, which ->
+                            session.setScheduleForDay(key, listOf(emptyDayCandidates[which]))
                             refreshScheduleUi()
-                            Toast.makeText(this, "✓ Đã xếp ${candidateRoutines[which]} vào $dayName!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "✓ Đã xếp ${emptyDayCandidates[which]} vào $dayName!", Toast.LENGTH_SHORT).show()
                         }
                         .show()
                 }
@@ -597,7 +749,10 @@ class WorkoutsActivity : AppCompatActivity() {
         popup.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 1 -> showAddToScheduleDialog(routineName)
-                2 -> startActivity(Intent(this, CreateRoutineActivity::class.java))
+                2 -> startActivity(Intent(this, CreateRoutineActivity::class.java).apply {
+                    putExtra("ROUTINE_ID", routineId.orEmpty())
+                    putExtra("ROUTINE_TITLE", routineName)
+                })
                 3 -> showDeleteConfirmDialog(routineName, cardView, routineId)
             }
             true
@@ -606,24 +761,34 @@ class WorkoutsActivity : AppCompatActivity() {
     }
 
     private fun showAddToScheduleDialog(routineName: String) {
+        val dayKeys = arrayOf("T2", "T3", "T4", "T5", "T6", "T7", "CN")
         val days = arrayOf("Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ Nhật")
         val checkedItems = booleanArrayOf(false, false, false, false, false, false, false)
-        val selectedDays = mutableListOf<String>()
+        val selectedIndices = mutableListOf<Int>()
 
         AlertDialog.Builder(this)
             .setTitle("Chọn ngày xếp vào lịch tập")
             .setMultiChoiceItems(days, checkedItems) { _, which, isChecked ->
                 if (isChecked) {
-                    selectedDays.add(days[which])
+                    if (!selectedIndices.contains(which)) selectedIndices.add(which)
                 } else {
-                    selectedDays.remove(days[which])
+                    selectedIndices.remove(which)
                 }
             }
             .setPositiveButton("Xếp vào lịch") { _, _ ->
-                if (selectedDays.isEmpty()) {
+                if (selectedIndices.isEmpty()) {
                     Toast.makeText(this, "Vui lòng chọn ít nhất một ngày tập", Toast.LENGTH_SHORT).show()
                 } else {
-                    val daysStr = selectedDays.joinToString(", ")
+                    selectedIndices.forEach { idx ->
+                        val key = dayKeys[idx]
+                        val current = session.getScheduleForDay(key).toMutableList()
+                        if (!current.contains(routineName)) {
+                            current.add(routineName)
+                            session.setScheduleForDay(key, current)
+                        }
+                    }
+                    setupWeeklyScheduleCards()
+                    val daysStr = selectedIndices.joinToString(", ") { days[it] }
                     Toast.makeText(this, "✓ Đã xếp \"$routineName\" vào $daysStr!", Toast.LENGTH_LONG).show()
                 }
             }
@@ -642,7 +807,8 @@ class WorkoutsActivity : AppCompatActivity() {
                             withContext(Dispatchers.IO) {
                                 ApiClient.getService(this@WorkoutsActivity).deleteRoutine(routineId)
                             }
-                            cardView.visibility = View.GONE
+                            loadedRoutines.removeAll { it.id == routineId }
+                            renderFoldersAndRoutines()
                             Toast.makeText(this@WorkoutsActivity, "✓ Đã xóa routine \"$routineName\" trên VPS", Toast.LENGTH_SHORT).show()
                         } catch (_: Exception) {
                             cardView.visibility = View.GONE

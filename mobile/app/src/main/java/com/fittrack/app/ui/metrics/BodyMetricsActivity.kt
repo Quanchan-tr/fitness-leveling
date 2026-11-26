@@ -36,6 +36,8 @@ class BodyMetricsActivity : AppCompatActivity() {
     private var currentProtein = 0
     private var currentCarb = 0
     private var currentFat = 0
+    private var isBodyFatChart = false
+    private var loadedMetricsList: List<com.fittrack.app.data.models.BodyMetricDto> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,8 +49,10 @@ class BodyMetricsActivity : AppCompatActivity() {
         session = SessionManager.getInstance(this)
 
         setupSubTabs()
+        setupMetricsActions()
         setupNutritionActions()
         setupCombos()
+        renderSavedCombos()
         initNutritionData()
         setupBottomNav()
 
@@ -76,29 +80,27 @@ class BodyMetricsActivity : AppCompatActivity() {
             try {
                 val res = withContext(Dispatchers.IO) { api.getBodyMetrics() }
                 if (res.isSuccessful && res.body()?.data?.isNotEmpty() == true) {
-                    val rawList = res.body()!!.data!!
-                    val latest = rawList.first()
-                    binding.tvMetricWeightVal.text = String.format(Locale.US, "%.1f kg", latest.weightKg)
+                    val hiddenIds = session.getHiddenMetricIds()
+                    val rawList = res.body()!!.data!!.filter { it.id !in hiddenIds }
+                    loadedMetricsList = rawList
+                    if (rawList.isNotEmpty()) {
+                        val latest = rawList.first()
+                        binding.tvMetricWeightVal.text = String.format(Locale.US, "%.1f kg", latest.weightKg)
 
-                    val heightM = (latest.heightCm?.takeIf { it > 50.0 } ?: 175.0) / 100.0
-                    val bmi = latest.weightKg / (heightM * heightM)
-                    binding.tvMetricBmiVal.text = String.format(Locale.US, "%.1f", bmi)
-                    binding.tvMetricBmiDesc.text = when {
-                        bmi < 18.5 -> "Gầy"
-                        bmi in 18.5..24.9 -> "Chuẩn"
-                        else -> "Thừa cân"
-                    }
+                        val heightM = (latest.heightCm?.takeIf { it > 50.0 } ?: 175.0) / 100.0
+                        val bmi = latest.weightKg / (heightM * heightM)
+                        binding.tvMetricBmiVal.text = String.format(Locale.US, "%.1f", bmi)
+                        binding.tvMetricBmiDesc.text = when {
+                            bmi < 18.5 -> "Gầy"
+                            bmi in 18.5..24.9 -> "Chuẩn"
+                            else -> "Thừa cân"
+                        }
 
-                    latest.bodyFatPct?.let { fat ->
-                        binding.tvMetricFatVal.text = String.format(Locale.US, "%.1f%%", fat)
+                        val displayFat = latest.bodyFatPct ?: estimateBodyFat(bmi)
+                        binding.tvMetricFatVal.text = String.format(Locale.US, "%.1f%%", displayFat)
+                        updateMetricsChart()
+                        renderMetricHistory()
                     }
-
-                    // Feed weight trend points into chart
-                    val chartPoints = rawList.reversed().map { item ->
-                        val dateLabel = item.logDate?.let { if (it.length >= 10) it.substring(5, 10) else it } ?: "Gần đây"
-                        Pair(dateLabel, item.weightKg.toFloat())
-                    }
-                    binding.chartWeightTrend.setData(chartPoints)
                 }
             } catch (_: Exception) {
                 // Giữ nguyên giao diện offline
@@ -107,33 +109,216 @@ class BodyMetricsActivity : AppCompatActivity() {
             // 2. Đồng bộ Nutrition Logs từ API
             try {
                 val nutRes = withContext(Dispatchers.IO) { api.getNutritionLogs() }
-                if (nutRes.isSuccessful && nutRes.body()?.data?.isNotEmpty() == true) {
-                    val logs = nutRes.body()!!.data!!
-                    val totalCalories = logs.sumOf { it.calories }
-                    val totalProtein = logs.sumOf { it.proteinGrams }
-                    val totalCarbs = logs.sumOf { it.carbsGrams }
-                    val totalFat = logs.sumOf { it.fatGrams }
-
-                    if (totalCalories > 0) {
-                        currentTotalCalories = totalCalories
-                        currentProtein = totalProtein.toInt()
-                        currentCarb = totalCarbs.toInt()
-                        currentFat = totalFat.toInt()
-
-                        binding.tvCalorieGoal.text = "$currentTotalCalories kcal"
-                        binding.tvProteinMacro.text = String.format(Locale.US, "Đạm: %dg / 160g", currentProtein)
-                        binding.pbProtein.progress = minOf(currentProtein, binding.pbProtein.max)
-
-                        binding.tvCarbMacro.text = String.format(Locale.US, "Carb: %dg / 240g", currentCarb)
-                        binding.pbCarb.progress = minOf(currentCarb, binding.pbCarb.max)
-
-                        binding.tvFatMacro.text = String.format(Locale.US, "Fat: %dg / 65g", currentFat)
-                        binding.pbFat.progress = minOf(currentFat, binding.pbFat.max)
-                    }
+                if (nutRes.isSuccessful && nutRes.body()?.data != null) {
+                    val allLogs = nutRes.body()!!.data!!
+                    val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(java.util.Date())
+                    val todayLogs = allLogs.filter { it.logDate.isNullOrBlank() || it.logDate.startsWith(todayStr) }
+                    renderNutritionLogsFromApi(todayLogs)
                 }
             } catch (_: Exception) {
                 // Giữ nguyên giao diện offline
             }
+        }
+    }
+
+    private fun estimateBodyFat(bmi: Double): Double {
+        val isMale = session.userGender.equals("male", ignoreCase = true)
+        val sexFactor = if (isMale) 1 else 0
+        return (1.20 * bmi + 0.23 * 22 - 10.8 * sexFactor - 5.4).coerceIn(5.0, 50.0)
+    }
+
+    private fun setupMetricsActions() {
+        binding.btnLogMetrics.setOnClickListener {
+            startActivity(Intent(this, LogMetricsModalActivity::class.java))
+        }
+
+        binding.btnToggleChartView.setOnClickListener {
+            isBodyFatChart = !isBodyFatChart
+            if (isBodyFatChart) {
+                binding.tvChartTitle.text = "Xu hướng % Mỡ cơ thể"
+                binding.btnToggleChartView.text = "🔄 Xem Cân nặng"
+            } else {
+                binding.tvChartTitle.text = getString(R.string.metric_trend_chart_title)
+                binding.btnToggleChartView.text = "🔄 Xem % Mỡ"
+            }
+            updateMetricsChart()
+        }
+    }
+
+    private fun updateMetricsChart() {
+        if (loadedMetricsList.isEmpty()) return
+        val chartPoints = loadedMetricsList.reversed().map { item ->
+            val dateLabel = item.logDate?.let { if (it.length >= 10) it.substring(5, 10) else it } ?: "Gần đây"
+            val value = if (isBodyFatChart) {
+                val hM = (item.heightCm?.takeIf { it > 50.0 } ?: 175.0) / 100.0
+                val bmi = item.weightKg / (hM * hM)
+                (item.bodyFatPct ?: estimateBodyFat(bmi)).toFloat()
+            } else {
+                item.weightKg.toFloat()
+            }
+            Pair(dateLabel, value)
+        }
+        binding.chartWeightTrend.setData(chartPoints)
+    }
+
+    private fun renderMetricHistory() {
+        val container = binding.llMetricHistoryContainer
+        container.removeAllViews()
+        if (loadedMetricsList.isEmpty()) {
+            binding.itemMetricHistory1.visibility = View.VISIBLE
+            binding.itemMetricHistory2.visibility = View.VISIBLE
+            return
+        }
+        binding.itemMetricHistory1.visibility = View.GONE
+        binding.itemMetricHistory2.visibility = View.GONE
+
+        loadedMetricsList.forEach { item ->
+            val hM = (item.heightCm?.takeIf { it > 50.0 } ?: 175.0) / 100.0
+            val bmi = item.weightKg / (hM * hM)
+            val fat = item.bodyFatPct ?: estimateBodyFat(bmi)
+            val dateText = item.logDate?.take(10) ?: "Hôm nay"
+
+            val row = LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = 12 }
+                background = ContextCompat.getDrawable(this@BodyMetricsActivity, R.drawable.bg_tag_chip)
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setPadding(24, 18, 24, 18)
+            }
+
+            val infoCol = LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                orientation = LinearLayout.VERTICAL
+            }
+
+            val tvDate = TextView(this).apply {
+                text = "📅 $dateText"
+                setTextColor(ContextCompat.getColor(this@BodyMetricsActivity, R.color.text_dark))
+                textSize = 12f
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
+            }
+
+            val tvVal = TextView(this).apply {
+                text = String.format(Locale.US, "%.1f kg  •  BMI %.1f  •  %.1f%% mỡ", item.weightKg, bmi, fat)
+                setTextColor(ContextCompat.getColor(this@BodyMetricsActivity, R.color.text_slate))
+                textSize = 11.5f
+            }
+
+            infoCol.addView(tvDate)
+            infoCol.addView(tvVal)
+
+            val btnDel = TextView(this).apply {
+                text = "🗑️"
+                textSize = 15f
+                setPadding(16, 8, 8, 8)
+                setOnClickListener {
+                    AlertDialog.Builder(this@BodyMetricsActivity)
+                        .setTitle("Ẩn bản ghi $dateText?")
+                        .setMessage("Xóa bản ghi ${item.weightKg} kg khỏi lịch sử trên thiết bị?")
+                        .setPositiveButton("Xóa") { _, _ ->
+                            session.hideMetricId(item.id)
+                            loadedMetricsList = loadedMetricsList.filter { it.id != item.id }
+                            updateMetricsChart()
+                            renderMetricHistory()
+                        }
+                        .setNegativeButton("Hủy", null)
+                        .show()
+                }
+            }
+
+            row.addView(infoCol)
+            row.addView(btnDel)
+            container.addView(row)
+        }
+    }
+
+    private fun renderNutritionLogsFromApi(logs: List<com.fittrack.app.data.models.NutritionLogDto>) {
+        currentTotalCalories = logs.sumOf { it.calories }
+        currentProtein = logs.sumOf { it.proteinGrams }.toInt()
+        currentCarb = logs.sumOf { it.carbsGrams }.toInt()
+        currentFat = logs.sumOf { it.fatGrams }.toInt()
+        updateNutritionDisplay()
+
+        val containers = listOf(
+            binding.llContainerBreakfast,
+            binding.llContainerLunch,
+            binding.llContainerDinner,
+            binding.llContainerSnack
+        )
+        containers.forEach { it.removeAllViews() }
+
+        if (logs.isEmpty()) {
+            binding.itemMealBreakfast1.visibility = View.GONE
+            binding.itemMealLunch1.visibility = View.GONE
+            binding.itemMealDinner1.visibility = View.GONE
+            return
+        }
+
+        logs.forEach { log ->
+            val targetContainer = when (log.mealType.lowercase(Locale.US)) {
+                "breakfast" -> binding.llContainerBreakfast
+                "lunch" -> binding.llContainerLunch
+                "dinner" -> binding.llContainerDinner
+                else -> binding.llContainerSnack
+            }
+
+            val row = LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = 10 }
+                background = ContextCompat.getDrawable(this@BodyMetricsActivity, R.drawable.bg_tag_chip)
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setPadding(24, 18, 24, 18)
+            }
+
+            val infoCol = LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                orientation = LinearLayout.VERTICAL
+            }
+
+            val tvName = TextView(this).apply {
+                text = log.foodName
+                setTextColor(ContextCompat.getColor(this@BodyMetricsActivity, R.color.text_dark))
+                textSize = 12.5f
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
+            }
+
+            val tvMacro = TextView(this).apply {
+                text = "${log.calories} kcal • ${log.proteinGrams.toInt()}g P • ${log.carbsGrams.toInt()}g C • ${log.fatGrams.toInt()}g F"
+                setTextColor(ContextCompat.getColor(this@BodyMetricsActivity, R.color.primary))
+                textSize = 11f
+            }
+
+            infoCol.addView(tvName)
+            infoCol.addView(tvMacro)
+
+            val btnDelete = TextView(this).apply {
+                text = "🗑️"
+                textSize = 15f
+                setPadding(16, 8, 8, 8)
+                setOnClickListener {
+                    lifecycleScope.launch {
+                        try {
+                            withContext(Dispatchers.IO) {
+                                ApiClient.getService(this@BodyMetricsActivity).deleteNutritionLog(log.id)
+                            }
+                            Toast.makeText(this@BodyMetricsActivity, "✓ Đã xóa ${log.foodName}", Toast.LENGTH_SHORT).show()
+                            fetchMetricsFromBackend()
+                        } catch (_: Exception) {
+                            Toast.makeText(this@BodyMetricsActivity, "Không thể xóa lúc này", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+
+            row.addView(infoCol)
+            row.addView(btnDelete)
+            targetContainer.addView(row)
         }
     }
 
@@ -150,6 +335,8 @@ class BodyMetricsActivity : AppCompatActivity() {
     private fun switchToTab(isNutrition: Boolean) {
         isNutritionTabActive = isNutrition
         if (isNutrition) {
+            binding.tvTitle.text = "Dinh dưỡng"
+            binding.btnLogMetrics.visibility = View.GONE
             binding.scrollBodyMetrics.visibility = View.GONE
             binding.scrollNutrition.visibility = View.VISIBLE
 
@@ -159,6 +346,8 @@ class BodyMetricsActivity : AppCompatActivity() {
             binding.tabBodyMetrics.background = ContextCompat.getDrawable(this, R.drawable.bg_subtab_pill_inactive)
             binding.tabBodyMetrics.setTextColor(ContextCompat.getColor(this, R.color.subtab_pill_inactive_text))
         } else {
+            binding.tvTitle.text = getString(R.string.metrics_title)
+            binding.btnLogMetrics.visibility = View.VISIBLE
             binding.scrollBodyMetrics.visibility = View.VISIBLE
             binding.scrollNutrition.visibility = View.GONE
 
@@ -392,70 +581,36 @@ class BodyMetricsActivity : AppCompatActivity() {
             currentFat += baseFat
             updateNutritionDisplay()
 
-            // Add dynamic card into corresponding container
-            val targetContainer = when (selectedMealType) {
-                "breakfast" -> binding.llContainerBreakfast
-                "dinner" -> binding.llContainerDinner
-                else -> binding.llContainerLunch
-            }
-
             val mealLabel = when (selectedMealType) {
                 "breakfast" -> "Bữa sáng"
                 "dinner" -> "Bữa tối"
                 else -> "Bữa trưa"
             }
 
-            val newMealView = LinearLayout(this).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { topMargin = 8 }
-                background = ContextCompat.getDrawable(this@BodyMetricsActivity, R.drawable.bg_tag_chip)
-                orientation = LinearLayout.HORIZONTAL
-                gravity = android.view.Gravity.CENTER_VERTICAL
-                setPadding(24, 20, 24, 20)
-                isClickable = true
-                isFocusable = true
+            if (session.isLoggedIn) {
+                val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(java.util.Date())
+                lifecycleScope.launch {
+                    try {
+                        withContext(Dispatchers.IO) {
+                            ApiClient.getService(this@BodyMetricsActivity).createNutritionLog(
+                                idempotencyKey = java.util.UUID.randomUUID().toString(),
+                                request = com.fittrack.app.data.models.CreateNutritionLogRequest(
+                                    logDate = todayStr,
+                                    mealType = selectedMealType,
+                                    foodName = name,
+                                    calories = baseCalories,
+                                    proteinGrams = baseProtein.toDouble(),
+                                    carbsGrams = baseCarb.toDouble(),
+                                    fatGrams = baseFat.toDouble()
+                                )
+                            )
+                        }
+                        fetchMetricsFromBackend()
+                    } catch (_: Exception) {
+                        // Offline fallback already updated local totals
+                    }
+                }
             }
-
-            val infoLayout = LinearLayout(this).apply {
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                orientation = LinearLayout.VERTICAL
-            }
-
-            val tvTitle = TextView(this).apply {
-                text = name
-                setTextColor(ContextCompat.getColor(this@BodyMetricsActivity, R.color.text_dark))
-                textSize = 12.5f
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
-            }
-
-            val tvDesc = TextView(this).apply {
-                text = "$baseCalories kcal • ${baseProtein}g Protein • ${baseCarb}g Carb"
-                setTextColor(ContextCompat.getColor(this@BodyMetricsActivity, R.color.text_slate))
-                textSize = 11f
-            }
-
-            infoLayout.addView(tvTitle)
-            infoLayout.addView(tvDesc)
-
-            val tvEditBadge = TextView(this).apply {
-                text = "Chỉnh ⚙️"
-                setTextColor(ContextCompat.getColor(this@BodyMetricsActivity, R.color.primary))
-                textSize = 10.5f
-                typeface = android.graphics.Typeface.DEFAULT_BOLD
-                background = ContextCompat.getDrawable(this@BodyMetricsActivity, R.drawable.bg_card_selectable)
-                setPadding(16, 8, 16, 8)
-            }
-
-            newMealView.addView(infoLayout)
-            newMealView.addView(tvEditBadge)
-
-            newMealView.setOnClickListener {
-                showMealPortionEditDialog(name, mealLabel, baseCalories, baseProtein, baseCarb, baseFat, tvTitle, tvDesc)
-            }
-
-            targetContainer.addView(newMealView)
 
             Toast.makeText(
                 this,
@@ -722,57 +877,95 @@ class BodyMetricsActivity : AppCompatActivity() {
                 f = etF.text.toString().toIntOrNull() ?: 12
             }
 
-            // Add new combo view to card_preset_combos
-            val newComboCard = LinearLayout(this).apply {
+            val savedCombos = session.getSavedCombos()
+            savedCombos.add(
+                0,
+                com.fittrack.app.data.models.SavedComboLocal(
+                    id = "combo-${System.currentTimeMillis()}",
+                    name = comboName,
+                    calories = cal,
+                    protein = p,
+                    carbs = c,
+                    fat = f,
+                    itemsText = itemsText
+                )
+            )
+            session.saveSavedCombos(savedCombos)
+            renderSavedCombos()
+
+            Toast.makeText(this, "✓ Đã lưu combo: $comboName!", Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    private fun renderSavedCombos() {
+        val container = binding.llSavedCombosContainer
+        container.removeAllViews()
+        val combos = session.getSavedCombos()
+        combos.forEach { combo ->
+            val card = LinearLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply { topMargin = 8 }
                 background = ContextCompat.getDrawable(this@BodyMetricsActivity, R.drawable.bg_tag_chip)
-                orientation = LinearLayout.VERTICAL
-                setPadding(24, 20, 24, 20)
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                setPadding(24, 18, 24, 18)
                 isClickable = true
                 isFocusable = true
             }
 
-            val tvCardTitle = TextView(this).apply {
-                text = "✨ $comboName ($cal kcal • ${p}g Protein)"
+            val infoCol = LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                orientation = LinearLayout.VERTICAL
+            }
+
+            val tvTitle = TextView(this).apply {
+                text = "✨ ${combo.name} (${combo.calories} kcal • ${combo.protein}g Protein)"
                 setTextColor(ContextCompat.getColor(this@BodyMetricsActivity, R.color.primary))
                 textSize = 12f
                 typeface = android.graphics.Typeface.DEFAULT_BOLD
             }
 
-            val tvCardDesc = TextView(this).apply {
-                text = itemsText
+            val tvDesc = TextView(this).apply {
+                text = combo.itemsText
                 setTextColor(ContextCompat.getColor(this@BodyMetricsActivity, R.color.text_dark))
                 textSize = 11f
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply { topMargin = 4 }
             }
 
-            newComboCard.addView(tvCardTitle)
-            newComboCard.addView(tvCardDesc)
+            infoCol.addView(tvTitle)
+            infoCol.addView(tvDesc)
 
-            newComboCard.setOnClickListener {
+            val btnDelete = TextView(this).apply {
+                text = "🗑️"
+                textSize = 15f
+                setPadding(16, 8, 8, 8)
+                setOnClickListener {
+                    val updated = session.getSavedCombos().filter { it.id != combo.id }
+                    session.saveSavedCombos(updated)
+                    renderSavedCombos()
+                    Toast.makeText(this@BodyMetricsActivity, "✓ Đã xóa combo ${combo.name}", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            card.setOnClickListener {
                 showComboDetailDialog(
-                    name = "✨ $comboName",
-                    baseCalories = cal,
-                    baseProtein = p,
-                    baseCarb = c,
-                    baseFat = f,
-                    items = listOf(itemsText)
+                    name = "✨ ${combo.name}",
+                    baseCalories = combo.calories,
+                    baseProtein = combo.protein,
+                    baseCarb = combo.carbs,
+                    baseFat = combo.fat,
+                    items = listOf(combo.itemsText)
                 )
             }
 
-            binding.cardPresetCombos.addView(newComboCard)
-
-            Toast.makeText(this, "✓ Đã tạo thành công combo: $comboName!", Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
+            card.addView(infoCol)
+            card.addView(btnDelete)
+            container.addView(card)
         }
-
-        dialog.show()
     }
 
     private fun setupBottomNav() {

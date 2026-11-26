@@ -31,6 +31,8 @@ class DashboardActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDashboardBinding
     private lateinit var session: SessionManager
+    private var todayRoutineId: String = ""
+    private var todayRoutineTitle: String = ""
 
     private val wardrobeLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -154,6 +156,8 @@ class DashboardActivity : AppCompatActivity() {
                 val routinesRes = withContext(Dispatchers.IO) { apiService.getRoutines() }
                 if (routinesRes.isSuccessful && routinesRes.body()?.data?.isNotEmpty() == true) {
                     val firstRoutine = routinesRes.body()!!.data!!.first()
+                    todayRoutineId = firstRoutine.id
+                    todayRoutineTitle = firstRoutine.title
                     binding.tvWorkoutName.text = firstRoutine.title
                 }
             } catch (_: Exception) {
@@ -180,17 +184,18 @@ class DashboardActivity : AppCompatActivity() {
                 // Keep current 3D avatar state
             }
 
-            // 4. Fetch Nutrition Logs for Real Energy & Calo
+            // 4. Fetch Nutrition Logs for Real Energy & Calo (Today only)
             try {
                 val nutRes = withContext(Dispatchers.IO) { apiService.getNutritionLogs() }
                 if (nutRes.isSuccessful && nutRes.body()?.data != null) {
-                    val logs = nutRes.body()!!.data!!
-                    val totalCalories = logs.sumOf { it.calories }
-                    if (totalCalories > 0) {
-                        session.loggedCalories = totalCalories
-                        binding.tvEnergyVal.text = "$totalCalories kcal"
-                        binding.pbEnergy.progress = minOf(totalCalories, binding.pbEnergy.max)
+                    val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", Locale.US).format(java.util.Date())
+                    val logs = nutRes.body()!!.data!!.filter {
+                        it.logDate.isNullOrBlank() || it.logDate.startsWith(todayStr)
                     }
+                    val totalCalories = logs.sumOf { it.calories }
+                    session.loggedCalories = totalCalories
+                    binding.tvEnergyVal.text = "$totalCalories kcal"
+                    binding.pbEnergy.progress = minOf(totalCalories, binding.pbEnergy.max)
                 }
             } catch (_: Exception) {}
 
@@ -272,13 +277,16 @@ class DashboardActivity : AppCompatActivity() {
             wardrobeLauncher.launch(Intent(this, WardrobeModalActivity::class.java))
         }
 
-        binding.btnEnterWorkoutNow.setOnClickListener {
-            startActivity(Intent(this, RoutineDetailActivity::class.java))
+        val openTodayRoutine = {
+            startActivity(Intent(this, RoutineDetailActivity::class.java).apply {
+                if (todayRoutineId.isNotBlank()) putExtra("ROUTINE_ID", todayRoutineId)
+                if (todayRoutineTitle.isNotBlank()) putExtra("ROUTINE_TITLE", todayRoutineTitle)
+            })
         }
 
-        binding.cardTodayWorkout.setOnClickListener {
-            startActivity(Intent(this, RoutineDetailActivity::class.java))
-        }
+        binding.btnEnterWorkoutNow.setOnClickListener { openTodayRoutine() }
+
+        binding.cardTodayWorkout.setOnClickListener { openTodayRoutine() }
 
         binding.btnOpenDailyQuests.setOnClickListener {
             startActivity(Intent(this, DailyQuestsModalActivity::class.java))

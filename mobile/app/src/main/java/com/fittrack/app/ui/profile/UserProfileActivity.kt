@@ -34,9 +34,8 @@ class UserProfileActivity : AppCompatActivity() {
     private var volumeBars: List<Pair<String, Float>> = (1..12).map { Pair("T$it", 0f) }
     private var selectedChartMode = 0 // 0: Duration, 1: Reps, 2: Volume
 
-    private var isPost3Loaded = false
-    private var isPost4Loaded = false
-    private var isLoadingMore = false
+    private var userPosts: List<com.fittrack.app.data.models.CommunityPostDto> = emptyList()
+    private var visiblePostCount = 3
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,17 +49,19 @@ class UserProfileActivity : AppCompatActivity() {
         bindUserData()
         setupInteractions()
         setupChartTabs()
-        setupLazyFeedScrolling()
+        setupLoadMorePosts()
         setupBottomNav()
 
         fetchFreshProfile()
         fetchWorkoutStats()
+        fetchUserPosts()
     }
 
     override fun onResume() {
         super.onResume()
         bindUserData()
         fetchWorkoutStats()
+        fetchUserPosts()
     }
 
     private fun bindUserData() {
@@ -166,50 +167,140 @@ class UserProfileActivity : AppCompatActivity() {
         binding.btnBadgesLinkLv.setOnClickListener { openBadges() }
         binding.btnBadgesLinkStreak.setOnClickListener { openBadges() }
 
-        binding.userPostItem1.setOnClickListener {
-            Toast.makeText(this, "Bài viết: Kỷ lục Bench Press 100kg • 48 lượt thích", Toast.LENGTH_SHORT).show()
+        val openPostInCommunity = { postId: String? ->
+            startActivity(Intent(this, com.fittrack.app.ui.community.CommunityActivity::class.java).apply {
+                if (!postId.isNullOrBlank()) putExtra("HIGHLIGHT_POST_ID", postId)
+            })
         }
-        binding.userPostItem2.setOnClickListener {
-            Toast.makeText(this, "Bài viết: Meal Prep tuần này • 32 lượt thích", Toast.LENGTH_SHORT).show()
+
+        binding.userPostItem1.setOnClickListener { openPostInCommunity(null) }
+        binding.userPostItem2.setOnClickListener { openPostInCommunity(null) }
+        binding.userPostItem3.setOnClickListener { openPostInCommunity(null) }
+        binding.userPostItem4.setOnClickListener { openPostInCommunity(null) }
+    }
+
+    private fun setupLoadMorePosts() {
+        binding.btnLoadMorePosts.setOnClickListener {
+            visiblePostCount += 4
+            renderUserPosts()
         }
     }
 
-    private fun setupLazyFeedScrolling() {
-        binding.scrollProfile.setOnScrollChangeListener(
-            NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, _ ->
-                val childHeight = v.getChildAt(0).measuredHeight
-                val viewHeight = v.measuredHeight
-                val threshold = childHeight - viewHeight - 350
+    private fun fetchUserPosts() {
+        if (!session.isLoggedIn) return
 
-                if (scrollY >= threshold && !isLoadingMore) {
-                    if (!isPost3Loaded) {
-                        isLoadingMore = true
-                        binding.pbPostsLoading.visibility = View.VISIBLE
-                        lifecycleScope.launch {
-                            delay(450)
-                            binding.pbPostsLoading.visibility = View.GONE
-                            binding.userPostItem3.visibility = View.VISIBLE
-                            isPost3Loaded = true
-                            isLoadingMore = false
-                            binding.tvPostsCounter.text = "3 bài viết"
-                            Toast.makeText(this@UserProfileActivity, "✓ Đã tải thêm bài viết (Form Check Squat 140kg)", Toast.LENGTH_SHORT).show()
-                        }
-                    } else if (!isPost4Loaded) {
-                        isLoadingMore = true
-                        binding.pbPostsLoading.visibility = View.VISIBLE
-                        lifecycleScope.launch {
-                            delay(450)
-                            binding.pbPostsLoading.visibility = View.GONE
-                            binding.userPostItem4.visibility = View.VISIBLE
-                            isPost4Loaded = true
-                            isLoadingMore = false
-                            binding.tvPostsCounter.text = "4 bài viết (Đã tải hết)"
-                            Toast.makeText(this@UserProfileActivity, "✓ Đã tải thêm bài viết (Cột mốc 30 ngày Streak)", Toast.LENGTH_SHORT).show()
-                        }
+        lifecycleScope.launch {
+            try {
+                val res = withContext(Dispatchers.IO) {
+                    ApiClient.getService(this@UserProfileActivity).getCommunityPosts()
+                }
+                if (res.isSuccessful && res.body()?.data != null) {
+                    val allPosts = res.body()!!.data!!
+                    val myId = session.userId
+                    userPosts = if (!myId.isNullOrBlank()) {
+                        allPosts.filter { it.userId == myId }
+                    } else {
+                        allPosts
                     }
+                    renderUserPosts()
+                }
+            } catch (_: Exception) {
+                // Keep offline fallback
+            }
+        }
+    }
+
+    private fun renderUserPosts() {
+        binding.userPostItem1.visibility = View.GONE
+        binding.userPostItem2.visibility = View.GONE
+        binding.userPostItem3.visibility = View.GONE
+        binding.userPostItem4.visibility = View.GONE
+
+        val container = binding.llUserPostsContainer
+        container.removeAllViews()
+
+        binding.tvPostsCounter.text = "${userPosts.size} bài viết"
+
+        if (userPosts.isEmpty()) {
+            binding.btnLoadMorePosts.visibility = View.GONE
+            val tvEmpty = android.widget.TextView(this).apply {
+                text = "Bạn chưa đăng bài viết nào. Nhấn để sang Cộng đồng!"
+                setTextColor(ContextCompat.getColor(this@UserProfileActivity, R.color.text_slate))
+                textSize = 12f
+                setPadding(16, 24, 16, 24)
+                setOnClickListener {
+                    startActivity(Intent(this@UserProfileActivity, com.fittrack.app.ui.community.CommunityActivity::class.java))
                 }
             }
-        )
+            container.addView(tvEmpty)
+            return
+        }
+
+        val itemsToShow = userPosts.take(visiblePostCount)
+        itemsToShow.forEachIndexed { idx, post ->
+            val card = android.widget.LinearLayout(this).apply {
+                layoutParams = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = if (idx == 0) 0 else 16 }
+                background = ContextCompat.getDrawable(this@UserProfileActivity, R.drawable.bg_tag_chip)
+                orientation = android.widget.LinearLayout.VERTICAL
+                setPadding(24, 20, 24, 20)
+                isClickable = true
+                isFocusable = true
+            }
+
+            val dateText = post.createdAt?.take(10) ?: "Gần đây"
+            val tvDate = android.widget.TextView(this).apply {
+                text = "📅 $dateText"
+                setTextColor(ContextCompat.getColor(this@UserProfileActivity, R.color.text_slate))
+                textSize = 10.5f
+            }
+
+            val tvContent = android.widget.TextView(this).apply {
+                text = post.content
+                setTextColor(ContextCompat.getColor(this@UserProfileActivity, R.color.text_dark))
+                textSize = 12.5f
+                maxLines = 2
+                ellipsize = android.text.TextUtils.TruncateAt.END
+                layoutParams = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = 8 }
+            }
+
+            val tvStats = android.widget.TextView(this).apply {
+                text = "❤️ ${post.likesCount} lượt thích   •   💬 ${post.commentsCount} bình luận   •   Xem bài viết ›"
+                setTextColor(ContextCompat.getColor(this@UserProfileActivity, R.color.primary))
+                textSize = 11f
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
+                layoutParams = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = 10 }
+            }
+
+            card.addView(tvDate)
+            card.addView(tvContent)
+            card.addView(tvStats)
+
+            card.setOnClickListener {
+                startActivity(Intent(this@UserProfileActivity, com.fittrack.app.ui.community.CommunityActivity::class.java).apply {
+                    putExtra("HIGHLIGHT_POST_ID", post.id)
+                    putExtra("HIGHLIGHT_POST_CONTENT", post.content)
+                })
+            }
+
+            container.addView(card)
+        }
+
+        if (userPosts.size > visiblePostCount) {
+            val remaining = userPosts.size - visiblePostCount
+            binding.btnLoadMorePosts.visibility = View.VISIBLE
+            binding.btnLoadMorePosts.text = "Xem thêm bài viết ($remaining bài nữa)"
+        } else {
+            binding.btnLoadMorePosts.visibility = View.GONE
+        }
     }
 
     private fun setupChartTabs() {

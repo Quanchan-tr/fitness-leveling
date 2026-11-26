@@ -69,6 +69,33 @@ data class CreateRoutineRequest(
     @SerializedName("is_active") val isActive: Boolean = true
 )
 
+data class RoutineFolderLocal(
+    val id: String,
+    var name: String,
+    var isExpanded: Boolean = true
+)
+
+data class RoutineSetLocal(
+    var setNumber: Int,
+    var weightKg: Float = 20f,
+    var reps: Int = 10
+)
+
+data class RoutineExerciseLocal(
+    val exerciseId: String,
+    val name: String,
+    val targetMuscle: String = "Toàn thân",
+    val equipment: String = "Tự do",
+    val gifUrl: String? = null,
+    val instructions: List<String> = emptyList(),
+    var setsCount: Int = 3,
+    var reps: Int = 10,
+    var weightKg: Float = 20f,
+    var restSeconds: Int = 60,
+    var note: String = "",
+    var sets: MutableList<RoutineSetLocal> = mutableListOf()
+)
+
 data class CreateWorkoutLogRequest(
     @SerializedName("log_date") val logDate: String,
     @SerializedName("notes") val notes: String? = null
@@ -148,6 +175,16 @@ data class CreateBodyMetricRequest(
     @SerializedName("weight_kg") val weightKg: Double,
     @SerializedName("body_fat_pct") val bodyFatPct: Double? = null,
     @SerializedName("height_cm") val heightCm: Double? = null
+)
+
+data class SavedComboLocal(
+    val id: String,
+    val name: String,
+    val calories: Int,
+    val protein: Int,
+    val carbs: Int,
+    val fat: Int,
+    val itemsText: String
 )
 
 // ── AI Planner ──────────────────────────────────────────────

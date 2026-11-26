@@ -28,6 +28,10 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        com.fittrack.app.util.WindowInsetsHelper.applySystemInsets(
+            this, binding.root, binding.layoutHeader, binding.bottomNavigation.root
+        )
+
         session = SessionManager.getInstance(this)
 
         bindRealUserData()
@@ -80,12 +84,12 @@ class SettingsActivity : AppCompatActivity() {
             ).show()
         }
 
+        binding.switchDarkMode.isChecked = session.isDarkMode
         binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
+            session.isDarkMode = isChecked
+            AppCompatDelegate.setDefaultNightMode(
+                if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+            )
         }
 
         binding.rowLanguage.setOnClickListener {
